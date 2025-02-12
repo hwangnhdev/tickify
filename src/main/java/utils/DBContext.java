@@ -18,7 +18,7 @@ public class DBContext {
 
     public DBContext() {
         try {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=TEST_TICKETBOX;trustServerCertificate=true";
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=TICKETBOX;trustServerCertificate=true";
             String username = "sa";
             String password = "123456";
 
