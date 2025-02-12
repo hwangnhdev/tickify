@@ -1,5 +1,5 @@
 <%-- 
-    Document   : allevents
+    Document   : homeevents
     Created on : Feb 11, 2025, 2:57:33 PM
     Author     : thanh
 --%>
@@ -11,13 +11,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
         <!-- Bootstrap CSS -->
-        <link
+<!--        <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
             rel="stylesheet"
-            />
+            />-->
         <style>
             /* Large Event */
-            body {
+/*            body {
                 margin: 0;
                 font-family: Arial, sans-serif;
             }
@@ -29,30 +29,30 @@
                 justify-content: space-between;
                 align-items: center;
                 padding: 10px 20px;
-            }
+            }*/
 
-            .logo {
+            .logo-large_events {
                 font-size: 24px;
                 font-weight: bold;
             }
 
-            .logo span {
+            .logo-large_events span {
                 color: #ffdd00;
             }
 
-            .search-bar {
+            .search-bar-large_events {
                 display: flex;
                 align-items: center;
             }
 
-            .search-bar input {
+            .search-bar-large_events input {
                 padding: 8px 12px;
                 border: none;
                 border-radius: 4px;
                 margin-right: 10px;
             }
 
-            .search-bar button {
+            .search-bar-large_events button {
                 background-color: #ffdd00;
                 color: #00a651;
                 border: none;
@@ -62,7 +62,7 @@
                 margin-right: 10px;
             }
 
-            nav {
+            nav-large_events {
                 background-color: #333;
                 color: white;
                 display: flex;
@@ -70,13 +70,13 @@
                 padding: 10px 0;
             }
 
-            nav a {
+            nav-large_events a {
                 color: white;
                 text-decoration: none;
                 margin: 0 20px;
             }
 
-            .content-grid {
+            .content-grid-large_events {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
                 grid-gap: 5px;
@@ -84,7 +84,7 @@
                 margin: 0 40px;
             }
 
-            .carousel {
+            .carousel-large_events {
                 position: relative;
                 overflow: hidden;
                 width: 100%;
@@ -94,12 +94,12 @@
                 border-radius: 8px;
             }
 
-            .slides {
+            .slides-large_events {
                 display: flex;
                 transition: transform 0.5s ease-in-out;
             }
 
-            .event-card {
+            .event-card-large_events {
                 flex: 0 0 100%; /* Đảm bảo mỗi card chiếm toàn bộ carousel */
                 box-sizing: border-box;
                 padding: 0; /* Loại bỏ khoảng cách */
@@ -109,13 +109,13 @@
                 overflow: hidden;
             }
 
-            .event-card img {
+            .event-card-large_events img {
                 width: 100%;
                 height: 100%; /* Đặt ảnh luôn vừa khung */
                 object-fit: fill;
             }
 
-            .view-btn {
+            .view-btn-large_events {
                 position: absolute;
                 bottom: 10px;
                 left: 10px;
@@ -128,8 +128,8 @@
                 z-index: 10; /* Đảm bảo nút nằm trên ảnh */
             }
 
-            .prev,
-            .next {
+            .prev-large_events,
+            .next-large_events {
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
@@ -143,23 +143,23 @@
                 z-index: 10;
             }
 
-            .prev {
+            .prev-large_events {
                 left: 20px; /* Căn cố định vị trí nút trái */
             }
 
-            .next {
+            .next-large_events {
                 right: 20px; /* Căn cố định vị trí nút phải */
             }
 
-            .sidebar {
+            .sidebar-large_events {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 padding: 20px;
             }
 
-            .calendar,
-            .map {
+            .calendar-large_events,
+            .map-large_events {
                 background-color: #f5f5f5;
                 border-radius: 8px;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -466,66 +466,133 @@
             }
         </style>
     </head>
-    <body>
-        <jsp:include page="../../components/header.jsp"></jsp:include>
-        
-        <div class="content-grid">
-            <div class="carousel">
-                <div class="slides">
-                    <div class="event-card">
+    <body>        
+        <!--Large-Events-->
+        <div class="content-grid-large_events">
+            <div class="carousel-large_events">
+                <div class="slides-large_events">
+                    <div class="event-card-large_events">
                         <img
                             src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Feb%2F3d%2F05%2F7c43bc9234ec67b4f08651f6e892bad4.jpg&w=640&q=75"
                             alt="Event Image"
                             />
-                        <button class="view-btn">View details</button>
+                        <button class="view-btn-large_events">View details</button>
                     </div>
-                    <div class="event-card">
+                    <div class="event-card-large_events">
                         <img
                             src="https://i.ytimg.com/vi/TdDnx2fr5gg/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB92DiHoE9AXstayS9XIcghkC9wSw"
                             alt="Event Image"
                             />
-                        <button class="view-btn">View details</button>
+                        <button class="view-btn-large_events">View details</button>
                     </div>
-                    <div class="event-card">
+                    <div class="event-card-large_events">
                         <img
                             src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Fbc%2F39%2F97%2F0bcedd8331d17bee81b65261a29976c2.jpg&w=384&q=75"
                             alt="Event Image 3"
                             />
-                        <button class="view-btn">View details</button>
+                        <button class="view-btn-large_events">View details</button>
                     </div>
                 </div>
-                <button class="prev">❮</button>
-                <button class="next">❯</button>
+                <button class="prev-large_events">❮</button>
+                <button class="next-large_events">❯</button>
             </div>
 
-            <div class="carousel">
-                <div class="slides">
-                    <div class="event-card">
+            <div class="carousel-large_events">
+                <div class="slides-large_events">
+                    <div class="event-card-large_events">
                         <img
                             src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Fd0%2F00%2Fd7%2F0596146f09bc0a37f14f2d8b0aeb3d1b.jpeg&w=384&q=75"
                             alt="Event Image"
                             />
-                        <button class="view-btn">View details</button>
+                        <button class="view-btn-large_events">View details</button>
                     </div>
-                    <div class="event-card">
+                    <div class="event-card-large_events">
                         <img
                             src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2F51%2Fb4%2F2f%2F753fa09de83c3b675867be409387e713.jpg&w=384&q=75"
                             alt="Event Image"
                             />
-                        <button class="view-btn">View details</button>
+                        <button class="view-btn-large_events">View details</button>
                     </div>
-                    <div class="event-card">
+                    <div class="event-card-large_events">
                         <img
                             src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Ff7%2Fc2%2F1a%2Fd8b6343fa22566789a9be23530d0dc41.png&w=384&q=75"
                             alt="Event Image 3"
                             />
-                        <button class="view-btn">View details</button>
+                        <button class="view-btn-large_events">View details</button>
                     </div>
                 </div>
-                <button class="prev">❮</button>
-                <button class="next">❯</button>
+                <button class="prev-large_events">❮</button>
+                <button class="next-large_events">❯</button>
             </div>
         </div>
+        
+        <script>
+        // Lấy tất cả các carousel trong trang
+        const carousels = document.querySelectorAll(".carousel-large_events");
+
+        // Lặp qua từng carousel để thêm logic hoạt động
+        carousels.forEach((carousel, index) => {
+            const slides = carousel.querySelector(".slides-large_events");
+            const eventCards = carousel.querySelectorAll(".event-card-large_events");
+            const prevButton = carousel.querySelector(".prev-large_events");
+            const nextButton = carousel.querySelector(".next-large_events");
+
+            let currentIndex = 0;
+            const totalSlides = eventCards.length;
+
+            // Hàm cập nhật vị trí slide
+            function updateSlide(index) {
+                slides.style.transform = `translateX(-${index * 100}%)`;
+            }
+
+            // Hàm tự động chuyển slide
+            function autoSlide() {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlide(currentIndex);
+            }
+
+            // Xử lý sự kiện nút "Next"
+            nextButton.addEventListener("click", () => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlide(currentIndex);
+            });
+
+            // Xử lý sự kiện nút "Previous"
+            prevButton.addEventListener("click", () => {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateSlide(currentIndex);
+            });
+
+            // Tự động chuyển slide với thời gian riêng biệt cho từng carousel
+            let slideInterval = setInterval(autoSlide, 2000 + index * 1000); // Thời gian khác nhau cho mỗi carousel
+
+            // Dừng tự động chuyển khi rê chuột vào carousel
+            carousel.addEventListener("mouseenter", () => {
+                clearInterval(slideInterval);
+            });
+
+            // Tiếp tục tự động chuyển khi rê chuột ra ngoài
+            carousel.addEventListener("mouseleave", () => {
+                slideInterval = setInterval(autoSlide, 2000 + index * 1000);
+            });
+        });
+        // Đảm bảo nút luôn căn giữa hình ảnh
+        window.addEventListener("resize", () => {
+            const carousels = document.querySelectorAll(".carousel-large_events");
+            carousels.forEach((carousel) => {
+                const slides = carousel.querySelector(".slides-large_events");
+                const eventCard = carousel.querySelector(".event-card-large_events img");
+                const prevButton = carousel.querySelector(".prev-large_events");
+                const nextButton = carousel.querySelector(".next-large_events");
+
+                if (eventCard) {
+                    const cardHeight = eventCard.clientHeight; // Lấy chiều cao ảnh
+                    prevButton.style.top = `${cardHeight / 2}px`; // Căn giữa nút trái
+                    nextButton.style.top = `${cardHeight / 2}px`; // Căn giữa nút phải
+                }
+            });
+        });
+        </script>
 
         <!--Special-Events-->
         <h2 class="title-spec_event">Special Events</h2>
@@ -1152,74 +1219,5 @@
 
         <!-- Bootstrap JS for All Events-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
-        <jsp:include page="../../components/footer.jsp"></jsp:include>
-            <script>
-            // Lấy tất cả các carousel trong trang
-            const carousels = document.querySelectorAll(".carousel");
-
-            // Lặp qua từng carousel để thêm logic hoạt động
-            carousels.forEach((carousel, index) => {
-                const slides = carousel.querySelector(".slides");
-                const eventCards = carousel.querySelectorAll(".event-card");
-                const prevButton = carousel.querySelector(".prev");
-                const nextButton = carousel.querySelector(".next");
-
-                let currentIndex = 0;
-                const totalSlides = eventCards.length;
-
-                // Hàm cập nhật vị trí slide
-                function updateSlide(index) {
-                    slides.style.transform = `translateX(-${index * 100}%)`;
-                }
-
-                // Hàm tự động chuyển slide
-                function autoSlide() {
-                    currentIndex = (currentIndex + 1) % totalSlides;
-                    updateSlide(currentIndex);
-                }
-
-                // Xử lý sự kiện nút "Next"
-                nextButton.addEventListener("click", () => {
-                    currentIndex = (currentIndex + 1) % totalSlides;
-                    updateSlide(currentIndex);
-                });
-
-                // Xử lý sự kiện nút "Previous"
-                prevButton.addEventListener("click", () => {
-                    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-                    updateSlide(currentIndex);
-                });
-
-                // Tự động chuyển slide với thời gian riêng biệt cho từng carousel
-                let slideInterval = setInterval(autoSlide, 2000 + index * 1000); // Thời gian khác nhau cho mỗi carousel
-
-                // Dừng tự động chuyển khi rê chuột vào carousel
-                carousel.addEventListener("mouseenter", () => {
-                    clearInterval(slideInterval);
-                });
-
-                // Tiếp tục tự động chuyển khi rê chuột ra ngoài
-                carousel.addEventListener("mouseleave", () => {
-                    slideInterval = setInterval(autoSlide, 2000 + index * 1000);
-                });
-            });
-            // Đảm bảo nút luôn căn giữa hình ảnh
-            window.addEventListener("resize", () => {
-                const carousels = document.querySelectorAll(".carousel");
-                carousels.forEach((carousel) => {
-                    const slides = carousel.querySelector(".slides");
-                    const eventCard = carousel.querySelector(".event-card img");
-                    const prevButton = carousel.querySelector(".prev");
-                    const nextButton = carousel.querySelector(".next");
-
-                    if (eventCard) {
-                        const cardHeight = eventCard.clientHeight; // Lấy chiều cao ảnh
-                        prevButton.style.top = `${cardHeight / 2}px`; // Căn giữa nút trái
-                        nextButton.style.top = `${cardHeight / 2}px`; // Căn giữa nút phải
-                    }
-                });
-            });
-        </script>
     </body>
 </html>
