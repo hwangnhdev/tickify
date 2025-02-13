@@ -63,9 +63,14 @@ public class EventController extends HttpServlet {
         // Create an instance of EventDAO to interact with the database
         EventDAO eventDAO = new EventDAO();
 
+        // Get All Events
+        List<Events> listAllEvents = eventDAO.getAllEvents();
+        // Store the list of events in the request scope so it can be accessed in the JSP
+        request.setAttribute("listAllEvents", listAllEvents);
+
         // Get Events Created Nearly
         // Retrieve a list of all events from the database
-        List<Events> listEvents = eventDAO.getAllEvents();
+        List<Events> listEvents = eventDAO.getTop10LatestEvents();
         // Store the list of events in the request scope so it can be accessed in the JSP
         request.setAttribute("listEvents", listEvents);
 
@@ -85,7 +90,28 @@ public class EventController extends HttpServlet {
         // Set attributes for JSP
         request.setAttribute("carousel1", carousel1);
         request.setAttribute("carousel2", carousel2);
-        
+
+        // Get the requested page number, default to 1 if not provided
+        int page = 1;
+        int pageSize = 12;
+        if (request.getParameter("page") != null) {
+            try {
+                page = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException e) {
+                page = 1; // Fallback to page 1 in case of an invalid input
+            }
+        }
+
+        // Get total number of events and calculate total pages
+        int totalEvents = eventDAO.getTotalEvents();
+        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+
+        // Fetch paginated list of events
+        List<Events> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
+        request.setAttribute("paginatedEvents", paginatedEvents);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
     }

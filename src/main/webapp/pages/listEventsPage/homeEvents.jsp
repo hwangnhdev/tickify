@@ -21,58 +21,32 @@
     <body>        
         <!--Large-Events-->
         <div class="content-grid-large_events">
+            <!-- Carousel 1 -->
             <div class="carousel-large_events">
                 <div class="slides-large_events">
-                    <div class="event-card-large_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Feb%2F3d%2F05%2F7c43bc9234ec67b4f08651f6e892bad4.jpg&w=640&q=75"
-                            alt="Event Image 1"
-                            />
-                        <button class="view-btn-large_events">View details</button>
-                    </div>
-                    <div class="event-card-large_events">
-                        <img
-                            src="https://i.ytimg.com/vi/TdDnx2fr5gg/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB92DiHoE9AXstayS9XIcghkC9wSw"
-                            alt="Event Image 2"
-                            />
-                        <button class="view-btn-large_events">View details</button>
-                    </div>
-                    <div class="event-card-large_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Fbc%2F39%2F97%2F0bcedd8331d17bee81b65261a29976c2.jpg&w=384&q=75"
-                            alt="Event Image 3"
-                            />
-                        <button class="view-btn-large_events">View details</button>
-                    </div>
+                    <c:forEach var="event" items="${carousel1}">
+                        <div class="event-card-large_events">
+                            <img src="src" alt="${event.eventName}"/>
+                            <button class="view-btn-large_events">View details</button>
+                        </div>
+                    </c:forEach>
                 </div>
+                <!-- Carousel Navigation -->
                 <button class="prev-large_events">❮</button>
                 <button class="next-large_events">❯</button>
             </div>
 
+            <!-- Carousel 2 -->
             <div class="carousel-large_events">
                 <div class="slides-large_events">
-                    <div class="event-card-large_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Fd0%2F00%2Fd7%2F0596146f09bc0a37f14f2d8b0aeb3d1b.jpeg&w=384&q=75"
-                            alt="Event Image 1"
-                            />
-                        <button class="view-btn-large_events">View details</button>
-                    </div>
-                    <div class="event-card-large_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2F51%2Fb4%2F2f%2F753fa09de83c3b675867be409387e713.jpg&w=384&q=75"
-                            alt="Event Image 2"
-                            />
-                        <button class="view-btn-large_events">View details</button>
-                    </div>
-                    <div class="event-card-large_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Ff7%2Fc2%2F1a%2Fd8b6343fa22566789a9be23530d0dc41.png&w=384&q=75"
-                            alt="Event Image 3"
-                            />
-                        <button class="view-btn-large_events">View details</button>
-                    </div>
+                    <c:forEach var="event" items="${carousel2}">
+                        <div class="event-card-large_events">
+                            <img src="src" alt="${event.eventName}"/>
+                            <button class="view-btn-large_events">View details</button>
+                        </div>
+                    </c:forEach>
                 </div>
+                <!-- Carousel Navigation -->
                 <button class="prev-large_events">❮</button>
                 <button class="next-large_events">❯</button>
             </div>
@@ -81,7 +55,7 @@
         <script src="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.js"></script>
 
         <!--Special-Events-->
-        <h2 class="title-spec_event">Special Events</h2>
+        <h2 class="title-spec_event">New Events</h2>
         <div class="content-grid-spec_event" id="eventContainer-spec_event">
             <button class="prev-btn-spec_event">❮</button>
             <div class="event-cards-spec_event">
@@ -89,7 +63,7 @@
                     <c:when test="${not empty listEvents}">
                         <c:forEach var="event" items="${listEvents}">
                             <div class="event-card-spec_event">
-                                <img src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F1a%2Fd9%2F5e%2F0f23b6fa6b7c6693c3bc9fd76ada848c.jpg&w=384&q=75" alt="${event.eventName}" />
+                                <img src="" alt="${event.eventName}" />
                             </div>
                         </c:forEach>
                     </c:when>
@@ -518,152 +492,36 @@
         <div class="container py-4">
             <div class="row gy-4">
                 <!-- Event Cards -->
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://images.tkbcdn.com/2/608/332/ts/ds/d1/91/35/4b4ca883013ffa19ccd3ce6889e96d69.png"
-                            alt="Event Image"
-                            />
-                        <h4>9X GARDEN</h4>
-                        <p>From 439.000đ</p>
-                        <p>25 Jan, 2025</p>
+                <c:forEach var="event" items="${paginatedEvents}">
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="event-card-all_events">
+                            <img src="" alt="${event.eventName}" />
+                            <h4>${event.eventName}</h4>
+                        </div>
                     </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://images.tkbcdn.com/2/608/332/ts/ds/d4/e9/12/b9cdaf59b65d91e9977e882902eb9e3d.jpg"
-                            alt="Event Image"
-                            />
-                        <h4>Terrarium Workshop</h4>
-                        <p>From 500.000đ</p>
-                        <p>30 Jan, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://images.tkbcdn.com/2/608/332/ts/ds/d4/12/c6/0076baaaee9b8c4d13afc0b3aaeeedec.jpg"
-                            alt="Event Image"
-                            />
-                        <h4>Spring Celebration</h4>
-                        <p>From 300.000đ</p>
-                        <p>1 Feb, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://images.tkbcdn.com/2/608/332/ts/ds/d1/91/35/4b4ca883013ffa19ccd3ce6889e96d69.png"
-                            alt="Event Image"
-                            />
-                        <h4>Art & Music</h4>
-                        <p>From 250.000đ</p>
-                        <p>5 Feb, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F99%2F2d%2Fda%2F6bd5f943fb17da4ef4d3458ae3e400f8.jpg&w=384&q=75"
-                            alt="Event Image"
-                            />
-                        <h4>9X GARDEN</h4>
-                        <p>From 439.000đ</p>
-                        <p>25 Jan, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2Faf%2Fc4%2F05%2F9425feab8d0b777666bcb598cba719f3.jpg&w=384&q=75"
-                            alt="Event Image"
-                            />
-                        <h4>Terrarium Workshop</h4>
-                        <p>From 500.000đ</p>
-                        <p>30 Jan, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://images.tkbcdn.com/2/608/332/ts/ds/d4/12/c6/0076baaaee9b8c4d13afc0b3aaeeedec.jpg"
-                            alt="Event Image"
-                            />
-                        <h4>Spring Celebration</h4>
-                        <p>From 300.000đ</p>
-                        <p>1 Feb, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F99%2F2d%2Fda%2F6bd5f943fb17da4ef4d3458ae3e400f8.jpg&w=384&q=75"
-                            alt="Event Image"
-                            />
-                        <h4>Art & Music</h4>
-                        <p>From 250.000đ</p>
-                        <p>5 Feb, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2Faf%2Fc4%2F05%2F9425feab8d0b777666bcb598cba719f3.jpg&w=384&q=75"
-                            alt="Event Image"
-                            />
-                        <h4>9X GARDEN</h4>
-                        <p>From 439.000đ</p>
-                        <p>25 Jan, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://images.tkbcdn.com/2/608/332/ts/ds/d4/e9/12/b9cdaf59b65d91e9977e882902eb9e3d.jpg"
-                            alt="Event Image"
-                            />
-                        <h4>Terrarium Workshop</h4>
-                        <p>From 500.000đ</p>
-                        <p>30 Jan, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2Faf%2Fc4%2F05%2F9425feab8d0b777666bcb598cba719f3.jpg&w=384&q=75"
-                            alt="Event Image"
-                            />
-                        <h4>Spring Celebration</h4>
-                        <p>From 300.000đ</p>
-                        <p>1 Feb, 2025</p>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="event-card-all_events">
-                        <img
-                            src="https://images.tkbcdn.com/2/608/332/ts/ds/d1/91/35/4b4ca883013ffa19ccd3ce6889e96d69.png"
-                            alt="Event Image"
-                            />
-                        <h4>Art & Music</h4>
-                        <p>From 250.000đ</p>
-                        <p>5 Feb, 2025</p>
-                    </div>
-                </div>
+                </c:forEach>
             </div>
 
             <!-- Pagination -->
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item">
-                        <a class="page-link" href="#">&laquo; Previous</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next &raquo;</a>
-                    </li>
+                    <c:if test="${currentPage > 1}">
+                        <li class="page-item">
+                            <a class="page-link" href="?page=${currentPage - 1}">&laquo; Previous</a>
+                        </li>
+                    </c:if>
+
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" href="?page=${i}">${i}</a>
+                        </li>
+                    </c:forEach>
+
+                    <c:if test="${currentPage < totalPages}">
+                        <li class="page-item">
+                            <a class="page-link" href="?page=${currentPage + 1}">Next &raquo;</a>
+                        </li>
+                    </c:if>
                 </ul>
             </nav>
         </div>
