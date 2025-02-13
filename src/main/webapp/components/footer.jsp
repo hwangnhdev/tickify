@@ -1,7 +1,7 @@
 <%-- 
     Document   : footer
     Created on : Feb 11, 2025, 3:22:19 PM
-    Author     : thanh
+    Author     : Tang Thanh Vui - CE180901
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>

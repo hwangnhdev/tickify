@@ -17,8 +17,7 @@
         <jsp:include page="../../components/header.jsp"></jsp:include>
 
         <!--Home Events-->
-        <%--<jsp:include page="../listEventsPage/homeEvents.jsp"></jsp:include>--%>
-        <jsp:include page="/pages/listEventsPage/homeEvents.jsp"></jsp:include>
+        <jsp:include page="../listEventsPage/homeEvents.jsp"></jsp:include>
 
         <!--Footer-->
         <jsp:include page="../../components/footer.jsp"></jsp:include>

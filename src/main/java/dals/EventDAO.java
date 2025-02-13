@@ -18,7 +18,7 @@ import utils.DBContext;
  */
 public class EventDAO extends DBContext {
 
-    private static final String SQL_SELECT_ALL_EVENTS = "SELECT TOP 20 * \n"
+    private static final String SQL_SELECT_ALL_EVENTS = "SELECT TOP 10 * \n"
             + "FROM Events \n"
             + "ORDER BY created_at DESC";
 
@@ -50,12 +50,72 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
+    public List<Events> getTopEventsWithLimit() {
+        List<Events> listEvents = new ArrayList<>();
+        String sql = "SELECT TOP 10 e.event_id, e.event_name, "
+                + "COALESCE(SUM(od.quantity), 0) AS total_tickets "
+                + "FROM Events e "
+                + "JOIN TicketTypes tt ON e.event_id = tt.event_id "
+                + "LEFT JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id "
+                + "GROUP BY e.event_id, e.event_name "
+                + "ORDER BY total_tickets DESC";
+
+        try {
+            // Prepare SQL statement
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+
+            // Fetch event data
+            while (rs.next()) {
+                Events event = new Events(
+                        rs.getInt("event_id"),
+                        0,
+                        rs.getString("event_name"),
+                        "",
+                        "",
+                        "",
+                        "",
+                        null,
+                        null,
+                        null,
+                        null
+                );
+                listEvents.add(event);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
     public static void main(String[] args) {
-        EventDAO ld = new EventDAO();
-        List<Events> list = ld.getAllEvents();
-        for (Events event : list) {
-            System.out.println(event.getEventName());
-            System.out.println(event.getCategoryId());
+//        EventDAO ld = new EventDAO();
+//        List<Events> list = ld.getAllEvents();
+//        for (Events event : list) {
+//            System.out.println(event.getEventName());
+//            System.out.println(event.getCategoryId());
+//        }
+
+        // Create instance of EventDAO
+        EventDAO eventDAO = new EventDAO();
+
+        // Test fetching top 10 best-selling events
+        int limit = 10;
+        List<Events> events = eventDAO.getTopEventsWithLimit();
+
+        // Print results to check if the query works correctly
+        System.out.println("===== Top " + limit + " Best-Selling Events =====");
+        for (Events event : events) {
+            System.out.println("Event ID: " + event.getEventId()
+                    + " | Name: " + event.getEventName()
+            );
+        }
+
+        // Check if the result contains the correct number of events
+        if (events.size() == limit) {
+            System.out.println("Test Passed: Retrieved " + limit + " events successfully.");
+        } else {
+            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
         }
     }
 }

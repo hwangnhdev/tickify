@@ -9,6 +9,7 @@ package models;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class OrderDetails {
+
     private int orderDetailId;
     private int orderId;
     private int ticketTypeId;
@@ -25,5 +26,45 @@ public class OrderDetails {
         this.quantity = quantity;
         this.price = price;
     }
-    
+
+    public int getOrderDetailId() {
+        return orderDetailId;
+    }
+
+    public void setOrderDetailId(int orderDetailId) {
+        this.orderDetailId = orderDetailId;
+    }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
+    public int getTicketTypeId() {
+        return ticketTypeId;
+    }
+
+    public void setTicketTypeId(int ticketTypeId) {
+        this.ticketTypeId = ticketTypeId;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
 }

@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import models.Events;
 
@@ -62,12 +63,29 @@ public class EventController extends HttpServlet {
         // Create an instance of EventDAO to interact with the database
         EventDAO eventDAO = new EventDAO();
 
+        // Get Events Created Nearly
         // Retrieve a list of all events from the database
         List<Events> listEvents = eventDAO.getAllEvents();
-
         // Store the list of events in the request scope so it can be accessed in the JSP
         request.setAttribute("listEvents", listEvents);
 
+        // Get top 10 Event most popular
+        // Fetch top 10 best-selling events
+        List<Events> topEvents = eventDAO.getTopEventsWithLimit();
+        // Split into two lists, each containing 5 events
+        List<Events> carousel1 = new ArrayList<>();
+        List<Events> carousel2 = new ArrayList<>();
+        for (int i = 0; i < topEvents.size(); i++) {
+            if (i < 5) {
+                carousel1.add(topEvents.get(i));
+            } else {
+                carousel2.add(topEvents.get(i));
+            }
+        }
+        // Set attributes for JSP
+        request.setAttribute("carousel1", carousel1);
+        request.setAttribute("carousel2", carousel2);
+        
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
     }

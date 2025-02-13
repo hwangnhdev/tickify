@@ -33,19 +33,23 @@
                 align-items: center;
                 background: white;
                 padding: 5px 10px;
+                line-height: 10px;
                 border-radius: 20px;
             }
             .search-bar-header input {
                 border: none;
                 outline: none;
                 padding: 5px;
+                line-height: 10px;
                 width: 220px;
+                font-size: 14px;
             }
             .search-bar-header button {
                 cursor: pointer;
                 color: black;
                 background-color: white;
                 border: none;
+                font-size: 14px;
             }
             .user-actions-header {
                 display: flex;

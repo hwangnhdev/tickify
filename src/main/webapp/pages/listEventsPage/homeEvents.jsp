@@ -1,7 +1,7 @@
 <%-- 
     Document   : homeevents
     Created on : Feb 11, 2025, 2:57:33 PM
-    Author     : thanh
+    Author     : Tang Thanh Vui - CE180901
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -12,460 +12,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
         <!-- Bootstrap CSS -->
-        <!--        <link
-                    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
-                    rel="stylesheet"
-                    />-->
-        <style>
-            /* Large Event */
-            /*            body {
-                            margin: 0;
-                            font-family: Arial, sans-serif;
-                        }
-            
-                        header {
-                            background-color: #00a651;
-                            color: white;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 10px 20px;
-                        }*/
-
-            .logo-large_events {
-                font-size: 24px;
-                font-weight: bold;
-            }
-
-            .logo-large_events span {
-                color: #ffdd00;
-            }
-
-            .search-bar-large_events {
-                display: flex;
-                align-items: center;
-            }
-
-            .search-bar-large_events input {
-                padding: 8px 12px;
-                border: none;
-                border-radius: 4px;
-                margin-right: 10px;
-            }
-
-            .search-bar-large_events button {
-                background-color: #ffdd00;
-                color: #00a651;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 12px;
-                cursor: pointer;
-                margin-right: 10px;
-            }
-
-            nav-large_events {
-                background-color: #333;
-                color: white;
-                display: flex;
-                justify-content: center;
-                padding: 10px 0;
-            }
-
-            nav-large_events a {
-                color: white;
-                text-decoration: none;
-                margin: 0 20px;
-            }
-
-            .content-grid-large_events {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                grid-gap: 5px;
-                padding: 10px;
-                margin: 0 40px;
-            }
-
-            .carousel-large_events {
-                position: relative;
-                overflow: hidden;
-                width: 100%;
-                height: 300px; /* Kích thước cố định cho carousel */
-                display: flex;
-                justify-content: center; /* Đảm bảo cân bằng hai bên */
-                border-radius: 8px;
-            }
-
-            .slides-large_events {
-                display: flex;
-                transition: transform 0.5s ease-in-out;
-            }
-
-            .event-card-large_events {
-                flex: 0 0 100%; /* Đảm bảo mỗi card chiếm toàn bộ carousel */
-                box-sizing: border-box;
-                padding: 0; /* Loại bỏ khoảng cách */
-                position: relative;
-                background-color: #f5f5f5;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-
-            .event-card-large_events img {
-                width: 100%;
-                height: 100%; /* Đặt ảnh luôn vừa khung */
-                object-fit: fill;
-            }
-
-            .view-btn-large_events {
-                position: absolute;
-                bottom: 10px;
-                left: 10px;
-                background-color: #00a651;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 12px;
-                cursor: pointer;
-                z-index: 10; /* Đảm bảo nút nằm trên ảnh */
-            }
-
-            .prev-large_events,
-            .next-large_events {
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                background-color: rgba(0, 0, 0, 0.5);
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                cursor: pointer;
-                z-index: 10;
-            }
-
-            .prev-large_events {
-                left: 20px; /* Căn cố định vị trí nút trái */
-            }
-
-            .next-large_events {
-                right: 20px; /* Căn cố định vị trí nút phải */
-            }
-
-            .sidebar-large_events {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: 20px;
-            }
-
-            .calendar-large_events,
-            .map-large_events {
-                background-color: #f5f5f5;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                padding: 16px;
-                width: 100%;
-                max-width: 300px;
-                margin-bottom: 20px;
-            }
-
-            /*Special-Events*/
-            .title-spec_event {
-                text-align: center;
-            }
-
-            .content-grid-spec_event {
-                display: flex;
-                align-items: center;
-                overflow-x: hidden;
-                position: relative;
-                padding: 20px;
-                margin: 0 40px;
-            }
-
-            .event-cards-spec_event {
-                display: flex;
-                overflow-x: hidden;
-                scroll-behavior: smooth;
-                padding: 0;
-            }
-
-            .event-card-spec_event {
-                position: relative;
-                background-color: #f5f5f5;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                height: 300px;
-                min-width: 220px;
-                margin-right: 20px;
-            }
-
-            .event-card-spec_event img {
-                width: 100%;
-                height: 100%;
-                object-fit: fill;
-            }
-
-            .prev-btn-spec_event,
-            .next-btn-spec_event {
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                background-color: rgba(0, 0, 0, 0.5);
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 10;
-            }
-
-            .prev-btn-spec_event {
-                left: 10px;
-            }
-
-            .next-btn-spec_event {
-                right: 10px;
-            }
-
-            /*Trending-Events*/
-            .title-trend_events {
-                text-align: center;
-            }
-
-            .content-grid-trend_events {
-                display: flex;
-                align-items: center;
-                overflow-x: hidden;
-                position: relative;
-                padding: 20px;
-                margin: 0 40px;
-            }
-
-            .event-cards-trend_events {
-                display: flex;
-                overflow-x: hidden;
-                scroll-behavior: smooth;
-                padding: 0;
-            }
-
-            .event-card-trend_events {
-                position: relative;
-                background-color: #f5f5f5;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                height: 180px;
-                min-width: 300px;
-                margin-right: 20px;
-            }
-
-            .event-card-trend_events img {
-                width: 100%;
-                height: 100%;
-                object-fit: fill;
-            }
-
-            .prev-btn-trend_events,
-            .next-btn-trend_events {
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                background-color: rgba(0, 0, 0, 0.5);
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 10;
-            }
-
-            .prev-btn-trend_events {
-                left: 10px;
-            }
-
-            .next-btn-trend_events {
-                right: 10px;
-            }
-
-            /*Top-Picks-For-You*/
-            .title-top_events {
-                text-align: center;
-            }
-
-            .content-grid-top_events {
-                display: flex;
-                align-items: center;
-                overflow-x: hidden;
-                position: relative;
-                padding: 20px;
-                margin: 0 40px;
-            }
-
-            .event-cards-top_events {
-                display: flex;
-                overflow-x: hidden;
-                scroll-behavior: smooth;
-                padding: 0;
-            }
-
-            .event-card-top_events {
-                position: relative;
-                background-color: #f5f5f5;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                height: 300px;
-                min-width: 220px;
-                margin-right: 20px;
-            }
-
-            .event-card-top_events img {
-                width: 100%;
-                height: 100%;
-                object-fit: fill;
-            }
-
-            .prev-btn-top_events,
-            .next-btn-top_events {
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                background-color: rgba(0, 0, 0, 0.5);
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 10;
-            }
-
-            .prev-btn-top_events {
-                left: 10px;
-            }
-
-            .next-btn-top_events {
-                right: 10px;
-            }
-
-            /*Recommendation Events*/
-            .title-rec_events {
-                text-align: center;
-            }
-
-            .content-grid-rec_events {
-                display: flex;
-                align-items: center;
-                overflow-x: hidden;
-                position: relative;
-                padding: 20px;
-                margin: 0 40px;
-            }
-
-            .event-cards-rec_events {
-                display: flex;
-                overflow-x: hidden;
-                scroll-behavior: smooth;
-                padding: 0;
-            }
-
-            .event-card-rec_events {
-                position: relative;
-                background-color: #f5f5f5;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                height: 180px;
-                min-width: 300px;
-                margin-right: 20px;
-            }
-
-            .event-card-rec_events img {
-                width: 100%;
-                height: 100%;
-                object-fit: fill;
-            }
-
-            .prev-btn-rec_events,
-            .next-btn-rec_events {
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                background-color: rgba(0, 0, 0, 0.5);
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 10;
-            }
-
-            .prev-btn-rec_events {
-                left: 10px;
-            }
-
-            .next-btn-rec_events {
-                right: 10px;
-            }
-
-            /*All Events*/
-            .title-all_events {
-                text-align: center;
-                font-size: 24px;
-                font-weight: bold;
-            }
-            .event-card-all_events {
-                background-color: #ffffff;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                overflow: hidden;
-                text-align: center;
-                /* width: 320px; */
-                transition: transform 0.3s, box-shadow 0.3s;
-            }
-
-            .event-card-all_events:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            }
-
-            .event-card-all_events img {
-                width: 100%;
-                height: 150px;
-                object-fit: fill;
-                background-color: #f0f0f0;
-                display: block;
-                transition: filter 0.3s;
-            }
-
-            .event-card-all_events:hover img {
-                filter: brightness(1.1);
-            }
-            .event-card-all_events h4 {
-                font-size: 16px;
-                margin: 10px 0 5px;
-                color: #000000;
-            }
-            .event-card-all_events p {
-                font-size: 14px;
-                margin: 5px 0;
-                color: #000000;
-            }
-            .pagination a {
-                text-decoration: none;
-            }
-        </style>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            />
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.css"/>
     </head>
     <body>        
         <!--Large-Events-->
@@ -475,14 +26,14 @@
                     <div class="event-card-large_events">
                         <img
                             src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Feb%2F3d%2F05%2F7c43bc9234ec67b4f08651f6e892bad4.jpg&w=640&q=75"
-                            alt="Event Image"
+                            alt="Event Image 1"
                             />
                         <button class="view-btn-large_events">View details</button>
                     </div>
                     <div class="event-card-large_events">
                         <img
                             src="https://i.ytimg.com/vi/TdDnx2fr5gg/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB92DiHoE9AXstayS9XIcghkC9wSw"
-                            alt="Event Image"
+                            alt="Event Image 2"
                             />
                         <button class="view-btn-large_events">View details</button>
                     </div>
@@ -503,14 +54,14 @@
                     <div class="event-card-large_events">
                         <img
                             src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2Fd0%2F00%2Fd7%2F0596146f09bc0a37f14f2d8b0aeb3d1b.jpeg&w=384&q=75"
-                            alt="Event Image"
+                            alt="Event Image 1"
                             />
                         <button class="view-btn-large_events">View details</button>
                     </div>
                     <div class="event-card-large_events">
                         <img
                             src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F608%2F332%2Fts%2Fds%2F51%2Fb4%2F2f%2F753fa09de83c3b675867be409387e713.jpg&w=384&q=75"
-                            alt="Event Image"
+                            alt="Event Image 2"
                             />
                         <button class="view-btn-large_events">View details</button>
                     </div>
@@ -527,73 +78,7 @@
             </div>
         </div>
 
-        <script>
-            // Lấy tất cả các carousel trong trang
-            const carousels = document.querySelectorAll(".carousel-large_events");
-
-            // Lặp qua từng carousel để thêm logic hoạt động
-            carousels.forEach((carousel, index) => {
-                const slides = carousel.querySelector(".slides-large_events");
-                const eventCards = carousel.querySelectorAll(".event-card-large_events");
-                const prevButton = carousel.querySelector(".prev-large_events");
-                const nextButton = carousel.querySelector(".next-large_events");
-
-                let currentIndex = 0;
-                const totalSlides = eventCards.length;
-
-                // Hàm cập nhật vị trí slide
-                function updateSlide(index) {
-                    slides.style.transform = `translateX(-${index * 100}%)`;
-                }
-
-                // Hàm tự động chuyển slide
-                function autoSlide() {
-                    currentIndex = (currentIndex + 1) % totalSlides;
-                    updateSlide(currentIndex);
-                }
-
-                // Xử lý sự kiện nút "Next"
-                nextButton.addEventListener("click", () => {
-                    currentIndex = (currentIndex + 1) % totalSlides;
-                    updateSlide(currentIndex);
-                });
-
-                // Xử lý sự kiện nút "Previous"
-                prevButton.addEventListener("click", () => {
-                    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-                    updateSlide(currentIndex);
-                });
-
-                // Tự động chuyển slide với thời gian riêng biệt cho từng carousel
-                let slideInterval = setInterval(autoSlide, 2000 + index * 1000); // Thời gian khác nhau cho mỗi carousel
-
-                // Dừng tự động chuyển khi rê chuột vào carousel
-                carousel.addEventListener("mouseenter", () => {
-                    clearInterval(slideInterval);
-                });
-
-                // Tiếp tục tự động chuyển khi rê chuột ra ngoài
-                carousel.addEventListener("mouseleave", () => {
-                    slideInterval = setInterval(autoSlide, 2000 + index * 1000);
-                });
-            });
-            // Đảm bảo nút luôn căn giữa hình ảnh
-            window.addEventListener("resize", () => {
-                const carousels = document.querySelectorAll(".carousel-large_events");
-                carousels.forEach((carousel) => {
-                    const slides = carousel.querySelector(".slides-large_events");
-                    const eventCard = carousel.querySelector(".event-card-large_events img");
-                    const prevButton = carousel.querySelector(".prev-large_events");
-                    const nextButton = carousel.querySelector(".next-large_events");
-
-                    if (eventCard) {
-                        const cardHeight = eventCard.clientHeight; // Lấy chiều cao ảnh
-                        prevButton.style.top = `${cardHeight / 2}px`; // Căn giữa nút trái
-                        nextButton.style.top = `${cardHeight / 2}px`; // Căn giữa nút phải
-                    }
-                });
-            });
-        </script>
+        <script src="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.js"></script>
 
         <!--Special-Events-->
         <h2 class="title-spec_event">Special Events</h2>
@@ -615,65 +100,49 @@
             </div>
             <button class="next-btn-spec_event">❯</button>
         </div>
-        <!--        <h2 class="title-spec_event">Special Events</h2>
-                <div class="content-grid-spec_event" id="eventContainer-spec_event">
-                    <button class="prev-btn-spec_event">❮</button>
-                    <div class="event-cards-spec_event">
-                        <div class="event-card-spec_event">
-                            <img
-                                src=""
-                                alt="Event Image"
-                                />
-                        </div>
-                    </div>
-                    <button class="next-btn-spec_event">❯</button>
-                </div>-->
-
         <script>
-            const prevButton = document.querySelector(".prev-btn-spec_event");
-            const nextButton = document.querySelector(".next-btn-spec_event");
-            const eventCardsContainer = document.querySelector(".event-cards-spec_event"); // Đúng phần cần cuộn
-            const eventCards = document.querySelectorAll(".event-card-spec_event");
-            let currentIndex = 0;
+            /*Specials-Events*/
+            document.querySelectorAll(".content-grid-spec_event").forEach((container) => {
+                const prevButton = container.querySelector(".prev-btn-spec_event");
+                const nextButton = container.querySelector(".next-btn-spec_event");
+                const eventCardsContainer = container.querySelector(".event-cards-spec_event");
+                const eventCards = container.querySelectorAll(".event-card-spec_event");
 
-            // Hàm cuộn đến sự kiện theo chỉ mục
-            function scrollToEvent(index) {
-                const eventCardWidth = eventCards[0].offsetWidth + 20; // Bao gồm margin-right
-                eventCardsContainer.scrollTo({
-                    left: eventCardWidth * index,
-                    behavior: "smooth",
+                let currentIndex = 0;
+
+                function scrollToEvent(index) {
+                    const eventCardWidth = eventCards[0].offsetWidth + 20; // Bao gồm margin-right
+                    eventCardsContainer.scrollTo({
+                        left: eventCardWidth * index,
+                        behavior: "smooth",
+                    });
+                }
+
+                prevButton.addEventListener("click", () => {
+                    currentIndex = Math.max(0, currentIndex - 1);
+                    scrollToEvent(currentIndex);
                 });
-            }
 
-            // Sự kiện bấm nút ❮
-            prevButton.addEventListener("click", () => {
-                currentIndex = Math.max(0, currentIndex - 1); // Giới hạn về đầu
-                scrollToEvent(currentIndex);
-            });
+                nextButton.addEventListener("click", () => {
+                    currentIndex = Math.min(eventCards.length - 1, currentIndex + 1);
+                    scrollToEvent(currentIndex);
+                });
 
-            // Sự kiện bấm nút ❯
-            nextButton.addEventListener("click", () => {
-                currentIndex = Math.min(eventCards.length - 1, currentIndex + 1); // Giới hạn về cuối
-                scrollToEvent(currentIndex);
-            });
-
-            // Tự động cuộn mỗi 3 giây
-            let autoScroll = setInterval(() => {
-                currentIndex = (currentIndex + 1) % eventCards.length; // Vòng lặp cuộn lại từ đầu
-                scrollToEvent(currentIndex);
-            }, 3000); // 3000ms = 3 giây
-
-            // Dừng tự động cuộn khi rê chuột vào carousel
-            eventCardsContainer.addEventListener("mouseenter", () => {
-                clearInterval(autoScroll);
-            });
-
-            // Tiếp tục tự động cuộn khi chuột rời khỏi carousel
-            eventCardsContainer.addEventListener("mouseleave", () => {
-                autoScroll = setInterval(() => {
+                let autoScroll = setInterval(() => {
                     currentIndex = (currentIndex + 1) % eventCards.length;
                     scrollToEvent(currentIndex);
-                }, 3000); // 3000ms = 3 giây
+                }, 3000);
+
+                eventCardsContainer.addEventListener("mouseenter", () => {
+                    clearInterval(autoScroll);
+                });
+
+                eventCardsContainer.addEventListener("mouseleave", () => {
+                    autoScroll = setInterval(() => {
+                        currentIndex = (currentIndex + 1) % eventCards.length;
+                        scrollToEvent(currentIndex);
+                    }, 1000);
+                });
             });
         </script>
 
@@ -786,10 +255,9 @@
                     autoScroll = setInterval(() => {
                         currentIndex = (currentIndex + 1) % eventCards.length;
                         scrollToEvent(currentIndex);
-                    }, 3000);
+                    }, 1000);
                 });
             });
-
         </script>
 
         <!--Top-Picks-For-You-->
@@ -913,7 +381,7 @@
                     autoScroll = setInterval(() => {
                         currentIndex = (currentIndex + 1) % totalCards;
                         scrollToEvent(currentIndex);
-                    }, 3000);
+                    }, 1000);
                 });
             });
 
@@ -1040,7 +508,7 @@
                     autoScroll = setInterval(() => {
                         currentIndex = (currentIndex + 1) % totalCards;
                         scrollToEvent(currentIndex);
-                    }, 3000);
+                    }, 1000);
                 });
             });
         </script>
