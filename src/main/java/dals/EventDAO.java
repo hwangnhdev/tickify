@@ -21,11 +21,16 @@ public class EventDAO extends DBContext {
 ////////////////////////////////////////////////////////////////////////////////
     public List<Events> getEventsByPage(int page, int pageSize) {
         List<Events> listEvents = new ArrayList<>();
-        String sql = "WITH EventPagination AS ( "
-                + "SELECT ROW_NUMBER() OVER (ORDER BY created_at ASC) AS rownum, * "
-                + "FROM Events "
-                + ") "
-                + "SELECT * FROM EventPagination WHERE rownum BETWEEN ? AND ?";
+        String sql = "WITH EventPagination AS (\n"
+                + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.*\n"
+                + "    FROM Events e\n"
+                + ")\n"
+                + "SELECT ep.*, ei.*\n"
+                + "FROM EventPagination ep\n"
+                + "LEFT JOIN EventImages ei \n"
+                + "ON ep.event_id = ei.event_id \n"
+                + "WHERE ep.rownum BETWEEN ? AND ? \n"
+                + "AND ei.image_title LIKE '%banner%';";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             int start = (page - 1) * pageSize + 1;
@@ -36,16 +41,9 @@ public class EventDAO extends DBContext {
             while (rs.next()) {
                 Events event = new Events(
                         rs.getInt("event_id"),
-                        rs.getInt("category_id"),
                         rs.getString("event_name"),
-                        rs.getString("location"),
-                        rs.getString("event_type"),
-                        rs.getString("status"),
-                        rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
                 );
                 listEvents.add(event);
             }
@@ -381,24 +379,25 @@ public class EventDAO extends DBContext {
 //            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
 //        }
 ////////////////////////////////////////////////////////////////////////////
-//        EventDAO eventDAO = new EventDAO();
-//
-//        // Kiểm tra với trang đầu tiên, mỗi trang 9 sự kiện
-//        int page = 1;
-//        int pageSize = 12;
-//
-//        int totalEvents = eventDAO.getTotalEvents();
-//        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
-//
-//        System.out.println("Total Events: " + totalEvents);
-//        System.out.println("Total Pages: " + totalPages);
-//
-//        for (int i = 1; i <= totalPages; i++) {
-//            List<Events> events = eventDAO.getEventsByPage(i, pageSize);
-//            System.out.println("===== Events on Page " + i + " =====");
-//            for (Events event : events) {
-//                System.out.println("Event ID: " + event.getEventId() + " | Name: " + event.getEventName());
-//            }
-//        }
+        EventDAO eventDAO = new EventDAO();
+
+        // Kiểm tra với trang đầu tiên, mỗi trang 9 sự kiện
+        int page = 1;
+        int pageSize = 12;
+
+        int totalEvents = eventDAO.getTotalEvents();
+        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+
+        System.out.println("Total Events: " + totalEvents);
+        System.out.println("Total Pages: " + totalPages);
+
+        for (int i = 1; i <= totalPages; i++) {
+            List<Events> events = eventDAO.getEventsByPage(i, pageSize);
+            System.out.println("===== Events on Page " + i + " =====");
+            for (Events event : events) {
+                System.out.println("Event ID: " + event.getEventId() + " | Name: " + event.getEventName());
+                System.out.println("Event ID: " + event.getImageURL() + " | Name: " + event.getImageTitle());
+            }
+        }
     }
 }
