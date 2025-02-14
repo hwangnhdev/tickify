@@ -60,6 +60,8 @@ public class EventController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+
         // Create an instance of EventDAO to interact with the database
         EventDAO eventDAO = new EventDAO();
 
@@ -67,6 +69,10 @@ public class EventController extends HttpServlet {
         List<Events> listAllEvents = eventDAO.getAllEvents();
         // Store the list of events in the request scope so it can be accessed in the JSP
         request.setAttribute("listAllEvents", listAllEvents);
+
+        // Lấy danh sách sự kiện sắp diễn ra (ví dụ: lấy 10 sự kiện)
+        List<Events> upcomingEvents = eventDAO.getUpcomingEvents();
+        request.setAttribute("upcomingEvents", upcomingEvents);
 
         // Get Events Created Nearly
         // Retrieve a list of all events from the database
@@ -111,6 +117,16 @@ public class EventController extends HttpServlet {
         request.setAttribute("paginatedEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+
+//        int customerId = (Integer) session.getAttribute("customerId");
+//        if (customerId == 0) {
+//            customerId = 0;
+//        }
+        List<Events> topTicketEvents = eventDAO.getTopPicksForYou(1);
+        request.setAttribute("topTicketEvents", topTicketEvents);
+
+        List<Events> listRecommendedEvents = eventDAO.getTopPicksForYou(1);
+        request.setAttribute("listRecommendedEvents", listRecommendedEvents);
 
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);

@@ -125,66 +125,11 @@
         <div class="content-grid-trend_events" id="eventContainer-trend_events">
             <button class="prev-btn-trend_events">❮</button>
             <div class="event-cards-trend_events">
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F8b%2Ffe%2Ff6%2Fa177577e2936c881cf05fba1903b2b44.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F8b%2Ffe%2Ff6%2Fa177577e2936c881cf05fba1903b2b44.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F1a%2Fd9%2F5e%2F0f23b6fa6b7c6693c3bc9fd76ada848c.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F8b%2Ffe%2Ff6%2Fa177577e2936c881cf05fba1903b2b44.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-trend_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
+                <c:forEach var="event" items="${upcomingEvents}">
+                    <div class="event-card-trend_events">
+                        <img src="" alt="${event.eventName}" />
+                    </div>
+                </c:forEach>
             </div>
             <button class="next-btn-trend_events">❯</button>
         </div>
@@ -239,66 +184,11 @@
         <div class="content-grid-top_events" id="eventContainer-top_events">
             <button class="prev-btn-top_events">❮</button>
             <div class="event-cards-top_events">
-                <div class="event-card-top_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F8b%2Fbf%2Fc6%2F3178ade25c2e3cd10fd2517f523cf060.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F8b%2Fbf%2Fc6%2F3178ade25c2e3cd10fd2517f523cf060.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2Faf%2Fc4%2F05%2F9425feab8d0b777666bcb598cba719f3.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-top_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2Faf%2Fc4%2F05%2F9425feab8d0b777666bcb598cba719f3.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
+                <c:forEach var="event" items="${topTicketEvents}">
+                    <div class="event-card-top_events">
+                        <img src="" alt="${event.eventName}" />
+                    </div>
+                </c:forEach>
             </div>
             <button class="next-btn-top_events">❯</button>
         </div>
@@ -366,66 +256,11 @@
         <div class="content-grid-rec_events" id="eventContainer-rec_events">
             <button class="prev-btn-rec_events">❮</button>
             <div class="event-cards-rec_events">
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F8b%2Ffe%2Ff6%2Fa177577e2936c881cf05fba1903b2b44.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F8b%2Ffe%2Ff6%2Fa177577e2936c881cf05fba1903b2b44.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F1a%2Fd9%2F5e%2F0f23b6fa6b7c6693c3bc9fd76ada848c.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://ticketbox.vn/_next/image?url=https%3A%2F%2Fimages.tkbcdn.com%2F2%2F360%2F479%2Fts%2Fds%2F8b%2Ffe%2Ff6%2Fa177577e2936c881cf05fba1903b2b44.jpg&w=384&q=75"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
-                <div class="event-card-rec_events">
-                    <img
-                        src="https://kenh14cdn.com/thumb_w/660/2019/4/12/latmat-15550565414841068539616.jpg"
-                        alt="Event Image"
-                        />
-                </div>
+                <c:forEach var="event" items="${topTicketEvents}">
+                    <div class="event-card-rec_events">
+                        <img src="" alt="${event.eventName}" />
+                    </div>
+                </c:forEach>
             </div>
             <button class="next-btn-rec_events">❯</button>
         </div>

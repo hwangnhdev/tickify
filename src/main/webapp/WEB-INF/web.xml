@@ -4,9 +4,17 @@
         <servlet-name>EventController</servlet-name>
         <servlet-class>controllers.EventController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AllEventsController</servlet-name>
+        <servlet-class>controllers.AllEventsController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EventController</servlet-name>
         <url-pattern>/event</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AllEventsController</servlet-name>
+        <url-pattern>/allevents</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
