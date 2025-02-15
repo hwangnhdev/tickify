@@ -55,11 +55,35 @@ public class CloudinaryUpload {
     }
 
     public static void main(String[] args) {
-        uploadImageToEvent(14,
-                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image3.webp",
+        uploadImageToEvent(23,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
                 "Music banner");
-        uploadImageToEvent(15,
-                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image4.jpg",
+        uploadImageToEvent(24,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+                "Music banner");
+        uploadImageToEvent(25,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+                "Music banner");
+        uploadImageToEvent(26,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+                "Music banner");
+        uploadImageToEvent(27,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+                "Music banner");
+        uploadImageToEvent(28,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+                "Music banner");
+        uploadImageToEvent(29,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+                "Music banner");
+        uploadImageToEvent(30,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+                "Music banner");
+        uploadImageToEvent(31,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+                "Music banner");
+        uploadImageToEvent(32,
+                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
                 "Music banner");
     }
 }

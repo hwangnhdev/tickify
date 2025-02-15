@@ -24,13 +24,19 @@ public class EventDAO extends DBContext {
         String sql = "WITH EventPagination AS (\n"
                 + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.*\n"
                 + "    FROM Events e\n"
+                + "),\n"
+                + "EventImagesFiltered AS (\n"
+                + "    SELECT ei.event_id, MIN(ei.image_url) AS image_url, MIN(ei.image_title) AS image_title\n"
+                + "    FROM EventImages ei\n"
+                + "    WHERE ei.image_title LIKE '%banner%'\n"
+                + "    GROUP BY ei.event_id\n"
                 + ")\n"
-                + "SELECT ep.*, ei.*\n"
+                + "SELECT ep.*, eif.image_url, eif.image_title\n"
                 + "FROM EventPagination ep\n"
-                + "LEFT JOIN EventImages ei \n"
-                + "ON ep.event_id = ei.event_id \n"
-                + "WHERE ep.rownum BETWEEN ? AND ? \n"
-                + "AND ei.image_title LIKE '%banner%';";
+                + "LEFT JOIN EventImagesFiltered eif \n"
+                + "ON ep.event_id = eif.event_id\n"
+                + "WHERE ep.rownum BETWEEN ? AND ?;";  // Không dùng AND với image_title
+
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             int start = (page - 1) * pageSize + 1;
@@ -42,8 +48,8 @@ public class EventDAO extends DBContext {
                 Events event = new Events(
                         rs.getInt("event_id"),
                         rs.getString("event_name"),
-                        rs.getString("image_url"),
-                        rs.getString("image_title")
+                        rs.getString("image_url"), // Lấy ảnh (có thể null)
+                        rs.getString("image_title") // Lấy image_title (có thể null)
                 );
                 listEvents.add(event);
             }
@@ -52,10 +58,13 @@ public class EventDAO extends DBContext {
         }
         return listEvents;
     }
-////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
     public int getTotalEvents() {
-        String sql = "SELECT COUNT(*) FROM Events";
+        String sql = "SELECT COUNT(DISTINCT e.event_id) \n"
+                + "FROM Events e\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%';";
+
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
@@ -67,8 +76,8 @@ public class EventDAO extends DBContext {
         }
         return 0;
     }
-////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
     public List<Events> getAllEvents() {
         List<Events> listEvents = new ArrayList<>();
         String sql = "SELECT * FROM Events";
@@ -383,7 +392,7 @@ public class EventDAO extends DBContext {
 
         // Kiểm tra với trang đầu tiên, mỗi trang 9 sự kiện
         int page = 1;
-        int pageSize = 12;
+        int pageSize = 16;
 
         int totalEvents = eventDAO.getTotalEvents();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);

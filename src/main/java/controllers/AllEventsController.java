@@ -61,7 +61,7 @@ public class AllEventsController extends HttpServlet {
         // Get the requested page number, default to 1 if not provided
         EventDAO eventDAO = new EventDAO();
         int page = 1;
-        int pageSize = 50;
+        int pageSize = 40;
         if (request.getParameter("page") != null) {
             try {
                 page = Integer.parseInt(request.getParameter("page"));
