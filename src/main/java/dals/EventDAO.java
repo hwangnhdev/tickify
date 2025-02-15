@@ -18,7 +18,7 @@ import utils.DBContext;
  */
 public class EventDAO extends DBContext {
 
-////////////////////////////////////////////////////////////////////////////////
+    /*getEventsByPage*/
     public List<Events> getEventsByPage(int page, int pageSize) {
         List<Events> listEvents = new ArrayList<>();
         String sql = "WITH EventPagination AS (\n"
@@ -59,7 +59,7 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-////////////////////////////////////////////////////////////////////////////////
+    /*getTotalEvents*/
     public int getTotalEvents() {
         String sql = "SELECT COUNT(DISTINCT e.event_id) \n"
                 + "FROM Events e\n"
@@ -77,7 +77,7 @@ public class EventDAO extends DBContext {
         return 0;
     }
 
-////////////////////////////////////////////////////////////////////////////////
+    /*getAllEvents*/
     public List<Events> getAllEvents() {
         List<Events> listEvents = new ArrayList<>();
         String sql = "SELECT * FROM Events";
@@ -106,13 +106,17 @@ public class EventDAO extends DBContext {
         }
         return listEvents;
     }
-////////////////////////////////////////////////////////////////////////////////
 
+    /*getTop10LatestEvents*/
     public List<Events> getTop10LatestEvents() {
         List<Events> listEvents = new ArrayList<>();
-        String sql = "SELECT TOP 10 * \n"
-                + "FROM Events \n"
-                + "ORDER BY created_at DESC";
+        String sql = "SELECT TOP 10 "
+                + "e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
+                + "e.status, e.description, e.start_date, e.end_date, e.created_at, e.updated_at, "
+                + "ei.image_url, ei.image_title "
+                + "FROM Events e "
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
+                + "ORDER BY e.created_at DESC";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -120,16 +124,9 @@ public class EventDAO extends DBContext {
             while (rs.next()) {
                 Events event = new Events(
                         rs.getInt("event_id"),
-                        rs.getInt("category_id"),
                         rs.getString("event_name"),
-                        rs.getString("location"),
-                        rs.getString("event_type"),
-                        rs.getString("status"),
-                        rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
                 );
                 listEvents.add(event);
             }
@@ -138,13 +135,18 @@ public class EventDAO extends DBContext {
         }
         return listEvents;
     }
-////////////////////////////////////////////////////////////////////////////////
 
+    /*getUpcomingEvents*/
     public List<Events> getUpcomingEvents() {
         List<Events> listEvents = new ArrayList<>();
-        String sql = "SELECT TOP 10 * FROM Events "
-                + "WHERE start_date >= GETDATE() "
-                + "ORDER BY start_date ASC";
+        String sql = "SELECT TOP 10 "
+                + "e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
+                + "e.status, e.description, e.start_date, e.end_date, e.created_at, e.updated_at, "
+                + "ei.image_url, ei.image_title "
+                + "FROM Events e "
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
+                + "WHERE e.start_date >= GETDATE() "
+                + "ORDER BY e.start_date ASC";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -152,16 +154,9 @@ public class EventDAO extends DBContext {
             while (rs.next()) {
                 Events event = new Events(
                         rs.getInt("event_id"),
-                        rs.getInt("category_id"),
                         rs.getString("event_name"),
-                        rs.getString("location"),
-                        rs.getString("event_type"),
-                        rs.getString("status"),
-                        rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
                 );
                 listEvents.add(event);
             }
@@ -170,8 +165,8 @@ public class EventDAO extends DBContext {
         }
         return listEvents;
     }
-////////////////////////////////////////////////////////////////////////////////
 
+    /*getTopPicksForYou*/
     public List<Events> getTopPicksForYou(int customerId) {
         List<Events> listEvents = new ArrayList<>();
         String sql = "WITH AvgPrice AS ( "
@@ -196,13 +191,16 @@ public class EventDAO extends DBContext {
                 + "SELECT DISTINCT TOP 10 "
                 + "    e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
                 + "    e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
-                + "    MIN(tt.price) AS min_price "
+                + "    MIN(tt.price) AS min_price, "
+                + "    ei.image_url, ei.image_title "
                 + "FROM Events e "
                 + "JOIN TicketTypes tt ON e.event_id = tt.event_id "
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
                 + "CROSS JOIN UserBudget "
                 + "WHERE tt.price <= UserBudget.budget "
                 + "GROUP BY e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
-                + "         e.status, e.start_date, e.end_date, e.created_at, e.updated_at "
+                + "         e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
+                + "         ei.image_url, ei.image_title "
                 + "ORDER BY min_price DESC;";
 
         try {
@@ -212,56 +210,51 @@ public class EventDAO extends DBContext {
             while (rs.next()) {
                 Events event = new Events(
                         rs.getInt("event_id"),
-                        0,
                         rs.getString("event_name"),
-                        "",
-                        "",
-                        "",
-                        "",
-                        null,
-                        null,
-                        null,
-                        null
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
                 );
                 listEvents.add(event);
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching upcoming events: " + e.getMessage());
+            System.out.println("Error fetching recommended events: " + e.getMessage());
         }
         return listEvents;
     }
-////////////////////////////////////////////////////////////////////////////////
 
+    /*getRecommendedEvents*/
     public List<Events> getRecommendedEvents(int customerId) {
         List<Events> listEvents = new ArrayList<>();
-        String sql = "\n"
-                + "            WITH UserCategories AS (\n"
-                + "                SELECT DISTINCT e.category_id\n"
-                + "                FROM Orders o\n"
-                + "                JOIN OrderDetails od ON o.order_id = od.order_id\n"
-                + "                JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
-                + "                JOIN Events e ON tt.event_id = e.event_id\n"
-                + "                WHERE o.customer_id = ?\n"
-                + "            ),\n"
-                + "            AllCategories AS (\n"
-                + "                SELECT category_id FROM Categories\n"
-                + "            ),\n"
-                + "            CategoriesToRecommend AS (\n"
-                + "                SELECT category_id FROM UserCategories\n"
-                + "                UNION\n"
-                + "                SELECT category_id FROM AllCategories\n"
-                + "                WHERE NOT EXISTS (SELECT 1 FROM UserCategories)\n"
-                + "            )\n"
-                + "            SELECT TOP 10 \n"
-                + "                e.event_id, e.category_id, e.event_name, e.location, e.event_type, \n"
-                + "                e.status, e.start_date, e.end_date, e.created_at, e.updated_at, \n"
-                + "                MIN(tt.price) AS min_price\n"
-                + "            FROM Events e\n"
-                + "            JOIN TicketTypes tt ON e.event_id = tt.event_id\n"
-                + "            WHERE e.category_id IN (SELECT category_id FROM CategoriesToRecommend)\n"
-                + "            GROUP BY e.event_id, e.category_id, e.event_name, e.location, e.event_type, \n"
-                + "                     e.status, e.start_date, e.end_date, e.created_at, e.updated_at\n"
-                + "            ORDER BY min_price DESC;";
+        String sql = "WITH UserCategories AS ( "
+                + "    SELECT DISTINCT e.category_id "
+                + "    FROM Orders o "
+                + "    JOIN OrderDetails od ON o.order_id = od.order_id "
+                + "    JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+                + "    JOIN Events e ON tt.event_id = e.event_id "
+                + "    WHERE o.customer_id = ? "
+                + "), "
+                + "AllCategories AS ( "
+                + "    SELECT category_id FROM Categories "
+                + "), "
+                + "CategoriesToRecommend AS ( "
+                + "    SELECT category_id FROM UserCategories "
+                + "    UNION "
+                + "    SELECT category_id FROM AllCategories "
+                + "    WHERE NOT EXISTS (SELECT 1 FROM UserCategories) "
+                + ") "
+                + "SELECT TOP 10 "
+                + "    e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
+                + "    e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
+                + "    MIN(tt.price) AS min_price, "
+                + "    ei.image_url, ei.image_title "
+                + "FROM Events e "
+                + "JOIN TicketTypes tt ON e.event_id = tt.event_id "
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
+                + "WHERE e.category_id IN (SELECT category_id FROM CategoriesToRecommend) "
+                + "GROUP BY e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
+                + "         e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
+                + "         ei.image_url, ei.image_title "
+                + "ORDER BY min_price DESC;";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -270,35 +263,33 @@ public class EventDAO extends DBContext {
             while (rs.next()) {
                 Events event = new Events(
                         rs.getInt("event_id"),
-                        0,
                         rs.getString("event_name"),
-                        "",
-                        "",
-                        "",
-                        "",
-                        null,
-                        null,
-                        null,
-                        null
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
                 );
                 listEvents.add(event);
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching upcoming events: " + e.getMessage());
+            System.out.println("Error fetching recommended events: " + e.getMessage());
         }
         return listEvents;
     }
-////////////////////////////////////////////////////////////////////////////////
 
+    /*getTopEventsWithLimit*/
     public List<Events> getTopEventsWithLimit() {
         List<Events> listEvents = new ArrayList<>();
-        String sql = "SELECT TOP 10 e.event_id, e.event_name, "
-                + "COALESCE(SUM(od.quantity), 0) AS total_tickets "
-                + "FROM Events e "
-                + "JOIN TicketTypes tt ON e.event_id = tt.event_id "
-                + "LEFT JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id "
-                + "GROUP BY e.event_id, e.event_name "
-                + "ORDER BY total_tickets DESC";
+        String sql = "SELECT TOP 10 \n"
+                + "    e.event_id, \n"
+                + "    e.event_name, \n"
+                + "    COALESCE(SUM(od.quantity), 0) AS total_tickets, \n"
+                + "    ei.image_url, \n"
+                + "    ei.image_title\n"
+                + "FROM Events e\n"
+                + "JOIN TicketTypes tt ON e.event_id = tt.event_id\n"
+                + "LEFT JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%'\n"
+                + "GROUP BY e.event_id, e.event_name, ei.image_url, ei.image_title\n"
+                + "ORDER BY total_tickets DESC;";
 
         try {
             // Prepare SQL statement
@@ -309,16 +300,9 @@ public class EventDAO extends DBContext {
             while (rs.next()) {
                 Events event = new Events(
                         rs.getInt("event_id"),
-                        0,
                         rs.getString("event_name"),
-                        "",
-                        "",
-                        "",
-                        "",
-                        null,
-                        null,
-                        null,
-                        null
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
                 );
                 listEvents.add(event);
             }
@@ -327,31 +311,49 @@ public class EventDAO extends DBContext {
         }
         return listEvents;
     }
-////////////////////////////////////////////////////////////////////////////////
 
+    /*main*/
     public static void main(String[] args) {
-////////////////////////////////////////////////////////////////////////////
+        /*getTopEventsWithLimit*/
+        EventDAO ld = new EventDAO();
+        List<Events> list = ld.getTopEventsWithLimit();
+        for (Events event : list) {
+            System.out.println(event.getEventName());
+            System.out.println(event.getImageURL());
+            System.out.println(event.getImageTitle());
+        }
+        /*getTop10LatestEvents*/
 //        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getRecommendedEvents(1);
+//        List<Events> list = ld.getTop10LatestEvents();
 //        for (Events event : list) {
 //            System.out.println(event.getEventName());
-//            System.out.println(event.getEventId());
+//            System.out.println(event.getImageURL());
 //        }
-////////////////////////////////////////////////////////////////////////////
-//        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getTopPicksForYou(1);
-//        for (Events event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getEventId());
-//        }
-////////////////////////////////////////////////////////////////////////////
+        /*getUpcomingEvents*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getUpcomingEvents();
 //        for (Events event : list) {
 //            System.out.println(event.getEventName());
-//            System.out.println(event.getCategoryId());
+//            System.out.println(event.getImageURL());
+//            System.out.println(event.getImageTitle());
 //        }
-////////////////////////////////////////////////////////////////////////////
+        /*getTopPicksForYou*/
+//        EventDAO ld = new EventDAO();
+//        List<Events> list = ld.getTopPicksForYou(1);
+//        for (Events event : list) {
+//            System.out.println(event.getEventName());
+//            System.out.println(event.getImageURL());
+//            System.out.println(event.getImageTitle());
+//        }
+        /*getRecommendedEvents*/
+//        EventDAO ld = new EventDAO();
+//        List<Events> list = ld.getRecommendedEvents(1);
+//        for (Events event : list) {
+//            System.out.println(event.getEventName());
+//            System.out.println(event.getImageURL());
+//            System.out.println(event.getImageTitle());
+//        }
+        /*getTotalEvents*/
 //        EventDAO ld = new EventDAO();
 //        int countEvents = ld.getTotalEvents();
 //        System.out.println(countEvents);
@@ -361,14 +363,7 @@ public class EventDAO extends DBContext {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getCategoryId());
 //        }
-////////////////////////////////////////////////////////////////////////////
-//        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getTop10LatestEvents();
-//        for (Events event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getCategoryId());
-//        }
-////////////////////////////////////////////////////////////////////////////
+        /*getTopEventsWithLimit*/
 //        // Create instance of EventDAO
 //        EventDAO eventDAO = new EventDAO();
 //        // Test fetching top 10 best-selling events
@@ -387,26 +382,26 @@ public class EventDAO extends DBContext {
 //        } else {
 //            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
 //        }
-////////////////////////////////////////////////////////////////////////////
-        EventDAO eventDAO = new EventDAO();
-
-        // Kiểm tra với trang đầu tiên, mỗi trang 9 sự kiện
-        int page = 1;
-        int pageSize = 16;
-
-        int totalEvents = eventDAO.getTotalEvents();
-        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
-
-        System.out.println("Total Events: " + totalEvents);
-        System.out.println("Total Pages: " + totalPages);
-
-        for (int i = 1; i <= totalPages; i++) {
-            List<Events> events = eventDAO.getEventsByPage(i, pageSize);
-            System.out.println("===== Events on Page " + i + " =====");
-            for (Events event : events) {
-                System.out.println("Event ID: " + event.getEventId() + " | Name: " + event.getEventName());
-                System.out.println("Event ID: " + event.getImageURL() + " | Name: " + event.getImageTitle());
-            }
-        }
+        /*getEventsByPage*/
+//        EventDAO eventDAO = new EventDAO();
+//
+//        // Kiểm tra với trang đầu tiên, mỗi trang 9 sự kiện
+//        int page = 1;
+//        int pageSize = 16;
+//
+//        int totalEvents = eventDAO.getTotalEvents();
+//        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+//
+//        System.out.println("Total Events: " + totalEvents);
+//        System.out.println("Total Pages: " + totalPages);
+//
+//        for (int i = 1; i <= totalPages; i++) {
+//            List<Events> events = eventDAO.getEventsByPage(i, pageSize);
+//            System.out.println("===== Events on Page " + i + " =====");
+//            for (Events event : events) {
+//                System.out.println("Event ID: " + event.getEventId() + " | Name: " + event.getEventName());
+//                System.out.println("Event ID: " + event.getImageURL() + " | Name: " + event.getImageTitle());
+//            }
+//        }
     }
 }

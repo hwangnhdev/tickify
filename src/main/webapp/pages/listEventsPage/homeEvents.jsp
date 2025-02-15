@@ -26,7 +26,14 @@
                 <div class="slides-large_events">
                     <c:forEach var="event" items="${carousel1}">
                         <div class="event-card-large_events">
-                            <img src="src" alt="${event.eventName}"/>
+                            <c:choose>
+                                <c:when test="${not empty event.imageURL}">
+                                    <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <img src="${event.imageURL}" alt="${event.eventName}" />
+                                </c:otherwise>
+                            </c:choose>
                             <button class="view-btn-large_events">View details</button>
                         </div>
                     </c:forEach>
@@ -41,7 +48,14 @@
                 <div class="slides-large_events">
                     <c:forEach var="event" items="${carousel2}">
                         <div class="event-card-large_events">
-                            <img src="src" alt="${event.eventName}"/>
+                            <c:choose>
+                                <c:when test="${not empty event.imageURL}">
+                                    <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <img src="${event.imageURL}" alt="${event.eventName}" />
+                                </c:otherwise>
+                            </c:choose>
                             <button class="view-btn-large_events">View details</button>
                         </div>
                     </c:forEach>
@@ -63,7 +77,7 @@
                     <c:when test="${not empty listEvents}">
                         <c:forEach var="event" items="${listEvents}">
                             <div class="event-card-spec_event">
-                                <img src="" alt="${event.eventName}" />
+                                <img src="${event.imageURL}" alt="${event.imageTitle}" />
                             </div>
                         </c:forEach>
                     </c:when>
@@ -127,7 +141,7 @@
             <div class="event-cards-trend_events">
                 <c:forEach var="event" items="${upcomingEvents}">
                     <div class="event-card-trend_events">
-                        <img src="" alt="${event.eventName}" />
+                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
                     </div>
                 </c:forEach>
             </div>
@@ -186,7 +200,7 @@
             <div class="event-cards-top_events">
                 <c:forEach var="event" items="${topTicketEvents}">
                     <div class="event-card-top_events">
-                        <img src="" alt="${event.eventName}" />
+                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
                     </div>
                 </c:forEach>
             </div>
@@ -258,7 +272,7 @@
             <div class="event-cards-rec_events">
                 <c:forEach var="event" items="${topTicketEvents}">
                     <div class="event-card-rec_events">
-                        <img src="" alt="${event.eventName}" />
+                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
                     </div>
                 </c:forEach>
             </div>
