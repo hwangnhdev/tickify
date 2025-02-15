@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import models.Categories;
+import models.EventImages;
 import models.Events;
 import utils.DBContext;
 
@@ -312,16 +314,122 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
+    /*selectEventByID*/
+    public Events selectEventByID(int id) {
+        String sql = "SELECT * FROM Events\n"
+                + "WHERE event_id = ?";
+
+        try {
+            // Prepare SQL statement
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+
+            // Fetch event data
+            if (rs.next()) {
+                Events event = new Events(
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getDate("start_date"),
+                        rs.getDate("end_date"),
+                        rs.getDate("created_at"),
+                        rs.getDate("updated_at")
+                );
+                return event;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /*selectEventImagesByID*/
+    public EventImages selectEventImagesByID(int id) {
+        String sql = "SELECT * FROM EventImages\n"
+                + "WHERE event_id = ? AND image_title LIKE '%banner%';";
+
+        try {
+            // Prepare SQL statement
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+
+            // Fetch event data
+            if (rs.next()) {
+                EventImages eventImage = new EventImages(
+                        rs.getInt("image_id"),
+                        rs.getInt("event_id"),
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
+                );
+                return eventImage;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /*selectEventCategoriesID*/
+    public Categories selectEventCategoriesID(int id) {
+        String sql = "SELECT * FROM Categories\n"
+                + "INNER JOIN Events ON Categories.category_id = Events.category_id\n"
+                + "WHERE event_id = ?";
+
+        try {
+            // Prepare SQL statement
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+
+            // Fetch event data
+            if (rs.next()) {
+                Categories eventCategories = new Categories(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name"),
+                        rs.getString("description"),
+                        rs.getDate("created_at"),
+                        rs.getDate("updated_at")
+                );
+                return eventCategories;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
+        return null;
+    }
+
     /*main*/
     public static void main(String[] args) {
-        /*getTopEventsWithLimit*/
+        /*selectEventByID*/
         EventDAO ld = new EventDAO();
-        List<Events> list = ld.getTopEventsWithLimit();
-        for (Events event : list) {
-            System.out.println(event.getEventName());
-            System.out.println(event.getImageURL());
-            System.out.println(event.getImageTitle());
-        }
+        Events event = ld.selectEventByID(1);
+        System.out.println(event.getEventName());
+
+        /*selectEventByID*/
+//        EventDAO ld = new EventDAO();
+//        EventImages event = ld.selectEventImagesByID(1);
+//        System.out.println(event.getImageId());
+
+        /*selectEventCategoriesID*/
+//        EventDAO ld = new EventDAO();
+//        Categories event = ld.selectEventCategoriesID(1);
+//        System.out.println(event.getCategoryName());
+
+        /*getTopEventsWithLimit*/
+//        EventDAO ld = new EventDAO();
+//        List<Events> list = ld.getTopEventsWithLimit();
+//        for (Events event : list) {
+//            System.out.println(event.getEventName());
+//            System.out.println(event.getImageURL());
+//            System.out.println(event.getImageTitle());
+//        }
+
         /*getTop10LatestEvents*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getTop10LatestEvents();
@@ -329,6 +437,7 @@ public class EventDAO extends DBContext {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getImageURL());
 //        }
+
         /*getUpcomingEvents*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getUpcomingEvents();
@@ -337,6 +446,7 @@ public class EventDAO extends DBContext {
 //            System.out.println(event.getImageURL());
 //            System.out.println(event.getImageTitle());
 //        }
+
         /*getTopPicksForYou*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getTopPicksForYou(1);
@@ -345,6 +455,7 @@ public class EventDAO extends DBContext {
 //            System.out.println(event.getImageURL());
 //            System.out.println(event.getImageTitle());
 //        }
+
         /*getRecommendedEvents*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getRecommendedEvents(1);
@@ -353,6 +464,7 @@ public class EventDAO extends DBContext {
 //            System.out.println(event.getImageURL());
 //            System.out.println(event.getImageTitle());
 //        }
+
         /*getTotalEvents*/
 //        EventDAO ld = new EventDAO();
 //        int countEvents = ld.getTotalEvents();
@@ -363,6 +475,7 @@ public class EventDAO extends DBContext {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getCategoryId());
 //        }
+
         /*getTopEventsWithLimit*/
 //        // Create instance of EventDAO
 //        EventDAO eventDAO = new EventDAO();
@@ -382,6 +495,7 @@ public class EventDAO extends DBContext {
 //        } else {
 //            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
 //        }
+
         /*getEventsByPage*/
 //        EventDAO eventDAO = new EventDAO();
 //
