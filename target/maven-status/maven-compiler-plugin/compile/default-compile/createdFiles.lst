@@ -8,6 +8,7 @@ dals\OrganizerDAO.class
 dals\EventImageDAO.class
 models\UserGoogleDTO.class
 dals\VoucherDAO.class
+controllers\EventDetailController.class
 dals\OrderDAO.class
 dals\EventDAO.class
 models\TicketTypes.class

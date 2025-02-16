@@ -66,7 +66,7 @@ public class EventDetailController extends HttpServlet {
 //        String id = request.getParameter("1");
         int eventId = 0;
         try {
-            eventId = Integer.parseInt("4");
+            eventId = Integer.parseInt("1");
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }

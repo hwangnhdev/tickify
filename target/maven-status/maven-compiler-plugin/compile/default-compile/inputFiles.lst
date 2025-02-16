@@ -4,6 +4,7 @@ D:\Semester5\SWP391\Code\tickify\src\main\java\controllers\AllEventsController.j
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\SeatDAO.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\couldinaryConfig\CouldinaryConfig.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\EventImageDAO.java
+D:\Semester5\SWP391\Code\tickify\src\main\java\controllers\EventDetailController.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\EventDAO.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\models\Events.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\OrderDetailDAO.java
@@ -12,7 +13,6 @@ D:\Semester5\SWP391\Code\tickify\src\main\java\utils\DBContext.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\couldinaryConfig\CloudinaryUpload.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\models\UserFacebookDTO.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\OrganizerDAO.java
-D:\Semester5\SWP391\Code\tickify\src\main\java\couldinaryConfig\FetchImages.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\CategoryDAO.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\OrderDAO.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\CustomerDAO.java
@@ -26,7 +26,6 @@ D:\Semester5\SWP391\Code\tickify\src\main\java\models\Admins.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\models\Tickets.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\dals\AdminDAO.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\models\Orders.java
-D:\Semester5\SWP391\Code\tickify\src\main\java\couldinaryConfig\DatabaseHandler.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\models\EventImages.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\utils\JwtUtil.java
 D:\Semester5\SWP391\Code\tickify\src\main\java\utils\EmailUtility.java
