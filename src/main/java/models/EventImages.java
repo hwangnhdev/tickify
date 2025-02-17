@@ -9,17 +9,20 @@ package models;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class EventImages {
+
     private int imageId;
     private int eventId;
     private String imageUrl;
+    private String image_title;
 
     public EventImages() {
     }
 
-    public EventImages(int imageId, int eventId, String imageUrl) {
+    public EventImages(int imageId, int eventId, String imageUrl, String image_title) {
         this.imageId = imageId;
         this.eventId = eventId;
         this.imageUrl = imageUrl;
+        this.image_title = image_title;
     }
 
     public int getImageId() {
@@ -45,6 +48,13 @@ public class EventImages {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-    
-    
+
+    public String getImage_title() {
+        return image_title;
+    }
+
+    public void setImage_title(String image_title) {
+        this.image_title = image_title;
+    }
+
 }

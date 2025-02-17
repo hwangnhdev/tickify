@@ -1,3 +1,5 @@
+controllers\AllEventsController.class
+couldinaryConfig\CloudinaryUpload.class
 dals\TicketDAO.class
 models\Categories.class
 models\UserFacebookDTO.class
@@ -6,6 +8,7 @@ dals\OrganizerDAO.class
 dals\EventImageDAO.class
 models\UserGoogleDTO.class
 dals\VoucherDAO.class
+controllers\EventDetailController.class
 dals\OrderDAO.class
 dals\EventDAO.class
 models\TicketTypes.class
@@ -21,6 +24,7 @@ models\Customers.class
 models\Tickets.class
 dals\TicketTypeDAO.class
 models\Vouchers.class
+couldinaryConfig\CouldinaryConfig.class
 models\Admins.class
 models\Events.class
 utils\EmailUtility.class

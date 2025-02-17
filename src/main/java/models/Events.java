@@ -11,6 +11,7 @@ import java.sql.Date;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class Events {
+
     private int eventId;
     private int categoryId;
     private String eventName;
@@ -22,6 +23,8 @@ public class Events {
     private Date endDate;
     private Date createdAt;
     private Date updatedAt;
+    private String imageURL;
+    private String imageTitle;
 
     public Events() {
     }
@@ -38,6 +41,13 @@ public class Events {
         this.endDate = endDate;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public Events(int eventId, String eventName, String imageURL, String imageTitle) {
+        this.eventId = eventId;
+        this.eventName = eventName;
+        this.imageURL = imageURL;
+        this.imageTitle = imageTitle;
     }
 
     public int getEventId() {
@@ -127,6 +137,21 @@ public class Events {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
-    
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public String getImageTitle() {
+        return imageTitle;
+    }
+
+    public void setImageTitle(String imageTitle) {
+        this.imageTitle = imageTitle;
+    }
+
 }
