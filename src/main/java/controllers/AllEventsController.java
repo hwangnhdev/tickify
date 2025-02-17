@@ -58,8 +58,15 @@ public class AllEventsController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Get the requested page number, default to 1 if not provided
+        
         EventDAO eventDAO = new EventDAO();
+        
+        /*Category*/
+        String idCategory = request.getParameter("idCategory");
+        request.setAttribute("idCategory", idCategory);
+        
+        /*Pagination*/
+        // Get the requested page number, default to 1 if not provided
         int page = 1;
         int pageSize = 40;
         if (request.getParameter("page") != null) {
@@ -69,16 +76,15 @@ public class AllEventsController extends HttpServlet {
                 page = 1; // Fallback to page 1 in case of an invalid input
             }
         }
-
         // Get total number of events and calculate total pages
         int totalEvents = eventDAO.getTotalEvents();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
-
         // Fetch paginated list of events
         List<Events> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
         request.setAttribute("paginatedEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/listEventsPage/allEvents.jsp").forward(request, response);
     }

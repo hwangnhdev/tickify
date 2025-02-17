@@ -80,11 +80,22 @@
     <body>
         <header>
             <div class="logo-header">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMOKXV6ymSP4avAusI4_RPe4Q6Tv4K2raW168in8s6w5dn70V42qa9l2y5wxU05gpikA&usqp=CAU" alt="Ticketbox Logo">
+                <a style="text-decoration: none; color: white;" href="event">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMOKXV6ymSP4avAusI4_RPe4Q6Tv4K2raW168in8s6w5dn70V42qa9l2y5wxU05gpikA&usqp=CAU" alt="Ticketbox Logo">
+                </a>
             </div>
             <div class="search-bar-header">
-                <input type="text" placeholder="What are you looking for today?">
-                <button>Search</button>
+                <!--The second-->
+                <form action="allEvents" method="GET">
+                    <input type="text" name="query" placeholder="What are you looking for today?" required>
+                    <button type="submit">Search</button>
+                </form>
+                <!--The first-->
+<!--                <input type="text" placeholder="What are you looking for today?">
+                <a style="text-decoration: none; color: black;" href="allEvents">
+                    Search
+                </a>-->
+                <!--<button>Search</button>-->
             </div>
             <div class="user-actions-header">
                 <button>Create Event</button>
@@ -93,10 +104,24 @@
             </div>
         </header>
         <nav class="categories-header">
-            <a href="#">Live Music</a>
-            <a href="#">Theater & Arts</a>
-            <a href="#">Sports</a>
-            <a href="#">Others</a>
+            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=liveMusic">
+                Live Music
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=theaterArts">
+                Theater & Arts
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=sports">
+                Sports
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=concert">
+                Concert
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=technology">
+                Technology
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=comedyShows">
+                Comedy Shows
+            </a>
         </nav>
     </body>
 </html>
