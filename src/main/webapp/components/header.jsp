@@ -85,16 +85,11 @@
                 </a>
             </div>
             <div class="search-bar-header">
-                <!--The second-->
-                <form action="allEvents" method="GET">
+                <!--Search Event-->
+                <form action="searchEvent" method="GET">
                     <input type="text" name="query" placeholder="What are you looking for today?" required>
                     <button type="submit">Search</button>
                 </form>
-                <!--The first-->
-<!--                <input type="text" placeholder="What are you looking for today?">
-                <a style="text-decoration: none; color: black;" href="allEvents">
-                    Search
-                </a>-->
                 <!--<button>Search</button>-->
             </div>
             <div class="user-actions-header">

@@ -404,12 +404,57 @@ public class EventDAO extends DBContext {
         return null;
     }
 
+    /*searchEventsByQuery*/
+    public List<Events> searchEventsByQuery(String query) {
+        List<Events> listEvents = new ArrayList<>();
+        String sql = "SELECT * FROM Events\n"
+                + "WHERE event_name LIKE ?";
+
+        try {
+            // Prepare SQL statement
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, "%" + query + "%");
+            ResultSet rs = st.executeQuery();
+
+            // Fetch event data
+            while (rs.next()) {
+                Events event = new Events(
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getDate("start_date"),
+                        rs.getDate("end_date"),
+                        rs.getDate("created_at"),
+                        rs.getDate("updated_at")
+                );
+                listEvents.add(event);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
     /*main*/
     public static void main(String[] args) {
-        /*selectEventByID*/
+        /*searchEventsByQuery*/
         EventDAO ld = new EventDAO();
-        Events event = ld.selectEventByID(1);
-        System.out.println(event.getEventName());
+        List<Events> list = ld.searchEventsByQuery("Rock Festival");
+        int count = 0;
+        for (Events event : list) {
+            System.out.println(event.getEventName());
+            count++;
+        }
+        System.out.println(count);
+
+        /*selectEventByID*/
+//        EventDAO ld = new EventDAO();
+//        Events event = ld.selectEventByID(1);
+//        System.out.println(event.getEventName());
 
         /*selectEventByID*/
 //        EventDAO ld = new EventDAO();

@@ -1,4 +1,5 @@
 controllers\AllEventsController.class
+controllers\SearchEventController.class
 couldinaryConfig\CloudinaryUpload.class
 dals\TicketDAO.class
 models\Categories.class
