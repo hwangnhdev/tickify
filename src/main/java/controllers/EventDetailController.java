@@ -63,10 +63,10 @@ public class EventDetailController extends HttpServlet {
         EventDAO eventDAO = new EventDAO();
 
         /*Get ID of Event*/
-//        String id = request.getParameter("1");
+        String id = request.getParameter("id");
         int eventId = 0;
         try {
-            eventId = Integer.parseInt("1");
+            eventId = Integer.parseInt(id);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }

@@ -13,9 +13,9 @@ import com.cloudinary.utils.ObjectUtils;
  */
 public class CouldinaryConfig {
 
-    private static final String CLOUD_NAME = "";
-    private static final String API_KEY = "";
-    private static final String API_SECRET = "";
+    private static final String CLOUD_NAME = "dnvpphtov";
+    private static final String API_KEY = "361735526766643";
+    private static final String API_SECRET = "tqw6jzCoHlzq4FN9Vusrbllobio";
 
     public static Cloudinary getInstance() {
         return new Cloudinary(ObjectUtils.asMap(

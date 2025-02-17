@@ -18,11 +18,11 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AllEventsController</servlet-name>
-        <url-pattern>/allevents</url-pattern>
+        <url-pattern>/allEvents</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EventDetailController</servlet-name>
-        <url-pattern>/eventdetail</url-pattern>
+        <url-pattern>/eventDetail</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

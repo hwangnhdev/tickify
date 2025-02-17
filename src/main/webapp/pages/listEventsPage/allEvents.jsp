@@ -78,8 +78,10 @@
                     <c:forEach var="event" items="${paginatedEvents}">
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
                             <div class="event-card-all_events">
-                                <img src="${event.imageURL}" alt="${event.imageTitle}" />
-                                <h4>${event.eventName}</h4>
+                                <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                    <h4>${event.eventName}</h4>
+                                </a>
                             </div>
                         </div>
                     </c:forEach>
