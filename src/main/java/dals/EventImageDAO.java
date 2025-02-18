@@ -18,7 +18,7 @@ import utils.DBContext;
  */
 public class EventImageDAO extends DBContext {
 
-    /*=========================getAllImageEvents=============================*/
+    /*getAllImageEvents*/
     public List<EventImages> getAllImageEvents() {
         List<EventImages> listImageEvents = new ArrayList<>();
         String sql = "SELECT * FROM EventImages";
@@ -40,7 +40,7 @@ public class EventImageDAO extends DBContext {
         return listImageEvents;
     }
 
-    /*=========================getImagesByEventId=============================*/
+    /*getImagesByEventId*/
     public List<EventImages> getImagesByEventId(int eventId) {
         List<EventImages> listImageEvents = new ArrayList<>();
         String sql = "SELECT * FROM EventImages WHERE event_id = ?";
@@ -64,14 +64,14 @@ public class EventImageDAO extends DBContext {
     }
 
     public static void main(String[] args) {
-        /*=========================getAllImageEvents=============================*/
+        /*getAllImageEvents*/
 //        EventImageDAO ld = new EventImageDAO();
 //        List<EventImages> list = ld.getAllImageEvents();
 //        for (EventImages event : list) {
 //            System.out.println(event.getEventId());
 //            System.out.println(event.getImageUrl());
 //        }
-        /*=========================getImagesByEventId=============================*/
+        /*getImagesByEventId*/
         EventImageDAO ld = new EventImageDAO();
         List<EventImages> list = ld.getImagesByEventId(1);
         for (EventImages event : list) {
