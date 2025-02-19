@@ -68,7 +68,7 @@ public class SearchEventController extends HttpServlet {
         request.setAttribute("searchEvents", searchEvents);
 
         // Forward the request and response to the home.jsp page to display the events
-        request.getRequestDispatcher("pages/listEventsPage/searchEvent.jsp").forward(request, response);
+        request.getRequestDispatcher("pages/listEventsPage/allEvents.jsp").forward(request, response);
     }
 
     /**

@@ -70,6 +70,7 @@ public class EventDetailController extends HttpServlet {
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
+        
         Events eventDetail = eventDAO.selectEventByID(eventId);
         EventImages eventImage = eventDAO.selectEventImagesByID(eventId);
         Categories eventCategories = eventDAO.selectEventCategoriesID(eventId);

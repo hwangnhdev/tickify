@@ -4,6 +4,7 @@
     Author     : Tang Thanh Vui - CE180901
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -14,218 +15,72 @@
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
             rel="stylesheet"
             />
-        <style>
-            body {
-                background-color: #ffffff;
-                color: #333;
-                padding: 20px;
-            }
-            .search-title {
-                font-weight: bold;
-            }
-            .btn-custom {
-                background-color: #1db954;
-                color: white;
-                border: none;
-                border-radius: 20px;
-                padding: 8px 15px;
-            }
-            .btn-custom:hover {
-                opacity: 0.8;
-            }
-            .dropdown-menu {
-                min-width: 300px;
-                border-radius: 8px;
-                padding: 15px;
-            }
-            .flatpickr-calendar {
-                border-radius: 8px !important;
-            }
-            .apply-reset {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 10px;
-            }
-            .filter-section {
-                margin-top: 20px;
-            }
-            .filter-section h6 {
-                margin-bottom: 15px;
-            }
-            .filter-category .btn {
-                margin: 5px;
-                border-radius: 20px;
-            }
-            .filter-category .btn.active {
-                background-color: #1db954;
-                color: white;
-            }
-            .selected-filters {
-                display: flex;
-                gap: 10px;
-                margin-left: 10px;
-            }
-            .filter-tag {
-                background-color: #e0e0e0;
-                border-radius: 20px;
-                padding: 5px 10px;
-                display: inline-flex;
-                align-items: center;
-            }
-            .filter-tag span {
-                margin-left: 5px;
-                cursor: pointer;
-                font-weight: bold;
-            }
-        </style>
     </head>
     <body>
-        <div class="container d-flex justify-content-between">
-            <div class="search-result search-title">Search result:</div>
-            <div class="filter-bar d-flex gap-3">
-                <!-- Date Range Picker -->
-                <div class="dropdown">
-                    <button
-                        class="btn btn-custom dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        id="dateButton"
-                        aria-expanded="false"
-                        >
-                        All Dates
-                    </button>
-                    <div class="dropdown-menu">
-                        <h6 class="text-center">Select Date Range</h6>
-                        <input
-                            type="text"
-                            id="datePicker"
-                            class="form-control mb-3"
-                            placeholder="Select date range"
-                            />
-                        <div class="apply-reset">
-                            <button class="btn btn-outline-secondary" id="resetDateBtn">
-                                Reset
-                            </button>
-                            <button class="btn btn-outline-success" id="applyDateBtn">
-                                Apply
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <form id="filterForm" action="${pageContext.request.contextPath}/filterEvent" method="GET">
 
-                <!-- Filter Options -->
-                <div class="dropdown">
-                    <button
-                        class="btn btn-custom dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                        >
-                        Filter
-                    </button>
-                    <div class="dropdown-menu">
-                        <!-- Location Filter -->
-                        <div class="filter-section">
-                            <h6>Location</h6>
-                            <div>
-                                <input
-                                    type="checkbox"
-                                    id="national"
-                                    name="location"
-                                    value="National"
-                                    checked
-                                    />
-                                <label for="national">National</label><br />
-                                <input
-                                    type="checkbox"
-                                    id="hcm"
-                                    name="location"
-                                    value="Ho Chi Minh city"
-                                    />
-                                <label for="hcm">Ho Chi Minh city</label><br />
-                                <input
-                                    type="checkbox"
-                                    id="hanoi"
-                                    name="location"
-                                    value="Ha Noi"
-                                    />
-                                <label for="hanoi">Ha Noi</label><br />
-                                <input
-                                    type="checkbox"
-                                    id="dalat"
-                                    name="location"
-                                    value="Dalat city"
-                                    />
-                                <label for="dalat">Dalat city</label><br />
-                                <input
-                                    type="checkbox"
-                                    id="other"
-                                    name="location"
-                                    value="Other locations"
-                                    />
-                                <label for="other">Other locations</label>
-                            </div>
-                        </div>
+            <!-- Filter Date -->
+            <div>
+                <input type="date" name="startDate" id="startDate"> <br>
+                <input type="date" name="endDate" id="endDate">
+            </div> <br>
 
-                        <!-- Price Filter -->
-                        <div class="filter-section">
-                            <h6>Price</h6>
-                            <div>
-                                <label for="priceToggle">Free</label>
-                                <input type="checkbox" id="priceToggle" />
-                            </div>
-                        </div>
+            <!-- Filter Category -->
+            <div class="filter-section">
+                <h6>Categories</h6>
+                <input type="checkbox" name="category" value="1"> Concert <br>
+                <input type="checkbox" name="category" value="2"> Technology <br>
+                <input type="checkbox" name="category" value="3"> Sports <br>
+                <input type="checkbox" name="category" value="4"> Festival <br>
+                <input type="checkbox" name="category" value="5"> Exhibition <br>
+            </div> <br>
 
-                        <!-- Categories Filter -->
-                        <!-- Categories Filter -->
-                        <div class="filter-section">
-                            <h6>Categories</h6>
-                            <div class="filter-category">
-                                <input
-                                    type="checkbox"
-                                    id="categoryMusic"
-                                    name="category"
-                                    value="Music"
-                                    />
-                                <label for="categoryMusic">Music</label><br />
-                                <input
-                                    type="checkbox"
-                                    id="categoryTheaters"
-                                    name="category"
-                                    value="Theaters & Art"
-                                    />
-                                <label for="categoryTheaters">Theaters & Art</label><br />
-                                <input
-                                    type="checkbox"
-                                    id="categorySport"
-                                    name="category"
-                                    value="Sport"
-                                    />
-                                <label for="categorySport">Sport</label><br />
-                                <input
-                                    type="checkbox"
-                                    id="categoryOthers"
-                                    name="category"
-                                    value="Others"
-                                    />
-                                <label for="categoryOthers">Others</label>
-                            </div>
-                        </div>
+            <!-- Filter Price -->
+            <div class="filter-section">
+                <h6>Price</h6>
+                <input type="radio" name="price" value="below_150"> Below 150 <br>
+                <input type="radio" name="price" value="between_150_300"> Between 150 And 300 <br>
+                <input type="radio" name="price" value="greater_300"> Greater Than 300 <br>
+            </div> <br>
 
-                        <!-- Apply and Reset Buttons -->
-                        <div class="apply-reset">
-                            <button class="btn btn-outline-secondary" id="resetFilterBtn">
-                                Reset
-                            </button>
-                            <button class="btn btn-success" id="applyFilterBtn">Apply</button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Filter Location -->
+            <div class="filter-section">
+                <h6>Location</h6>
+                <input type="radio" name="location" value="Open Arena"> Open Arena <br>
+                <input type="radio" name="location" value="Tech Hub"> Tech Hub <br>
+                <input type="radio" name="location" value="Sports Arena"> Sports Arena <br>
+                <input type="radio" name="location" value="Downtown Plaza"> Downtown Plaza <br>
+                <input type="radio" name="location" value="Museum Hall"> Museum Hall <br>
+            </div> <br>
 
-                <!-- Selected Filters -->
-                <div id="selectedFilters" class="selected-filters"></div>
-            </div>
-        </div>
+            <button type="submit" class="btn btn-success">Apply</button>
+        </form>
 
+        <h2>Filtered Events</h2>
+        <div id="filteredResults"></div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            var baseUrl = "${pageContext.request.contextPath}";
+        </script>
+        <script>
+            $(document).ready(function () {
+                $("#filterForm").submit(function (event) {
+                    event.preventDefault(); // Ngăn chặn tải lại trang
+
+                    $.ajax({
+                        type: "GET",
+                        url: baseUrl + "/filterEvent", // Sử dụng biến baseUrl
+                        data: $("#filterForm").serialize(),
+                        success: function (response) {
+                            $("#filteredResults").html(response);
+                        },
+                        error: function () {
+                            $("#filteredResults").html("<p style='color:red;'>Lỗi khi tải dữ liệu.</p>");
+                        }
+                    });
+                });
+            });
+        </script>
     </body>
 </html>

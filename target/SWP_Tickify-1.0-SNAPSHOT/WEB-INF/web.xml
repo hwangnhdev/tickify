@@ -16,6 +16,10 @@
         <servlet-name>SearchEventController</servlet-name>
         <servlet-class>controllers.SearchEventController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>FilterEventController</servlet-name>
+        <servlet-class>controllers.FilterEventController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EventController</servlet-name>
         <url-pattern>/event</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>SearchEventController</servlet-name>
         <url-pattern>/searchEvent</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FilterEventController</servlet-name>
+        <url-pattern>/filterEvent</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

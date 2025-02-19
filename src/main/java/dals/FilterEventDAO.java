@@ -21,39 +21,49 @@ import utils.DBContext;
  */
 public class FilterEventDAO extends DBContext {
 
+    /*searchEventsByQuery*/
     public List<Events> getFilteredEvents(FilterEvent filters) {
         List<Events> events = new ArrayList<>();
 
-        // Base query
-        StringBuilder sql = new StringBuilder("SELECT DISTINCT e.* \n"
-                + "FROM Events e\n"
-                + "LEFT JOIN TicketTypes t ON e.event_id = t.event_id\n"
-                + "LEFT JOIN Vouchers v ON v.voucher_id IS NOT NULL\n"
+        // Constructing the base SQL query with event details
+        StringBuilder sql = new StringBuilder("SELECT DISTINCT e.event_id, e.category_id, e.event_name, e.location, "
+                + "e.event_type, e.status, e.description, "
+                + "CAST(e.start_date AS DATE) AS start_date, CAST(e.end_date AS DATE) AS end_date, "
+                + "CAST(e.created_at AS DATE) AS created_at, CAST(e.updated_at AS DATE) AS updated_at "
+                + "FROM Events e "
+                + "LEFT JOIN TicketTypes t ON e.event_id = t.event_id "
                 + "WHERE 1 = 1 ");
 
-        // Parameters
+        // List to store query parameters
         List<Object> parameters = new ArrayList<>();
 
-        // Filter by category
-        if (filters.getCategoryID() != null) {
-            sql.append(" AND e.category_id = ?");
-            parameters.add(filters.getCategoryID());
+        // Filtering by category IDs
+        if (filters.getCategoryID() != null && !filters.getCategoryID().isEmpty()) {
+            StringBuilder categoryPlaceholders = new StringBuilder();
+            for (int i = 0; i < filters.getCategoryID().size(); i++) {
+                if (i > 0) {
+                    categoryPlaceholders.append(", ");
+                }
+                categoryPlaceholders.append("?");
+            }
+            sql.append(" AND e.category_id IN (" + categoryPlaceholders + ")");
+            parameters.addAll(filters.getCategoryID());
         }
 
-        // Filter by location
+        // Filtering by location
         if (filters.getLocation() != null && !filters.getLocation().isEmpty()) {
             sql.append(" AND e.location LIKE ?");
             parameters.add("%" + filters.getLocation() + "%");
         }
 
-        // Filter by date range
+        // Filtering by event date range
         if (filters.getStartDate() != null && filters.getEndDate() != null) {
             sql.append(" AND e.start_date >= ? AND e.end_date <= ?");
-            parameters.add(filters.getStartDate());
-            parameters.add(filters.getEndDate());
+            parameters.add(new java.sql.Date(filters.getStartDate().getTime()));
+            parameters.add(new java.sql.Date(filters.getEndDate().getTime()));
         }
 
-        // Filter by price range
+        // Filtering by price range
         if (filters.getPrice() != null) {
             switch (filters.getPrice()) {
                 case "below_150":
@@ -68,16 +78,22 @@ public class FilterEventDAO extends DBContext {
             }
         }
 
-        // Filter events that have vouchers
+        // Filtering by voucher availability
         if (filters.isVouchers()) {
             sql.append(" AND v.voucher_id IS NOT NULL");
         }
 
+        // Print the final SQL query and parameters for debugging
+        System.out.println("Final SQL Query: " + sql.toString());
+        System.out.println("Parameters: " + parameters);
+
         try ( PreparedStatement st = connection.prepareStatement(sql.toString())) {
+            // Set query parameters dynamically
             for (int i = 0; i < parameters.size(); i++) {
                 st.setObject(i + 1, parameters.get(i));
             }
 
+            // Execute query and process results
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 Events event = new Events(
@@ -96,32 +112,36 @@ public class FilterEventDAO extends DBContext {
                 events.add(event);
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching filtered events: " + e.getMessage());
+            System.err.println("Error fetching filtered events: " + e.getMessage());
         }
 
         return events;
     }
 
     public static void main(String[] args) {
-        FilterEventDAO filterEventDAO = new FilterEventDAO();
-
-        // Thiết lập các bộ lọc
-        List<Integer> categories = Arrays.asList(1, 2);
-        String location = "Open Arena";
-        Date startDate = Date.valueOf("2025-06-20 00:00:00.000");
-        Date endDate = Date.valueOf("2025-06-21 00:00:00.000");
-        String priceRange = "between_150_300"; // Các giá trị hợp lệ: "below 150", "between 150 and 300", "greater than 300"
-        boolean hasVoucher = true;
-
-        // Tạo đối tượng FilterEvent
-        FilterEvent filterEvent = new FilterEvent(categories, location, startDate, endDate, priceRange, hasVoucher);
-
-        // Gọi phương thức lọc sự kiện
-        List<Events> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
-
-        // Hiển thị kết quả
-        for (Events event : filteredEvents) {
-            System.out.println(event.getEventName());
-        }
+        /*getFilteredEvents*/
+//        FilterEventDAO filterEventDAO = new FilterEventDAO();
+//
+//        // Defining filter criteria
+//        List<Integer> categories = Arrays.asList(1, 2);
+//        String location = "Tech Hub";
+//        Date startDate = Date.valueOf("2025-07-25");
+//        Date endDate = Date.valueOf("2025-07-26");
+//        String priceRange = "below_150";
+//        boolean hasVoucher = true;
+//
+//        // Creating a filter object with the specified criteria
+//        FilterEvent filterEvent = new FilterEvent(categories, location, startDate, endDate, priceRange, false);
+//
+//        // Fetching the filtered events
+//        List<Events> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
+//        int count = 0;
+//
+//        // Printing the event names and count of filtered events
+//        for (Events event : filteredEvents) {
+//            System.out.println(event.getEventName());
+//            count++;
+//        }
+//        System.out.println(count);
     }
 }

@@ -1,6 +1,5 @@
 controllers\AllEventsController.class
 controllers\SearchEventController.class
-couldinaryConfig\CloudinaryUpload.class
 dals\TicketDAO.class
 models\Categories.class
 models\UserFacebookDTO.class
@@ -25,7 +24,6 @@ models\Customers.class
 models\Tickets.class
 dals\TicketTypeDAO.class
 models\Vouchers.class
-couldinaryConfig\CouldinaryConfig.class
 models\Admins.class
 models\Events.class
 utils\EmailUtility.class

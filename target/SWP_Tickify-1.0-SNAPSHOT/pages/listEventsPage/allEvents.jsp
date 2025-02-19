@@ -69,6 +69,12 @@
         <!--Header-->
         <jsp:include page="../../components/header.jsp"></jsp:include>
 
+            <!--Header-->
+        <jsp:include page="../../pages/listEventsPage/filterEvents.jsp"></jsp:include>
+
+            <!--Header-->
+        <jsp:include page="../../pages/listEventsPage/searchEvent.jsp"></jsp:include>
+
             <div>
                 <!--All Event--> 
                 <h2 class="title-all_events" id="title-all_events">All Events</h2>
