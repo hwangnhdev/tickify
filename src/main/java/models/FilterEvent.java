@@ -19,17 +19,19 @@ public class FilterEvent {
     private Date endDate;
     private String price;
     private boolean vouchers;
+    private String searchQuery;
 
     public FilterEvent() {
     }
 
-    public FilterEvent(List<Integer> categoryID, String location, Date startDate, Date endDate, String price, boolean vouchers) {
+    public FilterEvent(List<Integer> categoryID, String location, Date startDate, Date endDate, String price, boolean vouchers, String searchQuery) {
         this.categoryID = categoryID;
         this.location = location;
         this.startDate = startDate;
         this.endDate = endDate;
         this.price = price;
         this.vouchers = vouchers;
+        this.searchQuery = searchQuery;
     }
 
     public List<Integer> getCategoryID() {
@@ -78,6 +80,14 @@ public class FilterEvent {
 
     public void setVouchers(boolean vouchers) {
         this.vouchers = vouchers;
+    }
+
+    public String getSearchQuery() {
+        return searchQuery;
+    }
+
+    public void setSearchQuery(String searchQuery) {
+        this.searchQuery = searchQuery;
     }
 
 }

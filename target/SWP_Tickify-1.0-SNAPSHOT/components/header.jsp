@@ -86,8 +86,8 @@
             </div>
             <div class="search-bar-header">
                 <!--Search Event-->
-                <form action="searchEvent" method="GET">
-                    <input type="text" name="query" placeholder="What are you looking for today?" required>
+                <form action="allEvents" method="GET">
+                    <input type="text" value="${searchQuery != null ? searchQuery : ''}" name="query" placeholder="What are you looking for today?" required>
                     <button type="submit">Search</button>
                 </form>
                 <!--<button>Search</button>-->

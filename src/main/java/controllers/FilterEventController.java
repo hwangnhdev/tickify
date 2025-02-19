@@ -69,6 +69,7 @@ public class FilterEventController extends HttpServlet {
         String startDateStr = request.getParameter("startDate");
         String endDateStr = request.getParameter("endDate");
         String price = request.getParameter("price");
+        String searchQuery = request.getParameter("searchEvent");
 
         // Chuyển đổi tham số sang kiểu dữ liệu tương ứng
         List<Integer> categories = new ArrayList<>();
@@ -82,24 +83,28 @@ public class FilterEventController extends HttpServlet {
         Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? Date.valueOf(endDateStr) : null;
 
         // Tạo đối tượng bộ lọc
-        FilterEvent filters = new FilterEvent(categories, location, startDate, endDate, price, false);
+        FilterEvent filters = new FilterEvent(null, null, null, null, null, false, searchQuery);
 
         // Lấy danh sách sự kiện đã lọc
         List<Events> filteredEvents = filterEventDAO.getFilteredEvents(filters);
+        System.out.println("Filtered Events: " + filteredEvents); // Debug log
 
-        // Định dạng HTML trả về
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
+        request.setAttribute("filteredEvents", filteredEvents);
+        request.getRequestDispatcher("pages/listEventsPage/allEvents.jsp").forward(request, response);
 
-        if (filteredEvents.isEmpty()) {
-            out.println("<p>No events found.</p>");
-        } else {
-            for (Events event : filteredEvents) {
-                out.println("<a style='text-decoration: none' href='" + request.getContextPath() + "/eventDetail?id=" + event.getEventId() + "'>");
-                out.println("<h4>" + event.getEventName() + "</h4>");
-                out.println("</a>");
-            }
-        }
+//        // Định dạng HTML trả về
+//        response.setContentType("text/html;charset=UTF-8");
+//        PrintWriter out = response.getWriter();
+//
+//        if (filteredEvents.isEmpty()) {
+//            out.println("<p>No events found.</p>");
+//        } else {
+//            for (Events event : filteredEvents) {
+//                out.println("<a style='text-decoration: none' href='" + request.getContextPath() + "/eventDetail?id=" + event.getEventId() + "'>");
+//                out.println("<h4>" + event.getEventName() + "</h4>");
+//                out.println("</a>");
+//            }
+//        }
     }
 
     /**

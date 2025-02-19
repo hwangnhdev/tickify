@@ -83,6 +83,12 @@ public class FilterEventDAO extends DBContext {
             sql.append(" AND v.voucher_id IS NOT NULL");
         }
 
+        // Filtering by Search
+        if (filters.getSearchQuery()!= null && !filters.getSearchQuery().isEmpty()) {
+            sql.append(" AND e.event_name LIKE ?");
+            parameters.add("%" + filters.getSearchQuery() + "%");
+        }
+
         // Print the final SQL query and parameters for debugging
         System.out.println("Final SQL Query: " + sql.toString());
         System.out.println("Parameters: " + parameters);
@@ -120,28 +126,29 @@ public class FilterEventDAO extends DBContext {
 
     public static void main(String[] args) {
         /*getFilteredEvents*/
-//        FilterEventDAO filterEventDAO = new FilterEventDAO();
-//
-//        // Defining filter criteria
-//        List<Integer> categories = Arrays.asList(1, 2);
-//        String location = "Tech Hub";
-//        Date startDate = Date.valueOf("2025-07-25");
-//        Date endDate = Date.valueOf("2025-07-26");
-//        String priceRange = "below_150";
-//        boolean hasVoucher = true;
-//
-//        // Creating a filter object with the specified criteria
-//        FilterEvent filterEvent = new FilterEvent(categories, location, startDate, endDate, priceRange, false);
-//
-//        // Fetching the filtered events
-//        List<Events> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
-//        int count = 0;
-//
-//        // Printing the event names and count of filtered events
-//        for (Events event : filteredEvents) {
-//            System.out.println(event.getEventName());
-//            count++;
-//        }
-//        System.out.println(count);
+        FilterEventDAO filterEventDAO = new FilterEventDAO();
+
+        // Defining filter criteria
+        List<Integer> categories = Arrays.asList(1, 2);
+        String location = "Tech Hub";
+        Date startDate = Date.valueOf("2025-07-25");
+        Date endDate = Date.valueOf("2025-07-26");
+        String priceRange = "below_150";
+        boolean hasVoucher = true;
+        String query = "AI & Robotics Summit";
+
+        // Creating a filter object with the specified criteria
+        FilterEvent filterEvent = new FilterEvent(null, null, null, null, null, false, query);
+
+        // Fetching the filtered events
+        List<Events> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
+        int count = 0;
+
+        // Printing the event names and count of filtered events
+        for (Events event : filteredEvents) {
+            System.out.println(event.getEventName());
+            count++;
+        }
+        System.out.println(count);
     }
 }
