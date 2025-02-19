@@ -29,10 +29,12 @@ public class FilterEventDAO extends DBContext {
         StringBuilder sql = new StringBuilder("SELECT DISTINCT e.event_id, e.category_id, e.event_name, e.location, "
                 + "e.event_type, e.status, e.description, "
                 + "CAST(e.start_date AS DATE) AS start_date, CAST(e.end_date AS DATE) AS end_date, "
-                + "CAST(e.created_at AS DATE) AS created_at, CAST(e.updated_at AS DATE) AS updated_at "
+                + "CAST(e.created_at AS DATE) AS created_at, CAST(e.updated_at AS DATE) AS updated_at, "
+                + "ei. * "
                 + "FROM Events e "
                 + "LEFT JOIN TicketTypes t ON e.event_id = t.event_id "
-                + "WHERE 1 = 1 ");
+                + "LEFT JOIN EventImages ei ON ei.event_id = e.event_id "
+                + "WHERE 1 = 1 AND ei.image_title LIKE '%banner%' ");
 
         // List to store query parameters
         List<Object> parameters = new ArrayList<>();
@@ -84,7 +86,7 @@ public class FilterEventDAO extends DBContext {
         }
 
         // Filtering by Search
-        if (filters.getSearchQuery()!= null && !filters.getSearchQuery().isEmpty()) {
+        if (filters.getSearchQuery() != null && !filters.getSearchQuery().isEmpty()) {
             sql.append(" AND e.event_name LIKE ?");
             parameters.add("%" + filters.getSearchQuery() + "%");
         }
@@ -104,16 +106,9 @@ public class FilterEventDAO extends DBContext {
             while (rs.next()) {
                 Events event = new Events(
                         rs.getInt("event_id"),
-                        rs.getInt("category_id"),
                         rs.getString("event_name"),
-                        rs.getString("location"),
-                        rs.getString("event_type"),
-                        rs.getString("status"),
-                        rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
                 );
                 events.add(event);
             }
@@ -147,6 +142,8 @@ public class FilterEventDAO extends DBContext {
         // Printing the event names and count of filtered events
         for (Events event : filteredEvents) {
             System.out.println(event.getEventName());
+            System.out.println(event.getImageTitle());
+            System.out.println(event.getImageURL());
             count++;
         }
         System.out.println(count);
