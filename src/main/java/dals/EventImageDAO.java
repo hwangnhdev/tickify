@@ -71,6 +71,7 @@ public class EventImageDAO extends DBContext {
 //            System.out.println(event.getEventId());
 //            System.out.println(event.getImageUrl());
 //        }
+
         /*getImagesByEventId*/
         EventImageDAO ld = new EventImageDAO();
         List<EventImages> list = ld.getImagesByEventId(1);
