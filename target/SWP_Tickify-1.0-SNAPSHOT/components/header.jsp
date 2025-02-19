@@ -99,23 +99,20 @@
             </div>
         </header>
         <nav class="categories-header">
-            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=liveMusic">
-                Live Music
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=theaterArts">
-                Theater & Arts
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=sports">
-                Sports
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=concert">
+            <a style="text-decoration: none; color: white;" href="allEvents?category=1">
                 Concert
             </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=technology">
+            <a style="text-decoration: none; color: white;" href="allEvents?category=2">
                 Technology
             </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?idCatgory=comedyShows">
-                Comedy Shows
+            <a style="text-decoration: none; color: white;" href="allEvents?category=3">
+                Sports
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?category=4">
+                Festival
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?category=5">
+                Exhibition
             </a>
         </nav>
     </body>

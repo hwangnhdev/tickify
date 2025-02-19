@@ -148,30 +148,49 @@
                 <!-- Filter Category (Multiple Selection) -->
                 <div class="filter-group">
                     <label>Category:</label>
-                    <c:set var="selectedCategoryList" value="${selectedCategories}" />
+                    <c:set var="selectedCategoryList" value="${sessionScope.selectedCategories}" />
 
                     <input type="checkbox" name="category" value="1"
-                           <c:if test="${selectedCategoryList != null && selectedCategoryList.contains(1)}">checked</c:if>> Concert <br>
+                           <c:forEach var="category" items="${selectedCategoryList}">
+                               <c:if test="${category == 1}">
+                                   checked
+                               </c:if>
+                           </c:forEach>> Concert <br>
 
-                           <input type="checkbox" name="category" value="2"
-                           <c:if test="${selectedCategoryList != null && selectedCategoryList.contains(2)}">checked</c:if>> Technology <br>
+                    <input type="checkbox" name="category" value="2"
+                           <c:forEach var="category" items="${selectedCategoryList}">
+                               <c:if test="${category == 2}">
+                                   checked
+                               </c:if>
+                           </c:forEach>> Technology <br>
 
-                           <input type="checkbox" name="category" value="3"
-                           <c:if test="${selectedCategoryList != null && selectedCategoryList.contains(3)}">checked</c:if>> Sports <br>
+                    <input type="checkbox" name="category" value="3"
+                           <c:forEach var="category" items="${selectedCategoryList}">
+                               <c:if test="${category == 3}">
+                                   checked
+                               </c:if>
+                           </c:forEach>> Sports <br>
 
-                           <input type="checkbox" name="category" value="4"
-                           <c:if test="${selectedCategoryList != null && selectedCategoryList.contains(4)}">checked</c:if>> Festival <br>
+                    <input type="checkbox" name="category" value="4"
+                           <c:forEach var="category" items="${selectedCategoryList}">
+                               <c:if test="${category == 4}">
+                                   checked
+                               </c:if>
+                           </c:forEach>> Festival <br>
 
-                           <input type="checkbox" name="category" value="5"
-                           <c:if test="${selectedCategoryList != null && selectedCategoryList.contains(5)}">checked</c:if>> Exhibition <br>
-                    </div>
+                    <input type="checkbox" name="category" value="5"
+                           <c:forEach var="category" items="${selectedCategoryList}">
+                               <c:if test="${category == 5}">
+                                   checked
+                               </c:if>
+                           </c:forEach>> Exhibition <br>
+                </div>
 
-
-                    <!-- Filter Price (Dropdown) -->
-                    <div class="filter-group">
-                        <label for="priceDropdown">Price:</label>
-                        <select id="priceDropdown" name="price">
-                            <option value="" ${empty selectedPrice ? 'selected' : ''}>All Prices</option>
+                <!-- Filter Price (Dropdown) -->
+                <div class="filter-group">
+                    <label for="priceDropdown">Price:</label>
+                    <select id="priceDropdown" name="price">
+                        <option value="" ${empty selectedPrice ? 'selected' : ''}>All Prices</option>
                         <option value="below_150" ${selectedPrice == 'below_150' ? 'selected' : ''}>Below 150</option>
                         <option value="between_150_300" ${selectedPrice == 'between_150_300' ? 'selected' : ''}>150 - 300</option>
                         <option value="greater_300" ${selectedPrice == 'greater_300' ? 'selected' : ''}>Above 300</option>
