@@ -12,6 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Category</h1>
+        <h1>All Categories</h1>
     </body>
 </html>
