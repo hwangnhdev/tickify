@@ -11,6 +11,7 @@ import java.sql.Date;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class Categories {
+
     private int categoryId;
     private String categoryName;
     private String description;
@@ -18,7 +19,7 @@ public class Categories {
     private Date updatedAt;
 
     public Categories() {
-    }
+    }   
 
     public Categories(int categoryId, String categoryName, String description, Date createdAt, Date updatedAt) {
         this.categoryId = categoryId;
@@ -26,6 +27,17 @@ public class Categories {
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public Categories(String categoryName, String description) {
+        this.categoryName = categoryName;
+        this.description = description;
+    }
+
+    public Categories(int categoryId, String categoryName, String description) {
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.description = description;
     }
 
     public int getCategoryId() {
@@ -67,6 +79,5 @@ public class Categories {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
-    
+
 }
