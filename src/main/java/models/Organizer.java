@@ -10,7 +10,7 @@ import java.sql.Date;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Organizers {
+public class Organizer {
     private int organizerId;
     private int customerId;
     private int eventId;
@@ -18,10 +18,10 @@ public class Organizers {
     private Date createdAt;
     private Date updatedAt;
 
-    public Organizers() {
+    public Organizer() {
     }
 
-    public Organizers(int organizerId, int customerId, int eventId, String organizationName, Date createdAt, Date updatedAt) {
+    public Organizer(int organizerId, int customerId, int eventId, String organizationName, Date createdAt, Date updatedAt) {
         this.organizerId = organizerId;
         this.customerId = customerId;
         this.eventId = eventId;

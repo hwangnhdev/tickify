@@ -67,7 +67,7 @@
 </head>
 <body>
     <!-- Further code here -->
-    <form id="otpForm" action="verifyOtpServlet" method="POST">
+    <form id="otpForm" action="<%= request.getContextPath()%>/verifyOtp" method="POST">
         <input type="hidden" name="otp" id="otpInput">
         <p>OTP sent on ${sessionScope.userForgetPassword.getEmail()}</p>
         <h1>Enter OTP</h1>

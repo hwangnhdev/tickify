@@ -21,7 +21,7 @@ public class Categories {
     public Categories() {
     }   
 
-    public Categories(int categoryId, String categoryName, String description, Date createdAt, Date updatedAt) {
+    public Category(int categoryId, String categoryName, String description, Date createdAt, Date updatedAt) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.description = description;

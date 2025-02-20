@@ -8,16 +8,16 @@ package models;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Admins {
+public class Admin {
     private int adminId;
     private String name;
     private String email;
     private String password;
 
-    public Admins() {
+    public Admin() {
     }
 
-    public Admins(int adminId, String name, String email, String password) {
+    public Admin(int adminId, String name, String email, String password) {
         this.adminId = adminId;
         this.name = name;
         this.email = email;

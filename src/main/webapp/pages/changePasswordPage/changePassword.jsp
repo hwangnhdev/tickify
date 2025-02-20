@@ -1,6 +1,6 @@
 <%-- 
-    Document   : forgetPassword
-    Created on : Jan 26, 2025, 11:50:24 AM
+    Document   : changePassword
+    Created on : Jan 26, 2025, 11:49:12 AM
     Author     : Nguyen Huy Hoang - CE182102
 --%>
 
@@ -11,7 +11,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Forget Password Page</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-        
+
         <style>
             @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
@@ -109,9 +109,40 @@
                 margin: 8px 0;
                 width: 100%;
             }
-            
+
             input:last-child {
                 background: #000;
+            }
+
+            input[readonly] {
+                background-color: #e9ecef;
+                cursor: not-allowed;
+            }
+
+            input:focus-visible {
+                outline: none;
+                border: none;
+            }
+
+            .password-container {
+                position: relative;
+                background-color: #eee;
+                border: none;
+                margin: 8px 0;
+                width: 100%;
+            }
+
+            .password-container input {
+                margin: 0;
+            }
+
+            .toggle-password {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                font-size: 18px;
             }
 
             .container {
@@ -162,17 +193,67 @@
 
     <body>
         <div class="container" id="container">
+            <!-- Reset Password Form -->
             <div class="form-container log-in-container">
-                <form action="forgetPasswordServlet" method="post">
-                    <h1>Forget Password</h1>
-                    
-                    <!--Input-->
-                    <input type="hidden" name="action" value="forget"/>
-                    <input type="email" placeholder="Email" name="email" />
-                    <button style="margin-top: 34px" >Send mail</button>
+                <form action="<%= request.getContextPath()%>/resetPassword" method="post">
+                    <h1>Reset Password</h1>
+
+                    <!-- Hidden Input -->
+                    <input type="hidden" name="action" value="resetPassword"/>
+                    <input type="email" name="email" value="${email}" readonly/>
+
+                    <!-- New Password -->
+                    <div class="password-container">
+                        <input type="password" placeholder="New Password" name="newPassword" required>
+                        <span class="toggle-password">
+                            <i class="fa-regular fa-eye"></i>
+                        </span>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="password-container">
+                        <input type="password" placeholder="Confirm Password" name="confirmPassword" required>
+                        <span class="toggle-password">
+                            <i class="fa-regular fa-eye"></i>
+                        </span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button style="margin-top: 34px">Save Password</button>
                 </form>
             </div>
-            
         </div>
+
+        <script>
+            const togglePasswordIcons = document.querySelectorAll('.toggle-password');
+
+            togglePasswordIcons.forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    const passwordField = this.previousElementSibling;
+                    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordField.setAttribute('type', type);
+
+                    // Toggle the icon
+                    if (type === 'password') {
+                        this.innerHTML = '<i class="fa-regular fa-eye"></i>';
+                    } else {
+                        this.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
+                    }
+                });
+            });
+
+
+            const signUpButton = document.getElementById('signUp');
+            const signInButton = document.getElementById('signIn');
+            const container = document.getElementById('container');
+
+            signUpButton.addEventListener('click', () => {
+                container.classList.add("right-panel-active");
+            });
+
+            signInButton.addEventListener('click', () => {
+                container.classList.remove("right-panel-active");
+            });
+        </script>
     </body>
 </html>

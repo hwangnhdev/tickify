@@ -10,7 +10,7 @@ import java.sql.Date;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Vouchers {
+public class Voucher {
     private int voucherId;
     private String code;
     private String description;
@@ -22,10 +22,10 @@ public class Vouchers {
     private Date createdAt;
     private Date updatedAt;
 
-    public Vouchers() {
+    public Voucher() {
     }
 
-    public Vouchers(int voucherId, String code, String description, String discountType, double discountValue, Date expirationDate, int usageLimit, int status, Date createdAt, Date updatedAt) {
+    public Voucher(int voucherId, String code, String description, String discountType, double discountValue, Date expirationDate, int usageLimit, int status, Date createdAt, Date updatedAt) {
         this.voucherId = voucherId;
         this.code = code;
         this.description = description;

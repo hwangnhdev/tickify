@@ -22,10 +22,10 @@ public class TicketTypes {
     private Date createdAt;
     private Date updatedAt;
 
-    public TicketTypes() {
+    public TicketType() {
     }
 
-    public TicketTypes(int ticketTypeId, int eventId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+    public TicketType(int ticketTypeId, int eventId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
         this.ticketTypeId = ticketTypeId;
         this.eventId = eventId;
         this.name = name;

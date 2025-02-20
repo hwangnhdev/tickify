@@ -92,7 +92,8 @@
             }
 
             form {
-                background-color: rgb(39, 39, 42);;
+                background-color: rgb(39, 39, 42);
+                ;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -109,7 +110,7 @@
                 margin: 8px 0;
                 width: 100%;
             }
-            
+
             .password-container {
                 position: relative;
                 background-color: #eee;
@@ -117,7 +118,7 @@
                 margin: 8px 0;
                 width: 100%;
             }
-            
+
             .password-container input {
                 margin: 0;
             }
@@ -129,6 +130,7 @@
                 transform: translateY(-50%);
                 cursor: pointer;
                 font-size: 18px;
+                color: black;
             }
 
             .forgetLink {
@@ -291,49 +293,51 @@
     </head>
 
     <body>
-        <!--Sign Up-->
         <div class="container" id="container">
+            <!--Sign Up-->
             <div class="form-container sign-up-container">
-                <form action="auth" method="post">
+                <form action="<%= request.getContextPath()%>/verifyEmail" method="post">
                     <h1>Create Account</h1>
                     <div class="social-container">
-                        <a href="" class="social"><i class="fab fa-facebook-f"></i></a>
-                        <a href="" class="social"><i class="fab fa-google-plus-g"></i></a>
-                        <!--<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>-->
+                        <a href="https://www.facebook.com/v21.0/dialog/oauth?client_id=489098020910683&redirect_uri=http://localhost:8080/Tickify/loginFacebookHandler" class="social"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://accounts.google.com/o/oauth2/auth?scope=email profile openid&redirect_uri=http://localhost:8080/Tickify/loginGoogleHandler&response_type=code&client_id=349879213313-a8ic1a7q67r2ig4oue1vrungp83kkq26.apps.googleusercontent.com&approval_prompt=force" class="social"><i class="fab fa-google-plus-g"></i></a>
                     </div>
                     <span>or use your email for registration</span>
 
                     <!--Input-->
                     <input type="hidden" name="action" value="signup"/>
-                    <input type="text" placeholder="Name (8-50 chars)" name="name"/>
-                    <input type="email" placeholder="Email" name="email"/>
-                    <input type="password" placeholder="Password (8-50 chars)" name="password"/>
+                    <input type="text" placeholder="Name (8-50 chars)" name="name" required/>
+                    <input type="email" placeholder="Email" name="email" required/>
+                    <div class="password-container">
+                        <input type="password" placeholder="Password (8-50 chars)" name="password" required>
+                        <span class="toggle-password">
+                            <i class="fa-regular fa-eye"></i>
+                        </span>
+                    </div>
                     <button style="margin-top: 20px;">Sign Up</button>
                 </form>
             </div>
 
             <!--Log In-->
             <div class="form-container log-in-container">
-                <form action="auth" method="post">
+                <form action="<%= request.getContextPath()%>/auth" method="post">
                     <h1>Log In</h1>
                     <div class="social-container">
-                        <a href="" class="social"><i class="fab fa-facebook-f"></i></a>
-                        <a href="" class="social"><i class="fab fa-google-plus-g"></i></a>
-                        <!--<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>-->
+                        <a href="https://www.facebook.com/v21.0/dialog/oauth?client_id=489098020910683&redirect_uri=http://localhost:8080/Tickify/loginFacebookHandler" class="social"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://accounts.google.com/o/oauth2/auth?scope=email profile openid&redirect_uri=http://localhost:8080/Tickify/loginGoogleHandler&response_type=code&client_id=349879213313-a8ic1a7q67r2ig4oue1vrungp83kkq26.apps.googleusercontent.com&approval_prompt=force" class="social"><i class="fab fa-google-plus-g"></i></a>
                     </div>
                     <span>or use your account</span>
 
                     <!--Input-->
                     <input type="hidden" name="action" value="login"/>
-                    <input type="email" placeholder="Email" name="email" />
+                    <input type="email" placeholder="Email" name="email" required/>
                     <div class="password-container">
                         <input type="password" placeholder="Password" name="password" required>
                         <span class="toggle-password">
                             <i class="fa-regular fa-eye"></i>
                         </span>
                     </div>
-                    <!--<input type="password" placeholder="Password" name="password" />-->
-                    <a href="forgetPassword.jsp" class="forgetLink">Forgot your password?</a>
+                    <a href="<%= request.getContextPath()%>/pages/forgetPasswordPage/forgetPassword.jsp" class="forgetLink">Forgot your password?</a>
                     <button>Log In</button>
                 </form>
             </div>

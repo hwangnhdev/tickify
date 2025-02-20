@@ -26,10 +26,10 @@ public class Events {
     private String imageURL;
     private String imageTitle;
 
-    public Events() {
+    public Event() {
     }
 
-    public Events(int eventId, int categoryId, String eventName, String location, String eventType, String status, String description, Date startDate, Date endDate, Date createdAt, Date updatedAt) {
+    public Event(int eventId, int categoryId, String eventName, String location, String eventType, String status, String description, Date startDate, Date endDate, Date createdAt, Date updatedAt) {
         this.eventId = eventId;
         this.categoryId = categoryId;
         this.eventName = eventName;

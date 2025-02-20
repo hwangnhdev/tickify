@@ -10,7 +10,7 @@ import java.sql.Date;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Orders {
+public class Order {
     private int orderId;
     private int customerId;
     private int voucherId;
@@ -21,10 +21,10 @@ public class Orders {
     private Date createdAt;
     private Date updatedAt;
 
-    public Orders() {
+    public Order() {
     }
 
-    public Orders(int orderId, int customerId, int voucherId, double totalPrice, Date orderDate, String paymentStatus, String transactionId, Date createdAt, Date updatedAt) {
+    public Order(int orderId, int customerId, int voucherId, double totalPrice, Date orderDate, String paymentStatus, String transactionId, Date createdAt, Date updatedAt) {
         this.orderId = orderId;
         this.customerId = customerId;
         this.voucherId = voucherId;

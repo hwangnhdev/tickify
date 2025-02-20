@@ -16,10 +16,10 @@ public class OrderDetails {
     private int quantity;
     private double price;
 
-    public OrderDetails() {
+    public OrderDetail() {
     }
 
-    public OrderDetails(int orderDetailId, int orderId, int ticketTypeId, int quantity, double price) {
+    public OrderDetail(int orderDetailId, int orderId, int ticketTypeId, int quantity, double price) {
         this.orderDetailId = orderDetailId;
         this.orderId = orderId;
         this.ticketTypeId = ticketTypeId;

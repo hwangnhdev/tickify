@@ -1,6 +1,6 @@
 <%-- 
-    Document   : changePassword
-    Created on : Jan 26, 2025, 11:49:12 AM
+    Document   : forgetPassword
+    Created on : Jan 26, 2025, 11:50:24 AM
     Author     : Nguyen Huy Hoang - CE182102
 --%>
 
@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Forget Password Page</title>
+        <title>Input Email Page</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
         
         <style>
@@ -113,11 +113,6 @@
             input:last-child {
                 background: #000;
             }
-            
-            input[readonly] {
-                background-color: #e9ecef;
-                cursor: not-allowed;
-            }
 
             .container {
                 background-color: #fff;
@@ -167,17 +162,14 @@
 
     <body>
         <div class="container" id="container">
-            <!--Log In-->
             <div class="form-container log-in-container">
-                <form action="changePasswordServlet" method="post">
-                    <h1>Forget Password</h1>
+                <form action="<%= request.getContextPath()%>/verifyEmail" method="post">
+                    <h1>Input your Email</h1>
                     
                     <!--Input-->
-                    <input type="hidden" name="action" value="forget"/>
-                    <input type="email" placeholder="Email" name="email" value="${userForgetPassword.getEmail()}" readonly/>
-                    <input type="password" placeholder="Password" name="password" />
-                    <input type="password" placeholder="Comfirm Password" name="comfirm_password" />
-                    <button style="margin-top: 34px" >Send mail</button>
+                    <input type="hidden" name="action" value="forgetPassword"/>
+                    <input type="email" placeholder="Email" name="email" required/>
+                    <button style="margin-top: 34px" >Send OTP</button>
                 </form>
             </div>
         </div>

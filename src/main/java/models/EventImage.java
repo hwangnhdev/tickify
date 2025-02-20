@@ -15,7 +15,7 @@ public class EventImages {
     private String imageUrl;
     private String image_title;
 
-    public EventImages() {
+    public EventImage() {
     }
 
     public EventImages(int imageId, int eventId, String imageUrl, String image_title) {
