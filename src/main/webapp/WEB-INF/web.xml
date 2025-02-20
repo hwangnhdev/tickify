@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <servlet>
+<<<<<<< HEAD
         <servlet-name>AuthController</servlet-name>
         <servlet-class>controllers.AuthController</servlet-class>
     </servlet>
@@ -51,10 +52,64 @@
     <servlet-mapping>
         <servlet-name>ResetPasswordController</servlet-name>
         <url-pattern>/resetPassword</url-pattern>
+=======
+        <servlet-name>EventController</servlet-name>
+        <servlet-class>controllers.EventController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AllEventsController</servlet-name>
+        <servlet-class>controllers.AllEventsController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EventDetailController</servlet-name>
+        <servlet-class>controllers.EventDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SearchEventController</servlet-name>
+        <servlet-class>controllers.SearchEventController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FilterEventController</servlet-name>
+        <servlet-class>controllers.FilterEventController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CategoryController</servlet-name>
+        <servlet-class>controllers.CategoryController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EventController</servlet-name>
+        <url-pattern>/event</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AllEventsController</servlet-name>
+        <url-pattern>/allEvents</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EventDetailController</servlet-name>
+        <url-pattern>/eventDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SearchEventController</servlet-name>
+        <url-pattern>/searchEvent</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FilterEventController</servlet-name>
+        <url-pattern>/filterEvent</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CategoryController</servlet-name>
+        <url-pattern>/category</url-pattern>
+>>>>>>> 8c1a75f49d01c53b69e4b009234e5da21148d28e
     </servlet-mapping>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
+<<<<<<< HEAD
+=======
+    <welcome-file-list>
+        <welcome-file>event</welcome-file>
+    </welcome-file-list>
+>>>>>>> 8c1a75f49d01c53b69e4b009234e5da21148d28e
 </web-app>

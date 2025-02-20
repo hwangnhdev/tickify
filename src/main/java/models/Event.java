@@ -10,7 +10,8 @@ import java.sql.Date;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Event {
+public class Events {
+
     private int eventId;
     private int categoryId;
     private String eventName;
@@ -22,6 +23,8 @@ public class Event {
     private Date endDate;
     private Date createdAt;
     private Date updatedAt;
+    private String imageURL;
+    private String imageTitle;
 
     public Event() {
     }
@@ -39,6 +42,116 @@ public class Event {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-    
-    
+
+    public Events(int eventId, String eventName, String imageURL, String imageTitle) {
+        this.eventId = eventId;
+        this.eventName = eventName;
+        this.imageURL = imageURL;
+        this.imageTitle = imageTitle;
+    }
+
+    public int getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
+
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public String getImageTitle() {
+        return imageTitle;
+    }
+
+    public void setImageTitle(String imageTitle) {
+        this.imageTitle = imageTitle;
+    }
+
 }
