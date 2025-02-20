@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
-import models.Events;
+import models.Event;
 
 /**
  *
@@ -65,27 +65,27 @@ public class EventController extends HttpServlet {
         // Create an instance of EventDAO to interact with the database
         EventDAO eventDAO = new EventDAO();
 
-        // Get All Events
-        List<Events> listAllEvents = eventDAO.getAllEvents();
+        // Get All Event
+        List<Event> listAllEvents = eventDAO.getAllEvents();
         // Store the list of events in the request scope so it can be accessed in the JSP
         request.setAttribute("listAllEvents", listAllEvents);
 
         // Lấy danh sách sự kiện sắp diễn ra (ví dụ: lấy 10 sự kiện)
-        List<Events> upcomingEvents = eventDAO.getUpcomingEvents();
+        List<Event> upcomingEvents = eventDAO.getUpcomingEvents();
         request.setAttribute("upcomingEvents", upcomingEvents);
 
-        // Get Events Created Nearly
+        // Get Event Created Nearly
         // Retrieve a list of all events from the database
-        List<Events> listEvents = eventDAO.getTop10LatestEvents();
+        List<Event> listEvents = eventDAO.getTop10LatestEvents();
         // Store the list of events in the request scope so it can be accessed in the JSP
         request.setAttribute("listEvents", listEvents);
 
         // Get top 10 Event most popular
         // Fetch top 10 best-selling events
-        List<Events> topEvents = eventDAO.getTopEventsWithLimit();
+        List<Event> topEvents = eventDAO.getTopEventsWithLimit();
         // Split into two lists, each containing 5 events
-        List<Events> carousel1 = new ArrayList<>();
-        List<Events> carousel2 = new ArrayList<>();
+        List<Event> carousel1 = new ArrayList<>();
+        List<Event> carousel2 = new ArrayList<>();
         for (int i = 0; i < topEvents.size(); i++) {
             if (i < 5) {
                 carousel1.add(topEvents.get(i));
@@ -113,7 +113,7 @@ public class EventController extends HttpServlet {
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
 
         // Fetch paginated list of events
-        List<Events> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
+        List<Event> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
         request.setAttribute("paginatedEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -122,10 +122,10 @@ public class EventController extends HttpServlet {
 //        if (customerId == 0) {
 //            customerId = 0;
 //        }
-        List<Events> topTicketEvents = eventDAO.getTopPicksForYou(1);
+        List<Event> topTicketEvents = eventDAO.getTopPicksForYou(1);
         request.setAttribute("topTicketEvents", topTicketEvents);
 
-        List<Events> listRecommendedEvents = eventDAO.getTopPicksForYou(1);
+        List<Event> listRecommendedEvents = eventDAO.getTopPicksForYou(1);
         request.setAttribute("listRecommendedEvents", listRecommendedEvents);
 
         // Forward the request and response to the home.jsp page to display the events

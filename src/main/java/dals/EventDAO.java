@@ -9,9 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import models.Categories;
-import models.EventImages;
-import models.Events;
+import models.Category;
+import models.EventImage;
+import models.Event;
 import utils.DBContext;
 
 /**
@@ -21,8 +21,8 @@ import utils.DBContext;
 public class EventDAO extends DBContext {
 
     /*getEventsByPage*/
-    public List<Events> getEventsByPage(int page, int pageSize) {
-        List<Events> listEvents = new ArrayList<>();
+    public List<Event> getEventsByPage(int page, int pageSize) {
+        List<Event> listEvents = new ArrayList<>();
         String sql = "WITH EventPagination AS (\n"
                 + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.*\n"
                 + "    FROM Events e\n"
@@ -47,7 +47,7 @@ public class EventDAO extends DBContext {
             st.setInt(2, end);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getString("event_name"),
                         rs.getString("image_url"), // Lấy ảnh (có thể null)
@@ -80,15 +80,15 @@ public class EventDAO extends DBContext {
     }
 
     /*getAllEvents*/
-    public List<Events> getAllEvents() {
-        List<Events> listEvents = new ArrayList<>();
+    public List<Event> getAllEvents() {
+        List<Event> listEvents = new ArrayList<>();
         String sql = "SELECT * FROM Events";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getInt("category_id"),
                         rs.getString("event_name"),
@@ -110,8 +110,8 @@ public class EventDAO extends DBContext {
     }
 
     /*getTop10LatestEvents*/
-    public List<Events> getTop10LatestEvents() {
-        List<Events> listEvents = new ArrayList<>();
+    public List<Event> getTop10LatestEvents() {
+        List<Event> listEvents = new ArrayList<>();
         String sql = "SELECT TOP 10 "
                 + "e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
                 + "e.status, e.description, e.start_date, e.end_date, e.created_at, e.updated_at, "
@@ -124,7 +124,7 @@ public class EventDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getString("event_name"),
                         rs.getString("image_url"),
@@ -139,8 +139,8 @@ public class EventDAO extends DBContext {
     }
 
     /*getUpcomingEvents*/
-    public List<Events> getUpcomingEvents() {
-        List<Events> listEvents = new ArrayList<>();
+    public List<Event> getUpcomingEvents() {
+        List<Event> listEvents = new ArrayList<>();
         String sql = "SELECT TOP 10 "
                 + "e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
                 + "e.status, e.description, e.start_date, e.end_date, e.created_at, e.updated_at, "
@@ -154,7 +154,7 @@ public class EventDAO extends DBContext {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getString("event_name"),
                         rs.getString("image_url"),
@@ -169,8 +169,8 @@ public class EventDAO extends DBContext {
     }
 
     /*getTopPicksForYou*/
-    public List<Events> getTopPicksForYou(int customerId) {
-        List<Events> listEvents = new ArrayList<>();
+    public List<Event> getTopPicksForYou(int customerId) {
+        List<Event> listEvents = new ArrayList<>();
         String sql = "WITH AvgPrice AS ( "
                 + "    SELECT AVG(tt.price) AS userBudget "
                 + "    FROM Orders o "
@@ -210,7 +210,7 @@ public class EventDAO extends DBContext {
             st.setInt(1, customerId);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getString("event_name"),
                         rs.getString("image_url"),
@@ -225,8 +225,8 @@ public class EventDAO extends DBContext {
     }
 
     /*getRecommendedEvents*/
-    public List<Events> getRecommendedEvents(int customerId) {
-        List<Events> listEvents = new ArrayList<>();
+    public List<Event> getRecommendedEvents(int customerId) {
+        List<Event> listEvents = new ArrayList<>();
         String sql = "WITH UserCategories AS ( "
                 + "    SELECT DISTINCT e.category_id "
                 + "    FROM Orders o "
@@ -263,7 +263,7 @@ public class EventDAO extends DBContext {
             st.setInt(1, customerId);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getString("event_name"),
                         rs.getString("image_url"),
@@ -278,8 +278,8 @@ public class EventDAO extends DBContext {
     }
 
     /*getTopEventsWithLimit*/
-    public List<Events> getTopEventsWithLimit() {
-        List<Events> listEvents = new ArrayList<>();
+    public List<Event> getTopEventsWithLimit() {
+        List<Event> listEvents = new ArrayList<>();
         String sql = "SELECT TOP 10 \n"
                 + "    e.event_id, \n"
                 + "    e.event_name, \n"
@@ -300,7 +300,7 @@ public class EventDAO extends DBContext {
 
             // Fetch event data
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getString("event_name"),
                         rs.getString("image_url"),
@@ -315,7 +315,7 @@ public class EventDAO extends DBContext {
     }
 
     /*selectEventByID*/
-    public Events selectEventByID(int id) {
+    public Event selectEventByID(int id) {
         String sql = "SELECT * FROM Events\n"
                 + "WHERE event_id = ?";
 
@@ -327,7 +327,7 @@ public class EventDAO extends DBContext {
 
             // Fetch event data
             if (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getInt("category_id"),
                         rs.getString("event_name"),
@@ -349,7 +349,7 @@ public class EventDAO extends DBContext {
     }
 
     /*selectEventImagesByID*/
-    public EventImages selectEventImagesByID(int id) {
+    public EventImage selectEventImagesByID(int id) {
         String sql = "SELECT * FROM EventImages\n"
                 + "WHERE event_id = ? AND image_title LIKE '%banner%';";
 
@@ -361,7 +361,7 @@ public class EventDAO extends DBContext {
 
             // Fetch event data
             if (rs.next()) {
-                EventImages eventImage = new EventImages(
+                EventImage eventImage = new EventImage(
                         rs.getInt("image_id"),
                         rs.getInt("event_id"),
                         rs.getString("image_url"),
@@ -376,7 +376,7 @@ public class EventDAO extends DBContext {
     }
 
     /*selectEventCategoriesID*/
-    public Categories selectEventCategoriesID(int id) {
+    public Category selectEventCategoriesID(int id) {
         String sql = "SELECT * FROM Categories\n"
                 + "INNER JOIN Events ON Categories.category_id = Events.category_id\n"
                 + "WHERE event_id = ?";
@@ -389,7 +389,7 @@ public class EventDAO extends DBContext {
 
             // Fetch event data
             if (rs.next()) {
-                Categories eventCategories = new Categories(
+                Category eventCategories = new Category(
                         rs.getInt("category_id"),
                         rs.getString("category_name"),
                         rs.getString("description"),
@@ -405,8 +405,8 @@ public class EventDAO extends DBContext {
     }
 
     /*searchEventsByQuery*/
-    public List<Events> searchEventsByQuery(String query) {
-        List<Events> listEvents = new ArrayList<>();
+    public List<Event> searchEventsByQuery(String query) {
+        List<Event> listEvents = new ArrayList<>();
         String sql = "SELECT * FROM Events\n"
                 + "WHERE event_name LIKE ?";
 
@@ -418,7 +418,7 @@ public class EventDAO extends DBContext {
 
             // Fetch event data
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getInt("category_id"),
                         rs.getString("event_name"),
@@ -445,7 +445,7 @@ public class EventDAO extends DBContext {
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.searchEventsByQuery("Rock Festival");
 //        int count = 0;
-//        for (Events event : list) {
+//        for (Event event : list) {
 //            System.out.println(event.getEventName());
 //            count++;
 //        }
@@ -453,23 +453,23 @@ public class EventDAO extends DBContext {
 
         /*selectEventByID*/
 //        EventDAO ld = new EventDAO();
-//        Events event = ld.selectEventByID(1);
+//        Event event = ld.selectEventByID(1);
 //        System.out.println(event.getEventName());
 
         /*selectEventByID*/
 //        EventDAO ld = new EventDAO();
-//        EventImages event = ld.selectEventImagesByID(1);
+//        EventImage event = ld.selectEventImagesByID(1);
 //        System.out.println(event.getImageId());
 
         /*selectEventCategoriesID*/
 //        EventDAO ld = new EventDAO();
-//        Categories event = ld.selectEventCategoriesID(1);
+//        Category event = ld.selectEventCategoriesID(1);
 //        System.out.println(event.getCategoryName());
 
         /*getTopEventsWithLimit*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getTopEventsWithLimit();
-//        for (Events event : list) {
+//        for (Event event : list) {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getImageURL());
 //            System.out.println(event.getImageTitle());
@@ -478,7 +478,7 @@ public class EventDAO extends DBContext {
         /*getTop10LatestEvents*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getTop10LatestEvents();
-//        for (Events event : list) {
+//        for (Event event : list) {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getImageURL());
 //        }
@@ -486,7 +486,7 @@ public class EventDAO extends DBContext {
         /*getUpcomingEvents*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getUpcomingEvents();
-//        for (Events event : list) {
+//        for (Event event : list) {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getImageURL());
 //            System.out.println(event.getImageTitle());
@@ -495,7 +495,7 @@ public class EventDAO extends DBContext {
         /*getTopPicksForYou*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getTopPicksForYou(1);
-//        for (Events event : list) {
+//        for (Event event : list) {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getImageURL());
 //            System.out.println(event.getImageTitle());
@@ -504,7 +504,7 @@ public class EventDAO extends DBContext {
         /*getRecommendedEvents*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getRecommendedEvents(1);
-//        for (Events event : list) {
+//        for (Event event : list) {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getImageURL());
 //            System.out.println(event.getImageTitle());
@@ -516,7 +516,7 @@ public class EventDAO extends DBContext {
 //        System.out.println(countEvents);
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.getAllEvents();
-//        for (Events event : list) {
+//        for (Event event : list) {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getCategoryId());
 //        }
@@ -528,8 +528,8 @@ public class EventDAO extends DBContext {
 //        int limit = 10;
 //        List<Events> events = eventDAO.getTopEventsWithLimit();
 //        // Print results to check if the query works correctly
-//        System.out.println("===== Top " + limit + " Best-Selling Events =====");
-//        for (Events event : events) {
+//        System.out.println("===== Top " + limit + " Best-Selling Event =====");
+//        for (Event event : events) {
 //            System.out.println("Event ID: " + event.getEventId()
 //                    + " | Name: " + event.getEventName()
 //            );
@@ -551,13 +551,13 @@ public class EventDAO extends DBContext {
 //        int totalEvents = eventDAO.getTotalEvents();
 //        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
 //
-//        System.out.println("Total Events: " + totalEvents);
+//        System.out.println("Total Event: " + totalEvents);
 //        System.out.println("Total Pages: " + totalPages);
 //
 //        for (int i = 1; i <= totalPages; i++) {
 //            List<Events> events = eventDAO.getEventsByPage(i, pageSize);
-//            System.out.println("===== Events on Page " + i + " =====");
-//            for (Events event : events) {
+//            System.out.println("===== Event on Page " + i + " =====");
+//            for (Event event : events) {
 //                System.out.println("Event ID: " + event.getEventId() + " | Name: " + event.getEventName());
 //                System.out.println("Event ID: " + event.getImageURL() + " | Name: " + event.getImageTitle());
 //            }

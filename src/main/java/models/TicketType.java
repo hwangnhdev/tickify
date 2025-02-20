@@ -10,7 +10,7 @@ import java.sql.Date;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class TicketTypes {
+public class TicketType {
 
     private int ticketTypeId;
     private int eventId;

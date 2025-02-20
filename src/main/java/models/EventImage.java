@@ -8,7 +8,7 @@ package models;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class EventImages {
+public class EventImage {
 
     private int imageId;
     private int eventId;
@@ -18,7 +18,7 @@ public class EventImages {
     public EventImage() {
     }
 
-    public EventImages(int imageId, int eventId, String imageUrl, String image_title) {
+    public EventImage(int imageId, int eventId, String imageUrl, String image_title) {
         this.imageId = imageId;
         this.eventId = eventId;
         this.imageUrl = imageUrl;

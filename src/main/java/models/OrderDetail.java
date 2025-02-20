@@ -8,7 +8,7 @@ package models;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class OrderDetails {
+public class OrderDetail {
 
     private int orderDetailId;
     private int orderId;

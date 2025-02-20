@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import models.Events;
+import models.Event;
 import models.FilterEvent;
 
 /**
@@ -103,7 +103,7 @@ public class AllEventsController extends HttpServlet {
         session.setAttribute("selectedPrice", price);
 
         // Get filtered events
-        List<Events> filteredEvents = filterEventDAO.getFilteredEvents(filters);
+        List<Event> filteredEvents = filterEventDAO.getFilteredEvents(filters);
         System.out.println("Filtered Events Count: " + filteredEvents.size()); // Debug log
 
         // Pagination logic
@@ -127,7 +127,7 @@ public class AllEventsController extends HttpServlet {
         // Get events for the requested page
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalEvents);
-        List<Events> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
+        List<Event> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
 
         // Send attributes to JSP
         request.setAttribute("filteredEvents", paginatedEvents);

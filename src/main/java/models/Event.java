@@ -10,7 +10,7 @@ import java.sql.Date;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Events {
+public class Event {
 
     private int eventId;
     private int categoryId;
@@ -43,7 +43,7 @@ public class Events {
         this.updatedAt = updatedAt;
     }
 
-    public Events(int eventId, String eventName, String imageURL, String imageTitle) {
+    public Event(int eventId, String eventName, String imageURL, String imageTitle) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.imageURL = imageURL;

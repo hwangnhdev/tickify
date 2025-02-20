@@ -10,7 +10,7 @@ import java.sql.Date;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Categories {
+public class Category {
 
     private int categoryId;
     private String categoryName;
@@ -18,8 +18,8 @@ public class Categories {
     private Date createdAt;
     private Date updatedAt;
 
-    public Categories() {
-    }   
+    public Category() {
+    }
 
     public Category(int categoryId, String categoryName, String description, Date createdAt, Date updatedAt) {
         this.categoryId = categoryId;
@@ -29,12 +29,12 @@ public class Categories {
         this.updatedAt = updatedAt;
     }
 
-    public Categories(String categoryName, String description) {
+    public Category(String categoryName, String description) {
         this.categoryName = categoryName;
         this.description = description;
     }
 
-    public Categories(int categoryId, String categoryName, String description) {
+    public Category(int categoryId, String categoryName, String description) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.description = description;

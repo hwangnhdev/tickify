@@ -12,9 +12,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
-import models.Categories;
-import models.EventImages;
-import models.Events;
+import models.Category;
+import models.EventImage;
+import models.Event;
 
 /**
  *
@@ -71,9 +71,9 @@ public class EventDetailController extends HttpServlet {
             e.printStackTrace();
         }
 
-        Events eventDetail = eventDAO.selectEventByID(eventId);
-        EventImages eventImage = eventDAO.selectEventImagesByID(eventId);
-        Categories eventCategories = eventDAO.selectEventCategoriesID(eventId);
+        Event eventDetail = eventDAO.selectEventByID(eventId);
+        EventImage eventImage = eventDAO.selectEventImagesByID(eventId);
+        Category eventCategories = eventDAO.selectEventCategoriesID(eventId);
         request.setAttribute("eventDetail", eventDetail);
         request.setAttribute("eventImage", eventImage);
         request.setAttribute("eventCategories", eventCategories);
@@ -93,7 +93,7 @@ public class EventDetailController extends HttpServlet {
         int totalEvents = eventDAO.getTotalEvents();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
         // Fetch paginated list of events
-        List<Events> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
+        List<Event> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
         request.setAttribute("paginatedEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
