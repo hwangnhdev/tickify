@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <servlet>
-<<<<<<< HEAD
         <servlet-name>AuthController</servlet-name>
         <servlet-class>controllers.AuthController</servlet-class>
     </servlet>
@@ -29,30 +28,7 @@
         <servlet-name>ResetPasswordController</servlet-name>
         <servlet-class>controllers.ResetPasswordController</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>AuthController</servlet-name>
-        <url-pattern>/auth</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>VerifyOtpController</servlet-name>
-        <url-pattern>/verifyOtp</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>VerifyEmailController</servlet-name>
-        <url-pattern>/verifyEmail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LoginGoogleHandlerController</servlet-name>
-        <url-pattern>/loginGoogleHandler</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LoginFacebookHandlerController</servlet-name>
-        <url-pattern>/loginFacebookHandler</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ResetPasswordController</servlet-name>
-        <url-pattern>/resetPassword</url-pattern>
-=======
+    <servlet>
         <servlet-name>EventController</servlet-name>
         <servlet-class>controllers.EventController</servlet-class>
     </servlet>
@@ -76,6 +52,31 @@
         <servlet-name>CategoryController</servlet-name>
         <servlet-class>controllers.CategoryController</servlet-class>
     </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>AuthController</servlet-name>
+        <url-pattern>/auth</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VerifyOtpController</servlet-name>
+        <url-pattern>/verifyOtp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VerifyEmailController</servlet-name>
+        <url-pattern>/verifyEmail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginGoogleHandlerController</servlet-name>
+        <url-pattern>/loginGoogleHandler</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginFacebookHandlerController</servlet-name>
+        <url-pattern>/loginFacebookHandler</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResetPasswordController</servlet-name>
+        <url-pattern>/resetPassword</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EventController</servlet-name>
         <url-pattern>/event</url-pattern>
@@ -99,17 +100,13 @@
     <servlet-mapping>
         <servlet-name>CategoryController</servlet-name>
         <url-pattern>/category</url-pattern>
->>>>>>> 8c1a75f49d01c53b69e4b009234e5da21148d28e
     </servlet-mapping>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
-<<<<<<< HEAD
-=======
     <welcome-file-list>
         <welcome-file>event</welcome-file>
     </welcome-file-list>
->>>>>>> 8c1a75f49d01c53b69e4b009234e5da21148d28e
 </web-app>

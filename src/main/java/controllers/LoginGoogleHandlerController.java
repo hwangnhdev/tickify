@@ -79,7 +79,7 @@ public class LoginGoogleHandlerController extends HttpServlet {
             String provider = "google";
 
             Customer existingCustomer = customerDao.selectCustomerByEmail(user.getEmail());
-            
+
             int existingCustomerId;
             if (existingCustomer != null) {
                 existingCustomerId = existingCustomer.getCustomerId();
@@ -96,8 +96,8 @@ public class LoginGoogleHandlerController extends HttpServlet {
                 customerAuthDao.insertCustomerAuth(customerAuth);
 
                 customerSendRedirect = existingCustomer;
-            } 
-            
+            }
+
             //TH1: Chưa có customer và customer_auth trong DB 
             if (existingCustomer == null && existingCustomerAuth == null) {
                 Customer customer = new Customer(0, user.getName(), user.getEmail(), null, null, user.getPicture(), Boolean.TRUE);
@@ -114,7 +114,8 @@ public class LoginGoogleHandlerController extends HttpServlet {
             // Login 
             HttpSession session = request.getSession();
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
-            response.sendRedirect("pages/homePage/home.jsp");
+//            response.sendRedirect("pages/homePage/home.jsp");
+            response.sendRedirect("event");
         } catch (Exception e) {
             request.setAttribute("error", "Login fail!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
