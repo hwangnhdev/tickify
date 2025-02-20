@@ -20,6 +20,10 @@
         <servlet-name>FilterEventController</servlet-name>
         <servlet-class>controllers.FilterEventController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CategoryController</servlet-name>
+        <servlet-class>controllers.CategoryController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EventController</servlet-name>
         <url-pattern>/event</url-pattern>
@@ -39,6 +43,10 @@
     <servlet-mapping>
         <servlet-name>FilterEventController</servlet-name>
         <url-pattern>/filterEvent</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CategoryController</servlet-name>
+        <url-pattern>/category</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
