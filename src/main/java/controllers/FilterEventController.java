@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import models.Events;
+import models.Event;
 import models.FilterEvent;
 
 /**
@@ -86,7 +86,7 @@ public class FilterEventController extends HttpServlet {
         FilterEvent filters = new FilterEvent(null, null, null, null, null, false, searchQuery);
 
         // Lấy danh sách sự kiện đã lọc
-        List<Events> filteredEvents = filterEventDAO.getFilteredEvents(filters);
+        List<Event> filteredEvents = filterEventDAO.getFilteredEvents(filters);
         System.out.println("Filtered Events: " + filteredEvents); // Debug log
 
         request.setAttribute("filteredEvents", filteredEvents);
@@ -99,7 +99,7 @@ public class FilterEventController extends HttpServlet {
 //        if (filteredEvents.isEmpty()) {
 //            out.println("<p>No events found.</p>");
 //        } else {
-//            for (Events event : filteredEvents) {
+//            for (Event event : filteredEvents) {
 //                out.println("<a style='text-decoration: none' href='" + request.getContextPath() + "/eventDetail?id=" + event.getEventId() + "'>");
 //                out.println("<h4>" + event.getEventName() + "</h4>");
 //                out.println("</a>");

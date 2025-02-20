@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
-import models.Categories;
+import models.Category;
 
 /**
  *
@@ -59,7 +59,7 @@ public class CategoryController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         CategoryDAO categoryDAO = new CategoryDAO();
-        List<Categories> listCategories = categoryDAO.getAllCategories();
+        List<Category> listCategories = categoryDAO.getAllCategories();
         request.setAttribute("listCategories", listCategories);
         request.getRequestDispatcher("pages/adminPage/category.jsp").forward(request, response);
     }
@@ -82,7 +82,7 @@ public class CategoryController extends HttpServlet {
             String categoryName = request.getParameter("categoryName");
             String categoryDescription = request.getParameter("categoryDescription");
 
-            Categories category = new Categories(categoryName, categoryDescription);
+            Category category = new Category(categoryName, categoryDescription);
             categoryDAO.createCategory(category);
 
             response.sendRedirect("category");
@@ -93,7 +93,7 @@ public class CategoryController extends HttpServlet {
 
             int categoryID = Integer.parseInt(ID);
 
-            Categories category = new Categories(categoryID, categoryName, categoryDescription);
+            Category category = new Category(categoryID, categoryName, categoryDescription);
             categoryDAO.createCategory(category);
 
             response.sendRedirect("category");

@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import models.EventImages;
+import models.EventImage;
 import utils.DBContext;
 
 /**
@@ -19,15 +19,15 @@ import utils.DBContext;
 public class EventImageDAO extends DBContext {
 
     /*getAllImageEvents*/
-    public List<EventImages> getAllImageEvents() {
-        List<EventImages> listImageEvents = new ArrayList<>();
+    public List<EventImage> getAllImageEvents() {
+        List<EventImage> listImageEvents = new ArrayList<>();
         String sql = "SELECT * FROM EventImages";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                EventImages eventimages = new EventImages(
+                EventImage eventimages = new EventImage(
                         rs.getInt("image_id"),
                         rs.getInt("event_id"),
                         rs.getString("image_url"),
@@ -41,8 +41,8 @@ public class EventImageDAO extends DBContext {
     }
 
     /*getImagesByEventId*/
-    public List<EventImages> getImagesByEventId(int eventId) {
-        List<EventImages> listImageEvents = new ArrayList<>();
+    public List<EventImage> getImagesByEventId(int eventId) {
+        List<EventImage> listImageEvents = new ArrayList<>();
         String sql = "SELECT * FROM EventImages WHERE event_id = ?";
 
         try {
@@ -50,7 +50,7 @@ public class EventImageDAO extends DBContext {
             st.setInt(1, eventId); // Gán giá trị eventId vào câu SQL
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                EventImages eventImage = new EventImages(
+                EventImage eventImage = new EventImage(
                         rs.getInt("image_id"),
                         rs.getInt("event_id"),
                         rs.getString("image_url"),
@@ -67,15 +67,15 @@ public class EventImageDAO extends DBContext {
         /*getAllImageEvents*/
 //        EventImageDAO ld = new EventImageDAO();
 //        List<EventImages> list = ld.getAllImageEvents();
-//        for (EventImages event : list) {
+//        for (EventImage event : list) {
 //            System.out.println(event.getEventId());
 //            System.out.println(event.getImageUrl());
 //        }
 
         /*getImagesByEventId*/
         EventImageDAO ld = new EventImageDAO();
-        List<EventImages> list = ld.getImagesByEventId(1);
-        for (EventImages event : list) {
+        List<EventImage> list = ld.getImagesByEventId(1);
+        for (EventImage event : list) {
             System.out.println(event.getEventId());
             System.out.println(event.getImageUrl());
         }

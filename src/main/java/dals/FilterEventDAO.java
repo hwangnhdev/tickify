@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import models.Events;
+import models.Event;
 import models.FilterEvent;
 import utils.DBContext;
 
@@ -22,8 +22,8 @@ import utils.DBContext;
 public class FilterEventDAO extends DBContext {
 
     /*searchEventsByQuery*/
-    public List<Events> getFilteredEvents(FilterEvent filters) {
-        List<Events> events = new ArrayList<>();
+    public List<Event> getFilteredEvents(FilterEvent filters) {
+        List<Event> events = new ArrayList<>();
 
         // Constructing the base SQL query with event details
         StringBuilder sql = new StringBuilder("SELECT DISTINCT e.event_id, e.category_id, e.event_name, e.location, "
@@ -104,7 +104,7 @@ public class FilterEventDAO extends DBContext {
             // Execute query and process results
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Events event = new Events(
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getString("event_name"),
                         rs.getString("image_url"),
@@ -136,11 +136,11 @@ public class FilterEventDAO extends DBContext {
         FilterEvent filterEvent = new FilterEvent(null, null, null, null, null, false, query);
 
         // Fetching the filtered events
-        List<Events> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
+        List<Event> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
         int count = 0;
 
         // Printing the event names and count of filtered events
-        for (Events event : filteredEvents) {
+        for (Event event : filteredEvents) {
             System.out.println(event.getEventName());
             System.out.println(event.getImageTitle());
             System.out.println(event.getImageURL());

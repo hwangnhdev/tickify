@@ -5,7 +5,7 @@
 package dals;
 
 import java.util.List;
-import models.Categories;
+import models.Category;
 import utils.DBContext;
 
 /**
@@ -14,11 +14,11 @@ import utils.DBContext;
  */
 public class CategoryDAO extends DBContext{
 
-    public List<Categories> getAllCategories() {
+    public List<Category> getAllCategories() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    public void createCategory(Categories category) {
+    public void createCategory(Category category) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

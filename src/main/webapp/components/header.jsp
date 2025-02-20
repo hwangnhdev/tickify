@@ -95,7 +95,7 @@
             <div class="user-actions-header">
                 <button>Create Event</button>
                 <button>Purchased Tickets</button>
-                <button>Sign In | Register</button>
+                <a href="<%= request.getContextPath()%>/pages/signUpPage/signUp.jsp">Sign In | Register</a>
             </div>
         </header>
         <nav class="categories-header">

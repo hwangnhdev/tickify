@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
-import models.Events;
+import models.Event;
 
 /**
  *
@@ -64,7 +64,7 @@ public class SearchEventController extends HttpServlet {
         /*Category*/
         String querySearch = request.getParameter("query");
 
-        List<Events> searchEvents = eventDAO.searchEventsByQuery(querySearch);
+        List<Event> searchEvents = eventDAO.searchEventsByQuery(querySearch);
         request.setAttribute("searchEvents", searchEvents);
 
         // Forward the request and response to the home.jsp page to display the events
