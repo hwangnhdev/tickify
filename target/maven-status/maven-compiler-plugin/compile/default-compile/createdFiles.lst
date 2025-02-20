@@ -7,6 +7,7 @@ models\EventFilter.class
 utils\DBContext.class
 controllers\FilterEventController.class
 dals\OrganizerDAO.class
+controllers\CategoryController.class
 dals\EventImageDAO.class
 models\UserGoogleDTO.class
 dals\FilterEventDAO.class
