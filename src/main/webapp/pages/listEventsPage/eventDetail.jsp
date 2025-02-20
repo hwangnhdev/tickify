@@ -220,22 +220,17 @@
 
         <div class="event-info-event_detail">
             <!-- Google Maps Section -->
-            <div class="map-container">
-                <h3>Location Map</h3>
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.489165568831!2d106.70175527528224!3d10.777138092321223!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175292fcb15ce03%3A0x8e4157d1d3581a9!2zMjggTMOqIFRoYW5oIFTDom4sIELhuqNuIE5naMSpLCBRdeG6rW4gMSwgVGjhuqFuaCBwaOG7kSBIw6AgTWluaCBDaXR5!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s"
-                    width="100%"
-                    height="400"
-                    style="
-                    border: 0;
-                    border-radius: 15px;
-                    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
-                    "
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
-            </div>
+            <section class="mapAddress" style="padding: 32px 0">
+                <div class="containers">
+                    <div class="infoAddress"></div>
+                    <div class="map">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.489511011803!2d106.69907477479463!3d10.776889059126504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3b8f6333d5%3A0xa8f36b0ebda0d20d!2sSaigon%20Opera%20House%20(Ho%20Chi%20Minh%20Municipal%20Theater)!5e0!3m2!1sen!2s!4v1708131234567" 
+                                width="100%" height="450" style="border:0; display: inline-block;" 
+                                allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <!--Relevant Events-->

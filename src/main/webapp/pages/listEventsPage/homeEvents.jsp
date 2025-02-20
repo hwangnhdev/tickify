@@ -28,13 +28,21 @@
                         <div class="event-card-large_events">
                             <c:choose>
                                 <c:when test="${not empty event.imageURL}">
-                                    <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                    </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <img src="${event.imageURL}" alt="${event.eventName}" />
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageURL}" alt="${event.eventName}" />
+                                    </a>
                                 </c:otherwise>
                             </c:choose>
-                            <button class="view-btn-large_events">View details</button>
+                            <button class="view-btn-large_events">
+                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                                    View details
+                                </a>
+                            </button>
                         </div>
                     </c:forEach>
                 </div>
@@ -50,13 +58,21 @@
                         <div class="event-card-large_events">
                             <c:choose>
                                 <c:when test="${not empty event.imageURL}">
-                                    <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                    </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <img src="${event.imageURL}" alt="${event.eventName}" />
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageURL}" alt="${event.eventName}" />
+                                    </a>
                                 </c:otherwise>
                             </c:choose>
-                            <button class="view-btn-large_events">View details</button>
+                            <button class="view-btn-large_events">
+                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                                    View details
+                                </a>
+                            </button>
                         </div>
                     </c:forEach>
                 </div>
@@ -77,7 +93,9 @@
                     <c:when test="${not empty listEvents}">
                         <c:forEach var="event" items="${listEvents}">
                             <div class="event-card-spec_event">
-                                <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                                    <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                </a>
                             </div>
                         </c:forEach>
                     </c:when>
@@ -141,7 +159,9 @@
             <div class="event-cards-trend_events">
                 <c:forEach var="event" items="${upcomingEvents}">
                     <div class="event-card-trend_events">
-                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                            <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                        </a>
                     </div>
                 </c:forEach>
             </div>
@@ -200,7 +220,9 @@
             <div class="event-cards-top_events">
                 <c:forEach var="event" items="${topTicketEvents}">
                     <div class="event-card-top_events">
-                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                            <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                        </a>
                     </div>
                 </c:forEach>
             </div>
@@ -272,7 +294,9 @@
             <div class="event-cards-rec_events">
                 <c:forEach var="event" items="${topTicketEvents}">
                     <div class="event-card-rec_events">
-                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                            <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                        </a>
                     </div>
                 </c:forEach>
             </div>
@@ -344,8 +368,10 @@
                 <c:forEach var="event" items="${paginatedEvents}">
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                         <div class="event-card-all_events">
-                            <img src="${event.imageURL}" alt="${event.imageTitle}" />
-                            <h4>${event.eventName}</h4>
+                            <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                                <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                <h4>${event.eventName}</h4>
+                            </a>
                         </div>
                     </div>
                 </c:forEach>
