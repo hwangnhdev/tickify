@@ -59,9 +59,25 @@ public class CategoryController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         CategoryDAO categoryDAO = new CategoryDAO();
-        List<Category> listCategories = categoryDAO.getAllCategories();
-        request.setAttribute("listCategories", listCategories);
-        request.getRequestDispatcher("pages/adminPage/category.jsp").forward(request, response);
+        String action = request.getParameter("action");
+
+        if ("create".equals(action)) {
+            request.getRequestDispatcher("pages/admin/createCategory.jsp").forward(request, response);
+        } else if ("edit".equals(action)) {
+            int categoryID = Integer.parseInt(request.getParameter("categoryID"));
+            Category category = categoryDAO.getCategoryByID(categoryID);
+            request.setAttribute("category", category);
+            request.getRequestDispatcher("pages/admin/editCategory.jsp").forward(request, response);
+        } else if ("delete".equals(action)) {
+            int categoryID = Integer.parseInt(request.getParameter("categoryID"));
+            Category category = categoryDAO.getCategoryByID(categoryID);
+            request.setAttribute("category", category);
+            request.getRequestDispatcher("pages/admin/deleteCategory.jsp").forward(request, response);
+        } else {
+            List<Category> listCategories = categoryDAO.getAllCategories();
+            request.setAttribute("listCategories", listCategories);
+            request.getRequestDispatcher("pages/admin/listCategories.jsp").forward(request, response);
+        }
     }
 
     /**
@@ -78,30 +94,50 @@ public class CategoryController extends HttpServlet {
         CategoryDAO categoryDAO = new CategoryDAO();
         String action = request.getParameter("action");
 
-        if ("createCategory".equals(action)) {
+        if ("create".equals(action)) {
+            // Retrieve category name and description from the request
             String categoryName = request.getParameter("categoryName");
-            String categoryDescription = request.getParameter("categoryDescription");
+            String categoryDescription = request.getParameter("description"); // Fix parameter name
+            // Check if the category already exists in the database
+            Category existingCategory = categoryDAO.getCategoryByName(categoryName);
 
-            Category category = new Category(categoryName, categoryDescription);
-            categoryDAO.createCategory(category);
-
+            if (existingCategory != null) {
+                // If the category already exists, set an error message
+                request.setAttribute("errorMessage", "Category already exists. Please use a different name.");
+                // Forward the request back to the create category page to display the error
+                request.getRequestDispatcher("pages/admin/createCategory.jsp").forward(request, response);
+            } else {
+                // If the category does not exist, proceed with creating a new category
+                categoryDAO.createCategory(new Category(categoryName, categoryDescription));
+            }
             response.sendRedirect("category");
-        } else if ("updateCategory".equals(action)) {
-            String ID = request.getParameter("categoryID");
+        } else if ("update".equals(action)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
+            int categoryId = Integer.parseInt(request.getParameter("categoryID"));
             String categoryName = request.getParameter("categoryName");
-            String categoryDescription = request.getParameter("categoryDescription");
+            String description = request.getParameter("description");
 
-            int categoryID = Integer.parseInt(ID);
+            Category existingCategory = categoryDAO.getCategoryByName(categoryName);
 
-            Category category = new Category(categoryID, categoryName, categoryDescription);
-            categoryDAO.createCategory(category);
-
-            response.sendRedirect("category");
-        } else if ("deleteCategory".equals(action)) {
-            String ID = request.getParameter("categoryID");
-            int categoryID = Integer.parseInt(ID);
-            categoryDAO.deleteRoomType(categoryID);
-
+            if (existingCategory != null && existingCategory.getCategoryId() != categoryId) {
+                out.print("{\"error\": \"Category name already exists. Please choose a different name.\"}");
+                out.flush();
+                return;
+            } else {
+                categoryDAO.updateCategory(new Category(categoryId, categoryName, description));
+                boolean success = true;
+                if (success) {
+                    out.print("{\"success\": true}");
+                } else {
+                    out.print("{\"error\": \"Failed to update category. Please try again.\"}");
+                }
+                out.flush();
+            }
+        } else if ("delete".equals(action)) {
+            int categoryID = Integer.parseInt(request.getParameter("categoryID"));
+            categoryDAO.deleteCategory(categoryID);
             response.sendRedirect("category");
         }
     }
