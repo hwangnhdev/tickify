@@ -10,5 +10,4 @@ package constants;
  */
 public class Iconstant {
 
-
 }

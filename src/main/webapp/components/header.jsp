@@ -14,7 +14,10 @@
             body {
                 margin: 0;
                 font-family: Arial, sans-serif;
+                padding-top: 100px; /* Khoảng cách từ đầu trang để tránh bị che bởi header (khoảng 90px từ header + 30px từ nav) */
             }
+
+            /* Header (Fixed tại đầu trang) */
             header {
                 display: flex;
                 justify-content: space-between;
@@ -22,28 +25,36 @@
                 background: #28a745;
                 padding: 10px 20px;
                 color: white;
+                position: fixed; /* Cố định vị trí */
+                top: 0; /* Nằm ở đầu trang */
+                left: 0; /* Nằm ở bên trái */
+                right: 0; /* Chiếm toàn bộ chiều rộng */
+                z-index: 1100; /* Đảm bảo header hiển thị trên các phần tử khác, cao hơn filter (z-index: 1000) */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Thêm shadow để phân biệt với nội dung */
             }
+
             .logo-header img {
                 height: 30px;
                 cursor: pointer;
                 border-radius: 10px;
             }
+
             .search-bar-header {
                 display: flex;
                 align-items: center;
                 background: white;
                 padding: 5px 10px;
-                line-height: 10px;
                 border-radius: 20px;
             }
+
             .search-bar-header input {
                 border: none;
                 outline: none;
                 padding: 5px;
-                line-height: 10px;
                 width: 220px;
                 font-size: 14px;
             }
+
             .search-bar-header button {
                 cursor: pointer;
                 color: black;
@@ -51,10 +62,12 @@
                 border: none;
                 font-size: 14px;
             }
+
             .user-actions-header {
                 display: flex;
                 align-items: center;
             }
+
             .user-actions-header a, .user-actions-header button {
                 margin-left: 15px;
                 text-decoration: none;
@@ -64,16 +77,30 @@
                 cursor: pointer;
                 font-size: 16px;
             }
+
+            /* Navigation Categories (Fixed ngay dưới header) */
             .categories-header {
                 background: black;
                 padding: 10px 0;
                 text-align: center;
+                position: fixed; /* Cố định vị trí */
+                top: 60px; /* Nằm ngay dưới header (chiều cao header ~60px) */
+                left: 0;
+                right: 0;
+                z-index: 1050; /* Hiển thị dưới header nhưng trên nội dung khác */
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             }
+
             .categories-header a {
                 color: white;
                 text-decoration: none;
                 margin: 0 15px;
                 font-size: 16px;
+                transition: color 0.3s ease;
+            }
+
+            .categories-header a:hover {
+                color: #3498db;
             }
         </style>
     </head>
