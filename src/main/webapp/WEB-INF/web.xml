@@ -52,7 +52,10 @@
         <servlet-name>CategoryController</servlet-name>
         <servlet-class>controllers.CategoryController</servlet-class>
     </servlet>
-    
+    <servlet>
+        <servlet-name>EventStatisticController</servlet-name>
+        <servlet-class>controllers.EventStatisticController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -100,6 +103,10 @@
     <servlet-mapping>
         <servlet-name>CategoryController</servlet-name>
         <url-pattern>/category</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EventStatisticController</servlet-name>
+        <url-pattern>/eventStatistic</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

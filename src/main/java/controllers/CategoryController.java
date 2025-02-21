@@ -62,21 +62,21 @@ public class CategoryController extends HttpServlet {
         String action = request.getParameter("action");
 
         if ("create".equals(action)) {
-            request.getRequestDispatcher("pages/admin/createCategory.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/adminPage/createCategory.jsp").forward(request, response);
         } else if ("edit".equals(action)) {
             int categoryID = Integer.parseInt(request.getParameter("categoryID"));
             Category category = categoryDAO.getCategoryByID(categoryID);
             request.setAttribute("category", category);
-            request.getRequestDispatcher("pages/admin/editCategory.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/adminPage/editCategory.jsp").forward(request, response);
         } else if ("delete".equals(action)) {
             int categoryID = Integer.parseInt(request.getParameter("categoryID"));
             Category category = categoryDAO.getCategoryByID(categoryID);
             request.setAttribute("category", category);
-            request.getRequestDispatcher("pages/admin/deleteCategory.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/adminPage/deleteCategory.jsp").forward(request, response);
         } else {
             List<Category> listCategories = categoryDAO.getAllCategories();
             request.setAttribute("listCategories", listCategories);
-            request.getRequestDispatcher("pages/admin/listCategories.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/adminPage/listCategories.jsp").forward(request, response);
         }
     }
 
@@ -105,7 +105,7 @@ public class CategoryController extends HttpServlet {
                 // If the category already exists, set an error message
                 request.setAttribute("errorMessage", "Category already exists. Please use a different name.");
                 // Forward the request back to the create category page to display the error
-                request.getRequestDispatcher("pages/admin/createCategory.jsp").forward(request, response);
+                request.getRequestDispatcher("pages/adminPage/createCategory.jsp").forward(request, response);
             } else {
                 // If the category does not exist, proceed with creating a new category
                 categoryDAO.createCategory(new Category(categoryName, categoryDescription));
