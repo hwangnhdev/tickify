@@ -153,7 +153,7 @@ public class CategoryDAO extends DBContext {
     }
 
     public static void main(String[] args) {
-        /*getAllCategories*/
+        /*getCategoryByName*/
 //        CategoryDAO categoryDAO = new CategoryDAO();
 //        Category category = categoryDAO.getCategoryByName("Music");
 //        System.out.println(category.getCategoryName());
@@ -165,17 +165,17 @@ public class CategoryDAO extends DBContext {
 //            System.out.println(category.getCategoryName());
 //        }
 
-        /*getAllCategories*/
+        /*createCategory*/
 //        CategoryDAO categoryDAO = new CategoryDAO();
 //        Category category = new Category("Hiphop", "Hiphop never die");
 //        categoryDAO.createCategory(category);
 
-        /*getAllCategories*/
+        /*updateCategory*/
 //        CategoryDAO categoryDAO = new CategoryDAO();
 //        Category category = new Category(11, "Hiphop", "Hiphop never die Love you never wrong");
 //        categoryDAO.updateCategory(category);
 
-        /*getAllCategories*/
+        /*deleteCategory*/
 //        CategoryDAO categoryDAO = new CategoryDAO();
 //        categoryDAO.deleteCategory(11);
     }

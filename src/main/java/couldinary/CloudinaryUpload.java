@@ -7,7 +7,6 @@ package couldinary;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,9 +18,9 @@ import java.util.Map;
  */
 public class CloudinaryUpload {
 
-    private static final String DB_URL = "";
-    private static final String DB_USER = "";
-    private static final String DB_PASSWORD = "";
+    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=TickifyDB;trustServerCertificate=true";
+    private static final String DB_USER = "sa";
+    private static final String DB_PASSWORD = "123456";
 
     public static void uploadImageToEvent(int eventId, String imageUrl, String imageTitle) {
         CouldinaryConfig cloudinaryConfig = new CouldinaryConfig();
@@ -55,9 +54,9 @@ public class CloudinaryUpload {
     }
 
     public static void main(String[] args) {
-        uploadImageToEvent(1,
-                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
-                "Music banner");
+//        uploadImageToEvent(1,
+//                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image1.jpg",
+//                "Music banner");
 //        uploadImageToEvent(32,
 //                "D:/Semester5/SWP391/Code/tickify/src/main/webapp/images/image2.jpg",
 //                "Music banner");

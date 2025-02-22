@@ -37,7 +37,7 @@ public class EventDAO extends DBContext {
                 + "FROM EventPagination ep\n"
                 + "LEFT JOIN EventImagesFiltered eif \n"
                 + "ON ep.event_id = eif.event_id\n"
-                + "WHERE ep.rownum BETWEEN ? AND ?;";  // Không dùng AND với image_title
+                + "WHERE ep.rownum BETWEEN ? AND ?;";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
