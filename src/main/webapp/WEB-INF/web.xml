@@ -56,6 +56,10 @@
         <servlet-name>EventSummaryController</servlet-name>
         <servlet-class>controllers.EventSummaryController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminController</servlet-name>
+        <servlet-class>controllers.AdminController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -107,6 +111,10 @@
     <servlet-mapping>
         <servlet-name>EventSummaryController</servlet-name>
         <url-pattern>/eventSummary</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminController</servlet-name>
+        <url-pattern>/admin</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
