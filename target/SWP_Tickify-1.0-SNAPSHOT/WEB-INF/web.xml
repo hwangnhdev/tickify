@@ -12,17 +12,33 @@
         <servlet-name>EventDetailController</servlet-name>
         <servlet-class>controllers.EventDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProfileController</servlet-name>
+        <servlet-class>controllers.ProfileController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <servlet-class>controllers.ChangePasswordController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EventController</servlet-name>
         <url-pattern>/event</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AllEventsController</servlet-name>
-        <url-pattern>/allevents</url-pattern>
+        <url-pattern>/all-events</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EventDetailController</servlet-name>
-        <url-pattern>/eventdetail</url-pattern>
+        <url-pattern>/event-detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/change-password</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

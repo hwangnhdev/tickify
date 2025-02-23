@@ -4,7 +4,6 @@ dals\TicketDAO.class
 models\Categories.class
 models\UserFacebookDTO.class
 utils\DBContext.class
-dals\OrganizerDAO.class
 dals\EventImageDAO.class
 models\UserGoogleDTO.class
 dals\VoucherDAO.class
