@@ -89,41 +89,28 @@ public class ChangePasswordController extends HttpServlet {
 
         CustomerDAO dao = new CustomerDAO();
         Customers existingCustomer = dao.getCustomerById(1);
-        System.out.println("Stored Password: " + existingCustomer.getPassword()); // Print current password in DB
-        System.out.println("Entered Current Password: " + currentPassword);
 
         Customers customer = new Customers();
         customer.setPassword(newPassword);
 
-//        if (customer == null) {
-//            response.sendRedirect("login.jsp");
-//            return;
-//        }
         // Check if current password is correct
-//        if (!BCrypt.checkpw(currentPassword, customer.getPassword())) {
-//            request.setAttribute("errorMessage", "Current password is incorrect.");
-//            request.getRequestDispatcher("pages/profile/change-password.jsp").forward(request, response);
-//        } // Check if new password and confirm password match
-//        else if (!newPassword.equals(confirmPassword)) {
-//            request.setAttribute("errorMessage", "New passwords do not match.");
-//            request.getRequestDispatcher("pages/profile/change-password.jsp").forward(request, response);
-//        } // Update password
-//        else if (dao.updatePassword(1, newPassword)) {
-//            request.setAttribute("successMessage", "Password changed successfully.");
-//            request.getRequestDispatcher("pages/profile/change-password.jsp").forward(request, response);
-//        } else {
-//            request.setAttribute("errorMessage", "Error changing password. Please try again.");
-//            request.getRequestDispatcher("pages/profile/change-password.jsp").forward(request, response);
-//        }
-
-        if (!currentPassword.equals(existingCustomer.getPassword())) {
+        if (!BCrypt.checkpw(currentPassword, existingCustomer.getPassword())) {
             request.setAttribute("errorMessage", "Current password is incorrect.");
-        } else if (currentPassword.equals(existingCustomer.getPassword()) && !newPassword.equals(confirmPassword)) {
+        } // Check if new password and confirm password match
+        else if (!newPassword.equals(confirmPassword)) {
             request.setAttribute("errorMessage", "New passwords do not match.");
-        } else if (dao.updatePassword(1, newPassword)) {
+        } // Update password
+        else if (dao.updatePassword(1, newPassword)) {
             request.setAttribute("successMessage", "Password changed successfully.");
+        } else {
+            request.setAttribute("errorMessage", "Error changing password. Please try again.");
         }
-
+//        boolean isUpdated = dao.updatePassword(1, newPassword);
+//        if (isUpdated) {
+//            response.sendRedirect("pages/profile/profile.jsp");  // Redirect to the list of products on success
+//        } else {
+//            response.sendRedirect("pages/profile/change-password.jsp");  // Reload the creation page on failure
+//        }
         request.getRequestDispatcher("pages/profile/change-password.jsp").forward(request, response);
     }
 

@@ -3,7 +3,9 @@ couldinaryConfig\CloudinaryUpload.class
 dals\TicketDAO.class
 models\Categories.class
 models\UserFacebookDTO.class
+controllers\ProfileController.class
 utils\DBContext.class
+dals\OrganizerDAO.class
 dals\EventImageDAO.class
 models\UserGoogleDTO.class
 dals\VoucherDAO.class
@@ -23,6 +25,7 @@ models\Customers.class
 models\Tickets.class
 dals\TicketTypeDAO.class
 models\Vouchers.class
+controllers\ChangePasswordController.class
 couldinaryConfig\CouldinaryConfig.class
 models\Admins.class
 models\Events.class

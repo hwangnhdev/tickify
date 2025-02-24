@@ -84,10 +84,8 @@ public class CustomerDAO extends DBContext {
     public boolean updatePassword(int customerId, String newPassword) {
         String sql = "UPDATE Customer_auths SET password=? WHERE customer_id=?";
         try ( PreparedStatement ps = connection.prepareStatement(sql)) {
-            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt()); // Hash newPasword
             ps.setString(1, hashedPassword);
-
-//            ps.setString(1, newPassword);
             ps.setInt(2, customerId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
