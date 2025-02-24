@@ -6,7 +6,7 @@
 
 <%@page import="dals.CustomerDAO"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="models.Customers" %>
+<%@ page import="models.Customer" %>
 
 <!DOCTYPE html>
 <html>
@@ -114,7 +114,7 @@
         </style>
     </head>
     <%
-        Customers profile = (Customers) request.getAttribute("profile");
+        Customer profile = (Customer) request.getAttribute("profile");
     %>
 
     <body>

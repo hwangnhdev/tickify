@@ -10,4 +10,5 @@ package configs;
  */
 public class VnPayConfig {
 
+
 }

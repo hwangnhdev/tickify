@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import models.Customers;
+import models.Customer;
 import dals.CustomerDAO;
 import java.sql.Date;
 
@@ -62,8 +62,8 @@ public class ProfileController extends HttpServlet {
 //        HttpSession session = request.getSession();
 //        int customerId = (int) session.getAttribute("customerId");
         CustomerDAO customerDAO = new CustomerDAO();
-//        Customers customer = customerDAO.getCustomerById(customerId);
-        Customers customer = customerDAO.getCustomerById(1);
+//        Customer customer = customerDAO.getCustomerById(customerId);
+        Customer customer = customerDAO.getCustomerById(1);
         request.setAttribute("profile", customer);
         request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
 
@@ -93,10 +93,10 @@ public class ProfileController extends HttpServlet {
 
         // Fetch customer email from the database (since it's not editable)
         CustomerDAO customerDAO = new CustomerDAO();
-        Customers existingCustomer = customerDAO.getCustomerById(customerId);
+        Customer existingCustomer = customerDAO.getCustomerById(customerId);
         String email = existingCustomer.getEmail(); // Retain the original email
 
-        Customers customer = new Customers();
+        Customer customer = new Customer();
         customer.setCustomerId(customerId);
         customer.setFullName(fullname);
         customer.setAddress(address);
@@ -106,7 +106,7 @@ public class ProfileController extends HttpServlet {
         customer.setDob(dob);
         customer.setProfilePicture(picture);
 
-        boolean isUpdated = customerDAO.updateCustomer(customer);
+        boolean isUpdated = customerDAO.updateCustomerProfile(customer);
 
         if (isUpdated == true) {
             request.setAttribute("successMessage", "Profile updated successfully.");

@@ -4,7 +4,7 @@
     Author     : Dinh Minh Tien CE190701
 --%>
 <%@page import="dals.CustomerDAO"%>
-<%@ page import="models.Customers" %>
+<%@ page import="models.Customer" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
