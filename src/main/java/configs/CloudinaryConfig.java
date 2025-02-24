@@ -12,5 +12,5 @@ import com.cloudinary.utils.ObjectUtils;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class CloudinaryConfig {
-    
+
 }
