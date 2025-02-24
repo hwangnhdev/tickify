@@ -1,2 +1,3 @@
-/constants/Iconstant.java
+src/main/java/constants/Iconstant.java
+src/main/java/configs/
 target/

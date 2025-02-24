@@ -7,7 +7,7 @@ package controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import constants.Iconstant;
+import configs.AuthConfig;
 import dals.CustomerAuthDAO;
 import dals.CustomerDAO;
 import java.io.IOException;
@@ -57,12 +57,12 @@ public class LoginFacebookHandlerController extends HttpServlet {
     } 
     
     public static String getToken(String code) throws ClientProtocolException, IOException {
-        String response = Request.Post(Iconstant.FACEBOOK_LINK_GET_TOKEN)
+        String response = Request.Post(AuthConfig.FACEBOOK_LINK_GET_TOKEN)
                 .bodyForm(
                         Form.form()
-                                .add("client_id", Iconstant.FACEBOOK_CLIENT_ID)
-                                .add("client_secret", Iconstant.FACEBOOK_CLIENT_SECRET)
-                                .add("redirect_uri", Iconstant.FACEBOOK_REDIRECT_URI)
+                                .add("client_id", AuthConfig.FACEBOOK_CLIENT_ID)
+                                .add("client_secret", AuthConfig.FACEBOOK_CLIENT_SECRET)
+                                .add("redirect_uri", AuthConfig.FACEBOOK_REDIRECT_URI)
                                 .add("code", code)
                                 .build()
                 )
@@ -73,7 +73,7 @@ public class LoginFacebookHandlerController extends HttpServlet {
     }
 
     public static UserFacebookDTO getUserInfo(String accessToken) throws ClientProtocolException, IOException {
-        String link = Iconstant.FACEBOOK_LINK_GET_USER_INFO + accessToken;
+        String link = AuthConfig.FACEBOOK_LINK_GET_USER_INFO + accessToken;
         String response = Request.Get(link).execute().returnContent().asString();
         System.out.println("Facebook API Response: " + response);
         UserFacebookDTO fbAccount = new Gson().fromJson(response, UserFacebookDTO.class);
