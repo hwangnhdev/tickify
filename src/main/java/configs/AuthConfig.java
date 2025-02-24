@@ -6,7 +6,7 @@ package configs;
 
 /**
  *
- * @author Nguyen Huy Hoang - CE182102
+ * @author Tang Thanh Vui - CE180901
  */
 public class AuthConfig {
 

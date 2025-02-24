@@ -62,22 +62,6 @@
         <servlet-class>controllers.CategoryController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewSeatController</servlet-name>
-        <servlet-class>controllers.ViewSeatController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>VnPayReturnController</servlet-name>
-        <servlet-class>vnpay.VnPayReturnController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>VnPayAjaxController</servlet-name>
-        <servlet-class>vnpay.VnPayAjaxController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>PaymentController</servlet-name>
-        <servlet-class>controllers.PaymentController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>EventSummaryController</servlet-name>
         <servlet-class>controllers.EventSummaryController</servlet-class>
     </servlet>
@@ -154,22 +138,6 @@
     <servlet-mapping>
         <servlet-name>CategoryController</servlet-name>
         <url-pattern>/category</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ViewSeatController</servlet-name>
-        <url-pattern>/viewSeat</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>VnPayReturnController</servlet-name>
-        <url-pattern>/vnPayReturn</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>VnPayAjaxController</servlet-name>
-        <url-pattern>/vnPayAjax</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>PaymentController</servlet-name>
-        <url-pattern>/payment</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EventSummaryController</servlet-name>
