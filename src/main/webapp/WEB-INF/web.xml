@@ -60,6 +60,7 @@
         <servlet-name>AdminController</servlet-name>
         <servlet-class>controllers.AdminController</servlet-class>
     </servlet>
+    
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
