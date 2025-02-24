@@ -6,7 +6,7 @@ package controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import constants.Iconstant;
+import configs.AuthConfig;
 import dals.CustomerAuthDAO;
 import dals.CustomerDAO;
 import java.io.IOException;
@@ -41,14 +41,14 @@ public class LoginGoogleHandlerController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     public static String getToken(String code) throws ClientProtocolException, IOException {
-        String response = Request.Post(Iconstant.GOOGLE_LINK_GET_TOKEN)
+        String response = Request.Post(AuthConfig.GOOGLE_LINK_GET_TOKEN)
                 .bodyForm(
                         Form.form()
-                                .add("client_id", Iconstant.GOOGLE_CLIENT_ID)
-                                .add("client_secret", Iconstant.GOOGLE_CLIENT_SECRET)
-                                .add("redirect_uri", Iconstant.GOOGLE_REDIRECT_URI)
+                                .add("client_id", AuthConfig.GOOGLE_CLIENT_ID)
+                                .add("client_secret", AuthConfig.GOOGLE_CLIENT_SECRET)
+                                .add("redirect_uri", AuthConfig.GOOGLE_REDIRECT_URI)
                                 .add("code", code)
-                                .add("grant_type", Iconstant.GOOGLE_GRANT_TYPE)
+                                .add("grant_type", AuthConfig.GOOGLE_GRANT_TYPE)
                                 .build()
                 )
                 .execute().returnContent().asString();
@@ -59,7 +59,7 @@ public class LoginGoogleHandlerController extends HttpServlet {
     }
 
     public static UserGoogleDTO getUserInfo(String accessToken) throws ClientProtocolException, IOException {
-        String link = Iconstant.GOOGLE_LINK_GET_USER_INFO + accessToken;
+        String link = AuthConfig.GOOGLE_LINK_GET_USER_INFO + accessToken;
         String response = Request.Get(link).execute().returnContent().asString();
         UserGoogleDTO googlePojo = new Gson().fromJson(response, UserGoogleDTO.class);
         return googlePojo;
