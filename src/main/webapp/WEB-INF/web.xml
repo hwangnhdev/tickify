@@ -60,6 +60,14 @@
         <servlet-name>AdminController</servlet-name>
         <servlet-class>controllers.AdminController</servlet-class>
     </servlet>
+     <servlet>
+        <servlet-name>ViewAllTicketsController</servlet-name>
+        <servlet-class>controllers.ViewAllTicketsController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TicketDetailController</servlet-name>
+        <servlet-class>controllers.TicketDetailController</servlet-class>
+    </servlet>
     
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
@@ -117,10 +125,17 @@
         <servlet-name>AdminController</servlet-name>
         <url-pattern>/admin</url-pattern>
     </servlet-mapping>
+<servlet-mapping>
+        <servlet-name>ViewAllTicketsController</servlet-name>
+        <url-pattern>/viewalltickets</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TicketDetailController</servlet-name>
+        <url-pattern>/viewticketdetail</url-pattern>
+    </servlet-mapping>
+
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
     <welcome-file-list>
         <welcome-file>event</welcome-file>
