@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <!-- Define Servlets -->
     <servlet>
         <servlet-name>AuthController</servlet-name>
         <servlet-class>controllers.AuthController</servlet-class>
@@ -41,6 +42,14 @@
         <servlet-class>controllers.EventDetailController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ProfileController</servlet-name>
+        <servlet-class>controllers.ProfileController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <servlet-class>controllers.ChangePasswordController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>SearchEventController</servlet-name>
         <servlet-class>controllers.SearchEventController</servlet-class>
     </servlet>
@@ -60,6 +69,28 @@
         <servlet-name>AdminController</servlet-name>
         <servlet-class>controllers.AdminController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ViewAllTicketsController</servlet-name>
+        <servlet-class>controllers.ViewAllTicketsController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TicketDetailController</servlet-name>
+        <servlet-class>controllers.TicketDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginController</servlet-name>
+        <servlet-class>controllers.LoginController</servlet-class>
+    </servlet>
+        <servlet>
+        <servlet-name>ProfileController</servlet-name>
+        <servlet-class>controllers.ProfileController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <servlet-class>controllers.ChangePasswordController</servlet-class>
+    </servlet>
+
+    <!-- Define Servlet Mappings -->
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -116,9 +147,33 @@
         <servlet-name>AdminController</servlet-name>
         <url-pattern>/admin</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewAllTicketsController</servlet-name>
+        <url-pattern>/viewalltickets</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TicketDetailController</servlet-name>
+        <url-pattern>/viewticketdetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginController</servlet-name>
+        <url-pattern>/LoginController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/change-password</url-pattern>
+    </servlet-mapping>
+
+    <!-- Session Configuration -->
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
+
+    <!-- Welcome File List -->
     <welcome-file-list>
         <welcome-file>event</welcome-file>
     </welcome-file-list>

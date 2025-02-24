@@ -9,8 +9,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import models.Customer;
+
+import org.mindrot.jbcrypt.BCrypt;
+
 import models.CustomerAuth;
+import models.Customer;
 import utils.DBContext;
 
 /**
@@ -18,16 +21,16 @@ import utils.DBContext;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class CustomerDAO extends DBContext {
-    
+
     public static void main(String[] args) {
         Customer customer = new Customer();
         CustomerAuth customerAuth = new CustomerAuth();
         CustomerDAO cusDao = new CustomerDAO();
         CustomerAuthDAO cusAuthDao = new CustomerAuthDAO();
-        
+
         customer = cusDao.selectCustomerById(3);
         customerAuth = cusAuthDao.selectCustomerAuthById(customer.getCustomerId());
-        
+
         System.out.println(customer);
         System.out.println(customerAuth);
     }
@@ -37,7 +40,7 @@ public class CustomerDAO extends DBContext {
     private static final String SELECT_CUSTOMER_BY_EMAIL = "SELECT * FROM Customers WHERE email = ?";
     private static final String INSERT_CUSTOMER = "INSERT INTO Customers (full_name, email, address, phone, profile_picture, status) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_CUSTOMER = "UPDATE Customers SET full_name = ?, email = ?, address = ?, phone = ?, profile_picture = ?, status = ? WHERE customer_id = ?";
-    
+
     private Customer mapResultSetToCustomer(ResultSet rs) throws SQLException {
         Customer customer = new Customer();
         customer.setCustomerId(rs.getInt("customer_id"));
@@ -49,7 +52,7 @@ public class CustomerDAO extends DBContext {
         customer.setStatus(rs.getBoolean("status"));
         return customer;
     }
-    
+
     public List<Customer> selectAllCustomers() {
         List<Customer> customers = new ArrayList<>();
         try {
@@ -78,7 +81,7 @@ public class CustomerDAO extends DBContext {
         }
         return customer;
     }
-    
+
     public Customer selectCustomerByEmail(String email) {
         Customer customer = null;
         try {
@@ -93,7 +96,7 @@ public class CustomerDAO extends DBContext {
         }
         return customer;
     }
-    
+
     public boolean insertCustomer(Customer customer) {
         try {
             PreparedStatement st = connection.prepareStatement(INSERT_CUSTOMER);
@@ -130,5 +133,84 @@ public class CustomerDAO extends DBContext {
             return false;
         }
     }
-}
 
+    /**
+     * Method to get customer's information
+     *
+     * @param customerId
+     * @return Customers object
+     */
+    public Customer getCustomerById(int customerId) {
+        String query = "select c.*,\n"
+                + "	ca.password \n"
+                + "	from Customers c\n"
+                + "	inner join Customer_auths ca\n"
+                + "	on c.customer_id = ca.customer_id\n"
+                + "where c.customer_id = ?";
+        try ( PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, customerId);
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Customer customer = new Customer();
+                    customer.setCustomerId(rs.getInt("customer_id"));
+                    customer.setFullName(rs.getString("full_name"));
+                    customer.setAddress(rs.getString("address"));
+                    customer.setPhone(rs.getString("phone"));
+                    customer.setEmail(rs.getString("email"));
+                    customer.setDob(rs.getDate("dob"));
+                    customer.setGender(rs.getString("gender"));
+                    customer.setProfilePicture(rs.getString("profile_picture"));
+                    customer.setStatus(rs.getBoolean("status"));
+                    customer.setPassword(rs.getString("password"));
+                    return customer;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching profile: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Method for customer to update their own information
+     *
+     * @param customer
+     * @return true if updated successfully, false if failed
+     */
+    public boolean updateCustomerProfile(Customer customer) {
+        String query = "UPDATE Customers SET full_name = ?, address = ?, phone = ?, dob = ?, gender =?, profile_picture = ? WHERE customer_id = ?";
+        try ( PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, customer.getFullName());
+            ps.setString(2, customer.getAddress());
+            ps.setString(3, customer.getPhone());
+            ps.setDate(4, customer.getDob());
+            ps.setString(5, customer.getGender());
+            ps.setString(6, customer.getProfilePicture());
+            ps.setInt(7, customer.getCustomerId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating profile: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Method for customer to change their password
+     *
+     * @param customerId
+     * @param newPassword
+     * @return true if updated successfully, false if failed
+     */
+    public boolean updatePassword(int customerId, String newPassword) {
+        String sql = "UPDATE Customer_auths SET password=? WHERE customer_id=?";
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt()); // Hash newPasword
+            ps.setString(1, hashedPassword);
+            ps.setInt(2, customerId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating password: " + e.getMessage());
+        }
+        return false;
+    }
+}
