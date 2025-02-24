@@ -12,6 +12,18 @@
         <servlet-name>EventDetailController</servlet-name>
         <servlet-class>controllers.EventDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ViewAllTicketsController</servlet-name>
+        <servlet-class>controllers.ViewAllTicketsController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TicketDetailController</servlet-name>
+        <servlet-class>controllers.TicketDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginController</servlet-name>
+        <servlet-class>controllers.LoginController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>EventController</servlet-name>
         <url-pattern>/event</url-pattern>
@@ -24,10 +36,20 @@
         <servlet-name>EventDetailController</servlet-name>
         <url-pattern>/eventdetail</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewAllTicketsController</servlet-name>
+        <url-pattern>/viewalltickets</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TicketDetailController</servlet-name>
+        <url-pattern>/viewticketdetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginController</servlet-name>
+        <url-pattern>/LoginController</url-pattern>
+    </servlet-mapping>
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
     <welcome-file-list>
         <welcome-file>event</welcome-file>

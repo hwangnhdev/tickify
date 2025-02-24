@@ -1,6 +1,5 @@
 controllers\AllEventsController.class
 couldinaryConfig\CloudinaryUpload.class
-dals\TicketDAO.class
 models\Categories.class
 models\UserFacebookDTO.class
 utils\DBContext.class
@@ -21,7 +20,6 @@ dals\SeatDAO.class
 models\Orders.class
 dals\AdminDAO.class
 models\Customers.class
-models\Tickets.class
 dals\TicketTypeDAO.class
 models\Vouchers.class
 couldinaryConfig\CouldinaryConfig.class
