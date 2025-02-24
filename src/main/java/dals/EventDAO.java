@@ -528,7 +528,7 @@ public class EventDAO extends DBContext {
 
         /*getTopPicksForYou*/
 //        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getTopPicksForYou(1);
+//        List<Event> list = ld.getTopPicksForYou(3);
 //        for (Event event : list) {
 //            System.out.println(event.getEventName());
 //            System.out.println(event.getImageURL());
@@ -536,13 +536,13 @@ public class EventDAO extends DBContext {
 //        }
 
         /*getRecommendedEvents*/
-//        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getRecommendedEvents(1);
-//        for (Event event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getImageURL());
-//            System.out.println(event.getImageTitle());
-//        }
+        EventDAO ld = new EventDAO();
+        List<Event> list = ld.getRecommendedEvents(1);
+        for (Event event : list) {
+            System.out.println(event.getEventName());
+            System.out.println(event.getImageURL());
+            System.out.println(event.getImageTitle());
+        }
 
         /*getTotalEvents*/
 //        EventDAO ld = new EventDAO();
