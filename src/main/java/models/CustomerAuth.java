@@ -40,6 +40,11 @@ public class CustomerAuth {
         this.authProvider = authProvider;
         this.providerId = providerId;
     }
+    
+    public CustomerAuth(int customerId, String password) {
+        this.customerId = customerId;
+        this.password = password;
+    }
 
     public int getCustomerAuthId() {
         return customerAuthId;

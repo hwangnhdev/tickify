@@ -23,16 +23,20 @@ import utils.DBContext;
 public class CustomerDAO extends DBContext {
 
     public static void main(String[] args) {
-        Customer customer = new Customer();
-        CustomerAuth customerAuth = new CustomerAuth();
-        CustomerDAO cusDao = new CustomerDAO();
-        CustomerAuthDAO cusAuthDao = new CustomerAuthDAO();
+//        Customer customer = new Customer();
+//        CustomerAuth customerAuth = new CustomerAuth();
+//        CustomerDAO cusDao = new CustomerDAO();
+//        CustomerAuthDAO cusAuthDao = new CustomerAuthDAO();
+//
+//        customer = cusDao.selectCustomerById(3);
+//        customerAuth = cusAuthDao.selectCustomerAuthById(customer.getCustomerId());
+//
+//        System.out.println(customer);
+//        System.out.println(customerAuth)
 
-        customer = cusDao.selectCustomerById(3);
-        customerAuth = cusAuthDao.selectCustomerAuthById(customer.getCustomerId());
+        CustomerDAO dao = new CustomerDAO();
+        System.out.println(dao.getPassword(1));
 
-        System.out.println(customer);
-        System.out.println(customerAuth);
     }
 
     private static final String SELECT_ALL_CUSTOMERS = "SELECT * FROM Customers";
@@ -115,38 +119,48 @@ public class CustomerDAO extends DBContext {
         }
     }
 
+//    public boolean updateCustomer(Customer customer) {
+//        try {
+//            PreparedStatement st = connection.prepareStatement(UPDATE_CUSTOMER);
+//            st.setString(1, customer.getFullName());
+//            st.setString(2, customer.getEmail());
+//            st.setString(3, customer.getAddress());
+//            st.setString(4, customer.getPhone());
+//            st.setString(5, customer.getProfilePicture());
+//            st.setBoolean(6, customer.getStatus());
+//            st.setInt(7, customer.getCustomerId());
+//            int rowsUpdated = st.executeUpdate();
+//            return rowsUpdated > 0;
+//        } catch (SQLException e) {
+//            System.out.println(e);
+//            return false;
+//        }
+//    }
     public boolean updateCustomer(Customer customer) {
-        try {
-            PreparedStatement st = connection.prepareStatement(UPDATE_CUSTOMER);
-            st.setString(1, customer.getFullName());
-            st.setString(2, customer.getEmail());
-            st.setString(3, customer.getAddress());
-            st.setString(4, customer.getPhone());
-            st.setString(5, customer.getProfilePicture());
-            st.setBoolean(6, customer.getStatus());
-            st.setInt(7, customer.getCustomerId());
-
-            int rowsUpdated = st.executeUpdate();
-            return rowsUpdated > 0;
+        String query = "UPDATE Customers SET full_name = ?, address = ?, phone = ?, profile_picture = ? WHERE customer_id = ?";
+        try ( PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, customer.getFullName());
+            ps.setString(2, customer.getAddress());
+            ps.setString(3, customer.getPhone());
+            ps.setString(4, customer.getProfilePicture());
+            ps.setInt(5, customer.getCustomerId());
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println(e);
-            return false;
+            System.out.println("Error updating profile: " + e.getMessage());
         }
+        return false;
     }
 
     /**
      * Method to get customer's information
      *
      * @param customerId
-     * @return Customers object
+     * @return Customer object
      */
     public Customer getCustomerById(int customerId) {
-        String query = "select c.*,\n"
-                + "	ca.password \n"
-                + "	from Customers c\n"
-                + "	inner join Customer_auths ca\n"
-                + "	on c.customer_id = ca.customer_id\n"
-                + "where c.customer_id = ?";
+        String query = "select customer_id, full_name, address, phone, email, profile_picture, status\n"
+                + "	from Customers\n"
+                + "where customer_id = ?";
         try ( PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, customerId);
             try ( ResultSet rs = ps.executeQuery()) {
@@ -157,11 +171,8 @@ public class CustomerDAO extends DBContext {
                     customer.setAddress(rs.getString("address"));
                     customer.setPhone(rs.getString("phone"));
                     customer.setEmail(rs.getString("email"));
-                    customer.setDob(rs.getDate("dob"));
-                    customer.setGender(rs.getString("gender"));
                     customer.setProfilePicture(rs.getString("profile_picture"));
                     customer.setStatus(rs.getBoolean("status"));
-                    customer.setPassword(rs.getString("password"));
                     return customer;
                 }
             }
@@ -177,23 +188,20 @@ public class CustomerDAO extends DBContext {
      * @param customer
      * @return true if updated successfully, false if failed
      */
-    public boolean updateCustomerProfile(Customer customer) {
-        String query = "UPDATE Customers SET full_name = ?, address = ?, phone = ?, dob = ?, gender =?, profile_picture = ? WHERE customer_id = ?";
-        try ( PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setString(1, customer.getFullName());
-            ps.setString(2, customer.getAddress());
-            ps.setString(3, customer.getPhone());
-            ps.setDate(4, customer.getDob());
-            ps.setString(5, customer.getGender());
-            ps.setString(6, customer.getProfilePicture());
-            ps.setInt(7, customer.getCustomerId());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error updating profile: " + e.getMessage());
-        }
-        return false;
-    }
-
+//    public boolean updateCustomerProfile(Customer customer) {
+//        String query = "UPDATE Customers SET full_name = ?, address = ?, phone = ?, dob = ?, gender =?, profile_picture = ? WHERE customer_id = ?";
+//        try ( PreparedStatement ps = connection.prepareStatement(query)) {
+//            ps.setString(1, customer.getFullName());
+//            ps.setString(2, customer.getAddress());
+//            ps.setString(3, customer.getPhone());
+//            ps.setString(6, customer.getProfilePicture());
+//            ps.setInt(7, customer.getCustomerId());
+//            return ps.executeUpdate() > 0;
+//        } catch (SQLException e) {
+//            System.out.println("Error updating profile: " + e.getMessage());
+//        }
+//        return false;
+//    }
     /**
      * Method for customer to change their password
      *
@@ -213,4 +221,23 @@ public class CustomerDAO extends DBContext {
         }
         return false;
     }
+
+    public CustomerAuth getPassword(int customerId) {
+        CustomerAuth pass = null;
+        String sql = "SELECT password FROM Customer_auths WHERE customer_id=?";
+
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    pass = new CustomerAuth();
+                    pass.setPassword(rs.getString("password"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching password: " + e.getMessage());
+        }
+        return pass; // Return the retrieved object (or null if not found)
+    }
+
 }

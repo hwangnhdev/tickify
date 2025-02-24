@@ -5,6 +5,7 @@
 --%>
 <%@page import="dals.CustomerDAO"%>
 <%@ page import="models.Customer" %>
+<%@ page import="models.CustomerAuth" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>

@@ -9,5 +9,4 @@ package configs;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class VnPayConfig {
-
 }
