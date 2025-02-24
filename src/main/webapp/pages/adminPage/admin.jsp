@@ -1,6 +1,6 @@
 <%-- 
-    Document   : category
-    Created on : Feb 20, 2025, 4:26:07 PM
+    Document   : admin
+    Created on : Feb 23, 2025, 10:59:45 AM
     Author     : Tang Thanh Vui - CE180901
 --%>
 
@@ -12,6 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>All Categories</h1>
+        <h1>Hello World!</h1>
     </body>
 </html>
