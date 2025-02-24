@@ -60,6 +60,7 @@ public class EventController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Create session to store parameter when filter and search
         HttpSession session = request.getSession();
 
         // Create an instance of EventDAO to interact with the database
@@ -122,7 +123,7 @@ public class EventController extends HttpServlet {
 //        if (customerId == 0) {
 //            customerId = 0;
 //        }
-        List<Event> topTicketEvents = eventDAO.getTopPicksForYou(1);
+        List<Event> topTicketEvents = eventDAO.getTopPicksForYou(3);
         request.setAttribute("topTicketEvents", topTicketEvents);
 
         List<Event> listRecommendedEvents = eventDAO.getTopPicksForYou(1);

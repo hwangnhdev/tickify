@@ -4,12 +4,10 @@
  */
 package dals;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import models.Event;
 import models.FilterEvent;
@@ -121,31 +119,31 @@ public class FilterEventDAO extends DBContext {
 
     public static void main(String[] args) {
         /*getFilteredEvents*/
-        FilterEventDAO filterEventDAO = new FilterEventDAO();
-
-        // Defining filter criteria
-        List<Integer> categories = Arrays.asList(1, 2);
-        String location = "Tech Hub";
-        Date startDate = Date.valueOf("2025-07-25");
-        Date endDate = Date.valueOf("2025-07-26");
-        String priceRange = "below_150";
-        boolean hasVoucher = true;
-        String query = "AI & Robotics Summit";
-
-        // Creating a filter object with the specified criteria
-        FilterEvent filterEvent = new FilterEvent(null, null, null, null, null, false, query);
-
-        // Fetching the filtered events
-        List<Event> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
-        int count = 0;
-
-        // Printing the event names and count of filtered events
-        for (Event event : filteredEvents) {
-            System.out.println(event.getEventName());
-            System.out.println(event.getImageTitle());
-            System.out.println(event.getImageURL());
-            count++;
-        }
-        System.out.println(count);
+//        FilterEventDAO filterEventDAO = new FilterEventDAO();
+//
+//        // Defining filter criteria
+//        List<Integer> categories = Arrays.asList(1, 2);
+//        String location = "Tech Hub";
+//        Date startDate = Date.valueOf("2025-07-25");
+//        Date endDate = Date.valueOf("2025-07-26");
+//        String priceRange = "below_150";
+//        boolean hasVoucher = true;
+//        String query = "AI & Robotics Summit";
+//
+//        // Creating a filter object with the specified criteria
+//        FilterEvent filterEvent = new FilterEvent(null, null, null, null, null, false, query);
+//
+//        // Fetching the filtered events
+//        List<Event> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
+//        int count = 0;
+//
+//        // Printing the event names and count of filtered events
+//        for (Event event : filteredEvents) {
+//            System.out.println(event.getEventName());
+//            System.out.println(event.getImageTitle());
+//            System.out.println(event.getImageURL());
+//            count++;
+//        }
+//        System.out.println(count);
     }
 }
