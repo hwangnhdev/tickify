@@ -42,6 +42,14 @@
         <servlet-class>controllers.EventDetailController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ProfileController</servlet-name>
+        <servlet-class>controllers.ProfileController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <servlet-class>controllers.ChangePasswordController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>SearchEventController</servlet-name>
         <servlet-class>controllers.SearchEventController</servlet-class>
     </servlet>
@@ -88,6 +96,14 @@
     <servlet>
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controllers.LoginController</servlet-class>
+    </servlet>
+        <servlet>
+        <servlet-name>ProfileController</servlet-name>
+        <servlet-class>controllers.ProfileController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <servlet-class>controllers.ChangePasswordController</servlet-class>
     </servlet>
 
     <!-- Define Servlet Mappings -->
@@ -174,6 +190,14 @@
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/LoginController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/change-password</url-pattern>
     </servlet-mapping>
 
     <!-- Session Configuration -->
