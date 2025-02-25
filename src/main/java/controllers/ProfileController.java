@@ -61,9 +61,9 @@ public class ProfileController extends HttpServlet {
             throws ServletException, IOException {
 //        HttpSession session = request.getSession();
 //        int customerId = (int) session.getAttribute("customerId");
-        CustomerDAO customerDAO = new CustomerDAO();
+        CustomerDAO dao = new CustomerDAO();
 //        Customer customer = customerDAO.getCustomerById(customerId);
-        Customer customer = customerDAO.getCustomerById(1);
+        Customer customer = dao.getCustomerById(2);
         request.setAttribute("profile", customer);
         request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
 
@@ -87,26 +87,25 @@ public class ProfileController extends HttpServlet {
         String fullname = request.getParameter("fullname");
         String address = request.getParameter("address");
         String phone = request.getParameter("phone");
-        Date dob = Date.valueOf(request.getParameter("dob")); // Convert string to SQL Date
-        String gender = request.getParameter("gender");
         String picture = request.getParameter("profile_picture");
+//        Date dob = Date.valueOf(request.getParameter("dob")); // Convert string to SQL Date
+//        String gender = request.getParameter("gender");
 
         // Fetch customer email from the database (since it's not editable)
         CustomerDAO customerDAO = new CustomerDAO();
-        Customer existingCustomer = customerDAO.getCustomerById(customerId);
+        Customer existingCustomer = customerDAO.getCustomerById(1);
         String email = existingCustomer.getEmail(); // Retain the original email
 
         Customer customer = new Customer();
         customer.setCustomerId(customerId);
         customer.setFullName(fullname);
+        customer.setEmail(email);
         customer.setAddress(address);
         customer.setPhone(phone);
-        customer.setEmail(email);
-        customer.setGender(gender);
-        customer.setDob(dob);
+
         customer.setProfilePicture(picture);
 
-        boolean isUpdated = customerDAO.updateCustomerProfile(customer);
+        boolean isUpdated = customerDAO.updateCustomer(customer);
 
         if (isUpdated == true) {
             request.setAttribute("successMessage", "Profile updated successfully.");

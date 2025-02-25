@@ -4,10 +4,16 @@
  */
 package dals;
 
+import com.google.gson.Gson;
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.sql.Date;
 import java.util.List;
 import models.Category;
 import models.EventImage;
@@ -473,8 +479,68 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
+    /*createEvent*/
+    public void createEvent(Event event, List<EventImage> images) {
+        String sql = "{CALL InsertEventWithImages(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+
+        try ( CallableStatement stmt = connection.prepareCall(sql)) { // Use CallableStatement
+            // Set parameters for the stored procedure
+            stmt.setString(1, event.getEventName());
+            stmt.setString(2, event.getLocation());
+            stmt.setString(3, event.getEventType());
+            stmt.setString(4, event.getStatus());
+            stmt.setString(5, event.getDescription());
+            stmt.setDate(6, event.getStartDate());
+            stmt.setDate(7, event.getEndDate());
+
+            // Handle nullable categoryId
+            stmt.setInt(8, event.getCategoryId());
+
+            // Convert image list to JSON
+            Gson gson = new Gson();
+            String imagesJson = gson.toJson(images);
+            stmt.setNString(9, imagesJson); // Use setNString for Unicode support
+
+            // Execute the stored procedure
+            stmt.execute();
+            System.out.println("Event created successfully with images.");
+
+        } catch (SQLException e) {
+            System.out.println("Error creating event: " + e.getMessage());
+            throw new RuntimeException("Failed to create event", e);
+        }
+    }
+
     /*main*/
     public static void main(String[] args) {
+        /*createEvent*/
+        EventDAO eventDAO = new EventDAO();
+
+        // Create Event object using modern Timestamp creation
+        Event event = new Event(
+                0, // eventId will be auto-generated
+                2, // categoryId
+                "ThanhVui 2025",
+                "Saigon",
+                "Cultural",
+                "Active",
+                "A vibrant festival",
+                new Date(Timestamp.valueOf(LocalDateTime.of(2025, 4, 1, 9, 0)).getTime()), // 2025-04-01 09:00:00
+                new Date(Timestamp.valueOf(LocalDateTime.of(2025, 4, 1, 9, 0)).getTime()), // 2025-04-03 18:00:00
+                null, // createdAt will be set by DB
+                null // updatedAt will be set by DB
+        );
+
+        // Create list of EventImage
+        List<EventImage> images = Arrays.asList(
+                new EventImage("https://res.cloudinary.com/dnvpphtov/image/upload/v1739624793/sbtebivpbkgr9indbdhy.jpg", "Music logo_banner"),
+                new EventImage("https://res.cloudinary.com/dnvpphtov/image/upload/v1739624800/k240hpwtibcpxwgeibay.jpg", "Music logo_event"),
+                new EventImage("https://res.cloudinary.com/dnvpphtov/image/upload/v1739624800/k240hpwtibcpxwgeibay.jpg", "Music logo_organizer")
+        );
+
+        // Call createEvent method
+        eventDAO.createEvent(event, images);
+
         /*searchEventsByQuery*/
 //        EventDAO ld = new EventDAO();
 //        List<Events> list = ld.searchEventsByQuery("Rock Festival");
@@ -536,13 +602,13 @@ public class EventDAO extends DBContext {
 //        }
 
         /*getRecommendedEvents*/
-        EventDAO ld = new EventDAO();
-        List<Event> list = ld.getRecommendedEvents(1);
-        for (Event event : list) {
-            System.out.println(event.getEventName());
-            System.out.println(event.getImageURL());
-            System.out.println(event.getImageTitle());
-        }
+//        EventDAO ld = new EventDAO();
+//        List<Event> list = ld.getRecommendedEvents(1);
+//        for (Event event : list) {
+//            System.out.println(event.getEventName());
+//            System.out.println(event.getImageURL());
+//            System.out.println(event.getImageTitle());
+//        }
 
         /*getTotalEvents*/
 //        EventDAO ld = new EventDAO();
@@ -556,17 +622,18 @@ public class EventDAO extends DBContext {
 //        }
 
         /*getTopEventsWithLimit*/
-//        // Create instance of EventDAO
+        // Create instance of EventDAO
 //        EventDAO eventDAO = new EventDAO();
 //        // Test fetching top 10 best-selling events
 //        int limit = 10;
-//        List<Events> events = eventDAO.getTopEventsWithLimit();
+//        List<Event> events = eventDAO.getTopEventsWithLimit();
 //        // Print results to check if the query works correctly
 //        System.out.println("===== Top " + limit + " Best-Selling Event =====");
 //        for (Event event : events) {
 //            System.out.println("Event ID: " + event.getEventId()
 //                    + " | Name: " + event.getEventName()
 //            );
+//            System.out.println(event.getImageURL());
 //        }
 //        // Check if the result contains the correct number of events
 //        if (events.size() == limit) {

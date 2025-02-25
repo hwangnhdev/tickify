@@ -13,16 +13,21 @@ public class EventImage {
     private int imageId;
     private int eventId;
     private String imageUrl;
-    private String image_title;
+    private String imageTitle;
 
     public EventImage() {
     }
 
-    public EventImage(int imageId, int eventId, String imageUrl, String image_title) {
+    public EventImage(int imageId, int eventId, String imageUrl, String imageTitle) {
         this.imageId = imageId;
         this.eventId = eventId;
         this.imageUrl = imageUrl;
-        this.image_title = image_title;
+        this.imageTitle = imageTitle;
+    }
+
+    public EventImage(String imageUrl, String imageTitle) {
+        this.imageUrl = imageUrl;
+        this.imageTitle = imageTitle;
     }
 
     public int getImageId() {
@@ -50,11 +55,11 @@ public class EventImage {
     }
 
     public String getImage_title() {
-        return image_title;
+        return imageTitle;
     }
 
     public void setImage_title(String image_title) {
-        this.image_title = image_title;
+        this.imageTitle = image_title;
     }
 
 }

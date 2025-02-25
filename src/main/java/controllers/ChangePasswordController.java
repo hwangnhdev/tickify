@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Customer;
+import models.CustomerAuth;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
@@ -60,7 +61,7 @@ public class ChangePasswordController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         CustomerDAO dao = new CustomerDAO();
-        Customer customer = dao.getCustomerById(1);
+        CustomerAuth customer = dao.getPassword(1);
         request.setAttribute("profile", customer);
         request.getRequestDispatcher("pages/profile/change-password.jsp").forward(request, response);
     }
@@ -88,13 +89,13 @@ public class ChangePasswordController extends HttpServlet {
         String confirmPassword = request.getParameter("confirmPassword");
 
         CustomerDAO dao = new CustomerDAO();
-        Customer existingCustomer = dao.getCustomerById(1);
+        CustomerAuth existingPassword = dao.getPassword(1);
 
-        Customer customer = new Customer();
+        CustomerAuth customer = new CustomerAuth();
         customer.setPassword(newPassword);
 
         // Check if current password is correct
-        if (!BCrypt.checkpw(currentPassword, existingCustomer.getPassword())) {
+        if (!BCrypt.checkpw(currentPassword, existingPassword.getPassword())) {
             request.setAttribute("errorMessage", "Current password is incorrect.");
         } // Check if new password and confirm password match
         else if (!newPassword.equals(confirmPassword)) {
