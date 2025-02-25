@@ -122,6 +122,9 @@
             <div class="user-actions-header">
                 <button>Create Event</button>
                 <button>Purchased Tickets</button>
+                <a href="<%= request.getContextPath()%>/profile">My Profile</a>
+                <a href="<%= request.getContextPath()%>/change-password">Change Password</a>
+                <a href="<%= request.getContextPath()%>/viewalltickets">My Tickets</a>
                 <a href="<%= request.getContextPath()%>/pages/signUpPage/signUp.jsp">Sign In | Register</a>
             </div>
         </header>

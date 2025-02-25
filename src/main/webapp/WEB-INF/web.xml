@@ -81,14 +81,6 @@
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controllers.LoginController</servlet-class>
     </servlet>
-        <servlet>
-        <servlet-name>ProfileController</servlet-name>
-        <servlet-class>controllers.ProfileController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ChangePasswordController</servlet-name>
-        <servlet-class>controllers.ChangePasswordController</servlet-class>
-    </servlet>
 
     <!-- Define Servlet Mappings -->
     <servlet-mapping>
