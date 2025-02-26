@@ -4,6 +4,7 @@
     Author     : Tang Thanh Vui - CE180901
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -91,24 +92,45 @@
                             <div class="w-1/2 bg-gray-800 p-6 rounded flex items-center justify-center">
                                 <div class="text-center">
                                     <i class="fas fa-upload text-3xl mb-2"></i>
-                                    <p>Thêm logo sự kiện (720x458)</p>
+                                    <p>Thêm logo sự kiện (720x958)</p>
+                                    <input type="file" name="logoEvent" value="logoEvent"></input>
                                 </div>
                             </div>
                             <div class="w-1/2 bg-gray-800 p-6 rounded flex items-center justify-center">
                                 <div class="text-center">
                                     <i class="fas fa-upload text-3xl mb-2"></i>
                                     <p>Thêm ảnh nền sự kiện (1280x720)</p>
+                                    <input type="file" name="logoBanner" value="logoBanner"></input>
                                 </div>
                             </div>
                         </div>
                         <!-- Event Name -->
                         <div>
-                            <label class="block mb-2">Tên sự kiện</label>
-                            <input type="text" class="w-full p-3 bg-gray-800 rounded" placeholder="Tên sự kiện">
+                            <label class="block mb-2">Event Name</label>
+                            <input type="text" class="w-full p-3 bg-gray-800 rounded" placeholder="Event Name">
+                        </div>
+                        <!-- Type Of Event -->
+                        <div>
+                            <label class="block mb-2">Type Of Event</label>
+                            <select class="w-full p-3 bg-gray-800 rounded text-white">
+                                <option value="">-- Please Select Type --</option>
+                                <option value="standingevent">Standing Event</option>
+                                <option value="seatedevent">Seated Event</option>
+                            </select>
+                        </div>
+                        <!-- Event Category -->
+                        <div>
+                            <label class="block mb-2">Event Category</label>
+                            <select class="w-full p-3 bg-gray-800 rounded text-white">
+                                <option value="">-- Please Select Category --</option>
+                                <c:forEach var="category" items="${listCategories}">
+                                    <option value="${category.categoryId}">${category.categoryName}</option>
+                                </c:forEach>
+                            </select>
                         </div>
                         <!-- Event Location -->
                         <div>
-                            <label class="block mb-2">Địa chỉ sự kiện</label>
+                            <label class="block mb-2">Event Location</label>
                             <div class="flex items-center mb-4">
                                 <input type="radio" name="event_type" class="mr-2"> Sự kiện Offline
                                 <input type="radio" name="event_type" class="ml-6 mr-2"> Sự kiện Online
@@ -122,11 +144,6 @@
                                 <input type="text" class="w-1/2 p-3 bg-gray-800 rounded" placeholder="Phường/Xã">
                                 <input type="text" class="w-1/2 p-3 bg-gray-800 rounded" placeholder="Số nhà, đường">
                             </div>
-                        </div>
-                        <!-- Event Type -->
-                        <div>
-                            <label class="block mb-2">Thể loại sự kiện</label>
-                            <input type="text" class="w-full p-3 bg-gray-800 rounded" placeholder="Vui lòng chọn">
                         </div>
                         <!-- Event Information -->
                         <div>
