@@ -81,8 +81,11 @@
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controllers.LoginController</servlet-class>
     </servlet>
-
     <!-- Define Servlet Mappings -->
+    <servlet>
+        <servlet-name>CreateNewEventController</servlet-name>
+        <servlet-class>controllers.CreateNewEventController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -159,12 +162,14 @@
         <servlet-name>ChangePasswordController</servlet-name>
         <url-pattern>/change-password</url-pattern>
     </servlet-mapping>
-
     <!-- Session Configuration -->
+    <servlet-mapping>
+        <servlet-name>CreateNewEventController</servlet-name>
+        <url-pattern>/createNewEvent</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
     <!-- Welcome File List -->
     <welcome-file-list>
         <welcome-file>event</welcome-file>

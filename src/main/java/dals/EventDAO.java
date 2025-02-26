@@ -18,6 +18,8 @@ import java.util.List;
 import models.Category;
 import models.EventImage;
 import models.Event;
+import models.Seat;
+import models.TicketType;
 import utils.DBContext;
 
 /**
@@ -480,31 +482,43 @@ public class EventDAO extends DBContext {
     }
 
     /*createEvent*/
-    public void createEvent(Event event, List<EventImage> images) {
-        String sql = "{CALL InsertEventWithImages(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+    public void createEvent(Event event, List<EventImage> images, int customerId, String organizationName,
+            List<TicketType> ticketTypes, List<Seat> seats) {
+        String sql = "{CALL InsertEventWithImages(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
-        try ( CallableStatement stmt = connection.prepareCall(sql)) { // Use CallableStatement
-            // Set parameters for the stored procedure
+        try ( CallableStatement stmt = connection.prepareCall(sql)) {
+            // Set parameters for Events
             stmt.setString(1, event.getEventName());
             stmt.setString(2, event.getLocation());
             stmt.setString(3, event.getEventType());
             stmt.setString(4, event.getStatus());
             stmt.setString(5, event.getDescription());
-            stmt.setDate(6, event.getStartDate());
-            stmt.setDate(7, event.getEndDate());
+            stmt.setTimestamp(6, new Timestamp(event.getStartDate().getTime())); // Giữ giờ
+            stmt.setTimestamp(7, new Timestamp(event.getEndDate().getTime()));   // Giữ giờ
 
-            // Handle nullable categoryId
+            // Set categoryId (nullable)
             stmt.setInt(8, event.getCategoryId());
 
-            // Convert image list to JSON
+            // Set Organizer parameters
+            stmt.setInt(9, customerId);
+            stmt.setString(10, organizationName);
+
+            // Convert images to JSON
             Gson gson = new Gson();
             String imagesJson = gson.toJson(images);
-            stmt.setNString(9, imagesJson); // Use setNString for Unicode support
+            stmt.setNString(11, imagesJson);
+
+            // Convert ticket types to JSON
+            String ticketTypesJson = gson.toJson(ticketTypes);
+            stmt.setNString(12, ticketTypesJson);
+
+            // Convert seats to JSON (nullable)
+            String seatsJson = (seats != null && !seats.isEmpty()) ? gson.toJson(seats) : null;
+            stmt.setNString(13, seatsJson);
 
             // Execute the stored procedure
             stmt.execute();
-            System.out.println("Event created successfully with images.");
-
+            System.out.println("Event created successfully with all related data.");
         } catch (SQLException e) {
             System.out.println("Error creating event: " + e.getMessage());
             throw new RuntimeException("Failed to create event", e);
@@ -516,19 +530,19 @@ public class EventDAO extends DBContext {
         /*createEvent*/
         EventDAO eventDAO = new EventDAO();
 
-        // Create Event object using modern Timestamp creation
+        // Create Event object
         Event event = new Event(
                 0, // eventId will be auto-generated
                 2, // categoryId
-                "ThanhVui 2025",
+                "Festival 2025",
                 "Saigon",
                 "Cultural",
                 "Active",
                 "A vibrant festival",
                 new Date(Timestamp.valueOf(LocalDateTime.of(2025, 4, 1, 9, 0)).getTime()), // 2025-04-01 09:00:00
-                new Date(Timestamp.valueOf(LocalDateTime.of(2025, 4, 1, 9, 0)).getTime()), // 2025-04-03 18:00:00
-                null, // createdAt will be set by DB
-                null // updatedAt will be set by DB
+                new Date(Timestamp.valueOf(LocalDateTime.of(2025, 4, 3, 18, 0)).getTime()), // 2025-04-03 18:00:00
+                null, // createdAt
+                null // updatedAt
         );
 
         // Create list of EventImage
@@ -538,8 +552,25 @@ public class EventDAO extends DBContext {
                 new EventImage("https://res.cloudinary.com/dnvpphtov/image/upload/v1739624800/k240hpwtibcpxwgeibay.jpg", "Music logo_organizer")
         );
 
+        // Organizer info
+        int customerId = 2;
+        String organizationName = "Vivid Corp";
+
+        // Create list of TicketType
+        List<TicketType> ticketTypes = Arrays.asList(
+                new TicketType("VIP", "VIP seating", 150.00, 50),
+                new TicketType("General", "General admission", 50.00, 200)
+        );
+
+        // Create list of Seat (optional)
+        List<Seat> seats = Arrays.asList(
+                new Seat("A", "1", "Available"),
+                new Seat("A", "2", "Available")
+        );
+        // Nếu không cần ghế, có thể truyền null: List<Seat> seats = null;
+
         // Call createEvent method
-        eventDAO.createEvent(event, images);
+        eventDAO.createEvent(event, images, customerId, organizationName, ticketTypes, seats);
 
         /*searchEventsByQuery*/
 //        EventDAO ld = new EventDAO();
