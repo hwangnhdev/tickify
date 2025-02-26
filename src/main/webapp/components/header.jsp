@@ -120,7 +120,7 @@
                 <!--<button>Search</button>-->
             </div>
             <div class="user-actions-header">
-                <button>Create Event</button>
+                <a href="<%= request.getContextPath()%>/createNewEvent">Create New Event</a>
                 <button>Purchased Tickets</button>
                 <a href="<%= request.getContextPath()%>/profile">My Profile</a>
                 <a href="<%= request.getContextPath()%>/change-password">Change Password</a>
