@@ -4,18 +4,34 @@
  */
 package controllers;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import configs.CloudinaryConfig;
 import dals.CategoryDAO;
 import dals.EventDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import java.io.InputStream;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import models.Category;
+import models.Event;
+import models.EventImage;
+import models.Seat;
+import models.TicketType;
 
+@MultipartConfig // Thêm annotation để xử lý multipart/form-data
 /**
  *
  * @author Tang Thanh Vui - CE180901
@@ -65,13 +81,14 @@ public class CreateNewEventController extends HttpServlet {
         // Call all DAO to get methods in it
         EventDAO eventDAO = new EventDAO();
         CategoryDAO categoryDAO = new CategoryDAO();
-        
+
         // Get all category and store it in list categories
         List<Category> listCategories = categoryDAO.getAllCategories();
         // Set attribute for DAO
         session.setAttribute("listCategories", listCategories);
-        
-        request.getRequestDispatcher("pages/listEventsPage/createEvent.jsp").forward(request, response);
+
+        // Forward to jsp
+        request.getRequestDispatcher("pages/listEventsPage/testCreateEvent.jsp").forward(request, response);
     }
 
     /**
@@ -86,18 +103,63 @@ public class CreateNewEventController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         EventDAO eventDAO = new EventDAO();
-        String action = request.getParameter("action");
 
-        if ("create".equals(action)) {
+        // Lấy dữ liệu từ form
+        String eventName = request.getParameter("eventName");
+        String location = request.getParameter("location");
+        String eventType = request.getParameter("eventType");
+        String status = request.getParameter("status");
+        String description = request.getParameter("description");
+        LocalDateTime startDateTime = LocalDateTime.parse(request.getParameter("startDate"));
+        LocalDateTime endDateTime = LocalDateTime.parse(request.getParameter("endDate"));
+        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        int customerId = 1; // Giả sử customerId mặc định là 1
+        String organizationName = request.getParameter("organizationName");
 
-            response.sendRedirect("category");
-        } else if ("update".equals(action)) {
+        Date startDate = new Date(Timestamp.valueOf(startDateTime).getTime());
+        Date endDate = new Date(Timestamp.valueOf(endDateTime).getTime());
 
-            response.sendRedirect("category");
-        } else if ("delete".equals(action)) {
+        // Tạo đối tượng Event
+        Event event = new Event(0, categoryId, eventName, location, eventType, status, description, startDate, endDate, null, null);
 
-            response.sendRedirect("category");
+        // Xử lý upload ảnh lên Cloudinary
+        List<EventImage> images = new ArrayList<>();
+        String[] imageTitles = {"logo_banner", "logo_event", "logo_organizer"};
+
+        for (String title : imageTitles) {
+            Part filePart = request.getPart(title);
+            if (filePart != null && filePart.getSize() > 0) {
+                try ( InputStream fileContent = filePart.getInputStream()) {
+                    // Chuyển InputStream thành byte[]
+                    byte[] fileBytes = fileContent.readAllBytes();
+                    // Upload file lên Cloudinary
+                    Map uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.asMap("resource_type", "image"));
+                    String imageUrl = (String) uploadResult.get("secure_url");
+                    images.add(new EventImage(imageUrl, title));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new ServletException("Error uploading image: " + title, e);
+                }
+            }
         }
+
+        // Dữ liệu mẫu cho TicketTypes và Seats
+        List<TicketType> ticketTypes = new ArrayList<>();
+        List<Seat> seats = new ArrayList<>();
+
+        // Gọi phương thức createEvent để lưu vào database
+        eventDAO.createEvent(event, images, customerId, organizationName, ticketTypes, seats);
+
+        // Chuyển hướng sau khi thành công
+        response.sendRedirect("event?success=true");
+    }
+
+    private Cloudinary cloudinary;
+
+    @Override
+    public void init() throws ServletException {
+        // Khởi tạo Cloudinary từ CloudinaryConfig
+        cloudinary = CloudinaryConfig.getInstance();
     }
 
     /**

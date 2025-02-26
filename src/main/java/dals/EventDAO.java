@@ -125,7 +125,7 @@ public class EventDAO extends DBContext {
                 + "e.status, e.description, e.start_date, e.end_date, e.created_at, e.updated_at, "
                 + "ei.image_url, ei.image_title "
                 + "FROM Events e "
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_event%' "
                 + "ORDER BY e.created_at DESC";
 
         try {
@@ -259,7 +259,7 @@ public class EventDAO extends DBContext {
                 + "    ei.image_url, ei.image_title "
                 + "FROM Events e "
                 + "JOIN TicketTypes tt ON e.event_id = tt.event_id "
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%' "
                 + "WHERE e.category_id IN (SELECT category_id FROM CategoriesToRecommend) "
                 + "GROUP BY e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
                 + "         e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
