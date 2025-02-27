@@ -1,0 +1,234 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 27, 2025, 3:08:23 PM
+    Author     : Tang Thanh Vui - CE180901
+*/
+
+/* General styling */
+body {
+    background-color: #1F2937;
+    color: #D1D5DB;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: #15803D;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+.sidebar a:hover {
+    color: #A7F3D0;
+    transition: color 0.2s ease;
+}
+
+/* Tab buttons */
+.tab-button {
+    width: 32px;
+    height: 32px;
+    background-color: #4B5563;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.tab-button.active {
+    background-color: #15803D;
+    transform: scale(1.1);
+}
+.tab-button:hover {
+    background-color: #6B7280;
+}
+
+/* Upload area */
+.upload-area {
+    background-color: #4B5563;
+    border: 2px dashed #6B7280;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+.upload-area:hover {
+    border-color: #15803D;
+    background-color: #374151;
+}
+
+/* Form elements */
+.form-control, .form-select {
+    background-color: #4B5563;
+    color: #FFFFFF; /* Đổi màu text được nhập vào thành trắng */
+    border: 1px solid #6B7280;
+    border-radius: 6px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #15803D;
+    box-shadow: 0 0 5px rgba(21, 128, 61, 0.5);
+    background-color: #374151;
+    color: #FFFFFF; /* Giữ màu trắng khi focus */
+}
+.form-control::placeholder {
+    color: #D1D5DB; /* Giữ placeholder màu trắng nhạt để dễ nhìn */
+}
+.form-label {
+    font-weight: 500;
+    color: #E5E7EB;
+}
+
+/* Seat section */
+.seat-container {
+    background-color: #374151;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.seat-grid {
+    display: grid;
+    gap: 15px;
+    margin-top: 15px;
+}
+.seat-input {
+    display: flex; /* Sử dụng flex để các phần tử nằm ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    gap: 10px; /* Khoảng cách giữa các phần tử */
+    background-color: #4B5563;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #6B7280;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.seat-input:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3);
+}
+.seat-input label {
+    display: block; /* Đảm bảo label nằm trên input */
+    margin-bottom: 5px; /* Khoảng cách giữa label và input */
+    color: #D1D5DB;
+    font-weight: 400;
+    flex: 0 0 auto; /* Không co giãn, giữ kích thước cố định */
+}
+.seat-input input {
+    width: 150px; /* Đặt chiều rộng cố định cho input */
+    margin-bottom: 0; /* Xóa khoảng cách dưới input vì label đã nằm trên */
+    color: #FFFFFF; /* Đảm bảo text trong input là màu trắng */
+    flex: 1; /* Cho phép input co giãn để lấp đầy khoảng trống */
+}
+.seat-input button {
+    margin-top: 0; /* Xóa margin-top của button để nằm ngang */
+    flex: 0 0 auto; /* Không co giãn button, giữ kích thước cố định */
+}
+#seatSummary {
+    color: #34D399;
+    font-weight: bold;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #4A5568;
+    border-radius: 6px;
+    border-left: 4px solid #10B981;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    display: block;
+}
+
+/* Show time section */
+.ticket-section {
+    background-color: #374151;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.show-time {
+    background-color: #4B5563;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid #6B7280;
+}
+.show-time:hover {
+    background-color: #6B7280;
+    box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3);
+}
+.saved-ticket {
+    background-color: #374151;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+    border-left: 4px solid #15803D;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+.add-ticket-btn, .save-seat-btn {
+    background-color: #15803D;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-left: 5px;
+}
+.add-ticket-btn:hover, .save-seat-btn:hover {
+    background-color: #166534;
+    transform: translateY(-2px);
+}
+.btn-danger {
+    background-color: #DC2626;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-danger:hover {
+    background-color: #B91C1C;
+    transform: translateY(-2px);
+}
+
+/* Datetime-local inputs */
+.datetime-local {
+    background-color: #4B5563;
+    color: #FFFFFF; /* Đổi màu text trong datetime-local thành trắng */
+    border: 1px solid #6B7280;
+    border-radius: 6px;
+    padding: 8px;
+    width: 100%;
+    cursor: pointer;
+}
+.datetime-local:focus {
+    border-color: #15803D;
+    box-shadow: 0 0 5px rgba(21, 128, 61, 0.5);
+    color: #FFFFFF; /* Giữ màu trắng khi focus */
+}
+
+/* Modal */
+.modal-content {
+    background-color: #374151;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.modal-header {
+    border-bottom: 1px solid #6B7280;
+}
+.modal-footer {
+    border-top: 1px solid #6B7280;
+}
+.btn-secondary {
+    background-color: #6B7280;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.btn-secondary:hover {
+    background-color: #4B5563;
+}
+.btn-success {
+    background-color: #15803D;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-success:hover {
+    background-color: #166534;
+    transform: translateY(-2px);
+}
