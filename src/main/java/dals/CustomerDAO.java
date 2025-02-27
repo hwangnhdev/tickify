@@ -65,7 +65,7 @@ public class CustomerDAO extends DBContext {
             while (rs.next()) {
                 customers.add(mapResultSetToCustomer(rs));
             }
-        } catch (SQLException e) {
+        } catch (SQLException e) {      
             System.out.println(e);
         }
         return customers;
@@ -202,6 +202,7 @@ public class CustomerDAO extends DBContext {
 //        }
 //        return false;
 //    }
+    
     /**
      * Method for customer to change their password
      *

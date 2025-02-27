@@ -79,7 +79,7 @@ public class ChangePasswordController extends HttpServlet {
             throws ServletException, IOException {
 
 //        HttpSession session = request.getSession();
-//        Integer customerId = (Integer) session.getAttribute("customerId");
+//        Integer customerId = (Intege  r) session.getAttribute("customerId");
 //        if (customerId == null) {
 //            response.sendRedirect("login.jsp");
 //            return;
