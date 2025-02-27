@@ -117,6 +117,7 @@ public class AuthController extends HttpServlet {
         
         if (customer != null && BCrypt.checkpw(password, customerAuth.getPassword())) {
             HttpSession session = request.getSession();
+            session.setAttribute("customerImage", customer.getProfilePicture());
             session.setAttribute("customerId", customer.getCustomerId());
             response.sendRedirect("pages/homePage/home.jsp");
         } else {

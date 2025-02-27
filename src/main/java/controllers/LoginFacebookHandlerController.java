@@ -91,12 +91,16 @@ public class LoginFacebookHandlerController extends HttpServlet {
             CustomerAuthDAO customerAuthDao = new CustomerAuthDAO();
             Customer customerSendRedirect = new Customer();
             String provider = "facebook";
+            
+            if (user.getEmail() == null)
+                user.setEmail(user.getId() + "@temp.com");
 
             Customer existingCustomer = customerDao.selectCustomerByEmail(user.getEmail());
 
             int existingCustomerId;
             if (existingCustomer != null) {
                 existingCustomerId = existingCustomer.getCustomerId();
+                customerSendRedirect = existingCustomer;
             } else {
                 existingCustomerId = 0;
             }
@@ -108,31 +112,28 @@ public class LoginFacebookHandlerController extends HttpServlet {
                 // Lấy customer_id đã có trong Customers thêm 1 thằng Customer_auths 
                 CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), null, provider, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
-
-                customerSendRedirect = existingCustomer;
             }
 
             //TH1: Chưa có customer và customer_auth trong DB 
             if (existingCustomer == null && existingCustomerAuth == null) {
-                String tempEmail = null;
-                if (user.getEmail() == null)
-                    tempEmail = user.getId() + "@temp.com";
-                
-                Customer customer = new Customer(0, user.getName(), tempEmail, null, null, null, Boolean.TRUE);
+                Customer customer = new Customer(0, user.getName(), user.getEmail(), null, null, null, Boolean.TRUE);
                 customerDao.insertCustomer(customer);
 
-                int insertedCustomerId = customerDao.selectCustomerByEmail(tempEmail).getCustomerId();
+                int insertedCustomerId = customerDao.selectCustomerByEmail(user.getEmail()).getCustomerId();
 
                 CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, null, provider, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
 
                 customerSendRedirect.setCustomerId(insertedCustomerId);
             }
+            
+            System.out.println(customerSendRedirect);
 
             // Login 
             HttpSession session = request.getSession();
+            session.setAttribute("customerImage", customerSendRedirect.getProfilePicture());
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
-            response.sendRedirect("pages/homePage/home.jsp");
+            response.sendRedirect("event");
         } catch (Exception e) {
             request.setAttribute("error", "Login fail!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);

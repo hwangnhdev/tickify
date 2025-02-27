@@ -81,13 +81,21 @@
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controllers.LoginController</servlet-class>
     </servlet>
-        <servlet>
-        <servlet-name>ProfileController</servlet-name>
-        <servlet-class>controllers.ProfileController</servlet-class>
+    <servlet>
+        <servlet-name>ViewSeatController</servlet-name>
+        <servlet-class>controllers.ViewSeatController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ChangePasswordController</servlet-name>
-        <servlet-class>controllers.ChangePasswordController</servlet-class>
+        <servlet-name>VnPayReturnController</servlet-name>
+        <servlet-class>vnpay.VnPayReturnController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VnPayAjaxController</servlet-name>
+        <servlet-class>vnpay.VnPayAjaxController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PaymentController</servlet-name>
+        <servlet-class>controllers.PaymentController</servlet-class>
     </servlet>
 
     <!-- Define Servlet Mappings -->
@@ -166,6 +174,22 @@
     <servlet-mapping>
         <servlet-name>ChangePasswordController</servlet-name>
         <url-pattern>/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewSeatController</servlet-name>
+        <url-pattern>/viewSeat</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VnPayReturnController</servlet-name>
+        <url-pattern>/vnPayReturn</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VnPayAjaxController</servlet-name>
+        <url-pattern>/vnPayAjax</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PaymentController</servlet-name>
+        <url-pattern>/payment</url-pattern>
     </servlet-mapping>
 
     <!-- Session Configuration -->

@@ -536,13 +536,13 @@ public class EventDAO extends DBContext {
 //        }
 
         /*getRecommendedEvents*/
-        EventDAO ld = new EventDAO();
-        List<Event> list = ld.getRecommendedEvents(1);
-        for (Event event : list) {
-            System.out.println(event.getEventName());
-            System.out.println(event.getImageURL());
-            System.out.println(event.getImageTitle());
-        }
+//        EventDAO ld = new EventDAO();
+//        List<Event> list = ld.getRecommendedEvents(1);
+//        for (Event event : list) {
+//            System.out.println(event.getEventName());
+//            System.out.println(event.getImageURL());
+//            System.out.println(event.getImageTitle());
+//        }
 
         /*getTotalEvents*/
 //        EventDAO ld = new EventDAO();
@@ -556,24 +556,25 @@ public class EventDAO extends DBContext {
 //        }
 
         /*getTopEventsWithLimit*/
-//        // Create instance of EventDAO
-//        EventDAO eventDAO = new EventDAO();
-//        // Test fetching top 10 best-selling events
-//        int limit = 10;
-//        List<Events> events = eventDAO.getTopEventsWithLimit();
-//        // Print results to check if the query works correctly
-//        System.out.println("===== Top " + limit + " Best-Selling Event =====");
-//        for (Event event : events) {
-//            System.out.println("Event ID: " + event.getEventId()
-//                    + " | Name: " + event.getEventName()
-//            );
-//        }
-//        // Check if the result contains the correct number of events
-//        if (events.size() == limit) {
-//            System.out.println("Test Passed: Retrieved " + limit + " events successfully.");
-//        } else {
-//            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
-//        }
+        // Create instance of EventDAO
+        EventDAO eventDAO = new EventDAO();
+        // Test fetching top 10 best-selling events
+        int limit = 10;
+        List<Event> events = eventDAO.getTopEventsWithLimit();
+        // Print results to check if the query works correctly
+        System.out.println("===== Top " + limit + " Best-Selling Event =====");
+        for (Event event : events) {
+            System.out.println("Event ID: " + event.getEventId()
+                    + " | Name: " + event.getEventName()
+            );
+            System.out.println(event.getImageURL());
+        }
+        // Check if the result contains the correct number of events
+        if (events.size() == limit) {
+            System.out.println("Test Passed: Retrieved " + limit + " events successfully.");
+        } else {
+            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
+        }
 
         /*getEventsByPage*/
 //        EventDAO eventDAO = new EventDAO();

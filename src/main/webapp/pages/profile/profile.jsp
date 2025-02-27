@@ -54,7 +54,6 @@
             form {
                 margin-top: 20px;
                 text-align: left;
-
             }
 
             label {
@@ -139,25 +138,15 @@
 
                 <label>Full Name</label>
                 <input type="text" name="fullname" maxlength="50" value="<%= profile.getFullName()%>" />
+                
+                <label>Email</label>
+                <input type="text" name="email" maxlength="40" value="<%= profile.getEmail()%>" disabled />
 
                 <label>Address</label>
                 <input type="text" name="address" maxlenght="80" value="<%= profile.getAddress()%>"/>
 
                 <label>Phone Number</label>
                 <input type="text" name="phone" pattern="[0-9]*" maxlength="10" value="<%= profile.getPhone()%>" />
-
-                <label>Email</label>
-                <input type="text" name="email" maxlength="40" value="<%= profile.getEmail()%>" disabled />
-
-                <label>Date of Birth</label>
-                <input type="date" name="dob" value="<%= profile.getDob()%>" />
-
-                <div class="gender-group">
-                    <label>Gender</label><br/>
-                    <span><input type="radio" name="gender" value="Male" <%= profile.getGender().equals("Male") ? "checked" : ""%> /> Male</span>
-                    <span><input type="radio" name="gender" value="Female" <%= profile.getGender().equals("Female") ? "checked" : ""%> /> Female</span>
-                    <span><input type="radio" name="gender" value="Others" <%= profile.getGender().equals("Others") ? "checked" : ""%> /> Others</span>
-                </div>
 
                 <button type="submit" class="submit-btn" value="Complete">Complete</button>
 

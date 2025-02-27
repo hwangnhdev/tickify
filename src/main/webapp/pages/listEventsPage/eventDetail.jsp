@@ -188,7 +188,7 @@
                     <p><strong>Venue:</strong> ${event.location}</p>
                     <p class="price">From 270.000 ₫</p>
                     <p><strong>Description:</strong> ${event.description}</p>
-                    <button class="btn">Order Ticket Now</button>
+                    <a class="btn" href="pages/seatSelectionPage/seatSelection.jsp">Order Ticket Now</a>
                 </div>
                 <div class="event-image-event_detail">
                     <c:set var="image" value="${eventImage}" />
