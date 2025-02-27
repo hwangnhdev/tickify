@@ -12,6 +12,7 @@ import java.util.List;
 import models.Category;
 import models.EventImage;
 import models.Event;
+import models.OrganizerEventDetail;
 import utils.DBContext;
 
 /**
@@ -19,6 +20,90 @@ import utils.DBContext;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class EventDAO extends DBContext {
+
+    public OrganizerEventDetail getOrganizerEventDetail(int eventId, int customerId) {
+        OrganizerEventDetail detail = null;
+        String sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, e.description, "
+                + "       e.start_date, e.end_date, e.created_at, e.updated_at, "
+                + "       O.organization_name, "
+                + "       ei.image_url, ei.image_title "
+                + "FROM Events e "
+                + "INNER JOIN Organizers O ON e.event_id = O.event_id "
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
+                + "WHERE e.event_id = ? AND O.customer_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, eventId);
+            ps.setInt(2, customerId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                detail = new OrganizerEventDetail();
+                detail.setEventId(rs.getInt("event_id"));
+                detail.setEventName(rs.getString("event_name"));
+                detail.setLocation(rs.getString("location"));
+                detail.setEventType(rs.getString("event_type"));
+                detail.setStatus(rs.getString("status"));
+                detail.setDescription(rs.getString("description"));
+                detail.setStartDate(rs.getDate("start_date"));
+                detail.setEndDate(rs.getDate("end_date"));
+                detail.setCreatedAt(rs.getDate("created_at"));
+                detail.setUpdatedAt(rs.getDate("updated_at"));
+                // Set organization name from Organizers table
+                detail.setOrganizationName(rs.getString("organization_name"));
+                // Set image information (có thể null nếu không có ảnh banner)
+                detail.setImageURL(rs.getString("image_url"));
+                detail.setImageTitle(rs.getString("image_title"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching organizer event detail: " + e.getMessage());
+        }
+        return detail;
+    }
+
+    public List<Event> viewCreatedEventByStatus(int customerId, String status) {
+        List<Event> events = new ArrayList<>();
+        String sql;
+        if (status == null || status.equalsIgnoreCase("all")) {
+            sql = "SELECT E.event_id, E.event_name, E.location, E.event_type, E.status, "
+                    + "E.start_date, E.end_date, ei.image_url, ei.image_title "
+                    + "FROM Events E "
+                    + "INNER JOIN Organizers O ON E.event_id = O.event_id "
+                    + "LEFT JOIN EventImages ei ON E.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
+                    + "WHERE O.customer_id = ?";
+        } else {
+            sql = "SELECT E.event_id, E.event_name, E.location, E.event_type, E.status, "
+                    + "E.start_date, E.end_date, ei.image_url, ei.image_title "
+                    + "FROM Events E "
+                    + "INNER JOIN Organizers O ON E.event_id = O.event_id "
+                    + "LEFT JOIN EventImages ei ON E.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
+                    + "WHERE O.customer_id = ? AND E.status = ?";
+        }
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, customerId);
+            if (status != null && !status.equalsIgnoreCase("all")) {
+                ps.setString(2, status);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Event event = new Event();
+                event.setEventId(rs.getInt("event_id"));
+                event.setEventName(rs.getString("event_name"));
+                event.setLocation(rs.getString("location"));
+                event.setEventType(rs.getString("event_type"));
+                event.setStatus(rs.getString("status"));
+                event.setStartDate(rs.getDate("start_date"));
+                event.setEndDate(rs.getDate("end_date"));
+                event.setImageURL(rs.getString("image_url"));       // Lấy thông tin ảnh (có thể null)
+                event.setImageTitle(rs.getString("image_title"));   // Lấy tiêu đề ảnh (có thể null)
+                events.add(event);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching events by status: " + e.getMessage());
+        }
+        return events;
+    }
+
 
     /*getEventsByPage*/
     public List<Event> getEventsByPage(int page, int pageSize) {
@@ -536,13 +621,13 @@ public class EventDAO extends DBContext {
 //        }
 
         /*getRecommendedEvents*/
-        EventDAO ld = new EventDAO();
-        List<Event> list = ld.getRecommendedEvents(1);
-        for (Event event : list) {
-            System.out.println(event.getEventName());
-            System.out.println(event.getImageURL());
-            System.out.println(event.getImageTitle());
-        }
+//        EventDAO ld = new EventDAO();
+//        List<Event> list = ld.getRecommendedEvents(1);
+//        for (Event event : list) {
+//            System.out.println(event.getEventName());
+//            System.out.println(event.getImageURL());
+//            System.out.println(event.getImageTitle());
+//        }
 
         /*getTotalEvents*/
 //        EventDAO ld = new EventDAO();
@@ -556,24 +641,25 @@ public class EventDAO extends DBContext {
 //        }
 
         /*getTopEventsWithLimit*/
-//        // Create instance of EventDAO
-//        EventDAO eventDAO = new EventDAO();
-//        // Test fetching top 10 best-selling events
-//        int limit = 10;
-//        List<Events> events = eventDAO.getTopEventsWithLimit();
-//        // Print results to check if the query works correctly
-//        System.out.println("===== Top " + limit + " Best-Selling Event =====");
-//        for (Event event : events) {
-//            System.out.println("Event ID: " + event.getEventId()
-//                    + " | Name: " + event.getEventName()
-//            );
-//        }
-//        // Check if the result contains the correct number of events
-//        if (events.size() == limit) {
-//            System.out.println("Test Passed: Retrieved " + limit + " events successfully.");
-//        } else {
-//            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
-//        }
+        // Create instance of EventDAO
+        EventDAO eventDAO = new EventDAO();
+        // Test fetching top 10 best-selling events
+        int limit = 10;
+        List<Event> events = eventDAO.getTopEventsWithLimit();
+        // Print results to check if the query works correctly
+        System.out.println("===== Top " + limit + " Best-Selling Event =====");
+        for (Event event : events) {
+            System.out.println("Event ID: " + event.getEventId()
+                    + " | Name: " + event.getEventName()
+            );
+            System.out.println(event.getImageURL());
+        }
+        // Check if the result contains the correct number of events
+        if (events.size() == limit) {
+            System.out.println("Test Passed: Retrieved " + limit + " events successfully.");
+        } else {
+            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
+        }
 
         /*getEventsByPage*/
 //        EventDAO eventDAO = new EventDAO();

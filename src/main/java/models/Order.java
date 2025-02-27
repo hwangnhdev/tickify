@@ -1,19 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package models;
 
 import java.sql.Date;
 
 /**
- *
- * @author Nguyen Huy Hoang - CE182102
+ * Model đại diện cho đơn hàng trong hệ thống. Cập nhật bởi: [Tên bạn]
  */
 public class Order {
 
     private int orderId;
     private int customerId;
+    private String customerName;  // Mới thêm - Lưu tên khách hàng
     private int voucherId;
     private double totalPrice;
     private Date orderDate;
@@ -21,13 +17,22 @@ public class Order {
     private String transactionId;
     private Date createdAt;
     private Date updatedAt;
+    private int totalTickets;  // Mới thêm - Số lượng vé trong đơn hàng
 
+    /**
+     * Constructor mặc định.
+     */
     public Order() {
     }
 
-    public Order(int orderId, int customerId, int voucherId, double totalPrice, Date orderDate, String paymentStatus, String transactionId, Date createdAt, Date updatedAt) {
+    /**
+     * Constructor đầy đủ thông tin.
+     */
+    public Order(int orderId, int customerId, String customerName, int voucherId, double totalPrice,
+            Date orderDate, String paymentStatus, String transactionId, Date createdAt, Date updatedAt, int totalTickets) {
         this.orderId = orderId;
         this.customerId = customerId;
+        this.customerName = customerName;
         this.voucherId = voucherId;
         this.totalPrice = totalPrice;
         this.orderDate = orderDate;
@@ -35,8 +40,10 @@ public class Order {
         this.transactionId = transactionId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.totalTickets = totalTickets;
     }
 
+    // GETTER & SETTER
     public int getOrderId() {
         return orderId;
     }
@@ -51,6 +58,14 @@ public class Order {
 
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public int getVoucherId() {
@@ -109,4 +124,11 @@ public class Order {
         this.updatedAt = updatedAt;
     }
 
+    public int getTotalTickets() {
+        return totalTickets;
+    }
+
+    public void setTotalTickets(int totalTickets) {
+        this.totalTickets = totalTickets;
+    }
 }

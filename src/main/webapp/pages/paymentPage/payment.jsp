@@ -268,9 +268,9 @@
                             </p>
                         </div>
                         <div class="mt-4">
-                            <button class="bg-green-500 text-white w-full p-2 rounded-md">
+                            <a href="<%= request.getContextPath()%>/pages/testjsp.jsp" class="bg-green-500 text-white w-full p-2 rounded-md">
                                 Payment
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

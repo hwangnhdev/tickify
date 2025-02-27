@@ -1,54 +1,49 @@
 package controllers;
 
 import dals.OrderDAO;
-import dals.TicketDAO;
-import models.Order;
-import models.Ticket;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;    
+import models.CustomerTicketDTO;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "ViewAllTicketsController", urlPatterns = {"/viewalltickets", "/my-tickets"})
+@WebServlet(name = "ViewAllTicketsController", urlPatterns = {"/viewAllTickets"})
+
 public class ViewAllTicketsController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int customerId = 1; // Ví dụ: lấy từ session, ở đây dùng giá trị cố định
-        String statusParam = request.getParameter("status"); // Nếu cần lọc theo trạng thái
-        
-        OrderDAO orderDAO = new OrderDAO();
-        TicketDAO ticketDAO = new TicketDAO();
-        
-        List<Order> orders = orderDAO.getOrdersByCustomerId(customerId);
-        List<Ticket> ticketList = new ArrayList<>();
-        
-        // Với mỗi đơn hàng, lấy các vé tương ứng
-        for (Order order : orders) {
-            // Nếu có lọc theo trạng thái, bạn có thể bổ sung điều kiện kiểm tra tại đây
-            List<Ticket> tickets = ticketDAO.getTicketsByOrderId(order.getOrderId());
-            // Có thể bạn muốn gán thêm thông tin đơn hàng vào mỗi vé (nếu model Ticket có các trường đó)
-            // Ví dụ: ticket.setOrderCode(order.getOrderCode());
-            ticketList.addAll(tickets);
+        // Lấy customerId từ request (có thể thay đổi lấy từ session nếu cần)
+        String customerIdStr = request.getParameter("customerId");
+        int customerId = 2; // Default nếu không có tham số
+        if (customerIdStr != null && !customerIdStr.trim().isEmpty()) {
+            try {
+                customerId = Integer.parseInt(customerIdStr);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
         }
-        
-        if (ticketList.isEmpty()) {
-            request.setAttribute("message", "Không có vé nào được tìm thấy!");
-        } else {
-            request.setAttribute("ticketList", ticketList);
-        }
-        request.setAttribute("currentStatus", statusParam);
-        request.getRequestDispatcher("/pages/ticket/listTickets.jsp").forward(request, response);
-    }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
+        // Lấy tham số status từ request để lọc theo payment_status
+        String status = request.getParameter("status");
+
+        // Gọi DAO lấy dữ liệu vé theo customerId và (nếu có) theo payment_status
+        OrderDAO orderDAO = new OrderDAO();
+        List<CustomerTicketDTO> tickets;
+        if (status == null || status.trim().isEmpty()) {
+            tickets = orderDAO.getPurchasedTicketsByCustomer(customerId);
+        } else {
+            tickets = orderDAO.getPurchasedTicketsByCustomerAndStatus(customerId, status);
+        }
+
+        // Đưa dữ liệu vào request và forward sang JSP
+        request.setAttribute("tickets", tickets);
+        RequestDispatcher rd = request.getRequestDispatcher("/pages/ticketPage/viewAllTickets.jsp");
+        rd.forward(request, response);
     }
 }

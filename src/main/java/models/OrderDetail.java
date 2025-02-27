@@ -6,7 +6,7 @@ package models;
 
 /**
  *
- * @author Nguyen Huy Hoang - CE182102
+ * @author Duong Minh Kiet CE180166
  */
 public class OrderDetail {
 

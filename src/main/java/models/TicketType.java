@@ -36,7 +36,7 @@ public class TicketType {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
+//
     public int getTicketTypeId() {
         return ticketTypeId;
     }

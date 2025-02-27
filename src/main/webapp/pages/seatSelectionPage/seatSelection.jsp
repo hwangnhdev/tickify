@@ -110,7 +110,7 @@
                 <h5 class="text-lg font-bold mb-2">Selected Seats</h5>
                 <ul id="selectedSeatsList" class="list-group list-disc pl-5"></ul>
                 <div class="mt-4">
-                    <button type="button" class="btn btn-success w-full" id="confirmSelection">Continue - <span id="totalPrice">0</span> đ</button>
+                    <a type="button" href="<%= request.getContextPath()%>/pages/paymentPage/payment.jsp" class="btn btn-success w-full" id="confirmSelection">Continue - <span id="totalPrice">0</span> đ</a>
                 </div>
             </aside>
         </div>

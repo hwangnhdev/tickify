@@ -1,71 +1,74 @@
 package dals;
 
-import models.Ticket;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import models.TicketDetailDTO;
 import utils.DBContext;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class TicketDAO {
+public class TicketDAO extends DBContext {
 
-    /**
-     * Lấy danh sách vé theo order_id.
-     */
-    public List<Ticket> getTicketsByOrderId(int orderId) {
-        List<Ticket> tickets = new ArrayList<>();
-        String query = "SELECT ticket_id, order_detail_id, seat_id, ticket_code, price, status, check_in_datetime, created_at, updated_at " +
-                       "FROM Tickets WHERE order_detail_id = ?";
-        try (Connection conn = new DBContext().connection;
-             PreparedStatement ps = conn.prepareStatement(query)) {
-             
-            ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-                Ticket ticket = new Ticket();
-                ticket.setTicketId(rs.getInt("ticket_id"));
-                ticket.setOrderDetailId(rs.getInt("order_detail_id"));
-                ticket.setSeatId(rs.getInt("seat_id"));
-                ticket.setTicketCode(rs.getString("ticket_code"));
-                ticket.setPrice(rs.getDouble("price"));
-                ticket.setStatus(rs.getString("status"));
-                ticket.setCheckInDatetime(rs.getDate("check_in_datetime"));
-                ticket.setCreatedAt(rs.getDate("created_at"));
-                ticket.setUpdatedAt(rs.getDate("updated_at"));
-                tickets.add(ticket);
-            }
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-        return tickets;
+    // Constructor kế thừa từ DBContext
+    public TicketDAO() {
+        super(); // Gọi constructor của DBContext để thiết lập kết nối
     }
-    
+
     /**
-     * Lấy chi tiết vé theo ticketId.
+     * Lấy chi tiết đơn hàng theo orderId, bao gồm eventName, voucher,
+     * và ảnh sự kiện từ EventImages (nếu có).
      */
-    public Ticket getTicketById(int ticketId) {
-        Ticket ticket = null;
-        String query = "SELECT ticket_id, order_detail_id, seat_id, ticket_code, price, status, check_in_datetime, created_at, updated_at " +
-                       "FROM Tickets WHERE ticket_id = ?";
-        try (Connection conn = new DBContext().connection;
-             PreparedStatement ps = conn.prepareStatement(query)) {
-             
-            ps.setInt(1, ticketId);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                ticket = new Ticket();
-                ticket.setTicketId(rs.getInt("ticket_id"));
-                ticket.setOrderDetailId(rs.getInt("order_detail_id"));
-                ticket.setSeatId(rs.getInt("seat_id"));
-                ticket.setTicketCode(rs.getString("ticket_code"));
-                ticket.setPrice(rs.getDouble("price"));
-                ticket.setStatus(rs.getString("status"));
-                ticket.setCheckInDatetime(rs.getDate("check_in_datetime"));
-                ticket.setCreatedAt(rs.getDate("created_at"));
-                ticket.setUpdatedAt(rs.getDate("updated_at"));
+    public TicketDetailDTO getTicketDetailByOrderId(int orderId) {
+        TicketDetailDTO detail = null;
+        String sql = "SELECT " +
+                     "    o.order_date, " +
+                     "    o.payment_status, " +
+                     "    c.full_name AS customer_name, " +
+                     "    c.email AS customer_email, " +
+                     "    c.phone AS customer_phone, " +
+                     "    c.address AS customer_address, " +
+                     "    e.event_name AS event_name, " +
+                     "    tt.name AS ticket_type, " +
+                     "    tt.price AS ticket_price, " +
+                     "    od.quantity AS ticket_quantity, " +
+                     "    v.code AS voucher_code, " +
+                     "    v.[discount_type] AS voucher_discount_type, " +
+                     "    v.discount_value AS voucher_discount_value, " +
+                     "    o.total_price AS order_total_price, " +
+                     "    ei.image_url AS ticket_image " +
+                     "FROM Orders o " +
+                     "JOIN Customers c ON o.customer_id = c.customer_id " +
+                     "JOIN OrderDetails od ON o.order_id = od.order_id " +
+                     "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id " +
+                     "JOIN Events e ON tt.event_id = e.event_id " +
+                     "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id " +
+                     "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
+                     "WHERE o.order_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {  // Sử dụng connection kế thừa từ DBContext
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    detail = new TicketDetailDTO();
+                    detail.setOrderDate(rs.getDate("order_date"));
+                    detail.setPaymentStatus(rs.getString("payment_status"));
+                    detail.setCustomerName(rs.getString("customer_name"));
+                    detail.setCustomerEmail(rs.getString("customer_email"));
+                    detail.setCustomerPhone(rs.getString("customer_phone"));
+                    detail.setCustomerAddress(rs.getString("customer_address"));
+                    detail.setEventName(rs.getString("event_name"));
+                    detail.setTicketType(rs.getString("ticket_type"));
+                    detail.setTicketPrice(rs.getDouble("ticket_price"));
+                    detail.setTicketQuantity(rs.getInt("ticket_quantity"));
+                    detail.setVoucherCode(rs.getString("voucher_code"));
+                    detail.setVoucherDiscountType(rs.getString("voucher_discount_type"));
+                    detail.setVoucherDiscountValue(rs.getDouble("voucher_discount_value"));
+                    detail.setOrderTotalPrice(rs.getDouble("order_total_price"));
+                    detail.setTicketImage(rs.getString("ticket_image")); // lấy ảnh
+                }
             }
-        } catch(SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace(); // Thay bằng logging nếu cần
         }
-        return ticket;
+        return detail;
     }
 }
