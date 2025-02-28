@@ -79,7 +79,6 @@ public class CreateNewEventController extends HttpServlet {
         // Create session to store parameter when filter and search
         HttpSession session = request.getSession();
         // Call all DAO to get methods in it
-        EventDAO eventDAO = new EventDAO();
         CategoryDAO categoryDAO = new CategoryDAO();
 
         // Get all category and store it in list categories
@@ -88,7 +87,7 @@ public class CreateNewEventController extends HttpServlet {
         session.setAttribute("listCategories", listCategories);
 
         // Forward to jsp
-        request.getRequestDispatcher("pages/listEventsPage/testCreateEvent.jsp").forward(request, response);
+        request.getRequestDispatcher("pages/organizerPage/createEvent.jsp").forward(request, response);
     }
 
     /**
@@ -102,86 +101,86 @@ public class CreateNewEventController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        EventDAO eventDAO = new EventDAO();
-
-        // Lấy dữ liệu từ form
-        String eventName = request.getParameter("eventName");
-        String location = request.getParameter("location");
-        String eventType = request.getParameter("eventType");
-        String status = request.getParameter("status");
-        String description = request.getParameter("description");
-        LocalDateTime startDateTime = LocalDateTime.parse(request.getParameter("startDate"));
-        LocalDateTime endDateTime = LocalDateTime.parse(request.getParameter("endDate"));
-        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-        int customerId = 1; // Giả sử customerId mặc định là 1
-        String organizationName = request.getParameter("organizationName");
-
-        Date startDate = new Date(Timestamp.valueOf(startDateTime).getTime());
-        Date endDate = new Date(Timestamp.valueOf(endDateTime).getTime());
-
-        // Tạo đối tượng Event
-        Event event = new Event(0, categoryId, eventName, location, eventType, status, description, startDate, endDate, null, null);
-
-        // Xử lý upload ảnh lên Cloudinary
-        List<EventImage> images = new ArrayList<>();
-        String[] imageTitles = {"logo_banner", "logo_event", "logo_organizer"};
-
-        // Call cloudinary to upload to image to cloud
-        CloudinaryConfig cloudinaryConfig = new CloudinaryConfig();
-        Cloudinary cloudinary = cloudinaryConfig.getInstance();
-
-        for (String title : imageTitles) {
-            Part filePart = request.getPart(title);
-            if (filePart != null && filePart.getSize() > 0) {
-                try ( InputStream fileContent = filePart.getInputStream()) {
-                    byte[] fileBytes = fileContent.readAllBytes();
-                    Map uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.asMap("resource_type", "image"));
-                    String imageUrl = (String) uploadResult.get("secure_url");
-                    images.add(new EventImage(imageUrl, title));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new ServletException("Error uploading image: " + title, e);
-                }
-            }
-        }
-
-        // Xử lý TicketTypes
-        List<TicketType> ticketTypes = new ArrayList<>();
-        String[] ticketNames = request.getParameterValues("ticketName[]");
-        String[] ticketDescriptions = request.getParameterValues("ticketDescription[]");
-        String[] ticketPrices = request.getParameterValues("ticketPrice[]");
-        String[] ticketQuantities = request.getParameterValues("ticketQuantity[]");
-
-        if (ticketNames != null && ticketDescriptions != null && ticketPrices != null && ticketQuantities != null) {
-            for (int i = 0; i < ticketNames.length; i++) {
-                String name = ticketNames[i];
-                String ticketDesc = ticketDescriptions[i];
-                double price = Double.parseDouble(ticketPrices[i]);
-                int quantity = Integer.parseInt(ticketQuantities[i]);
-                ticketTypes.add(new TicketType(name, ticketDesc, price, quantity));
-            }
-        }
-
-        // Xử lý Seats
-        List<Seat> seats = new ArrayList<>();
-        String[] seatRows = request.getParameterValues("seatRow[]");
-        String[] seatNumbers = request.getParameterValues("seatNumber[]");
-        String[] seatStatuses = request.getParameterValues("seatStatus[]");
-
-        if (seatRows != null && seatNumbers != null && seatStatuses != null) {
-            for (int i = 0; i < seatRows.length; i++) {
-                String row = seatRows[i];
-                String number = seatNumbers[i];
-                String seatStatus = seatStatuses[i];
-                seats.add(new Seat(row, number, seatStatus));
-            }
-        }
-
-        // Gọi phương thức createEvent để lưu vào database
-        eventDAO.createEvent(event, images, customerId, organizationName, ticketTypes, seats);
-
-        // Chuyển hướng sau khi thành công
-        response.sendRedirect("event?success=true");
+//        EventDAO eventDAO = new EventDAO();
+//
+//        // Lấy dữ liệu từ form
+//        String eventName = request.getParameter("eventName");
+//        String location = request.getParameter("location");
+//        String eventType = request.getParameter("eventType");
+//        String status = request.getParameter("status");
+//        String description = request.getParameter("description");
+//        LocalDateTime startDateTime = LocalDateTime.parse(request.getParameter("startDate"));
+//        LocalDateTime endDateTime = LocalDateTime.parse(request.getParameter("endDate"));
+//        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+//        int customerId = 1; // Giả sử customerId mặc định là 1
+//        String organizationName = request.getParameter("organizationName");
+//
+//        Date startDate = new Date(Timestamp.valueOf(startDateTime).getTime());
+//        Date endDate = new Date(Timestamp.valueOf(endDateTime).getTime());
+//
+//        // Tạo đối tượng Event
+//        Event event = new Event(0, categoryId, eventName, location, eventType, status, description, startDate, endDate, null, null);
+//
+//        // Xử lý upload ảnh lên Cloudinary
+//        List<EventImage> images = new ArrayList<>();
+//        String[] imageTitles = {"logo_banner", "logo_event", "logo_organizer"};
+//
+//        // Call cloudinary to upload to image to cloud
+//        CloudinaryConfig cloudinaryConfig = new CloudinaryConfig();
+//        Cloudinary cloudinary = cloudinaryConfig.getInstance();
+//
+//        for (String title : imageTitles) {
+//            Part filePart = request.getPart(title);
+//            if (filePart != null && filePart.getSize() > 0) {
+//                try ( InputStream fileContent = filePart.getInputStream()) {
+//                    byte[] fileBytes = fileContent.readAllBytes();
+//                    Map uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.asMap("resource_type", "image"));
+//                    String imageUrl = (String) uploadResult.get("secure_url");
+//                    images.add(new EventImage(imageUrl, title));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    throw new ServletException("Error uploading image: " + title, e);
+//                }
+//            }
+//        }
+//
+//        // Xử lý TicketTypes
+//        List<TicketType> ticketTypes = new ArrayList<>();
+//        String[] ticketNames = request.getParameterValues("ticketName[]");
+//        String[] ticketDescriptions = request.getParameterValues("ticketDescription[]");
+//        String[] ticketPrices = request.getParameterValues("ticketPrice[]");
+//        String[] ticketQuantities = request.getParameterValues("ticketQuantity[]");
+//
+//        if (ticketNames != null && ticketDescriptions != null && ticketPrices != null && ticketQuantities != null) {
+//            for (int i = 0; i < ticketNames.length; i++) {
+//                String name = ticketNames[i];
+//                String ticketDesc = ticketDescriptions[i];
+//                double price = Double.parseDouble(ticketPrices[i]);
+//                int quantity = Integer.parseInt(ticketQuantities[i]);
+//                ticketTypes.add(new TicketType(name, ticketDesc, price, quantity));
+//            }
+//        }
+//
+//        // Xử lý Seats
+//        List<Seat> seats = new ArrayList<>();
+//        String[] seatRows = request.getParameterValues("seatRow[]");
+//        String[] seatNumbers = request.getParameterValues("seatNumber[]");
+//        String[] seatStatuses = request.getParameterValues("seatStatus[]");
+//
+//        if (seatRows != null && seatNumbers != null && seatStatuses != null) {
+//            for (int i = 0; i < seatRows.length; i++) {
+//                String row = seatRows[i];
+//                String number = seatNumbers[i];
+//                String seatStatus = seatStatuses[i];
+//                seats.add(new Seat(row, number, seatStatus));
+//            }
+//        }
+//
+//        // Gọi phương thức createEvent để lưu vào database
+//        eventDAO.createEvent(event, images, customerId, organizationName, ticketTypes, seats);
+//
+//        // Chuyển hướng sau khi thành công
+//        response.sendRedirect("event?success=true");
     }
 
     /**

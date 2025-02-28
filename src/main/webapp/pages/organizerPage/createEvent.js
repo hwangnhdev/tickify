@@ -3,6 +3,116 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
  */
 
+
+// Kiểm tra xem có lỗi nào hiển thị không
+function hasErrors() {
+    const errorElements = document.querySelectorAll('.error-message');
+    return Array.from(errorElements).some(error => error.style.display === 'block');
+}
+
+// Cập nhật trạng thái nút Save
+function updateSaveButtonState() {
+    const saveBtn = document.getElementById('saveTicketBtn');
+    saveBtn.disabled = hasErrors();
+}
+
+function validateDateTime(input) {
+    const showTime = input.closest('.show-time');
+    const modal = document.getElementById('newTicketModal');
+    const isModal = !!modal && !modal.classList.contains('hidden');
+    const showTimeId = isModal ? modal.getAttribute('data-show-time') : null;
+
+    const currentDate = new Date();
+
+    let showStartInput, showEndInput, ticketStartInput, ticketEndInput;
+    if (showTime) {
+        showStartInput = showTime.querySelector('input[name="showStartDate"]');
+        showEndInput = showTime.querySelector('input[name="showEndDate"]');
+    }
+    if (isModal) {
+        ticketStartInput = document.getElementById('modalTicketStartDate');
+        ticketEndInput = document.getElementById('modalTicketEndDate');
+        showStartInput = document.getElementById(`showStartDate_${showTimeId}`);
+        showEndInput = document.getElementById(`showEndDate_${showTimeId}`);
+    }
+
+    const showStart = showStartInput ? new Date(showStartInput.value) : null;
+    const showEnd = showEndInput ? new Date(showEndInput.value) : null;
+    const ticketStart = ticketStartInput ? new Date(ticketStartInput.value) : null;
+    const ticketEnd = ticketEndInput ? new Date(ticketEndInput.value) : null;
+
+    if (showStartInput)
+        clearError(showStartInput.id);
+    if (showEndInput)
+        clearError(showEndInput.id);
+    if (ticketStartInput)
+        clearError('modalTicketStartDate');
+    if (ticketEndInput)
+        clearError('modalTicketEndDate');
+
+    if (showStartInput && showStartInput.value && showStart < currentDate) {
+        showError(showStartInput.id, `Show start date cannot be in the past (before ${currentDate.toLocaleDateString()})`);
+        updateSaveButtonState();
+        return false;
+    }
+    if (showEndInput && showEndInput.value && showEnd < currentDate) {
+        showError(showEndInput.id, `Show end date cannot be in the past (before ${currentDate.toLocaleDateString()})`);
+        updateSaveButtonState();
+        return false;
+    }
+    if (ticketStartInput && ticketStartInput.value && ticketStart < currentDate) {
+        showError('modalTicketStartDate', `Sale start date cannot be in the past (before ${currentDate.toLocaleDateString()})`);
+        updateSaveButtonState();
+        return false;
+    }
+    if (ticketEndInput && ticketEndInput.value && ticketEnd < currentDate) {
+        showError('modalTicketEndDate', `Sale end date cannot be in the past (before ${currentDate.toLocaleDateString()})`);
+        updateSaveButtonState();
+        return false;
+    }
+
+    if (showStartInput && showEndInput && showStartInput.value && showEndInput.value && showStart >= showEnd) {
+        showError(showStartInput.id, "Show start date must be earlier than show end date");
+        updateSaveButtonState();
+        return false;
+    }
+
+    if (ticketStartInput && ticketEndInput && ticketStartInput.value && ticketEndInput.value && ticketStart >= ticketEnd) {
+        showError('modalTicketStartDate', "Sale start date must be earlier than sale end date");
+        updateSaveButtonState();
+        return false;
+    }
+
+    if (ticketStartInput && showEndInput && ticketStartInput.value && showEndInput.value && ticketStart >= showEnd) {
+        showError('modalTicketStartDate', "Sale start date must be before show end date");
+        updateSaveButtonState();
+        return false;
+    }
+    if (ticketEndInput && showEndInput && ticketEndInput.value && showEndInput.value && ticketEnd > showEnd) {
+        showError('modalTicketEndDate', "Sale end date must be before or at show end date");
+        updateSaveButtonState();
+        return false;
+    }
+
+    updateSaveButtonState();
+    return true;
+}
+
+function formatDateTime(dateTime) {
+    if (!dateTime)
+        return 'Not set';
+    // Tạo đối tượng Date từ chuỗi datetime-local (ví dụ: "2025-02-28T14:30")
+    const date = new Date(dateTime);
+
+    // Định dạng lại theo kiểu "YYYY-MM-DD HH:MM" (bỏ "T")
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Thêm số 0 nếu cần
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
 // Check for next step
 // Kiểm tra Tab 1 (Event Information)
 function isEventInfoValid() {
@@ -34,26 +144,34 @@ function isTimeLogisticsValid() {
         return false;
     }
 
-    // Nếu là Seated Event, kiểm tra ít nhất một hàng ghế
+    // Nếu là Seated Event, kiểm tra ít nhất một hàng ghế và tổng số ghế
     if (eventType === 'seatedevent') {
         const seatRows = document.querySelectorAll('input[name="seatRow[]"]');
         const seatNumbers = document.querySelectorAll('input[name="seatNumber[]"]');
         let hasValidSeat = false;
+        let totalSeats = 0;
+
         for (let i = 0; i < seatRows.length; i++) {
             const row = seatRows[i].value.trim();
-            const num = seatNumbers[i].value.trim();
-            if (row && num && !isNaN(num) && num > 0) {
+            const num = parseInt(seatNumbers[i].value.trim());
+            if (row && !isNaN(num) && num > 0) {
                 hasValidSeat = true;
-                break;
+                totalSeats += num;
             }
         }
+
         if (!hasValidSeat) {
             alert('Please add at least one valid seat (Row and Number of Seats) for a Seated Event.');
             return false;
         }
+
+        if (totalSeats > 461) {
+            alert('Total seats cannot exceed 461 for a Seated Event.');
+            return false;
+        }
     }
 
-    // Kiểm tra ít nhất một Show Time với ít nhất một Ticket Type
+    // Kiểm tra Show Time và Ticket Type
     const showTimes = document.querySelectorAll('.show-time');
     if (showTimes.length === 0) {
         alert('Please add at least one Show Time in Time & Logistics.');
@@ -176,6 +294,7 @@ function calculateSeatSummary() {
     const seatRows = document.querySelectorAll('input[name="seatRow[]"]');
     const seatNumbers = document.querySelectorAll('input[name="seatNumber[]"]');
     const seatSummary = document.getElementById('seatSummary');
+    const errorDiv = document.getElementById('seatError');
 
     if (!seatRows.length) {
         seatSummary.innerHTML = 'Total Rows: 0, Total Columns: 0, Total Seats: 0';
@@ -187,14 +306,30 @@ function calculateSeatSummary() {
         const row = seatRows[i].value.trim().toUpperCase();
         const seatNum = parseInt(seatNumbers[i].value.trim());
         if (row && !isNaN(seatNum) && seatNum > 0) {
+            if (seatNum > 16) { // Giới hạn mỗi hàng tối đa 16 ghế
+                showSeatError(`Row ${row} exceeds maximum 16 seats per row.`);
+                return;
+            }
             rowCount++;
             totalSeats += seatNum;
-            seatsByRow[row] = Math.max(seatsByRow[row] || 0, seatNum);
+            seatsByRow[row] = seatNum; // Lưu số ghế theo hàng
             maxSeatsPerRow = Math.max(maxSeatsPerRow, seatNum);
         }
     }
 
+    if (rowCount > 26) { // Giới hạn tối đa 26 hàng
+        showSeatError('Maximum 26 rows allowed (A-Z).');
+        return;
+    }
+
+    if (totalSeats > 461) { // Giới hạn tổng số ghế
+        showSeatError('Total seats cannot exceed 461.');
+        return;
+    }
+
+    clearSeatError();
     seatSummary.innerHTML = `Total Rows: ${rowCount}, Total Columns: ${maxSeatsPerRow}, Total Seats: ${totalSeats}`;
+    return seatsByRow; // Trả về object chứa số ghế theo hàng
 }
 
 // Format DateTime by replacing "T" with a space
@@ -222,10 +357,14 @@ function updateShowTimeLabel(input) {
     const endDateInput = showTime.querySelector('input[name="showEndDate"]');
     const details = showTime.querySelector('.show-time-details');
 
+    // Kiểm tra thời gian ngay lập tức
+    if (!validateDateTime(input))
+        return;
+
     if (details.classList.contains('collapsed')) {
-        const startDate = formatDateTime(startDateInput.value);
-        const endDate = formatDateTime(endDateInput.value);
-        labelSpan.textContent = `Show Time #${showTimeIndex} (${startDate} - ${endDate})`;
+        const formattedStartDate = formatDateTime(startDateInput.value);
+        const formattedEndDate = formatDateTime(endDateInput.value);
+        labelSpan.textContent = `Show Time #${showTimeIndex} (${formattedStartDate} - ${formattedEndDate})`;
     }
 }
 
@@ -274,40 +413,48 @@ function toggleTicket(button) {
         labelSpan.textContent = ticketName;
     }
 }
-
 // Add New Show Time
 let showTimeCount = 1;
+// Sửa addNewShowTime để thêm sự kiện input
 function addNewShowTime() {
     showTimeCount++;
     const showTimeList = document.getElementById('showTimeList');
     const newShowTime = document.createElement('div');
     newShowTime.className = 'show-time bg-gray-800 p-4 rounded';
     newShowTime.innerHTML = `
-                    <div class="flex justify-between items-center mb-3">
-                        <h6 class="text-white"><span class="show-time-label">Show Time #${showTimeCount}</span></h6>
-                        <div class="flex gap-2">
-                            <button class="toggle-btn" onclick="toggleShowTime(this)">
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeShowTime(this)">Delete</button>
-                        </div>
-                    </div>
-                    <div class="collapsible-content show-time-details">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-gray-300">Start Date</label>
-                                <input type="datetime-local" name="showStartDate" id="showStartDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)">
-                            </div>
-                            <div>
-                                <label class="text-gray-300">End Date</label>
-                                <input type="datetime-local" name="showEndDate" id="showEndDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)">
-                            </div>
-                        </div>
-                        <div id="ticketList_${showTimeCount}" class="mt-3 space-y-2"></div>
-                        <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" data-show-time="${showTimeCount}" onclick="openModal(this)">+ Add Ticket Type</button>
-                    </div>
-                `;
+        <div class="flex justify-between items-center mb-3">
+            <h6 class="text-white"><span class="show-time-label">Show Time #${showTimeCount}</span></h6>
+            <div class="flex gap-2">
+                <button class="toggle-btn" onclick="toggleShowTime(this)">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeShowTime(this)">Delete</button>
+            </div>
+        </div>
+        <div class="collapsible-content show-time-details">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="text-gray-300">Start Date</label>
+                    <input type="datetime-local" name="showStartDate" id="showStartDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none">
+                    <span class="error-message" id="showStartDate_${showTimeCount}_error"></span>
+                </div>
+                <div>
+                    <label class="text-gray-300">End Date</label>
+                    <input type="datetime-local" name="showEndDate" id="showEndDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none">
+                    <span class="error-message" id="showEndDate_${showTimeCount}_error"></span>
+                </div>
+            </div>
+            <div id="ticketList_${showTimeCount}" class="mt-3 space-y-2"></div>
+            <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" data-show-time="${showTimeCount}" onclick="openModal(this)">+ Add Ticket Type</button>
+        </div>
+    `;
     showTimeList.appendChild(newShowTime);
+
+    // Thêm sự kiện input cho các input mới
+    const newInputs = newShowTime.querySelectorAll('input[type="datetime-local"]');
+    newInputs.forEach(input => {
+        input.addEventListener('input', () => validateDateTime(input));
+    });
 }
 
 // Remove Show Time
@@ -341,15 +488,57 @@ function openModal(button) {
     modal.setAttribute('data-show-time', button.getAttribute('data-show-time'));
     modal.classList.remove('hidden');
 
-    // Set the initial color value
+    ['modalTicketName', 'modalTicketDescription', 'modalTicketPrice', 'modalTicketQuantity', 'modalTicketStartDate', 'modalTicketEndDate'].forEach(clearError);
+
+    const eventType = document.getElementById('eventType').value;
+    const seatSelectionDiv = document.getElementById('seatSelection');
+    if (!seatSelectionDiv) {
+        const newSeatDiv = document.createElement('div');
+        newSeatDiv.id = 'seatSelection';
+        newSeatDiv.className = 'space-y-2';
+        modal.querySelector('.space-y-4').appendChild(newSeatDiv);
+    }
+
+    if (eventType === 'seatedevent') {
+        const seatsByRow = calculateSeatSummary();
+        let seatOptions = '<label class="block text-gray-300 mb-2">Select Seat Rows:</label>';
+        for (let row in seatsByRow) {
+            seatOptions += `
+                <div>
+                    <input type="checkbox" name="selectedSeats" value="${row}" data-seats="${seatsByRow[row]}">
+                    <label class="text-gray-300 ml-2">Row ${row} (${seatsByRow[row]} seats)</label>
+                </div>`;
+        }
+        seatSelectionDiv.innerHTML = seatOptions;
+    } else {
+        seatSelectionDiv.innerHTML = '';
+    }
+
     const colorInput = document.getElementById('modalTicketColor');
     const colorValueSpan = document.getElementById('colorValue');
     colorValueSpan.textContent = colorInput.value.toUpperCase();
+
+    const ticketStartInput = document.getElementById('modalTicketStartDate');
+    const ticketEndInput = document.getElementById('modalTicketEndDate');
+    ticketStartInput.addEventListener('input', () => validateDateTime(ticketStartInput));
+    ticketEndInput.addEventListener('input', () => validateDateTime(ticketEndInput));
+
+    // Thêm sự kiện input cho các trường khác để cập nhật nút Save
+    ['modalTicketName', 'modalTicketDescription', 'modalTicketPrice', 'modalTicketQuantity'].forEach(id => {
+        const input = document.getElementById(id);
+        input.addEventListener('input', updateSaveButtonState);
+    });
+
+    // Cập nhật trạng thái ban đầu của nút Save
+    updateSaveButtonState();
 }
 
 // Close Modal
 function closeModal() {
-    document.getElementById('newTicketModal').classList.add('hidden');
+    const modal = document.getElementById('newTicketModal');
+    modal.classList.add('hidden');
+    modal.removeAttribute('data-editing-ticket');
+    modal.querySelector('h5').textContent = 'Create New Ticket Type';
     document.getElementById('modalTicketName').value = '';
     document.getElementById('modalTicketDescription').value = '';
     document.getElementById('modalTicketPrice').value = '';
@@ -362,54 +551,198 @@ function closeModal() {
 
 // Save New Ticket
 async function saveNewTicket() {
-    const showTimeId = document.getElementById('newTicketModal').getAttribute('data-show-time');
+    const modal = document.getElementById('newTicketModal');
+    const showTimeId = modal.getAttribute('data-show-time');
+    const isEditing = modal.hasAttribute('data-editing-ticket');
+    const editingTicketName = modal.getAttribute('data-editing-ticket');
+
     const ticketName = document.getElementById('modalTicketName').value;
     const ticketDescription = document.getElementById('modalTicketDescription').value;
     const ticketPrice = document.getElementById('modalTicketPrice').value;
-    const ticketQuantity = document.getElementById('modalTicketQuantity').value;
+    const ticketQuantity = parseInt(document.getElementById('modalTicketQuantity').value);
     const ticketColor = document.getElementById('modalTicketColor').value;
     const ticketStartDate = document.getElementById('modalTicketStartDate').value;
     const ticketEndDate = document.getElementById('modalTicketEndDate').value;
+    const eventType = document.getElementById('eventType').value;
 
-    if (ticketName && ticketDescription && ticketPrice && ticketQuantity && ticketColor && ticketStartDate && ticketEndDate) {
-        const ticketList = document.getElementById(`ticketList_${showTimeId}`);
+    const showTime = document.getElementById(`ticketList_${showTimeId}`).closest('.show-time');
+    const showStartDate = showTime.querySelector('input[name="showStartDate"]').value;
+    const showEndDate = showTime.querySelector('input[name="showEndDate"]').value;
+
+    // Nếu có lỗi hiển thị, không cho lưu
+    if (hasErrors()) {
+        return;
+    }
+
+    // Kiểm tra các trường bắt buộc
+    if (!ticketName || !ticketDescription || !ticketPrice || !ticketQuantity || !ticketColor || !ticketStartDate || !ticketEndDate || !showStartDate || !showEndDate) {
+        if (!ticketName)
+            showError('modalTicketName', 'Ticket name is required');
+        if (!ticketDescription)
+            showError('modalTicketDescription', 'Description is required');
+        if (!ticketPrice)
+            showError('modalTicketPrice', 'Price is required');
+        if (!ticketQuantity)
+            showError('modalTicketQuantity', 'Quantity is required');
+        if (!ticketColor)
+            showError('modalTicketColor', 'Color is required');
+        if (!ticketStartDate)
+            showError('modalTicketStartDate', 'Sale start date is required');
+        if (!ticketEndDate)
+            showError('modalTicketEndDate', 'Sale end date is required');
+        if (!showStartDate)
+            showError(`showStartDate_${showTimeId}`, 'Show start date is required');
+        if (!showEndDate)
+            showError(`showEndDate_${showTimeId}`, 'Show end date is required');
+        updateSaveButtonState();
+        return;
+    }
+
+    let totalAvailableSeats = 0;
+    let selectedRows = [];
+    if (eventType === 'seatedevent') {
+        const selectedSeats = document.querySelectorAll('input[name="selectedSeats"]:checked');
+        if (selectedSeats.length === 0) {
+            showError('seatSelection', 'Please select at least one seat row');
+            updateSaveButtonState();
+            return;
+        }
+
+        selectedSeats.forEach(seat => {
+            const seatsInRow = parseInt(seat.getAttribute('data-seats'));
+            totalAvailableSeats += seatsInRow;
+            selectedRows.push(`${seat.value} (${seatsInRow} seats)`);
+        });
+
+        if (ticketQuantity > totalAvailableSeats) {
+            showError('modalTicketQuantity', `Quantity (${ticketQuantity}) exceeds available seats (${totalAvailableSeats})`);
+            updateSaveButtonState();
+            return;
+        }
+    }
+
+    const ticketList = document.getElementById(`ticketList_${showTimeId}`);
+    const colorName = await getColorNameFromAPI(ticketColor);
+
+    if (isEditing) {
+        const tickets = ticketList.querySelectorAll('.saved-ticket');
+        for (let ticket of tickets) {
+            if (ticket.querySelector('.ticket-label').getAttribute('data-ticket-name') === editingTicketName) {
+                ticket.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h6 class="text-white"><span class="ticket-label" data-ticket-name="${ticketName}">${ticketName}</span></h6>
+                        <div class="flex gap-2">
+                            <button class="toggle-btn" onclick="toggleTicket(this)">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition duration-200" onclick="editTicket(this, '${showTimeId}')">Edit</button>
+                            <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeTicket(this, '${showTimeId}')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="collapsible-content ticket-details">
+                        <div class="space-y-2 text-gray-300">
+                            <div><label>Description:</label> <span>${ticketDescription}</span></div>
+                            <div><label>Price (VND):</label> <span>${ticketPrice}</span></div>
+                            <div><label>Quantity:</label> <span>${ticketQuantity}</span></div>
+                            ${eventType === 'seatedevent' ? `<div><label>Selected Rows:</label> <span>${selectedRows.join(', ')}</span></div>` : ''}
+                            <div><label>Color:</label> <span style="color: ${ticketColor}">${ticketColor}</span> <span>(${colorName})</span></div>
+                            <div><label>Sale Start:</label> <span class="sale-start">${formatDateTime(ticketStartDate)}</span></div>
+                            <div><label>Sale End:</label> <span class="sale-end">${formatDateTime(ticketEndDate)}</span></div>
+                        </div>
+                    </div>
+                `;
+                break;
+            }
+        }
+    } else {
         const newTicket = document.createElement('div');
-
-        // Lấy tên màu từ API
-        const colorName = await getColorNameFromAPI(ticketColor);
-
         newTicket.className = 'saved-ticket bg-gray-700 p-3 rounded';
         newTicket.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
-                            <h6 class="text-white"><span class="ticket-label" data-ticket-name="${ticketName}">${ticketName}</span></h6>
-                            <div class="flex gap-2">
-                                <button class="toggle-btn" onclick="toggleTicket(this)">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                                <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeTicket(this, '${showTimeId}')">Delete</button>
-                            </div>
-                        </div>
-                        <div class="collapsible-content ticket-details">
-                            <div class="space-y-2 text-gray-300">
-                                <div><label>Description:</label> <span>${ticketDescription}</span></div>
-                                <div><label>Price (VND):</label> <span>${ticketPrice}</span></div>
-                                <div><label>Quantity:</label> <span>${ticketQuantity}</span></div>
-                                <div><label>Color:</label> <span style="color: ${ticketColor}">${ticketColor}</span> <span>(${colorName})</span></div>
-                                <div><label>Sale Start:</label> <span class="sale-start">${ticketStartDate}</span></div>
-                                <div><label>Sale End:</label> <span class="sale-end">${ticketEndDate}</span></div>
-                            </div>
-                        </div>
-                    `;
+            <div class="flex justify-between items-center mb-2">
+                <h6 class="text-white"><span class="ticket-label" data-ticket-name="${ticketName}">${ticketName}</span></h6>
+                <div class="flex gap-2">
+                    <button class="toggle-btn" onclick="toggleTicket(this)">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition duration-200" onclick="editTicket(this, '${showTimeId}')">Edit</button>
+                    <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeTicket(this, '${showTimeId}')">Delete</button>
+                </div>
+            </div>
+            <div class="collapsible-content ticket-details">
+                <div class="space-y-2 text-gray-300">
+                    <div><label>Description:</label> <span>${ticketDescription}</span></div>
+                    <div><label>Price (VND):</label> <span>${ticketPrice}</span></div>
+                    <div><label>Quantity:</label> <span>${ticketQuantity}</span></div>
+                    ${eventType === 'seatedevent' ? `<div><label>Selected Rows:</label> <span>${selectedRows.join(', ')}</span></div>` : ''}
+                    <div><label>Color:</label> <span style="color: ${ticketColor}">${ticketColor}</span> <span>(${colorName})</span></div>
+                    <div><label>Sale Start:</label> <span class="sale-start">${formatDateTime(ticketStartDate)}</span></div>
+                    <div><label>Sale End:</label> <span class="sale-end">${formatDateTime(ticketEndDate)}</span></div>
+                </div>
+            </div>
+        `;
         ticketList.appendChild(newTicket);
-        closeModal();
-    } else {
-        alert("Please fill in all information!");
     }
+
+    modal.removeAttribute('data-editing-ticket');
+    modal.querySelector('h5').textContent = 'Create New Ticket Type';
+    closeModal();
 }
 
 // Remove Ticket
 function removeTicket(button) {
     button.closest('.saved-ticket').remove();
+}
+
+function editTicket(button, showTimeId) {
+    const ticket = button.closest('.saved-ticket');
+    const ticketDetails = ticket.querySelector('.ticket-details');
+    const modal = document.getElementById('newTicketModal');
+
+    // Điền thông tin hiện tại vào modal
+    document.getElementById('modalTicketName').value = ticket.querySelector('.ticket-label').getAttribute('data-ticket-name');
+    document.getElementById('modalTicketDescription').value = ticketDetails.querySelector('div:nth-child(1) span').textContent;
+    document.getElementById('modalTicketPrice').value = ticketDetails.querySelector('div:nth-child(2) span').textContent;
+    document.getElementById('modalTicketQuantity').value = ticketDetails.querySelector('div:nth-child(3) span').textContent;
+    document.getElementById('modalTicketColor').value = ticketDetails.querySelector('div:nth-child(5) span').textContent;
+    document.getElementById('colorValue').textContent = ticketDetails.querySelector('div:nth-child(5) span').textContent;
+
+    // Lấy và định dạng lại thời gian
+    const saleStart = ticketDetails.querySelector('.sale-start').textContent;
+    const saleEnd = ticketDetails.querySelector('.sale-end').textContent;
+    document.getElementById('modalTicketStartDate').value = formatDateTime(saleStart);
+    document.getElementById('modalTicketEndDate').value = formatDateTime(saleEnd);
+
+    // Xử lý ghế nếu là seated event
+    const eventType = document.getElementById('eventType').value;
+    const seatSelectionDiv = document.getElementById('seatSelection');
+    if (eventType === 'seatedevent') {
+        const seatsByRow = calculateSeatSummary();
+        let selectedRowsText = '';
+        const selectedRowsDiv = ticketDetails.querySelector('div:nth-child(4)'); // Kiểm tra div chứa thông tin hàng ghế
+        if (selectedRowsDiv) {
+            selectedRowsText = selectedRowsDiv.querySelector('span')?.textContent || '';
+        }
+        const selectedRows = selectedRowsText.split(', ').map(row => row.split(' ')[1]); // Lấy danh sách hàng (e.g., "A", "B")
+
+        let seatOptions = '<label class="block text-gray-300 mb-2">Select Seat Rows:</label>';
+        for (let row in seatsByRow) {
+            const isChecked = selectedRows.includes(row) ? 'checked' : '';
+            seatOptions += `
+                <div>
+                    <input type="checkbox" name="selectedSeats" value="${row}" data-seats="${seatsByRow[row]}" ${isChecked}>
+                    <label class="text-gray-300 ml-2">Row ${row} (${seatsByRow[row]} seats)</label>
+                </div>`;
+        }
+        seatSelectionDiv.innerHTML = seatOptions;
+    } else {
+        seatSelectionDiv.innerHTML = ''; // Không hiển thị ghế cho standing event
+    }
+
+    // Đặt thuộc tính để biết đây là chỉnh sửa
+    modal.setAttribute('data-show-time', showTimeId);
+    modal.setAttribute('data-editing-ticket', ticket.querySelector('.ticket-label').getAttribute('data-ticket-name')); // Lưu tên ticket để xác định ticket cần chỉnh sửa
+    modal.querySelector('h5').textContent = 'Edit Ticket Type';
+    modal.classList.remove('hidden');
 }
 
 // Hàm lấy tên màu từ API Color Pizza
@@ -422,6 +755,23 @@ async function getColorNameFromAPI(hex) {
     } catch (error) {
         console.error('Error fetching color name:', error);
         return 'Custom Color'; // Trả về giá trị mặc định nếu lỗi
+    }
+}
+// Hiển thị thông báo lỗi
+function showError(elementId, message) {
+    const errorElement = document.getElementById(`${elementId}_error`);
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+}
+
+// Xóa thông báo lỗi
+function clearError(elementId) {
+    const errorElement = document.getElementById(`${elementId}_error`);
+    if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.style.display = 'none';
     }
 }
 
@@ -490,7 +840,15 @@ document.addEventListener('DOMContentLoaded', () => {
         colorValueSpan.textContent = `${colorValue} (${colorName})`; // Hiển thị mã và tên màu
     });
 
-    // Các phần khởi tạo khác giữ nguyên
+    const currentDate = new Date();
+    const minDateTime = currentDate.toISOString().slice(0, 16);
+
+    const dateInputs = document.querySelectorAll('input[type="datetime-local"]');
+    dateInputs.forEach(input => {
+        input.setAttribute('min', minDateTime);
+        input.addEventListener('input', () => validateDateTime(input)); // Kiểm tra ngay khi nhập
+    });
+
     showTab('event-info');
     loadBanks();
     loadProvinces(); // Thêm dòng này để tải danh sách tỉnh/thành

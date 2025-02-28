@@ -33,7 +33,22 @@
                 color: #A7F3D0;
                 transition: color 0.2s ease;
             }
+            /*Header*/
+            /* Thêm vào phần <style> hiện có */
+            header.fixed {
+                position: fixed;
+                top: 0;
+                left: 16rem; /* Độ rộng của sidebar (16rem = 256px) */
+                right: 0;
+                z-index: 50; /* Đảm bảo header nằm trên các nội dung khác */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Thêm shadow để phân biệt khi cuộn */
+                background-color: #1F2937; /* Giữ màu nền phù hợp với giao diện */
+            }
 
+            main {
+                margin-top: 4rem; /* margin-top để tránh nội dung bị che bởi header (4rem ~ 64px) */
+                padding-top: 1rem; /* Padding thêm cho nội dung bên dưới header */
+            }
             /* Tab buttons */
             .tab-button {
                 width: 32px;
@@ -326,10 +341,11 @@
                 text-align: center;
             }
 
+            /* Event Logo (720x958) */
             #logoImage {
                 width: 100%;
                 height: 100%;
-                object-fit: contain; /* Sử dụng contain để giữ nguyên tỷ lệ, không cắt xén */
+                object-fit: cover; /* Thay đổi từ contain thành cover để phủ toàn bộ khung */
                 border-radius: 8px; /* Bo góc */
                 display: block; /* Đảm bảo hiển thị đúng */
             }
@@ -366,10 +382,11 @@
                 text-align: center;
             }
 
+            /* Background Image (1280x720) */
             #backgroundImage {
                 width: 100%;
                 height: 100%;
-                object-fit: contain; /* Sử dụng contain để giữ nguyên tỷ lệ, không cắt xén */
+                object-fit: cover; /* Thay đổi từ contain thành cover để phủ toàn bộ khung */
                 border-radius: 8px; /* Bo góc */
                 display: block; /* Đảm bảo hiển thị đúng */
             }
@@ -406,10 +423,11 @@
                 text-align: center;
             }
 
+            /* Organizer Logo (275x275) */
             #organizerLogoImage {
                 width: 100%;
                 height: 100%;
-                object-fit: contain; /* Sử dụng contain để giữ nguyên tỷ lệ, không cắt xén */
+                object-fit: cover; /* Thay đổi từ contain thành cover để phủ toàn bộ khung */
                 border-radius: 8px; /* Bo góc */
                 display: block; /* Đảm bảo hiển thị đúng */
             }
@@ -439,12 +457,55 @@
             .upload-icon.hidden, .upload-text.hidden {
                 display: none; /* Đảm bảo các phần tử ẩn hoàn toàn khi có class 'hidden' */
             }
-
             .image-error {
                 color: #EF4444;
                 font-size: 0.875rem;
                 margin-top: 0.5rem;
                 text-align: center;
+            }
+            .error-message {
+                color: #EF4444; /* Màu đỏ */
+                font-size: 0.875rem; /* text-sm */
+                margin-top: 0.25rem; /* mt-1 */
+                display: none; /* Mặc định ẩn */
+            }
+            /* Thêm hoặc cập nhật class cho textarea */
+            .event-info-textarea {
+                width: 100%; /* Đảm bảo textarea chiếm toàn bộ chiều rộng của container */
+                padding: 0.5rem; /* p-2 tương ứng 0.5rem trong Tailwind */
+                border-radius: 0.375rem; /* rounded */
+                background-color: #4B5563; /* bg-gray-700 */
+                border: 1px solid #6B7280; /* border-gray-600 */
+                color: #FFFFFF; /* Màu chữ trắng */
+                outline: none; /* focus:outline-none */
+                resize: vertical; /* Cho phép người dùng kéo dọc để thay đổi kích thước */
+                min-height: 100px; /* Chiều cao tối thiểu */
+                max-height: 400px; /* Chiều cao tối đa (tùy chỉnh theo nhu cầu) */
+                overflow-y: auto; /* Hiển thị thanh cuộn nếu nội dung vượt quá chiều cao tối đa */
+                box-shadow: 0 0 0 2px transparent; /* focus:ring-2 focus:ring-green-500 (ban đầu ẩn) */
+                transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng chuyển đổi */
+            }
+            .event-info-textarea:focus {
+                border-color: #15803D; /* focus:ring-green-500 */
+                box-shadow: 0 0 0 2px #15803D; /* focus:ring-2 focus:ring-green-500 */
+                background-color: #374151; /* Tối hơn khi focus */
+                color: #FFFFFF; /* Giữ màu chữ trắng */
+            }
+            /* Tự động mở rộng theo nội dung (dùng JavaScript nếu cần, nhưng CSS có thể hỗ trợ cơ bản) */
+            .event-info-textarea {
+                height: 300px;
+                line-height: 1; /* Điều chỉnh dòng chữ để tính chiều cao chính xác */
+            }
+            .event-info-textarea {
+                transition: height 0.3s ease;
+            }
+            .btn-success:disabled {
+                background-color: #6B7280; /* Màu xám khi bị vô hiệu hóa */
+                cursor: not-allowed;
+                transform: none; /* Không có hiệu ứng hover khi disabled */
+            }
+            .btn-success:disabled:hover {
+                background-color: #6B7280; /* Giữ nguyên màu khi hover */
             }
         </style>
     </head>
@@ -467,9 +528,9 @@
             </aside>
 
             <!-- Main Content -->
-            <main class="flex-1 p-4 overflow-y-auto">
+            <main class="flex-1 p-4 overflow-y-auto mt-16">
                 <!-- Header -->
-                <header class="bg-gray-800 p-4 rounded-t-lg mb-4">
+                <header class="fixed top-0 left-64 right-0 bg-gray-800 p-4 rounded-t-lg z-50 shadow-md">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-4">
                             <button class="tab-button w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white hover:bg-green-600 transition duration-200" onclick="showTab('event-info')">1</button>
@@ -525,19 +586,38 @@
                             <label class="block text-gray-300 mb-2">Full Address</label>
                             <input type="text" id="fullAddress" name="fullAddress" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Building number, Street name, Ward, District, Province/City">
                         </div>
+                        <!-- Trong phần tab Event Info, thay thế hoặc thêm vào phần textarea hiện có -->
                         <div class="md:col-span-2">
                             <label class="block text-gray-300 mb-2">Event Information</label>
-                            <textarea class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" rows="5" placeholder="Description"></textarea>
+                            <textarea class="event-info-textarea" placeholder="Description">Event Introduction:
+
+[Brief summary of the event: Location of the event, time, specific venue, and reasons why attendees shouldn’t miss it]
+
+Event Theme:
+
+Main Program: [List the standout activities in the event: performances, special guests, specific schedules for different segments]
+Guests: [Information about special guests, artists, or speakers attending the event. This may include a brief description of them and their roles in the event]
+Special Experiences: [Highlight other unique activities such as workshops, experience zones, photo booths, check-in areas, or exclusive gifts/discounts for attendees.]
+Target Audience and Conditions:
+
+[Terms and Conditions (T&C)] of the event
+
+Notes and Additional Terms
+
+Notes and VAT Terms</textarea>
                         </div>
                         <!-- Nhóm Event Image và Background Image -->
                         <div class="md:col-span-2 p-4 rounded bg-gray-800 text-center">
                             <div class="image-group">
+                                <!-- Event Logo -->
                                 <div id="logoPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
                                     <i class="fas fa-upload text-2xl mb-2 text-green-500 upload-icon"></i>
                                     <p class="text-gray-300 text-sm upload-text">Event Logo (720x958)</p>
                                     <input type="file" id="logoEventInput" class="hidden">
                                     <img id="logoImage" src="" alt="Event Logo Preview" class="w-full h-full object-cover rounded hidden">
                                 </div>
+
+                                <!-- Event Background Image -->
                                 <div id="backgroundPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
                                     <i class="fas fa-upload text-2xl mb-2 text-green-500 upload-icon"></i>
                                     <p class="text-gray-300 text-sm upload-text">Add Event Background Image (1280x720)</p>
@@ -549,6 +629,7 @@
                         <div class="md:col-span-2 p-4 rounded bg-gray-800 text-center">
                             <!-- Organizer Image và Organizer Name nằm ngang nhau -->
                             <div class="organizer-row">
+                                <!-- Organizer Logo -->
                                 <div id="organizerLogoPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
                                     <i class="fas fa-upload text-2xl mb-2 text-green-500 upload-icon"></i>
                                     <p class="text-gray-300 text-sm upload-text">Organizer Logo (275x275)</p>
@@ -607,7 +688,7 @@
                                 <div id="showTimeList" class="space-y-4">
                                     <div class="show-time bg-gray-800 p-4 rounded">
                                         <div class="flex justify-between items-center mb-3">
-                                            <h6 class="text-white"><span class="show-time-label">Show Time #1</span></h6>
+                                            <h6 class="text-white"><span class="show-time-label">Show Time #${showTimeCount}</span></h6>
                                             <div class="flex gap-2">
                                                 <button class="toggle-btn" onclick="toggleShowTime(this)">
                                                     <i class="fas fa-chevron-down"></i>
@@ -619,15 +700,17 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="text-gray-300">Start Date</label>
-                                                    <input type="datetime-local" name="showStartDate" id="showStartDate_1" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)">
+                                                    <input type="datetime-local" name="showStartDate" id="showStartDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)">
+                                                    <span class="error-message" id="showStartDate_${showTimeCount}_error"></span>
                                                 </div>
                                                 <div>
                                                     <label class="text-gray-300">End Date</label>
-                                                    <input type="datetime-local" name="showEndDate" id="showEndDate_1" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)">
+                                                    <input type="datetime-local" name="showEndDate" id="showEndDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)">
+                                                    <span class="error-message" id="showEndDate_${showTimeCount}_error"></span>
                                                 </div>
                                             </div>
-                                            <div id="ticketList_1" class="mt-3 space-y-2"></div>
-                                            <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" data-show-time="1" onclick="openModal(this)">+ Add Ticket Type</button>
+                                            <div id="ticketList_${showTimeCount}" class="mt-3 space-y-2"></div>
+                                            <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" data-show-time="${showTimeCount}" onclick="openModal(this)">+ Add Ticket Type</button>
                                         </div>
                                     </div>
                                 </div>
@@ -669,6 +752,7 @@
                     <button class="text-gray-400 hover:text-white text-2xl" onclick="closeModal()">×</button>
                 </div>
                 <div class="space-y-4">
+                    <!-- Các trường hiện có -->
                     <div>
                         <label class="block text-gray-300 mb-2">Ticket Type Name</label>
                         <input type="text" id="modalTicketName" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., VIP">
@@ -700,20 +784,24 @@
                         <div>
                             <label class="block text-gray-300 mb-2">Sale Start Date</label>
                             <input type="datetime-local" id="modalTicketStartDate" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none">
+                            <span class="error-message" id="modalTicketStartDate_error"></span>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">Sale End Date</label>
                             <input type="datetime-local" id="modalTicketEndDate" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none">
+                            <span class="error-message" id="modalTicketEndDate_error"></span>
                         </div>
                     </div>
+                    <!-- Phần chọn ghế (được thêm động qua JS) -->
+                    <div id="seatSelection" class="space-y-2"></div>
                 </div>
                 <div class="mt-4 flex justify-end gap-3">
                     <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200" onclick="closeModal()">Cancel</button>
-                    <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200" onclick="saveNewTicket()">Save</button>
+                    <button id="saveTicketBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200" onclick="saveNewTicket()">Save</button>
                 </div>
             </div>
         </div>
 
-        <script src="createEvent.js"></script>
+        <script src="${pageContext.request.contextPath}/pages/organizerPage/createEvent.js"></script>
     </body>
 </html>
