@@ -14,8 +14,8 @@ public class CustomerAuth {
 
     private int customerAuthId;
     private int customerId;
-    private String password;
     private String authProvider;
+    private String password;
     private String providerId;
     private Date createdAt;
     private Date updatedAt;
@@ -23,22 +23,14 @@ public class CustomerAuth {
     public CustomerAuth() {
     }
 
-    public CustomerAuth(int customerAuthId, int customerId, String password, String authProvider, String providerId, Date createdAt, Date updatedAt) {
+    public CustomerAuth(int customerAuthId, int customerId, String authProvider, String password, String providerId, Date createdAt, Date updatedAt) {
         this.customerAuthId = customerAuthId;
         this.customerId = customerId;
-        this.password = password;
         this.authProvider = authProvider;
+        this.password = password;
         this.providerId = providerId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-    
-    public CustomerAuth(int customerAuthId, int customerId, String password, String authProvider, String providerId) {
-        this.customerAuthId = customerAuthId;
-        this.customerId = customerId;
-        this.password = password;
-        this.authProvider = authProvider;
-        this.providerId = providerId;
     }
 
     public int getCustomerAuthId() {
@@ -57,20 +49,20 @@ public class CustomerAuth {
         this.customerId = customerId;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getAuthProvider() {
         return authProvider;
     }
 
     public void setAuthProvider(String authProvider) {
         this.authProvider = authProvider;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getProviderId() {
@@ -99,13 +91,7 @@ public class CustomerAuth {
 
     @Override
     public String toString() {
-        return "CustomerAuth{"
-                + "customerId=" + customerId
-                + ", password='" + password + '\''
-                + ", authProvider='" + authProvider + '\''
-                + ", providerId='" + providerId + '\''
-                + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt
-                + '}';
+        return "CustomerAuth{" + "customerAuthId=" + customerAuthId + ", customerId=" + customerId + ", authProvider=" + authProvider + ", password=" + password + ", providerId=" + providerId + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
+
 }

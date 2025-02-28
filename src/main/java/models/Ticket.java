@@ -18,21 +18,19 @@ public class Ticket {
     private String ticketCode;
     private double price;
     private String status;
-    private Date checkInDatetime;
     private Date createdAt;
     private Date updatedAt;
 
     public Ticket() {
     }
 
-    public Ticket(int ticketId, int orderDetailId, int seatId, String ticketCode, double price, String status, Date checkInDatetime, Date createdAt, Date updatedAt) {
+    public Ticket(int ticketId, int orderDetailId, int seatId, String ticketCode, double price, String status, Date createdAt, Date updatedAt) {
         this.ticketId = ticketId;
         this.orderDetailId = orderDetailId;
         this.seatId = seatId;
         this.ticketCode = ticketCode;
         this.price = price;
         this.status = status;
-        this.checkInDatetime = checkInDatetime;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -83,14 +81,6 @@ public class Ticket {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Date getCheckInDatetime() {
-        return checkInDatetime;
-    }
-
-    public void setCheckInDatetime(Date checkInDatetime) {
-        this.checkInDatetime = checkInDatetime;
     }
 
     public Date getCreatedAt() {

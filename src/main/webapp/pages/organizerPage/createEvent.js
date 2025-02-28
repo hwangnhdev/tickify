@@ -3,6 +3,95 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
  */
 
+// Check for next step
+// Kiểm tra Tab 1 (Event Information)
+function isEventInfoValid() {
+    const eventName = document.querySelector('#event-info input[placeholder="Event Name"]').value.trim();
+    const eventCategory = document.querySelector('#event-info select').value;
+    const province = document.getElementById('province').value;
+    const district = document.getElementById('district').value;
+    const ward = document.getElementById('ward').value;
+    const fullAddress = document.getElementById('fullAddress').value.trim();
+    const eventInfo = document.querySelector('#event-info textarea').value.trim();
+    const logoUrl = document.getElementById('logoEventInput').dataset.url || '';
+    const backgroundUrl = document.getElementById('backgroundInput').dataset.url || '';
+    const organizerLogoUrl = document.getElementById('organizerLogoInput').dataset.url || '';
+    const organizerName = document.querySelector('#event-info .organizer-row input[placeholder="Organizer Name"]').value.trim();
+
+    const isValid = eventName && eventCategory && province && district && ward && fullAddress && eventInfo && logoUrl && backgroundUrl && organizerLogoUrl && organizerName;
+
+    if (!isValid) {
+        alert('Please fill in all required fields in Event Information:\n- Event Name\n- Event Category\n- Province/City\n- District\n- Ward\n- Full Address\n- Event Information\n- Event Logo\n- Background Image\n- Organizer Logo\n- Organizer Name');
+    }
+    return isValid;
+}
+
+// Kiểm tra Tab 2 (Time & Logistics)
+function isTimeLogisticsValid() {
+    const eventType = document.getElementById('eventType').value;
+    if (!eventType) {
+        alert('Please select Type of Event in Time & Logistics.');
+        return false;
+    }
+
+    // Nếu là Seated Event, kiểm tra ít nhất một hàng ghế
+    if (eventType === 'seatedevent') {
+        const seatRows = document.querySelectorAll('input[name="seatRow[]"]');
+        const seatNumbers = document.querySelectorAll('input[name="seatNumber[]"]');
+        let hasValidSeat = false;
+        for (let i = 0; i < seatRows.length; i++) {
+            const row = seatRows[i].value.trim();
+            const num = seatNumbers[i].value.trim();
+            if (row && num && !isNaN(num) && num > 0) {
+                hasValidSeat = true;
+                break;
+            }
+        }
+        if (!hasValidSeat) {
+            alert('Please add at least one valid seat (Row and Number of Seats) for a Seated Event.');
+            return false;
+        }
+    }
+
+    // Kiểm tra ít nhất một Show Time với ít nhất một Ticket Type
+    const showTimes = document.querySelectorAll('.show-time');
+    if (showTimes.length === 0) {
+        alert('Please add at least one Show Time in Time & Logistics.');
+        return false;
+    }
+
+    let hasValidShowTime = false;
+    for (let showTime of showTimes) {
+        const startDate = showTime.querySelector('input[name="showStartDate"]').value;
+        const endDate = showTime.querySelector('input[name="showEndDate"]').value;
+        const ticketList = showTime.querySelector('.space-y-2').children.length;
+        if (startDate && endDate && ticketList > 0) {
+            hasValidShowTime = true;
+            break;
+        }
+    }
+    if (!hasValidShowTime) {
+        alert('Please ensure each Show Time has a Start Date, End Date, and at least one Ticket Type.');
+        return false;
+    }
+
+    return true;
+}
+
+// Kiểm tra Tab 3 (Payment Information)
+function isPaymentInfoValid() {
+    const bankName = document.getElementById('bank').value;
+    const bankAccount = document.querySelector('input[name="bankAccount"]').value.trim();
+    const accountHolder = document.querySelector('input[name="accountHolder"]').value.trim();
+
+    const isValid = bankName && bankAccount && accountHolder;
+
+    if (!isValid) {
+        alert('Please fill in all required fields in Payment Information:\n- Bank Name\n- Bank Account\n- Account Holder');
+    }
+    return isValid;
+}
+
 // Toggle Seat Section Display
 function toggleEventType() {
     const eventType = document.getElementById('eventType').value;
@@ -338,6 +427,17 @@ async function getColorNameFromAPI(hex) {
 
 // Switch Tabs
 function showTab(tabId) {
+    const currentTab = document.querySelector('.tab-content:not(.hidden)').id;
+
+    // Kiểm tra điều kiện trước khi chuyển tab
+    if (currentTab === 'event-info' && tabId !== 'event-info' && !isEventInfoValid()) {
+        return; // Không chuyển tab nếu Tab 1 chưa đủ thông tin
+    }
+    if (currentTab === 'time-logistics' && tabId === 'payment-info' && !isTimeLogisticsValid()) {
+        return; // Không chuyển từ Tab 2 sang Tab 3 nếu Tab 2 chưa đủ thông tin
+    }
+
+    // Chuyển tab nếu điều kiện thỏa mãn
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
     document.getElementById(tabId).classList.remove('hidden');
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('bg-green-600'));
@@ -349,8 +449,18 @@ function nextTab() {
     const tabs = ['event-info', 'time-logistics', 'payment-info'];
     const currentTab = document.querySelector('.tab-content:not(.hidden)').id;
     const nextIndex = tabs.indexOf(currentTab) + 1;
-    if (nextIndex < tabs.length)
+
+    // Kiểm tra điều kiện trước khi chuyển sang tab tiếp theo
+    if (currentTab === 'event-info' && !isEventInfoValid()) {
+        return; // Không chuyển từ Tab 1 sang Tab 2 nếu Tab 1 chưa đủ thông tin
+    }
+    if (currentTab === 'time-logistics' && !isTimeLogisticsValid()) {
+        return; // Không chuyển từ Tab 2 sang Tab 3 nếu Tab 2 chưa đủ thông tin
+    }
+
+    if (nextIndex < tabs.length) {
         showTab(tabs[nextIndex]);
+    }
 }
 
 // Load Banks
@@ -383,6 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Các phần khởi tạo khác giữ nguyên
     showTab('event-info');
     loadBanks();
+    loadProvinces(); // Thêm dòng này để tải danh sách tỉnh/thành
     document.querySelectorAll('input[name="seatRow[]"], input[name="seatNumber[]"]').forEach(input => {
         input.addEventListener('input', calculateSeatSummary);
     });
