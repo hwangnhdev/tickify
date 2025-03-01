@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -15,29 +16,18 @@ public class Category {
     private int categoryId;
     private String categoryName;
     private String description;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Category() {
     }
 
-    public Category(int categoryId, String categoryName, String description, Date createdAt, Date updatedAt) {
+    public Category(int categoryId, String categoryName, String description, Timestamp createdAt, Timestamp updatedAt) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public Category(String categoryName, String description) {
-        this.categoryName = categoryName;
-        this.description = description;
-    }
-
-    public Category(int categoryId, String categoryName, String description) {
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
-        this.description = description;
     }
 
     public int getCategoryId() {
@@ -64,19 +54,19 @@ public class Category {
         this.description = description;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

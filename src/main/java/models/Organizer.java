@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -18,13 +19,13 @@ public class Organizer {
     private String accountHolder;
     private String accountNumber;
     private String bankName;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Organizer() {
     }
 
-    public Organizer(int organizerId, int customerId, String organizationName, String accountHolder, String accountNumber, String bankName, Date createdAt, Date updatedAt) {
+    public Organizer(int organizerId, int customerId, String organizationName, String accountHolder, String accountNumber, String bankName, Timestamp createdAt, Timestamp updatedAt) {
         this.organizerId = organizerId;
         this.customerId = customerId;
         this.organizationName = organizationName;
@@ -83,19 +84,19 @@ public class Organizer {
         this.bankName = bankName;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

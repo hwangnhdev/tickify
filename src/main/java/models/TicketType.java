@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -20,13 +21,13 @@ public class TicketType {
     private String color;
     private int totalQuantity;
     private int soldQuantity;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public TicketType() {
     }
 
-    public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+    public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Timestamp createdAt, Timestamp updatedAt) {
         this.ticketTypeId = ticketTypeId;
         this.showtimeId = showtimeId;
         this.name = name;
@@ -103,19 +104,19 @@ public class TicketType {
         this.soldQuantity = soldQuantity;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

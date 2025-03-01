@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -22,13 +23,13 @@ public class Voucher {
     private Date endDate;
     private int usageLimit;
     private boolean status;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Voucher() {
     }
 
-    public Voucher(int voucherId, int eventId, String code, String description, String discountType, double discountValue, Date startDate, Date endDate, int usageLimit, boolean status, Date createdAt, Date updatedAt) {
+    public Voucher(int voucherId, int eventId, String code, String description, String discountType, double discountValue, Date startDate, Date endDate, int usageLimit, boolean status, Timestamp createdAt, Timestamp updatedAt) {
         this.voucherId = voucherId;
         this.eventId = eventId;
         this.code = code;
@@ -123,19 +124,19 @@ public class Voucher {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

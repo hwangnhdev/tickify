@@ -33,8 +33,8 @@ public class CategoryDAO extends DBContext {
                         rs.getInt("category_id"),
                         rs.getString("category_name"),
                         rs.getString("description"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
                 );
                 return category;
             }
@@ -61,8 +61,8 @@ public class CategoryDAO extends DBContext {
                         rs.getInt("category_id"),
                         rs.getString("category_name"),
                         rs.getString("description"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
                 );
                 return category;
             }
@@ -88,8 +88,8 @@ public class CategoryDAO extends DBContext {
                         rs.getInt("category_id"),
                         rs.getString("category_name"),
                         rs.getString("description"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
                 );
                 listCategories.add(category);
             }

@@ -4,9 +4,10 @@
  */
 package controllers;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import configs.CloudinaryConfig;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import dals.CategoryDAO;
 import dals.EventDAO;
 import java.io.IOException;
@@ -17,18 +18,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
-import java.io.InputStream;
-import java.sql.Date;
+import java.io.BufferedReader;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import models.Category;
-import models.Event;
-import models.EventImage;
 import models.Seat;
+import models.ShowTime;
 import models.TicketType;
 
 @MultipartConfig // Thêm annotation để xử lý multipart/form-data
@@ -101,86 +97,108 @@ public class CreateNewEventController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        EventDAO eventDAO = new EventDAO();
-//
-//        // Lấy dữ liệu từ form
-//        String eventName = request.getParameter("eventName");
-//        String location = request.getParameter("location");
-//        String eventType = request.getParameter("eventType");
-//        String status = request.getParameter("status");
-//        String description = request.getParameter("description");
-//        LocalDateTime startDateTime = LocalDateTime.parse(request.getParameter("startDate"));
-//        LocalDateTime endDateTime = LocalDateTime.parse(request.getParameter("endDate"));
-//        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-//        int customerId = 1; // Giả sử customerId mặc định là 1
-//        String organizationName = request.getParameter("organizationName");
-//
-//        Date startDate = new Date(Timestamp.valueOf(startDateTime).getTime());
-//        Date endDate = new Date(Timestamp.valueOf(endDateTime).getTime());
-//
-//        // Tạo đối tượng Event
-//        Event event = new Event(0, categoryId, eventName, location, eventType, status, description, startDate, endDate, null, null);
-//
-//        // Xử lý upload ảnh lên Cloudinary
-//        List<EventImage> images = new ArrayList<>();
-//        String[] imageTitles = {"logo_banner", "logo_event", "logo_organizer"};
-//
-//        // Call cloudinary to upload to image to cloud
-//        CloudinaryConfig cloudinaryConfig = new CloudinaryConfig();
-//        Cloudinary cloudinary = cloudinaryConfig.getInstance();
-//
-//        for (String title : imageTitles) {
-//            Part filePart = request.getPart(title);
-//            if (filePart != null && filePart.getSize() > 0) {
-//                try ( InputStream fileContent = filePart.getInputStream()) {
-//                    byte[] fileBytes = fileContent.readAllBytes();
-//                    Map uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.asMap("resource_type", "image"));
-//                    String imageUrl = (String) uploadResult.get("secure_url");
-//                    images.add(new EventImage(imageUrl, title));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    throw new ServletException("Error uploading image: " + title, e);
-//                }
-//            }
-//        }
-//
-//        // Xử lý TicketTypes
-//        List<TicketType> ticketTypes = new ArrayList<>();
-//        String[] ticketNames = request.getParameterValues("ticketName[]");
-//        String[] ticketDescriptions = request.getParameterValues("ticketDescription[]");
-//        String[] ticketPrices = request.getParameterValues("ticketPrice[]");
-//        String[] ticketQuantities = request.getParameterValues("ticketQuantity[]");
-//
-//        if (ticketNames != null && ticketDescriptions != null && ticketPrices != null && ticketQuantities != null) {
-//            for (int i = 0; i < ticketNames.length; i++) {
-//                String name = ticketNames[i];
-//                String ticketDesc = ticketDescriptions[i];
-//                double price = Double.parseDouble(ticketPrices[i]);
-//                int quantity = Integer.parseInt(ticketQuantities[i]);
-//                ticketTypes.add(new TicketType(name, ticketDesc, price, quantity));
-//            }
-//        }
-//
-//        // Xử lý Seats
-//        List<Seat> seats = new ArrayList<>();
-//        String[] seatRows = request.getParameterValues("seatRow[]");
-//        String[] seatNumbers = request.getParameterValues("seatNumber[]");
-//        String[] seatStatuses = request.getParameterValues("seatStatus[]");
-//
-//        if (seatRows != null && seatNumbers != null && seatStatuses != null) {
-//            for (int i = 0; i < seatRows.length; i++) {
-//                String row = seatRows[i];
-//                String number = seatNumbers[i];
-//                String seatStatus = seatStatuses[i];
-//                seats.add(new Seat(row, number, seatStatus));
-//            }
-//        }
-//
-//        // Gọi phương thức createEvent để lưu vào database
-//        eventDAO.createEvent(event, images, customerId, organizationName, ticketTypes, seats);
-//
-//        // Chuyển hướng sau khi thành công
-//        response.sendRedirect("event?success=true");
+        response.setContentType("application/json");
+        EventDAO eventDAO = new EventDAO();
+
+        // Đọc dữ liệu JSON từ request body
+        StringBuilder jsonBuffer = new StringBuilder();
+        try ( BufferedReader reader = request.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonBuffer.append(line);
+            }
+        }
+
+        Gson gson = new Gson();
+        JsonObject jsonData = gson.fromJson(jsonBuffer.toString(), JsonObject.class);
+
+        // Lấy dữ liệu từ JSON
+        int customerId = jsonData.get("customerId").getAsInt(); // Lấy từ session trong thực tế
+        String eventName = jsonData.get("eventName").getAsString();
+        int categoryId = jsonData.get("categoryId").getAsInt();
+        String location = jsonData.get("location").getAsString();
+        String eventType = jsonData.get("eventType").getAsString();
+        String description = jsonData.get("description").getAsString();
+        String status = jsonData.get("status").getAsString();
+        String eventLogoUrl = jsonData.get("eventLogoUrl").getAsString();
+        String backgroundImageUrl = jsonData.get("backgroundImageUrl").getAsString();
+        String organizerImageUrl = jsonData.get("organizerImageUrl").getAsString();
+        String organizerName = jsonData.get("organizerName").getAsString();
+        String bankName = jsonData.get("bankName").getAsString();
+        String bankAccount = jsonData.get("bankAccount").getAsString();
+        String accountHolder = jsonData.get("accountHolder").getAsString();
+
+        // Xử lý ShowTimes
+        List<ShowTime> showTimes = new ArrayList<>();
+        JsonArray showTimesArray = jsonData.getAsJsonArray("showTimes");
+        for (JsonElement showTimeElement : showTimesArray) {
+            JsonObject showTimeObj = showTimeElement.getAsJsonObject();
+            ShowTime showTime = new ShowTime();
+            showTime.setStartDate(Timestamp.valueOf(showTimeObj.get("startDate").getAsString().replace("T", " ") + ":00"));
+            showTime.setEndDate(Timestamp.valueOf(showTimeObj.get("endDate").getAsString().replace("T", " ") + ":00"));
+            showTime.setStatus(showTimeObj.get("status").getAsString());
+
+            // Xử lý TicketTypes trong mỗi ShowTime
+            List<TicketType> ticketTypes = new ArrayList<>();
+            JsonArray ticketTypesArray = showTimeObj.getAsJsonArray("ticketTypes");
+            for (JsonElement ticketTypeElement : ticketTypesArray) {
+                JsonObject ticketTypeObj = ticketTypeElement.getAsJsonObject();
+                TicketType ticketType = new TicketType();
+                ticketType.setName(ticketTypeObj.get("name").getAsString());
+                ticketType.setDescription(ticketTypeObj.get("description").getAsString());
+                ticketType.setPrice(ticketTypeObj.get("price").getAsDouble());
+                ticketType.setTotalQuantity(ticketTypeObj.get("quantity").getAsInt());
+                ticketType.setColor(ticketTypeObj.get("color").getAsString());
+                ticketTypes.add(ticketType);
+            }
+            showTime.setTicketTypes(ticketTypes); // Giả sử ShowTime có setter này
+            showTimes.add(showTime);
+        }
+
+        // Xử lý Seats (nếu có)
+        List<Seat> seats = new ArrayList<>();
+        if (eventType.equals("seatedevent")) {
+            JsonArray seatsArray = jsonData.getAsJsonArray("seats");
+            for (JsonElement seatElement : seatsArray) {
+                JsonObject seatObj = seatElement.getAsJsonObject();
+                Seat seat = new Seat();
+                seat.setSeatRow(seatObj.get("seatRow").getAsString());
+                seat.setStatus(seatObj.get("status").getAsString());
+                seats.add(seat);
+            }
+        } else {
+            seats = null; // Không gửi seats nếu là standing event
+        }
+
+        // Gọi EventDAO để tạo sự kiện
+        EventDAO.EventCreationResult result = eventDAO.createEvent(
+                customerId, organizerName, accountHolder, bankAccount, bankName,
+                categoryId, eventName, location, eventType, description, status,
+                eventLogoUrl, backgroundImageUrl, organizerImageUrl,
+                showTimes, ticketTypesFromShowTimes(showTimes), seats
+        );
+
+        // Chuẩn bị phản hồi JSON
+        JsonObject responseJson = new JsonObject();
+        if (result.eventId > 0 && result.organizerId > 0) {
+            responseJson.addProperty("success", true);
+            responseJson.addProperty("eventId", result.eventId);
+            responseJson.addProperty("organizerId", result.organizerId);
+        } else {
+            responseJson.addProperty("success", false);
+            responseJson.addProperty("message", "Failed to create event");
+        }
+
+        response.getWriter().write(gson.toJson(responseJson));
+    }
+
+    // Helper method to extract TicketTypes from ShowTimes
+    private List<TicketType> ticketTypesFromShowTimes(List<ShowTime> showTimes) {
+        List<TicketType> ticketTypes = new ArrayList<>();
+        for (ShowTime showTime : showTimes) {
+            ticketTypes.addAll(showTime.getTicketTypes());
+        }
+        return ticketTypes;
     }
 
     /**

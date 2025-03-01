@@ -5,6 +5,8 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.List;
 
 /**
  *
@@ -14,16 +16,25 @@ public class ShowTime {
 
     private int showtimeId;
     private int eventId;
-    private Date startDate;
-    private Date endDate;
+    private Timestamp startDate; // Changed from Date to Timestamp
+    private Timestamp endDate;   // Changed from Date to Timestamp
     private String status;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt; // Changed from Date to Timestamp
+    private Timestamp updatedAt; // Changed from Date to Timestamp
+    private List<TicketType> ticketTypes;
+
+    public List<TicketType> getTicketTypes() {
+        return ticketTypes;
+    }
+
+    public void setTicketTypes(List<TicketType> ticketTypes) {
+        this.ticketTypes = ticketTypes;
+    }
 
     public ShowTime() {
     }
 
-    public ShowTime(int showtimeId, int eventId, Date startDate, Date endDate, String status, Date createdAt, Date updatedAt) {
+    public ShowTime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt) {
         this.showtimeId = showtimeId;
         this.eventId = eventId;
         this.startDate = startDate;
@@ -49,19 +60,19 @@ public class ShowTime {
         this.eventId = eventId;
     }
 
-    public Date getStartDate() {
+    public Timestamp getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Timestamp startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
 
@@ -73,19 +84,19 @@ public class ShowTime {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

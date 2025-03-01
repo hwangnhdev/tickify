@@ -780,18 +780,6 @@ Notes and VAT Terms</textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-gray-300 mb-2">Sale Start Date</label>
-                            <input type="datetime-local" id="modalTicketStartDate" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none">
-                            <span class="error-message" id="modalTicketStartDate_error"></span>
-                        </div>
-                        <div>
-                            <label class="block text-gray-300 mb-2">Sale End Date</label>
-                            <input type="datetime-local" id="modalTicketEndDate" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none">
-                            <span class="error-message" id="modalTicketEndDate_error"></span>
-                        </div>
-                    </div>
                     <!-- Phần chọn ghế (được thêm động qua JS) -->
                     <div id="seatSelection" class="space-y-2"></div>
                 </div>
