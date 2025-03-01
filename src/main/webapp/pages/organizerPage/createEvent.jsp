@@ -518,7 +518,7 @@
                     <span class="text-lg font-bold text-green-500">Organizer Center</span>
                 </div>
                 <nav class="space-y-4">
-                    <a class="flex items-center w-full p-2 rounded-lg hover:bg-green-700 transition duration-200" href="organizerCenter.jsp">
+                    <a class="flex items-center w-full p-2 rounded-lg hover:bg-green-700 transition duration-200" href="${pageContext.request.contextPath}/pages/organizerPage/organizerCenter.jsp">
                         <i class="fas fa-ticket-alt mr-2"></i>My Event
                     </a>
                     <a class="flex items-center w-full p-2 bg-green-700 rounded-lg" href="createEvent.jsp">
@@ -541,7 +541,7 @@
                             <span>Payment Information</span>
                         </div>
                         <div class="flex gap-3">
-                            <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200">Save</button>
+                            <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200" onclick="submitEventForm()">Save</button>
                             <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200" onclick="nextTab()">Continue</button>
                         </div>
                     </div>
