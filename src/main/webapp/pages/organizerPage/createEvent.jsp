@@ -541,7 +541,7 @@
                             <span>Payment Information</span>
                         </div>
                         <div class="flex gap-3">
-                            <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200" onclick="submitEventForm()">Save</button>
+                            <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200" onclick="submitEventForm()">Create</button>
                             <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200" onclick="nextTab()">Continue</button>
                         </div>
                     </div>
@@ -552,11 +552,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-300 mb-2">Event Name</label>
-                            <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Event Name">
+                            <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Event Name" required>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">Event Category</label>
-                            <select class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <select class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" required>
                                 <option value="">-- Please Select Category --</option>
                                 <c:forEach var="category" items="${listCategories}">
                                     <option value="${category.categoryId}">${category.categoryName}</option>
@@ -566,30 +566,30 @@
                         <!-- Event Location with Province/City, District, and Ward -->
                         <div>
                             <label class="block text-gray-300 mb-2">Province/City</label>
-                            <select id="province" name="province" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateDistricts(); updateFullAddress();">
+                            <select id="province" name="province" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateDistricts(); updateFullAddress();" required>
                                 <option value="">-- Select Province/City --</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">District</label>
-                            <select id="district" name="district" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateWards(); updateFullAddress();">
+                            <select id="district" name="district" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateWards(); updateFullAddress();" required>
                                 <option value="">-- Select District --</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">Ward</label>
-                            <select id="ward" name="ward" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateFullAddress();">
+                            <select id="ward" name="ward" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateFullAddress();" required>
                                 <option value="">-- Select Ward --</option>
                             </select>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-gray-300 mb-2">Full Address</label>
-                            <input type="text" id="fullAddress" name="fullAddress" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Building number, Street name, Ward, District, Province/City">
+                            <input type="text" id="fullAddress" name="fullAddress" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Building number, Street name, Ward, District, Province/City" required>
                         </div>
                         <!-- Trong phần tab Event Info, thay thế hoặc thêm vào phần textarea hiện có -->
                         <div class="md:col-span-2">
                             <label class="block text-gray-300 mb-2">Event Information</label>
-                            <textarea class="event-info-textarea" placeholder="Description">Event Introduction:
+                            <textarea class="event-info-textarea" placeholder="Description" required>Event Introduction:
 
 [Brief summary of the event: Location of the event, time, specific venue, and reasons why attendees shouldn’t miss it]
 
@@ -781,7 +781,11 @@ Notes and VAT Terms</textarea>
                         </div>
                     </div>
                     <!-- Phần chọn ghế (được thêm động qua JS) -->
-                    <div id="seatSelection" class="space-y-2"></div>
+                    <!-- Trong phần <div id="seatSelection" class="space-y-2"> của modal -->
+                    <div id="seatSelection" class="space-y-2">
+                        <label class="block text-gray-300 mb-2">Select Seat Rows (VIP: A, B; Normal: C):</label>
+                        <!-- Các checkbox sẽ được thêm động bằng JS -->
+                    </div>
                 </div>
                 <div class="mt-4 flex justify-end gap-3">
                     <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200" onclick="closeModal()">Cancel</button>

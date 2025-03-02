@@ -46,7 +46,7 @@ public class CreateNewEventController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -60,7 +60,6 @@ public class CreateNewEventController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -82,7 +81,7 @@ public class CreateNewEventController extends HttpServlet {
         // Set attribute for DAO
         session.setAttribute("listCategories", listCategories);
 
-        // Forward to jsp
+        // Forward to JSP
         request.getRequestDispatcher("pages/organizerPage/createEvent.jsp").forward(request, response);
     }
 
@@ -100,105 +99,149 @@ public class CreateNewEventController extends HttpServlet {
         response.setContentType("application/json");
         EventDAO eventDAO = new EventDAO();
 
-        // Đọc dữ liệu JSON từ request body
+        System.out.println("Received request to /createNewEvent");
         StringBuilder jsonBuffer = new StringBuilder();
-        try ( BufferedReader reader = request.getReader()) {
+        try (BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
                 jsonBuffer.append(line);
             }
+        } catch (IOException e) {
+            System.err.println("Error reading request body: " + e.getMessage());
+            sendErrorResponse(response, "Error reading request data");
+            return;
         }
 
         Gson gson = new Gson();
-        JsonObject jsonData = gson.fromJson(jsonBuffer.toString(), JsonObject.class);
+        JsonObject jsonData;
+        try {
+            jsonData = gson.fromJson(jsonBuffer.toString(), JsonObject.class);
+            System.out.println("Parsed JSON data: " + jsonBuffer.toString());
+        } catch (Exception e) {
+            System.err.println("Error parsing JSON: " + e.getMessage());
+            sendErrorResponse(response, "Invalid JSON format");
+            return;
+        }
 
-        // Lấy dữ liệu từ JSON
-        int customerId = jsonData.get("customerId").getAsInt(); // Lấy từ session trong thực tế
-        String eventName = jsonData.get("eventName").getAsString();
-        int categoryId = jsonData.get("categoryId").getAsInt();
-        String location = jsonData.get("location").getAsString();
-        String eventType = jsonData.get("eventType").getAsString();
-        String description = jsonData.get("description").getAsString();
-        String status = jsonData.get("status").getAsString();
-        String eventLogoUrl = jsonData.get("eventLogoUrl").getAsString();
-        String backgroundImageUrl = jsonData.get("backgroundImageUrl").getAsString();
-        String organizerImageUrl = jsonData.get("organizerImageUrl").getAsString();
-        String organizerName = jsonData.get("organizerName").getAsString();
-        String bankName = jsonData.get("bankName").getAsString();
-        String bankAccount = jsonData.get("bankAccount").getAsString();
-        String accountHolder = jsonData.get("accountHolder").getAsString();
+        try {
+            // Get data from JSON with null checks
+            int customerId = jsonData.has("customerId") ? jsonData.get("customerId").getAsInt() : 0;
+            if (customerId == 0) {
+                throw new IllegalArgumentException("Customer ID is required");
+            }
 
-        // Xử lý ShowTimes
-        List<ShowTime> showTimes = new ArrayList<>();
-        JsonArray showTimesArray = jsonData.getAsJsonArray("showTimes");
-        for (JsonElement showTimeElement : showTimesArray) {
-            JsonObject showTimeObj = showTimeElement.getAsJsonObject();
-            ShowTime showTime = new ShowTime();
-            showTime.setStartDate(Timestamp.valueOf(showTimeObj.get("startDate").getAsString().replace("T", " ") + ":00"));
-            showTime.setEndDate(Timestamp.valueOf(showTimeObj.get("endDate").getAsString().replace("T", " ") + ":00"));
-            showTime.setStatus(showTimeObj.get("status").getAsString());
+            String organizationName = jsonData.has("organizationName") ? jsonData.get("organizationName").getAsString() : "";
+            String accountHolder = jsonData.has("accountHolder") ? jsonData.get("accountHolder").getAsString() : "";
+            String accountNumber = jsonData.has("accountNumber") ? jsonData.get("accountNumber").getAsString() : "";
+            String bankName = jsonData.has("bankName") ? jsonData.get("bankName").getAsString() : "";
+            int categoryId = jsonData.has("categoryId") ? jsonData.get("categoryId").getAsInt() : 0;
+            String eventName = jsonData.has("eventName") ? jsonData.get("eventName").getAsString() : "";
+            String location = jsonData.has("location") ? jsonData.get("location").getAsString() : "";
+            String eventType = jsonData.has("eventType") ? jsonData.get("eventType").getAsString() : "";
+            String description = jsonData.has("description") ? jsonData.get("description").getAsString() : "";
+            String status = jsonData.has("status") ? jsonData.get("status").getAsString() : "Pending";
+            String eventLogoUrl = jsonData.has("eventLogoUrl") ? jsonData.get("eventLogoUrl").getAsString() : "";
+            String backgroundImageUrl = jsonData.has("backgroundImageUrl") ? jsonData.get("backgroundImageUrl").getAsString() : "";
+            String organizerImageUrl = jsonData.has("organizerImageUrl") ? jsonData.get("organizerImageUrl").getAsString() : "";
 
-            // Xử lý TicketTypes trong mỗi ShowTime
+            // Validate required fields
+            if (eventName.isEmpty() || categoryId == 0 || location.isEmpty() || eventType.isEmpty()) {
+                throw new IllegalArgumentException("Event name, category ID, location, and event type are required");
+            }
+
+            // Process ShowTimes
+            List<ShowTime> showTimes = new ArrayList<>();
+            JsonArray showTimesArray = jsonData.has("showTimes") ? jsonData.getAsJsonArray("showTimes") : null;
+            if (showTimesArray == null || showTimesArray.size() == 0) {
+                throw new IllegalArgumentException("ShowTimes is required and cannot be empty");
+            }
+            for (JsonElement showTimeElement : showTimesArray) {
+                JsonObject showTimeObj = showTimeElement.getAsJsonObject();
+                ShowTime showTime = new ShowTime();
+                // Ensure date format matches yyyy-MM-dd HH:mm:ss
+                String startDateStr = showTimeObj.get("startDate").getAsString();
+                String endDateStr = showTimeObj.get("endDate").getAsString();
+                showTime.setStartDate(Timestamp.valueOf(startDateStr));
+                showTime.setEndDate(Timestamp.valueOf(endDateStr));
+                showTime.setStatus(showTimeObj.has("status") ? showTimeObj.get("status").getAsString() : "Scheduled");
+                showTimes.add(showTime);
+            }
+
+            // Process TicketTypes
             List<TicketType> ticketTypes = new ArrayList<>();
-            JsonArray ticketTypesArray = showTimeObj.getAsJsonArray("ticketTypes");
+            JsonArray ticketTypesArray = jsonData.has("ticketTypes") ? jsonData.getAsJsonArray("ticketTypes") : null;
+            if (ticketTypesArray == null || ticketTypesArray.size() == 0) {
+                throw new IllegalArgumentException("TicketTypes is required and cannot be empty");
+            }
             for (JsonElement ticketTypeElement : ticketTypesArray) {
                 JsonObject ticketTypeObj = ticketTypeElement.getAsJsonObject();
                 TicketType ticketType = new TicketType();
-                ticketType.setName(ticketTypeObj.get("name").getAsString());
-                ticketType.setDescription(ticketTypeObj.get("description").getAsString());
-                ticketType.setPrice(ticketTypeObj.get("price").getAsDouble());
-                ticketType.setTotalQuantity(ticketTypeObj.get("quantity").getAsInt());
-                ticketType.setColor(ticketTypeObj.get("color").getAsString());
+                ticketType.setName(ticketTypeObj.has("name") ? ticketTypeObj.get("name").getAsString() : "");
+                ticketType.setDescription(ticketTypeObj.has("description") ? ticketTypeObj.get("description").getAsString() : "");
+                ticketType.setPrice(ticketTypeObj.has("price") ? ticketTypeObj.get("price").getAsDouble() : 0.0);
+                ticketType.setColor(ticketTypeObj.has("color") ? ticketTypeObj.get("color").getAsString() : "#000000");
+                ticketType.setTotalQuantity(ticketTypeObj.has("totalQuantity") ? ticketTypeObj.get("totalQuantity").getAsInt() : 0);
+
+                if (ticketType.getName().isEmpty() || ticketType.getTotalQuantity() == 0) {
+                    throw new IllegalArgumentException("Ticket name and quantity are required for each ticket type");
+                }
                 ticketTypes.add(ticketType);
             }
-            showTime.setTicketTypes(ticketTypes); // Giả sử ShowTime có setter này
-            showTimes.add(showTime);
-        }
 
-        // Xử lý Seats (nếu có)
-        List<Seat> seats = new ArrayList<>();
-        if (eventType.equals("seatedevent")) {
-            JsonArray seatsArray = jsonData.getAsJsonArray("seats");
-            for (JsonElement seatElement : seatsArray) {
-                JsonObject seatObj = seatElement.getAsJsonObject();
-                Seat seat = new Seat();
-                seat.setSeatRow(seatObj.get("seatRow").getAsString());
-                seat.setStatus(seatObj.get("status").getAsString());
-                seats.add(seat);
+            // Process Seats (if seated event)
+            List<Seat> seats = new ArrayList<>();
+            if ("seatedevent".equals(eventType)) {
+                JsonArray seatsArray = jsonData.has("seats") ? jsonData.getAsJsonArray("seats") : null;
+                if (seatsArray == null || seatsArray.size() == 0) {
+                    throw new IllegalArgumentException("Seats are required for seated events");
+                }
+                for (JsonElement seatElement : seatsArray) {
+                    JsonObject seatObj = seatElement.getAsJsonObject();
+                    Seat seat = new Seat();
+                    seat.setTicketTypeName(seatObj.has("ticketTypeName") ? seatObj.get("ticketTypeName").getAsString() : "");
+                    seat.setSeatRow(seatObj.has("seatRow") ? seatObj.get("seatRow").getAsString() : "");
+                    seat.setStatus(seatObj.has("status") ? seatObj.get("status").getAsString() : "Available");
+                    if (seat.getTicketTypeName().isEmpty() || seat.getSeatRow().isEmpty()) {
+                        throw new IllegalArgumentException("TicketTypeName and SeatRow are required for each seat");
+                    }
+                    seats.add(seat);
+                }
             }
-        } else {
-            seats = null; // Không gửi seats nếu là standing event
+
+            // Call EventDAO to create the event
+            EventDAO.EventCreationResult result = eventDAO.createEvent(
+                    customerId, organizationName, accountHolder, accountNumber, bankName,
+                    categoryId, eventName, location, eventType, description, status,
+                    eventLogoUrl, backgroundImageUrl, organizerImageUrl,
+                    showTimes, ticketTypes, seats
+            );
+
+            // Prepare JSON response
+            JsonObject responseJson = new JsonObject();
+            if (result.eventId > 0 && result.organizerId > 0) {
+                responseJson.addProperty("success", true);
+                responseJson.addProperty("eventId", result.eventId);
+                responseJson.addProperty("organizerId", result.organizerId);
+                responseJson.addProperty("redirectUrl", "createNewEvent");
+            } else {
+                responseJson.addProperty("success", false);
+                responseJson.addProperty("message", "Failed to create event");
+            }
+
+            response.getWriter().write(gson.toJson(responseJson));
+        } catch (Exception e) {
+            System.err.println("Error processing event creation: " + e.getMessage());
+            e.printStackTrace();
+            sendErrorResponse(response, "An error occurred while creating the event: " + e.getMessage());
         }
-
-        // Gọi EventDAO để tạo sự kiện
-        EventDAO.EventCreationResult result = eventDAO.createEvent(
-                customerId, organizerName, accountHolder, bankAccount, bankName,
-                categoryId, eventName, location, eventType, description, status,
-                eventLogoUrl, backgroundImageUrl, organizerImageUrl,
-                showTimes, ticketTypesFromShowTimes(showTimes), seats
-        );
-
-        // Chuẩn bị phản hồi JSON
-        JsonObject responseJson = new JsonObject();
-        if (result.eventId > 0 && result.organizerId > 0) {
-            responseJson.addProperty("success", true);
-            responseJson.addProperty("eventId", result.eventId);
-            responseJson.addProperty("organizerId", result.organizerId);
-        } else {
-            responseJson.addProperty("success", false);
-            responseJson.addProperty("message", "Failed to create event");
-        }
-
-        response.getWriter().write(gson.toJson(responseJson));
     }
 
-    // Helper method to extract TicketTypes from ShowTimes
-    private List<TicketType> ticketTypesFromShowTimes(List<ShowTime> showTimes) {
-        List<TicketType> ticketTypes = new ArrayList<>();
-        for (ShowTime showTime : showTimes) {
-            ticketTypes.addAll(showTime.getTicketTypes());
-        }
-        return ticketTypes;
+    private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        JsonObject errorJson = new JsonObject();
+        errorJson.addProperty("success", false);
+        errorJson.addProperty("message", message);
+        response.getWriter().write(new Gson().toJson(errorJson));
     }
 
     /**
@@ -209,6 +252,5 @@ public class CreateNewEventController extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-
+    }
 }

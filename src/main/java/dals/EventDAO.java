@@ -42,7 +42,7 @@ public class EventDAO extends DBContext {
             List<TicketType> ticketTypes,
             List<Seat> seats) {
 
-        // Initialize Gson with custom date format matching SQL Server DATETIME
+        // Initialize Gson with custom date format matching SQL Server DATETIME (yyyy-MM-dd HH:mm:ss)
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")
                 .create();
@@ -50,13 +50,13 @@ public class EventDAO extends DBContext {
         // Prepare JSON for ShowTimes, TicketTypes, and Seats
         String showTimesJson = prepareShowTimesJson(showTimes, gson);
         String ticketTypesJson = prepareTicketTypesJson(ticketTypes, showTimes, gson);
-        String seatsJson = (seats != null && !seats.isEmpty()) ? prepareSeatsJson(seats, ticketTypes, gson) : null;
+        String seatsJson = (seats != null && !seats.isEmpty()) ? prepareSeatsJson(seats, gson) : null; // Removed ticketTypes parameter since ticketTypeName is now in Seat
 
         String sql = "{CALL [dbo].[CreateEvent](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
         EventCreationResult result = new EventCreationResult();
 
         try ( CallableStatement stmt = connection.prepareCall(sql)) {
-            // Set input parameters
+            // Set input parameters (match stored procedure parameters)
             stmt.setInt(1, customerId);
             stmt.setString(2, organizationName);
             stmt.setString(3, accountHolder);
@@ -83,7 +83,10 @@ public class EventDAO extends DBContext {
             stmt.registerOutParameter(18, Types.INTEGER); // @EventId
             stmt.registerOutParameter(19, Types.INTEGER); // @OrganizerId
 
-            // Execute the stored procedure
+            // Execute the stored procedure and log for debugging
+            System.out.println("Executing stored procedure with ShowTimes JSON: " + showTimesJson);
+            System.out.println("Executing stored procedure with TicketTypes JSON: " + ticketTypesJson);
+            System.out.println("Executing stored procedure with Seats JSON: " + seatsJson);
             stmt.execute();
 
             // Retrieve output parameters
@@ -92,11 +95,12 @@ public class EventDAO extends DBContext {
 
             // Check if the creation was successful
             if (result.eventId == -1 || result.organizerId == -1) {
-                throw new SQLException("Failed to create event. EventId or OrganizerId returned -1.");
+                throw new SQLException("Failed to create event. EventId or OrganizerId returned -1. Check SQL Server logs for details.");
             }
 
         } catch (SQLException e) {
             System.err.println("Error creating event: " + e.getMessage());
+            e.printStackTrace(); // Log full stack trace for debugging
             result.eventId = -1;
             result.organizerId = -1;
         }
@@ -106,62 +110,78 @@ public class EventDAO extends DBContext {
 
     // Helper method to prepare ShowTimes JSON
     private String prepareShowTimesJson(List<ShowTime> showTimes, Gson gson) {
+        if (showTimes == null || showTimes.isEmpty()) {
+            throw new IllegalArgumentException("ShowTimes list cannot be null or empty");
+        }
+
         List<Object> showTimesList = new ArrayList<>();
         for (ShowTime st : showTimes) {
+            if (st.getStartDate() == null || st.getEndDate() == null) {
+                throw new IllegalArgumentException("StartDate and EndDate in ShowTimes cannot be null");
+            }
             showTimesList.add(new ShowTimeJson(
                     st.getStartDate(),
                     st.getEndDate(),
-                    st.getStatus()
+                    st.getStatus() != null ? st.getStatus() : "Scheduled"
             ));
         }
         return gson.toJson(showTimesList);
     }
 
-    // Helper method to prepare TicketTypes JSON (Adjusted to avoid lambda)
+    // Helper method to prepare TicketTypes JSON
     private String prepareTicketTypesJson(List<TicketType> ticketTypes, List<ShowTime> showTimes, Gson gson) {
+        if (ticketTypes == null || ticketTypes.isEmpty()) {
+            throw new IllegalArgumentException("TicketTypes list cannot be null or empty");
+        }
+        if (showTimes == null || showTimes.isEmpty()) {
+            throw new IllegalArgumentException("ShowTimes list cannot be null or empty for TicketTypes mapping");
+        }
+
         List<Object> ticketTypesList = new ArrayList<>();
-        int showTimeIndex = 0; // Giả sử TicketTypes được sắp xếp theo thứ tự ShowTimes
+        int showTimeIndex = 0;
 
         for (TicketType tt : ticketTypes) {
-            // Lấy ShowTime tương ứng theo thứ tự (giả định đơn giản hóa)
+            if (tt.getName() == null || tt.getTotalQuantity() <= 0) {
+                throw new IllegalArgumentException("Ticket name and totalQuantity are required for each ticket type");
+            }
+
             if (showTimeIndex < showTimes.size()) {
                 ShowTime matchingShowTime = showTimes.get(showTimeIndex);
                 ticketTypesList.add(new TicketTypeJson(
                         matchingShowTime.getStartDate(),
                         matchingShowTime.getEndDate(),
                         tt.getName(),
-                        tt.getDescription(),
+                        tt.getDescription() != null ? tt.getDescription() : "",
                         tt.getPrice(),
-                        tt.getColor(),
+                        tt.getColor() != null ? tt.getColor() : "#000000",
                         tt.getTotalQuantity()
                 ));
                 showTimeIndex++;
-                // Nếu danh sách TicketTypes dài hơn ShowTimes, reset index để tái sử dụng ShowTimes
                 if (showTimeIndex >= showTimes.size()) {
-                    showTimeIndex = 0;
+                    showTimeIndex = 0; // Reset index to reuse ShowTimes if more ticket types than show times
                 }
+            } else {
+                throw new IllegalArgumentException("Insufficient ShowTimes for mapping TicketTypes");
             }
         }
         return gson.toJson(ticketTypesList);
     }
 
     // Helper method to prepare Seats JSON
-    private String prepareSeatsJson(List<Seat> seats, List<TicketType> ticketTypes, Gson gson) {
+    private String prepareSeatsJson(List<Seat> seats, Gson gson) {
+        if (seats == null || seats.isEmpty()) {
+            return null; // Return null for empty or null seats (handled by stored procedure)
+        }
+
         List<Object> seatsList = new ArrayList<>();
         for (Seat seat : seats) {
-            // Tìm TicketType tương ứng dựa trên thứ tự hoặc tên (giả định đơn giản)
-            for (TicketType tt : ticketTypes) {
-                if (seat.getSeatRow().equals("A") && tt.getName().equals("VIP")
-                        || seat.getSeatRow().equals("B") && tt.getName().equals("Normal")
-                        || seat.getSeatRow().equals("C") && tt.getName().equals("VIP Vui")
-                        || seat.getSeatRow().equals("D") && tt.getName().equals("Normal Vui")) {
-                    seatsList.add(new SeatJson(
-                            tt.getName(),
-                            seat.getSeatRow()
-                    ));
-                    break;
-                }
+            if (seat.getTicketTypeName() == null || seat.getSeatRow() == null) {
+                throw new IllegalArgumentException("ticketTypeName and seatRow are required for each seat");
             }
+            seatsList.add(new SeatJson(
+                    seat.getTicketTypeName(),
+                    seat.getSeatRow()
+            ));
         }
         return gson.toJson(seatsList);
     }
@@ -228,9 +248,9 @@ public class EventDAO extends DBContext {
     public static void main(String[] args) {
         EventDAO eventDAO = new EventDAO();
 
-        // Sample data for testing
-        int customerId = 10;
-        String organizationName = "Tang Thanh Vui";
+        // Sample data for testing (matching stored procedure test data)
+        int customerId = 8;
+        String organizationName = "Huynh Le Cong Bien";
         String accountHolder = "John Doe";
         String accountNumber = "1234567890";
         String bankName = "Sample Bank";
@@ -258,10 +278,12 @@ public class EventDAO extends DBContext {
 
         // Sample Seats
         List<Seat> seats = new ArrayList<>();
-        seats.add(new Seat(0, 0, "A", null, "Available"));
-        seats.add(new Seat(0, 0, "B", null, "Available"));
-        seats.add(new Seat(0, 0, "C", null, "Available"));
-        seats.add(new Seat(0, 0, "D", null, "Available"));
+        seats.add(new Seat(0, 0, "A", null, "Available", "VIP")); // Added ticketTypeName
+        seats.add(new Seat(0, 0, "B", null, "Available", "VIP"));
+        seats.add(new Seat(0, 0, "C", null, "Available", "Normal"));
+        seats.add(new Seat(0, 0, "D", null, "Available", "Normal"));
+        seats.add(new Seat(0, 0, "E", null, "Available", "VIP Vui"));
+        seats.add(new Seat(0, 0, "F", null, "Available", "Normal Vui"));
 
         // Call createEvent method
         EventCreationResult result = eventDAO.createEvent(

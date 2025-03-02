@@ -15,6 +15,7 @@ public class Seat {
     private String seatRow;
     private String seatCol;
     private String status;
+    private String ticketTypeName; // Vui add to store json
 
     public Seat() {
     }
@@ -27,6 +28,16 @@ public class Seat {
         this.status = status;
     }
 
+    // Vui add to store json
+    public Seat(int seatId, int ticketTypeId, String seatRow, String seatCol, String status, String ticketTypeName) {
+        this.seatId = seatId;
+        this.ticketTypeId = ticketTypeId;
+        this.seatRow = seatRow;
+        this.seatCol = seatCol;
+        this.status = status;
+        this.ticketTypeName = ticketTypeName;
+    }
+    
     public int getSeatId() {
         return seatId;
     }
@@ -65,6 +76,15 @@ public class Seat {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getTicketTypeName() {
+        return ticketTypeName;
+    }
+
+    // Vui add to return json for controller
+    public void setTicketTypeName(String ticketTypeName) {
+        this.ticketTypeName = ticketTypeName;
     }
 
 }
