@@ -28,20 +28,52 @@ function validateDateTime(input) {
     const showEnd = showEndInput ? new Date(showEndInput.value) : null;
     if (showStartInput) clearError(showStartInput.id);
     if (showEndInput) clearError(showEndInput.id);
-    if (showStartInput && showStartInput.value && showStart < currentDate) {
-        showError(showStartInput.id, `Show start date cannot be in the past (before ${currentDate.toLocaleDateString()})`);
-        updateSaveButtonState();
-        return false;
+
+    // Thêm kiểm tra startDate trước ngày hiện tại 40 ngày
+    const minStartDate = new Date(currentDate);
+    minStartDate.setDate(currentDate.getDate() + 40); // Thêm 40 ngày
+
+    if (showStartInput && showStartInput.value) {
+        if (isNaN(showStart.getTime())) {
+            showError(showStartInput.id, 'Invalid start date format');
+            updateSaveButtonState();
+            return false;
+        }
+        if (showStart < minStartDate) {
+            showError(showStartInput.id, `Show start date must be at least 40 days from today (${minStartDate.toLocaleDateString()})`);
+            updateSaveButtonState();
+            return false;
+        }
+        if (showStart < currentDate) {
+            showError(showStartInput.id, `Show start date cannot be in the past (before ${currentDate.toLocaleDateString()})`);
+            updateSaveButtonState();
+            return false;
+        }
     }
+
     if (showEndInput && showEndInput.value && showEnd < currentDate) {
         showError(showEndInput.id, `Show end date cannot be in the past (before ${currentDate.toLocaleDateString()})`);
         updateSaveButtonState();
         return false;
     }
+
     if (showStartInput && showEndInput && showStartInput.value && showEndInput.value && showStart >= showEnd) {
         showError(showStartInput.id, "Show start date must be earlier than show end date");
         updateSaveButtonState();
         return false;
+    }
+
+    // Kiểm tra trùng lấn thời gian ngay khi nhập, truyền showTime hiện tại
+    if (showStartInput && showStartInput.value && showEndInput && showEndInput.value) {
+        if (checkShowTimeOverlap(showStartInput.value, showEndInput.value, showTime)) {
+            showError(showStartInput.id, 'This showtime overlaps with another showtime.');
+            showError(showEndInput.id, 'This showtime overlaps with another showtime.');
+            updateSaveButtonState();
+            return false;
+        } else {
+            clearError(showStartInput.id);
+            clearError(showEndInput.id);
+        }
     }
 
     updateSaveButtonState();
@@ -76,19 +108,100 @@ function isEventInfoValid() {
     const backgroundUrl = document.getElementById('backgroundInput').dataset.url || '';
     const organizerLogoUrl = document.getElementById('organizerLogoInput').dataset.url || '';
     const organizerName = document.querySelector('#event-info .organizer-row input[placeholder="Organizer Name"]').value.trim();
-    const isValid = eventName && eventCategory && province && district && ward && fullAddress && eventInfo && logoUrl && backgroundUrl && organizerLogoUrl && organizerName;
-    if (!isValid) {
-        alert('Please fill in all required fields in Event Information:\n- Event Name\n- Event Category\n- Province/City\n- District\n- Ward\n- Full Address\n- Event Information\n- Event Logo\n- Background Image\n- Organizer Logo\n- Organizer Name');
+
+    let hasErrors = false;
+
+    if (!eventName) {
+        showError('eventName', 'Event Name is required');
+        hasErrors = true;
+    } else {
+        clearError('eventName');
     }
-    return isValid;
+
+    if (!eventCategory) {
+        showError('eventCategory', 'Event Category is required');
+        hasErrors = true;
+    } else {
+        clearError('eventCategory');
+    }
+
+    if (!province) {
+        showError('province', 'Province/City is required');
+        hasErrors = true;
+    } else {
+        clearError('province');
+    }
+
+    if (!district) {
+        showError('district', 'District is required');
+        hasErrors = true;
+    } else {
+        clearError('district');
+    }
+
+    if (!ward) {
+        showError('ward', 'Ward is required');
+        hasErrors = true;
+    } else {
+        clearError('ward');
+    }
+
+    if (!fullAddress) {
+        showError('fullAddress', 'Full Address is required');
+        hasErrors = true;
+    } else {
+        clearError('fullAddress');
+    }
+
+    if (!eventInfo) {
+        showError('eventInfo', 'Event Information is required');
+        hasErrors = true;
+    } else {
+        clearError('eventInfo');
+    }
+
+    if (!logoUrl) {
+        showError('logoEvent', 'Event Logo is required');
+        hasErrors = true;
+    } else {
+        clearError('logoEvent');
+    }
+
+    if (!backgroundUrl) {
+        showError('backgroundImage', 'Background Image is required');
+        hasErrors = true;
+    } else {
+        clearError('backgroundImage');
+    }
+
+    if (!organizerLogoUrl) {
+        showError('organizerLogo', 'Organizer Logo is required');
+        hasErrors = true;
+    } else {
+        clearError('organizerLogo');
+    }
+
+    if (!organizerName) {
+        showError('organizerName', 'Organizer Name is required');
+        hasErrors = true;
+    } else {
+        clearError('organizerName');
+    }
+
+    updateSaveButtonState();
+    return !hasErrors;
 }
 
 // Kiểm tra Tab 2 (Time & Logistics)
 function isTimeLogisticsValid() {
     const eventType = document.getElementById('eventType').value;
+    let hasErrors = false;
+
     if (!eventType) {
-        alert('Please select Type of Event in Time & Logistics.');
-        return false;
+        showError('eventType', 'Type of Event is required');
+        hasErrors = true;
+    } else {
+        clearError('eventType');
     }
 
     // Nếu là Seated Event, kiểm tra ít nhất một hàng ghế và tổng số ghế
@@ -97,49 +210,105 @@ function isTimeLogisticsValid() {
         const seatNumbers = document.querySelectorAll('input[name="seatNumber[]"]');
         let hasValidSeat = false;
         let totalSeats = 0;
-        for (let i = 0; i < seatRows.length; i++) {
-            const row = seatRows[i].value.trim();
+
+        seatRows.forEach((rowInput, i) => {
+            const row = rowInput.value.trim();
             const num = parseInt(seatNumbers[i].value.trim());
+            if (!row) {
+                showError('seatRow_error', 'Row is required');
+                hasErrors = true;
+            } else {
+                clearError('seatRow_error');
+            }
+            if (!num || isNaN(num) || num <= 0) {
+                showError('seatNumber_error', 'Number of Seats is required and must be greater than 0');
+                hasErrors = true;
+            } else {
+                clearError('seatNumber_error');
+            }
             if (row && !isNaN(num) && num > 0) {
                 hasValidSeat = true;
                 totalSeats += num;
             }
-        }
+        });
 
         if (!hasValidSeat) {
-            alert('Please add at least one valid seat (Row and Number of Seats) for a Seated Event.');
-            return false;
+            showError('seatRow_error', 'Please add at least one valid seat (Row and Number of Seats) for a Seated Event');
+            hasErrors = true;
+        } else {
+            clearError('seatRow_error');
+            clearError('seatNumber_error');
         }
 
         if (totalSeats > 461) {
-            alert('Total seats cannot exceed 461 for a Seated Event.');
-            return false;
+            showError('seatNumber_error', 'Total seats cannot exceed 461 for a Seated Event');
+            hasErrors = true;
         }
     }
 
     // Kiểm tra Show Time và Ticket Type
     const showTimes = document.querySelectorAll('.show-time');
     if (showTimes.length === 0) {
-        alert('Please add at least one Show Time in Time & Logistics.');
-        return false;
-    }
+        showError('showTime_error', 'Please add at least one Show Time');
+        hasErrors = true;
+    } else {
+        clearError('showTime_error');
+        let hasValidShowTime = false;
 
-    let hasValidShowTime = false;
-    for (let showTime of showTimes) {
-        const startDate = showTime.querySelector('input[name="showStartDate"]').value;
-        const endDate = showTime.querySelector('input[name="showEndDate"]').value;
-        const ticketList = showTime.querySelector('.space-y-2').children.length;
-        if (startDate && endDate && ticketList > 0) {
-            hasValidShowTime = true;
-            break;
+        for (let i = 0; i < showTimes.length; i++) {
+            const showTime = showTimes[i];
+            const startDate = showTime.querySelector('input[name="showStartDate"]').value;
+            const endDate = showTime.querySelector('input[name="showEndDate"]').value;
+            const ticketList = showTime.querySelector('.space-y-2').children.length;
+
+            if (!startDate) {
+                showError(`showStartDate_${showTime.querySelector('input[name="showStartDate"]').id}`, 'Start Date is required');
+                hasErrors = true;
+            } else {
+                clearError(`showStartDate_${showTime.querySelector('input[name="showStartDate"]').id}`);
+            }
+
+            if (!endDate) {
+                showError(`showEndDate_${showTime.querySelector('input[name="showEndDate"]').id}`, 'End Date is required');
+                hasErrors = true;
+            } else {
+                clearError(`showEndDate_${showTime.querySelector('input[name="showEndDate"]').id}`);
+            }
+
+            if (startDate && endDate && ticketList > 0) {
+                hasValidShowTime = true;
+            }
+
+            // Kiểm tra trùng lấn với tất cả các showtime khác
+            for (let j = 0; j < showTimes.length; j++) {
+                if (i !== j) { // Không so sánh showtime với chính nó
+                    const otherShowTime = showTimes[j];
+                    const otherStart = otherShowTime.querySelector('input[name="showStartDate"]').value;
+                    const otherEnd = otherShowTime.querySelector('input[name="showEndDate"]').value;
+                    if (otherStart && otherEnd) {
+                        if (checkShowTimeOverlap(startDate, endDate)) {
+                            showError(`showStartDate_${showTime.querySelector('input[name="showStartDate"]').id}`, 'This showtime overlaps with another showtime.');
+                            showError(`showEndDate_${showTime.querySelector('input[name="showEndDate"]').id}`, 'This showtime overlaps with another showtime.');
+                            hasErrors = true;
+                            break;
+                        } else {
+                            clearError(`showStartDate_${showTime.querySelector('input[name="showStartDate"]').id}`);
+                            clearError(`showEndDate_${showTime.querySelector('input[name="showEndDate"]').id}`);
+                        }
+                    }
+                }
+            }
+        }
+        if (!hasValidShowTime) {
+            showError('showTime_error', 'Please ensure each Show Time has a Start Date, End Date, and at least one Ticket Type');
+            hasErrors = true;
+        } else {
+            clearError('showTime_error');
         }
     }
-    if (!hasValidShowTime) {
-        alert('Please ensure each Show Time has a Start Date, End Date, and at least one Ticket Type.');
-        return false;
-    }
 
-    return true;
+    updateSaveButtonState();
+    return !hasErrors;
 }
 
 // Kiểm tra Tab 3 (Payment Information)
@@ -147,11 +316,32 @@ function isPaymentInfoValid() {
     const bankName = document.getElementById('bank').value;
     const bankAccount = document.querySelector('input[name="bankAccount"]').value.trim();
     const accountHolder = document.querySelector('input[name="accountHolder"]').value.trim();
-    const isValid = bankName && bankAccount && accountHolder;
-    if (!isValid) {
-        alert('Please fill in all required fields in Payment Information:\n- Bank Name\n- Bank Account\n- Account Holder');
+
+    let hasErrors = false;
+
+    if (!bankName) {
+        showError('bank', 'Bank Name is required');
+        hasErrors = true;
+    } else {
+        clearError('bank');
     }
-    return isValid;
+
+    if (!bankAccount) {
+        showError('bankAccount', 'Bank Account is required');
+        hasErrors = true;
+    } else {
+        clearError('bankAccount');
+    }
+
+    if (!accountHolder) {
+        showError('accountHolder', 'Account Holder is required');
+        hasErrors = true;
+    } else {
+        clearError('accountHolder');
+    }
+
+    updateSaveButtonState();
+    return !hasErrors;
 }
 
 // Toggle Seat Section Display
@@ -323,39 +513,147 @@ function toggleShowTime(button) {
     const showTime = button.closest('.show-time');
     const details = showTime.querySelector('.show-time-details');
     const labelSpan = showTime.querySelector('.show-time-label');
-    const showTimeIndex = labelSpan.textContent.match(/\d+/)[0];
-    const startDateInput = showTime.querySelector('input[name="showStartDate"]');
-    const endDateInput = showTime.querySelector('input[name="showEndDate"]');
     const icon = button.querySelector('i');
+    const ticketList = showTime.querySelector('.space-y-2'); // Lấy danh sách ticket types
+
+    // Tính toán chiều cao chính xác, bao gồm padding, margin, border, và các ticket types
+    let contentHeight = 0;
+    const style = window.getComputedStyle(details);
+    const paddingTop = parseFloat(style.paddingTop);
+    const paddingBottom = parseFloat(style.paddingBottom);
+    const marginTop = parseFloat(style.marginTop);
+    const marginBottom = parseFloat(style.marginBottom);
+    const borderTop = parseFloat(style.borderTopWidth);
+    const borderBottom = parseFloat(style.borderBottomWidth);
+
+    // Tính chiều cao của các phần tử con (Start Date, End Date, và ticket types)
+    const gridHeight = details.querySelector('.grid').scrollHeight; // Chiều cao của grid (Start/End Date)
+    contentHeight += gridHeight;
+
+    if (ticketList) {
+        const tickets = ticketList.querySelectorAll('.saved-ticket');
+        tickets.forEach(ticket => {
+            contentHeight += ticket.scrollHeight; // Cộng chiều cao của mỗi ticket
+            const ticketStyle = window.getComputedStyle(ticket);
+            const ticketMarginTop = parseFloat(ticketStyle.marginTop);
+            const ticketMarginBottom = parseFloat(ticketStyle.marginBottom);
+            contentHeight += ticketMarginTop + ticketMarginBottom; // Cộng margin của ticket
+        });
+    }
+
+    contentHeight += paddingTop + paddingBottom + marginTop + marginBottom + borderTop + borderBottom;
+
+    if (!details.classList.contains('collapsed')) {
+        details.style.height = `${contentHeight}px`; // Đặt chiều cao ban đầu
+    }
+
     details.classList.toggle('collapsed');
     icon.classList.toggle('fa-chevron-down');
     icon.classList.toggle('fa-chevron-up');
+
+    let showTimeIndex = '1';
+    if (labelSpan && labelSpan.textContent) {
+        const match = labelSpan.textContent.match(/\d+/);
+        showTimeIndex = match ? match[0] : '1';
+    }
+
     if (details.classList.contains('collapsed')) {
+        details.style.height = '0'; // Thu gọn
+        const startDateInput = showTime.querySelector('input[name="showStartDate"]');
+        const endDateInput = showTime.querySelector('input[name="showEndDate"]');
         const startDate = formatDateTime(startDateInput.value);
         const endDate = formatDateTime(endDateInput.value);
-        labelSpan.textContent = `Show Time #${showTimeIndex} (${startDate} - ${endDate})`;
+        if (labelSpan) {
+            labelSpan.textContent = `Show Time #${showTimeIndex} (${startDate} - ${endDate})`;
+        }
     } else {
-        labelSpan.textContent = `Show Time #${showTimeIndex}`;
+        if (labelSpan) {
+            labelSpan.textContent = `Show Time #${showTimeIndex}`;
+        }
+        details.style.height = `${contentHeight}px`; // Mở rộng
     }
 }
 
-// Toggle Individual Ticket
 function toggleTicket(button) {
     const ticket = button.closest('.saved-ticket');
     const details = ticket.querySelector('.ticket-details');
     const labelSpan = ticket.querySelector('.ticket-label');
     const ticketName = labelSpan.getAttribute('data-ticket-name');
     const icon = button.querySelector('i');
+
+    // Tính toán chiều cao chính xác, bao gồm padding, margin, và border
+    let contentHeight = details.scrollHeight;
+    const style = window.getComputedStyle(details);
+    const paddingTop = parseFloat(style.paddingTop);
+    const paddingBottom = parseFloat(style.paddingBottom);
+    const marginTop = parseFloat(style.marginTop);
+    const marginBottom = parseFloat(style.marginBottom);
+    const borderTop = parseFloat(style.borderTopWidth);
+    const borderBottom = parseFloat(style.borderBottomWidth);
+
+    contentHeight += paddingTop + paddingBottom + marginTop + marginBottom + borderTop + borderBottom;
+
+    if (!details.classList.contains('collapsed')) {
+        details.style.height = `${contentHeight}px`; // Đặt chiều cao ban đầu
+    }
+
     details.classList.toggle('collapsed');
     icon.classList.toggle('fa-chevron-down');
     icon.classList.toggle('fa-chevron-up');
     labelSpan.textContent = ticketName; // Keep ticket name unchanged
+
+    if (details.classList.contains('collapsed')) {
+        details.style.height = '0'; // Thu gọn
+    } else {
+        details.style.height = `${contentHeight}px`; // Mở rộng
+    }
+}
+
+// Update addNewShowTime to add input events
+function checkShowTimeOverlap(newShowTimeStart, newShowTimeEnd, currentShowTime = null) {
+    const showTimes = document.querySelectorAll('.show-time');
+    const newStart = new Date(newShowTimeStart);
+    const newEnd = new Date(newShowTimeEnd);
+
+    // Kiểm tra nếu newStart hoặc newEnd là NaN (không hợp lệ)
+    if (isNaN(newStart.getTime()) || isNaN(newEnd.getTime())) {
+        return false; // Trả về false nếu thời gian không hợp lệ
+    }
+
+    for (let showTime of showTimes) {
+        // Bỏ qua showtime hiện tại nếu được truyền vào
+        if (currentShowTime && showTime === currentShowTime) {
+            continue;
+        }
+
+        const startDate = showTime.querySelector('input[name="showStartDate"]').value;
+        const endDate = showTime.querySelector('input[name="showEndDate"]').value;
+        if (startDate && endDate) {
+            const existingStart = new Date(startDate);
+            const existingEnd = new Date(endDate);
+
+            // Kiểm tra nếu existingStart hoặc existingEnd là NaN
+            if (isNaN(existingStart.getTime()) || isNaN(existingEnd.getTime())) {
+                continue; // Bỏ qua nếu thời gian không hợp lệ
+            }
+
+            // Kiểm tra trùng lấn: nếu khoảng thời gian mới giao với khoảng thời gian hiện có
+            if (newStart < existingEnd && newEnd > existingStart) {
+                return true; // Có trùng lấn
+            }
+        }
+    }
+    return false; // Không trùng lấn
 }
 
 // Add New Show Time
 let showTimeCount = 1;
-// Update addNewShowTime to add input events
+// Cập nhật addNewShowTime
 function addNewShowTime() {
+    console.log('Adding new showtime, showTimeCount:', showTimeCount);
+    if (!showTimeCount || showTimeCount < 1) {
+        showTimeCount = 1; // Reset về 1 nếu không hợp lệ
+    }
     showTimeCount++;
     const showTimeList = document.getElementById('showTimeList');
     const newShowTime = document.createElement('div');
@@ -388,6 +686,31 @@ function addNewShowTime() {
         </div>
     `;
     showTimeList.appendChild(newShowTime);
+
+    // Thêm kiểm tra realtime với sự kiện 'input' thay vì chỉ 'change'
+    const startDateInput = newShowTime.querySelector('input[name="showStartDate"]');
+    const endDateInput = newShowTime.querySelector('input[name="showEndDate"]');
+
+    const checkOverlap = () => {
+        if (startDateInput.value && endDateInput.value) {
+            if (checkShowTimeOverlap(startDateInput.value, endDateInput.value, newShowTime)) {
+                showError(startDateInput.id, 'This showtime overlaps with another showtime.');
+                showError(endDateInput.id, 'This showtime overlaps with another showtime.');
+            } else {
+                clearError(startDateInput.id);
+                clearError(endDateInput.id);
+            }
+        } else {
+            clearError(startDateInput.id);
+            clearError(endDateInput.id);
+        }
+    };
+
+    // Kiểm tra khi nhập hoặc thay đổi dữ liệu
+    startDateInput.addEventListener('input', checkOverlap);
+    startDateInput.addEventListener('change', checkOverlap);
+    endDateInput.addEventListener('input', checkOverlap);
+    endDateInput.addEventListener('change', checkOverlap);
 
     // Attach onchange events for new inputs
     const newInputs = newShowTime.querySelectorAll('input[type="datetime-local"]');
@@ -459,10 +782,12 @@ function openModal(button) {
                     isAllowed = false; // Chỉ hiển thị C cho Normal
                 }
                 if (isAllowed) {
+                    // Đảm bảo data-seats là chuỗi số
+                    const seatNum = seatsByRow[row].seatNum.toString();
                     seatOptions += `
                         <div>
-                            <input type="checkbox" name="selectedSeats" value="${row}" data-seats="${seatsByRow[row]}" ${isDisabled}>
-                            <label class="text-gray-300 ml-2">Row ${row} (${seatsByRow[row]} seats)</label>
+                            <input type="checkbox" name="selectedSeats" value="${row}" data-seats="${seatNum}" ${isDisabled}>
+                            <label class="text-gray-300 ml-2">Row ${row} (${seatNum} seats)</label>
                         </div>`;
                 }
             }
@@ -526,7 +851,7 @@ function validateSeatSelection() {
     if (hasDuplicate) {
         showError('modalTicketQuantity', 'One or more selected seats are already assigned to another ticket in this showtime.');
     } else if (ticketQuantity > totalAvailableSeats) {
-        showError('modalTicketQuantity', `Quantity (${ticketQuantity}) exceeds total available seats (${totalAvailableSeats}) for selected rows.`);
+        showError('modalTicketQuantity', 'Total tickets must be less than or equal to the total number of selected seats.');
     } else {
         clearError('modalTicketQuantity');
     }
@@ -545,36 +870,78 @@ function closeModal() {
     document.getElementById('modalTicketQuantity').value = '';
     document.getElementById('modalTicketColor').value = '#000000';
     document.getElementById('colorValue').textContent = '#000000';
+    clearAllErrors(); // Xóa tất cả lỗi khi đóng modal
 }
 
 // Save New Ticket
+// Trong saveNewTicket, thay đổi cách tạo selectedSeatsText
 async function saveNewTicket() {
     const modal = document.getElementById('newTicketModal');
     const showTimeId = modal.getAttribute('data-show-time');
     const isEditing = modal.hasAttribute('data-editing-ticket');
     const editingTicketName = modal.getAttribute('data-editing-ticket');
-    const ticketName = document.getElementById('modalTicketName').value;
-    const ticketDescription = document.getElementById('modalTicketDescription').value;
-    const ticketPrice = document.getElementById('modalTicketPrice').value;
-    const ticketQuantity = parseInt(document.getElementById('modalTicketQuantity').value);
+    const ticketName = document.getElementById('modalTicketName').value.trim();
+    const ticketDescription = document.getElementById('modalTicketDescription').value.trim();
+    const ticketPrice = document.getElementById('modalTicketPrice').value.trim();
+    const ticketQuantity = parseInt(document.getElementById('modalTicketQuantity').value) || 0;
     const ticketColor = document.getElementById('modalTicketColor').value;
     const eventType = document.getElementById('eventType').value;
     const showTime = document.getElementById(`ticketList_${showTimeId}`).closest('.show-time');
     const showStartDate = showTime.querySelector('input[name="showStartDate"]').value;
     const showEndDate = showTime.querySelector('input[name="showEndDate"]').value;
+    
+    let hasErrors = false;
 
-    if (hasErrors()) {
-        return;
+    if (!ticketName) {
+        showError('modalTicketName', 'Ticket name is required');
+        hasErrors = true;
+    } else {
+        clearError('modalTicketName');
     }
 
-    if (!ticketName || !ticketDescription || !ticketPrice || !ticketQuantity || !ticketColor || !showStartDate || !showEndDate) {
-        if (!ticketName) showError('modalTicketName', 'Ticket name is required');
-        if (!ticketDescription) showError('modalTicketDescription', 'Description is required');
-        if (!ticketPrice) showError('modalTicketPrice', 'Price is required');
-        if (!ticketQuantity) showError('modalTicketQuantity', 'Quantity is required');
-        if (!ticketColor) showError('modalTicketColor', 'Color is required');
-        if (!showStartDate) showError(`showStartDate_${showTimeId}`, 'Show start date is required');
-        if (!showEndDate) showError(`showEndDate_${showTimeId}`, 'Show end date is required');
+    if (!ticketDescription) {
+        showError('modalTicketDescription', 'Description is required');
+        hasErrors = true;
+    } else {
+        clearError('modalTicketDescription');
+    }
+
+    if (!ticketPrice) {
+        showError('modalTicketPrice', 'Price is required');
+        hasErrors = true;
+    } else {
+        clearError('modalTicketPrice');
+    }
+
+    if (!ticketQuantity || ticketQuantity <= 0) {
+        showError('modalTicketQuantity', 'Quantity is required and must be greater than 0');
+        hasErrors = true;
+    } else {
+        clearError('modalTicketQuantity');
+    }
+
+    if (!ticketColor) {
+        showError('modalTicketColor', 'Color is required');
+        hasErrors = true;
+    } else {
+        clearError('modalTicketColor');
+    }
+
+    if (!showStartDate) {
+        showError(`showStartDate_${showTimeId}`, 'Show start date is required');
+        hasErrors = true;
+    } else {
+        clearError(`showStartDate_${showTimeId}`);
+    }
+
+    if (!showEndDate) {
+        showError(`showEndDate_${showTimeId}`, 'Show end date is required');
+        hasErrors = true;
+    } else {
+        clearError(`showEndDate_${showTimeId}`);
+    }
+
+    if (hasErrors) {
         updateSaveButtonState();
         return;
     }
@@ -582,19 +949,31 @@ async function saveNewTicket() {
     const ticketList = document.getElementById(`ticketList_${showTimeId}`);
     const colorName = await getColorNameFromAPI(ticketColor);
     let selectedSeatsText = '';
+    let totalSeats = 0;
+
     if (eventType === 'seatedevent') {
         const selectedSeats = document.querySelectorAll('#seatSelection input[name="selectedSeats"]:checked');
-        const seatsArray = Array.from(selectedSeats).map(checkbox => `${checkbox.value} ${checkbox.dataset.seats}`);
+        // Đảm bảo seatCol là chuỗi số
+        const seatsArray = Array.from(selectedSeats).map(checkbox => {
+            const seatRow = checkbox.value;
+            const seatCol = parseInt(checkbox.dataset.seats).toString(); // Chuyển thành chuỗi số
+            return `${seatRow} ${seatCol}`;
+        });
         selectedSeatsText = seatsArray.join(', ');
+
         if (!selectedSeatsText) {
             showError('modalTicketQuantity', 'Please select at least one seat row.');
+            updateSaveButtonState();
             return;
         }
-        const totalSeats = Array.from(selectedSeats).reduce((sum, checkbox) => sum + parseInt(checkbox.dataset.seats), 0);
+
+        totalSeats = Array.from(selectedSeats).reduce((sum, checkbox) => sum + parseInt(checkbox.dataset.seats), 0);
         if (ticketQuantity > totalSeats) {
-            showError('modalTicketQuantity', `Quantity (${ticketQuantity}) exceeds total seats (${totalSeats}) for selected rows.`);
+            showError('modalTicketQuantity', 'Total tickets must be less than or equal to the total number of selected seats.');
+            updateSaveButtonState();
             return;
         }
+        clearError('modalTicketQuantity');
     }
 
     const ticketHTML = `
@@ -636,6 +1015,7 @@ async function saveNewTicket() {
 
     modal.removeAttribute('data-editing-ticket');
     modal.querySelector('h5').textContent = 'Create New Ticket Type';
+    clearAllErrors(); // Xóa tất cả lỗi sau khi lưu
     closeModal();
 }
 
@@ -689,11 +1069,13 @@ function editTicket(button, showTimeId) {
                     isAllowed = false; // Chỉ hiển thị C cho Normal
                 }
                 if (isAllowed) {
+                    // Đảm bảo data-seats là chuỗi số
+                    const seatNum = seatsByRow[row].seatNum.toString();
                     const isChecked = selectedRows.includes(row) ? 'checked' : '';
                     seatOptions += `
                         <div>
-                            <input type="checkbox" name="selectedSeats" value="${row}" data-seats="${seatsByRow[row]}" ${isDisabled} ${isChecked}>
-                            <label class="text-gray-300 ml-2">Row ${row} (${seatsByRow[row]} seats)</label>
+                            <input type="checkbox" name="selectedSeats" value="${row}" data-seats="${seatNum}" ${isDisabled} ${isChecked}>
+                            <label class="text-gray-300 ml-2">Row ${row} (${seatNum} seats)</label>
                         </div>`;
                 }
             }
@@ -712,6 +1094,7 @@ function editTicket(button, showTimeId) {
     modal.setAttribute('data-editing-ticket', ticket.querySelector('.ticket-label').getAttribute('data-ticket-name'));
     modal.querySelector('h5').textContent = 'Edit Ticket Type';
     modal.classList.remove('hidden');
+    clearAllErrors(); // Xóa tất cả lỗi khi mở modal để chỉnh sửa
 }
 
 // Hàm lấy tên màu từ API Color Pizza
@@ -748,6 +1131,7 @@ function clearError(elementId) {
 // Switch Tabs
 function showTab(tabId) {
     const currentTab = document.querySelector('.tab-content:not(.hidden)').id;
+
     // Kiểm tra điều kiện trước khi chuyển tab
     if (currentTab === 'event-info' && tabId !== 'event-info' && !isEventInfoValid()) {
         return; // Không chuyển tab nếu Tab 1 chưa đủ thông tin
@@ -756,6 +1140,9 @@ function showTab(tabId) {
         return; // Không chuyển từ Tab 2 sang Tab 3 nếu Tab 2 chưa đủ thông tin
     }
 
+    // Xóa lỗi khi chuyển tab (nếu cần)
+    clearAllErrors();
+
     // Chuyển tab nếu điều kiện thỏa mãn
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
     document.getElementById(tabId).classList.remove('hidden');
@@ -763,11 +1150,21 @@ function showTab(tabId) {
     document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add('bg-green-600');
 }
 
+// Hàm xóa tất cả lỗi
+function clearAllErrors() {
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach(error => {
+        error.style.display = 'none';
+        error.textContent = '';
+    });
+}
+
 // Move to Next Tab
 function nextTab() {
     const tabs = ['event-info', 'time-logistics', 'payment-info'];
     const currentTab = document.querySelector('.tab-content:not(.hidden)').id;
     const nextIndex = tabs.indexOf(currentTab) + 1;
+
     // Kiểm tra điều kiện trước khi chuyển sang tab tiếp theo
     if (currentTab === 'event-info' && !isEventInfoValid()) {
         return; // Không chuyển từ Tab 1 sang Tab 2 nếu Tab 1 chưa đủ thông tin
@@ -1101,7 +1498,17 @@ document.getElementById('organizerLogoInput').addEventListener('change', functio
 // Create Event
 // Hàm gửi dữ liệu qua AJAX khi nhấn nút "Save" hoặc "Continue"
 async function submitEventForm() {
-    // Explicitly collect data from the DOM
+    // Kiểm tra tất cả các tab trước khi gửi
+    const isEventInfoValidResult = isEventInfoValid();
+    const isTimeLogisticsValidResult = isTimeLogisticsValid();
+    const isPaymentInfoValidResult = isPaymentInfoValid();
+
+    if (!isEventInfoValidResult || !isTimeLogisticsValidResult || !isPaymentInfoValidResult) {
+        alert('Please complete all required fields in all tabs before submitting.');
+        return;
+    }
+
+    // ... (giữ nguyên phần thu thập dữ liệu và gửi request)
     const eventName = document.querySelector('#event-info input[placeholder="Event Name"]')?.value.trim() || '';
     const eventCategory = document.querySelector('#event-info select')?.value || '';
     const province = document.getElementById('province')?.value || '';
@@ -1118,7 +1525,6 @@ async function submitEventForm() {
     const bankAccount = document.querySelector('input[name="bankAccount"]')?.value.trim() || '';
     const accountHolder = document.querySelector('input[name="accountHolder"]')?.value.trim() || '';
 
-    // Collect showTimes
     // Collect showTimes
     const showTimes = [];
     const showTimeElements = document.querySelectorAll('.show-time');
@@ -1231,11 +1637,6 @@ async function submitEventForm() {
 
     console.log("Final event data being sent:", JSON.stringify(eventData, null, 2));
 
-    if (!isEventInfoValid() || !isTimeLogisticsValid() || !isPaymentInfoValid()) {
-        alert('Please complete all required fields before submitting.');
-        return;
-    }
-
     try {
         const response = await fetch('createNewEvent', {
             method: 'POST',
@@ -1256,3 +1657,31 @@ async function submitEventForm() {
         alert('An error occurred while submitting the form: ' + error.message);
     }
 }
+
+// Validation Account
+document.addEventListener('DOMContentLoaded', () => {
+    const bankAccountInput = document.querySelector('input[name="bankAccount"]');
+    const accountHolderInput = document.querySelector('input[name="accountHolder"]');
+
+    // Kiểm tra Bank Account realtime
+    bankAccountInput.addEventListener('input', () => {
+        const value = bankAccountInput.value.trim();
+        if (!/^\d{8,16}$/.test(value)) {
+            showError('bankAccount', 'Bank Account must be 8-16 digits and contain only numbers (0-9).');
+        } else {
+            clearError('bankAccount');
+        }
+        updateSaveButtonState();
+    });
+
+    // Kiểm tra Account Holder realtime
+    accountHolderInput.addEventListener('input', () => {
+        const value = accountHolderInput.value.trim();
+        if (!/^[a-zA-Z\s.-]{2,}$/.test(value)) {
+            showError('accountHolder', 'Account Holder must contain only letters, spaces, and allowed special characters (e.g., ".", "-"), and be at least 2 characters long.');
+        } else {
+            clearError('accountHolder');
+        }
+        updateSaveButtonState();
+    });
+});

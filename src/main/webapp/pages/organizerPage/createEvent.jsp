@@ -166,10 +166,11 @@
             .show-time {
                 background-color: #4B5563;
                 border-radius: 6px;
-                padding: 15px;
+                padding: 0; /* Đã giảm padding từ 15px về 0 */
                 margin-bottom: 15px;
                 transition: all 0.3s ease;
                 border: 1px solid #6B7280;
+                overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài */
             }
             .show-time:hover {
                 background-color: #6B7280;
@@ -178,12 +179,25 @@
             .saved-ticket {
                 background-color: #374151;
                 border-radius: 6px;
-                padding: 10px;
+                padding: 0; /* Đã giảm padding từ 10px về 0 */
                 margin-top: 10px;
                 border-left: 4px solid #15803D;
                 box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+                overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài */
+            }
+            .show-time-details {
+                padding: 10px; /* Giữ padding nhưng đảm bảo không làm tràn nội dung */
+                margin: 0;
+                min-height: 0; /* Xóa min-height cố định nếu có */
+            }
+            .grid.grid-cols-1.md:grid-cols-2.gap-4 {
+                gap: 8px; /* Giảm gap từ 1rem (16px) về 8px */
             }
 
+            .space-y-2 {
+                margin-top: 0; /* Xóa margin-top dư thừa */
+                margin-bottom: 0;
+            }
             /* Toggle buttons */
             .toggle-btn {
                 background-color: #4B5563;
@@ -199,14 +213,15 @@
                 transform: translateY(-2px);
             }
             .collapsible-content {
-                transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+                height: auto; /* Đảm bảo chiều cao tự động khi không bị thu gọn */
+                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
                 overflow: hidden;
             }
             .collapsible-content.collapsed {
-                max-height: 0;
+                height: 0;
                 opacity: 0;
+                padding: 0; /* Xóa padding khi thu gọn */
             }
-
             /* Buttons */
             .add-ticket-btn, .save-seat-btn {
                 background-color: #15803D;
@@ -548,11 +563,13 @@
                 </header>
 
                 <!-- Tab Event Info -->
+                <!-- Tab Event Info -->
                 <section id="event-info" class="tab-content">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-gray-300 mb-2">Event Name</label>
                             <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Event Name" required>
+                            <span class="error-message" id="eventName_error"></span>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">Event Category</label>
@@ -562,6 +579,7 @@
                                     <option value="${category.categoryId}">${category.categoryName}</option>
                                 </c:forEach>
                             </select>
+                            <span class="error-message" id="eventCategory_error"></span>
                         </div>
                         <!-- Event Location with Province/City, District, and Ward -->
                         <div>
@@ -569,22 +587,26 @@
                             <select id="province" name="province" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateDistricts(); updateFullAddress();" required>
                                 <option value="">-- Select Province/City --</option>
                             </select>
+                            <span class="error-message" id="province_error"></span>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">District</label>
                             <select id="district" name="district" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateWards(); updateFullAddress();" required>
                                 <option value="">-- Select District --</option>
                             </select>
+                            <span class="error-message" id="district_error"></span>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">Ward</label>
                             <select id="ward" name="ward" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateFullAddress();" required>
                                 <option value="">-- Select Ward --</option>
                             </select>
+                            <span class="error-message" id="ward_error"></span>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-gray-300 mb-2">Full Address</label>
                             <input type="text" id="fullAddress" name="fullAddress" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Building number, Street name, Ward, District, Province/City" required>
+                            <span class="error-message" id="fullAddress_error"></span>
                         </div>
                         <!-- Trong phần tab Event Info, thay thế hoặc thêm vào phần textarea hiện có -->
                         <div class="md:col-span-2">
@@ -605,6 +627,7 @@ Target Audience and Conditions:
 Notes and Additional Terms
 
 Notes and VAT Terms</textarea>
+                            <span class="error-message" id="eventInfo_error"></span>
                         </div>
                         <!-- Nhóm Event Image và Background Image -->
                         <div class="md:col-span-2 p-4 rounded bg-gray-800 text-center">
@@ -616,6 +639,7 @@ Notes and VAT Terms</textarea>
                                     <input type="file" id="logoEventInput" class="hidden">
                                     <img id="logoImage" src="" alt="Event Logo Preview" class="w-full h-full object-cover rounded hidden">
                                 </div>
+                                <span class="error-message" id="logoEvent_error"></span>
 
                                 <!-- Event Background Image -->
                                 <div id="backgroundPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
@@ -624,6 +648,7 @@ Notes and VAT Terms</textarea>
                                     <input type="file" id="backgroundInput" class="hidden">
                                     <img id="backgroundImage" src="" alt="Event Background Preview" class="w-full h-full object-cover rounded hidden">
                                 </div>
+                                <span class="error-message" id="backgroundImage_error"></span>
                             </div>
                         </div>
                         <div class="md:col-span-2 p-4 rounded bg-gray-800 text-center">
@@ -636,9 +661,12 @@ Notes and VAT Terms</textarea>
                                     <input type="file" id="organizerLogoInput" class="hidden">
                                     <img id="organizerLogoImage" src="" alt="Organizer Logo Preview" class="w-full h-full object-cover rounded hidden">
                                 </div>
+                                <span class="error-message" id="organizerLogo_error"></span>
+
                                 <div class="input-container">
                                     <label class="block text-gray-300 mb-2">Organizer Name</label>
-                                    <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Organizer Name">
+                                    <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Organizer Name" required>
+                                    <span class="error-message" id="organizerName_error"></span>
                                 </div>
                             </div>
                         </div>
@@ -646,15 +674,17 @@ Notes and VAT Terms</textarea>
                 </section>
 
                 <!-- Tab Time & Logistics -->
+                <!-- Tab Time & Logistics -->
                 <section id="time-logistics" class="tab-content hidden">
                     <div class="space-y-6">
                         <div>
                             <label class="block text-gray-300 mb-2">Type Of Event</label>
-                            <select id="eventType" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="toggleEventType()">
+                            <select id="eventType" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="toggleEventType()" required>
                                 <option value="">-- Please Select Type --</option>
                                 <option value="standingevent">Standing Event</option>
                                 <option value="seatedevent">Seated Event</option>
                             </select>
+                            <span class="error-message" id="eventType_error"></span>
                         </div>
                         <div id="seatSection" class="hidden">
                             <h5 class="text-white mb-3">Seat Management (Seated Event)</h5>
@@ -663,10 +693,12 @@ Notes and VAT Terms</textarea>
                                     <div class="flex-1">
                                         <label class="text-gray-300">Row:</label>
                                         <input type="text" name="seatRow[]" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" required>
+                                        <span class="error-message" id="seatRow_error"></span>
                                     </div>
                                     <div class="flex-1">
                                         <label class="text-gray-300">Number of Seats:</label>
                                         <input type="text" name="seatNumber[]" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" required>
+                                        <span class="error-message" id="seatNumber_error"></span>
                                     </div>
                                     <button type="button" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200" onclick="removeSeat(this)">Delete</button>
                                     <button type="button" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200" onclick="saveSeat(this)">Save Seat</button>
@@ -700,12 +732,12 @@ Notes and VAT Terms</textarea>
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="text-gray-300">Start Date</label>
-                                                    <input type="datetime-local" name="showStartDate" id="showStartDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)">
+                                                    <input type="datetime-local" name="showStartDate" id="showStartDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)" required>
                                                     <span class="error-message" id="showStartDate_${showTimeCount}_error"></span>
                                                 </div>
                                                 <div>
                                                     <label class="text-gray-300">End Date</label>
-                                                    <input type="datetime-local" name="showEndDate" id="showEndDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)">
+                                                    <input type="datetime-local" name="showEndDate" id="showEndDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)" required>
                                                     <span class="error-message" id="showEndDate_${showTimeCount}_error"></span>
                                                 </div>
                                             </div>
@@ -721,6 +753,7 @@ Notes and VAT Terms</textarea>
                 </section>
 
                 <!-- Tab Payment Info -->
+                <!-- Tab Payment Info -->
                 <section id="payment-info" class="tab-content hidden">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -729,21 +762,27 @@ Notes and VAT Terms</textarea>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">Bank Name</label>
-                            <select id="bank" name="bankName" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"></select>
+                            <select id="bank" name="bankName" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                <option value="">Bank Name</option>
+                            </select>
+                            <span class="error-message" id="bank_error"></span>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">Bank Account</label>
-                            <input type="text" name="bankAccount" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Bank Account">
+                            <input type="text" name="bankAccount" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Bank Account" required>
+                            <span class="error-message" id="bankAccount_error"></span>
                         </div>
                         <div>
                             <label class="block text-gray-300 mb-2">Account Holder</label>
-                            <input type="text" name="accountHolder" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Account Holder">
+                            <input type="text" name="accountHolder" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Account Holder" required>
+                            <span class="error-message" id="accountHolder_error"></span>
                         </div>
                     </div>
                 </section>
             </main>
         </div>
 
+        <!-- Modal -->
         <!-- Modal -->
         <div id="newTicketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
             <div class="bg-gray-800 rounded-lg w-full max-w-4xl p-6">
@@ -752,25 +791,33 @@ Notes and VAT Terms</textarea>
                     <button class="text-gray-400 hover:text-white text-2xl" onclick="closeModal()">×</button>
                 </div>
                 <div class="space-y-4">
-                    <!-- Các trường hiện có -->
+                    <!-- Ticket Type Name -->
                     <div>
                         <label class="block text-gray-300 mb-2">Ticket Type Name</label>
                         <input type="text" id="modalTicketName" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., VIP">
+                        <span class="error-message" id="modalTicketName_error"></span>
                     </div>
+                    <!-- Description -->
                     <div>
                         <label class="block text-gray-300 mb-2">Description</label>
                         <textarea id="modalTicketDescription" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" rows="2" placeholder="e.g., VIP seating"></textarea>
+                        <span class="error-message" id="modalTicketDescription_error"></span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Price -->
                         <div>
                             <label class="block text-gray-300 mb-2">Price (VND)</label>
                             <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 150000" step="1000">
+                            <span class="error-message" id="modalTicketPrice_error"></span>
                         </div>
+                        <!-- Quantity -->
                         <div>
                             <label class="block text-gray-300 mb-2">Quantity</label>
                             <input type="number" id="modalTicketQuantity" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 50">
+                            <span class="error-message" id="modalTicketQuantity_error"></span>
                         </div>
                     </div>
+                    <!-- Color -->
                     <div class="color-picker-container flex items-center gap-3">
                         <div class="flex-1">
                             <label class="block text-gray-300 mb-2">Color</label>
@@ -778,10 +825,10 @@ Notes and VAT Terms</textarea>
                                 <input type="color" id="modalTicketColor" class="w-full h-10 rounded bg-gray-700 border border-gray-600 cursor-pointer">
                                 <span id="colorValue" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-300 text-sm bg-gray-800 px-2 py-1 rounded"></span>
                             </div>
+                            <span class="error-message" id="modalTicketColor_error"></span>
                         </div>
                     </div>
-                    <!-- Phần chọn ghế (được thêm động qua JS) -->
-                    <!-- Trong phần <div id="seatSelection" class="space-y-2"> của modal -->
+                    <!-- Phần chọn ghế -->
                     <div id="seatSelection" class="space-y-2">
                         <label class="block text-gray-300 mb-2">Select Seat Rows (VIP: A, B; Normal: C):</label>
                         <!-- Các checkbox sẽ được thêm động bằng JS -->
