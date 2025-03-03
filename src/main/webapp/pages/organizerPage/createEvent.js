@@ -427,7 +427,7 @@ function calculateSeatSummary() {
     const seatNumbers = document.querySelectorAll('input[name="seatNumber[]"]');
     const seatSummary = document.getElementById('seatSummary');
     const errorDiv = document.getElementById('seatError');
-    const seatsByRow = {};
+    const seatsByRow = {}; // Object để lưu thông tin ghế: { "A": { seatNum: 10, ticketTypeName: "" }, ... }
 
     if (!seatRows.length) {
         seatSummary.innerHTML = 'Total Rows: 0, Total Columns: 0, Total Seats: 0';
@@ -448,7 +448,7 @@ function calculateSeatSummary() {
             }
             rowCount++;
             totalSeats += seatNum;
-            seatsByRow[row] = { seatNum: seatNum, ticketTypeName: '' }; // Để trống ticketTypeName, sẽ gán sau
+            seatsByRow[row] = { seatNum: seatNum, ticketTypeName: '' }; // Lưu số ghế thực tế và để trống ticketTypeName, sẽ gán sau
             maxSeatsPerRow = Math.max(maxSeatsPerRow, seatNum);
         }
     }
@@ -465,7 +465,7 @@ function calculateSeatSummary() {
 
     clearSeatError();
     seatSummary.innerHTML = `Total Rows: ${rowCount}, Total Columns: ${maxSeatsPerRow}, Total Seats: ${totalSeats}`;
-    return seatsByRow; // Trả về object { "A": { seatNum: 16, ticketTypeName: "" }, ... }
+    return seatsByRow; // Trả về { "A": { seatNum: 10, ticketTypeName: "" }, "B": { seatNum: 16, ticketTypeName: "" }, "C": { seatNum: 15, ticketTypeName: "" } }
 }
 
 // Toggle Show Time Section
@@ -746,43 +746,46 @@ function updateShowTimeLabels() {
 }
 
 // Open Modal
+// Open Modal with Real-Time Validation
 function openModal(button) {
     const modal = document.getElementById('newTicketModal');
     modal.setAttribute('data-show-time', button.getAttribute('data-show-time'));
     modal.classList.remove('hidden');
-    ['modalTicketName', 'modalTicketDescription', 'modalTicketPrice', 'modalTicketQuantity'].forEach(clearError);
+    
+    // Clear previous errors
+    ['modalTicketName', 'modalTicketDescription', 'modalTicketPrice', 'modalTicketQuantity', 'modalTicketColor'].forEach(clearError);
+    
     const eventType = document.getElementById('eventType').value;
     const seatSelectionDiv = document.getElementById('seatSelection');
 
     if (eventType === 'seatedevent') {
         const seatsByRow = calculateSeatSummary();
         let seatOptions = '<label class="block text-gray-300 mb-2">Select Seat Rows (VIP: A, B; Normal: C):</label>';
-        const ticketNameInput = document.getElementById('modalTicketName').value.toLowerCase();
-
-        // Lấy danh sách ghế đã được chọn bởi các vé khác trong cùng showtime
+        const ticketNameInput = document.getElementById('modalTicketName');
         const showTimeId = button.getAttribute('data-show-time');
         const ticketList = document.getElementById(`ticketList_${showTimeId}`);
         const usedRows = new Set();
+
         ticketList.querySelectorAll('.saved-ticket').forEach(ticket => {
             const rowsText = ticket.querySelector('.ticket-details div:nth-child(5) span')?.textContent || '';
             rowsText.split(', ').forEach(row => {
-                const rowName = row.split(' ')[0]; // Lấy row (e.g., "A" từ "A 16")
+                const rowName = row.split(' ')[0];
                 usedRows.add(rowName);
             });
         });
 
         for (let row in seatsByRow) {
-            const isDisabled = usedRows.has(row) ? 'disabled' : ''; // Vô hiệu hóa ghế đã được chọn
-            let isVisible = !usedRows.has(row); // Chỉ hiển thị ghế chưa được chọn
+            const isDisabled = usedRows.has(row) ? 'disabled' : '';
+            let isVisible = !usedRows.has(row);
             if (isVisible) {
                 let isAllowed = true;
-                if (ticketNameInput.includes('vip') && (row !== 'A' && row !== 'B')) {
-                    isAllowed = false; // Chỉ hiển thị A, B cho VIP
-                } else if (ticketNameInput.includes('normal') && row !== 'C') {
-                    isAllowed = false; // Chỉ hiển thị C cho Normal
+                const ticketName = ticketNameInput.value.toLowerCase();
+                if (ticketName.includes('vip') && (row !== 'A' && row !== 'B')) {
+                    isAllowed = false;
+                } else if (ticketName.includes('normal') && row !== 'C') {
+                    isAllowed = false;
                 }
                 if (isAllowed) {
-                    // Đảm bảo data-seats là chuỗi số
                     const seatNum = seatsByRow[row].seatNum.toString();
                     seatOptions += `
                         <div>
@@ -794,7 +797,6 @@ function openModal(button) {
         }
         seatSelectionDiv.innerHTML = seatOptions;
 
-        // Listener để kiểm tra số lượng ghế khi chọn
         seatSelectionDiv.querySelectorAll('input[name="selectedSeats"]').forEach(checkbox => {
             checkbox.addEventListener('change', validateSeatSelection);
         });
@@ -805,10 +807,32 @@ function openModal(button) {
     const colorInput = document.getElementById('modalTicketColor');
     const colorValueSpan = document.getElementById('colorValue');
     colorValueSpan.textContent = colorInput.value.toUpperCase();
-    ['modalTicketName', 'modalTicketDescription', 'modalTicketPrice', 'modalTicketQuantity'].forEach(id => {
+
+    // Add real-time validation for modal inputs
+    const inputs = {
+        modalTicketName: (value) => value.trim() ? '' : 'Ticket name is required',
+        modalTicketDescription: (value) => value.trim() ? '' : 'Description is required',
+        modalTicketPrice: (value) => value.trim() && !isNaN(value) && parseFloat(value) >= 0 ? '' : 'Price is required and must be a valid number',
+        modalTicketQuantity: (value) => value && !isNaN(value) && parseInt(value) > 0 ? '' : 'Quantity is required and must be greater than 0',
+        modalTicketColor: (value) => value ? '' : 'Color is required'
+    };
+
+    Object.keys(inputs).forEach(id => {
         const input = document.getElementById(id);
-        input.addEventListener('input', updateSaveButtonState);
+        const validateInput = () => {
+            const errorMessage = inputs[id](input.value);
+            if (errorMessage) {
+                showError(id, errorMessage);
+            } else {
+                clearError(id);
+            }
+            updateSaveButtonState();
+        };
+        input.addEventListener('input', validateInput);
+        // Initial validation
+        validateInput();
     });
+
     updateSaveButtonState();
 }
 
@@ -875,6 +899,7 @@ function closeModal() {
 
 // Save New Ticket
 // Trong saveNewTicket, thay đổi cách tạo selectedSeatsText
+// Save New Ticket with Proper Error Handling
 async function saveNewTicket() {
     const modal = document.getElementById('newTicketModal');
     const showTimeId = modal.getAttribute('data-show-time');
@@ -889,9 +914,10 @@ async function saveNewTicket() {
     const showTime = document.getElementById(`ticketList_${showTimeId}`).closest('.show-time');
     const showStartDate = showTime.querySelector('input[name="showStartDate"]').value;
     const showEndDate = showTime.querySelector('input[name="showEndDate"]').value;
-    
+
     let hasErrors = false;
 
+    // Validate inputs
     if (!ticketName) {
         showError('modalTicketName', 'Ticket name is required');
         hasErrors = true;
@@ -906,8 +932,8 @@ async function saveNewTicket() {
         clearError('modalTicketDescription');
     }
 
-    if (!ticketPrice) {
-        showError('modalTicketPrice', 'Price is required');
+    if (!ticketPrice || isNaN(ticketPrice) || parseFloat(ticketPrice) < 0) {
+        showError('modalTicketPrice', 'Price is required and must be a valid number');
         hasErrors = true;
     } else {
         clearError('modalTicketPrice');
@@ -948,16 +974,16 @@ async function saveNewTicket() {
 
     const ticketList = document.getElementById(`ticketList_${showTimeId}`);
     const colorName = await getColorNameFromAPI(ticketColor);
+   // Trong saveNewTicket, sửa phần tạo selectedSeatsText:
     let selectedSeatsText = '';
     let totalSeats = 0;
 
     if (eventType === 'seatedevent') {
         const selectedSeats = document.querySelectorAll('#seatSelection input[name="selectedSeats"]:checked');
-        // Đảm bảo seatCol là chuỗi số
         const seatsArray = Array.from(selectedSeats).map(checkbox => {
             const seatRow = checkbox.value;
-            const seatCol = parseInt(checkbox.dataset.seats).toString(); // Chuyển thành chuỗi số
-            return `${seatRow} ${seatCol}`;
+            const seatCol = checkbox.dataset.seats; // Lấy số ghế thực tế từ data-seats (e.g., "10", "16", "15")
+            return `${seatRow} ${seatCol}`; // Tạo chuỗi "A 10", "B 16", "C 15"
         });
         selectedSeatsText = seatsArray.join(', ');
 
@@ -1015,7 +1041,7 @@ async function saveNewTicket() {
 
     modal.removeAttribute('data-editing-ticket');
     modal.querySelector('h5').textContent = 'Create New Ticket Type';
-    clearAllErrors(); // Xóa tất cả lỗi sau khi lưu
+    clearAllErrors();
     closeModal();
 }
 
@@ -1117,6 +1143,7 @@ function showError(elementId, message) {
         errorElement.textContent = message;
         errorElement.style.display = 'block';
     }
+    updateSaveButtonState(); // Cập nhật trạng thái nút Save mỗi khi có lỗi
 }
 
 // Xóa thông báo lỗi
@@ -1126,6 +1153,7 @@ function clearError(elementId) {
         errorElement.textContent = '';
         errorElement.style.display = 'none';
     }
+    updateSaveButtonState(); // Cập nhật trạng thái nút Save mỗi khi xóa lỗi
 }
 
 // Switch Tabs
@@ -1331,8 +1359,6 @@ function checkImageDimensions(file, requiredWidth, requiredHeight, callback) {
 function showImageError(elementId, message) {
     const preview = document.getElementById(elementId);
     const errorDiv = document.createElement('div');
-    errorDiv.className = 'text-red-500 text-sm mt-2 image-error';
-    errorDiv.textContent = message;
     const existingError = preview.parentElement.querySelector('.image-error');
     if (existingError) existingError.remove();
     preview.parentElement.appendChild(errorDiv);
@@ -1352,19 +1378,24 @@ document.getElementById('logoEventInput').addEventListener('change', function (e
     const img = document.getElementById('logoImage');
     const icon = preview.querySelector('.upload-icon');
     const text = preview.querySelector('.upload-text');
-    if (!file) return;
+    if (!file) {
+        showError('logoEvent', 'Event Logo is required');
+        return;
+    }
+
     // Check size (720x958)
     checkImageDimensions(file, 720, 958, async (isValid, errorMessage) => {
         if (!isValid) {
-            showImageError('logoPreview', errorMessage);
+            showError('logoEvent', errorMessage);
             this.value = ''; // Clear selected file
-            img.classList.add('hidden'); // Hide image
+            img.classList.add('hidden');
             if (icon) icon.classList.remove('hidden');
             if (text) text.classList.remove('hidden');
             return;
         }
 
         clearImageError('logoPreview');
+        clearError('logoEvent'); // Clear the validation error
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "event_upload");
@@ -1381,12 +1412,13 @@ document.getElementById('logoEventInput').addEventListener('change', function (e
                 if (icon) icon.classList.add('hidden');
                 if (text) text.classList.add('hidden');
                 this.dataset.url = data.secure_url;
+                clearError('logoEvent'); // Ensure error is cleared after successful upload
             } else {
                 throw new Error("Upload failed");
             }
         } catch (error) {
             console.error("Error uploading Event Logo:", error);
-            showImageError('logoPreview', 'Upload failed. Please try again.');
+            showError('logoEvent', 'Upload failed. Please try again.');
             this.value = ''; // Clear file if upload fails
             img.classList.add('hidden');
             if (icon) icon.classList.remove('hidden');
@@ -1402,11 +1434,15 @@ document.getElementById('backgroundInput').addEventListener('change', function (
     const img = document.getElementById('backgroundImage');
     const icon = preview.querySelector('.upload-icon');
     const text = preview.querySelector('.upload-text');
-    if (!file) return;
+    if (!file) {
+        showError('backgroundImage', 'Background Image is required');
+        return;
+    }
+
     // Check size (1280x720)
     checkImageDimensions(file, 1280, 720, async (isValid, errorMessage) => {
         if (!isValid) {
-            showImageError('backgroundPreview', errorMessage);
+            showError('backgroundImage', errorMessage);
             this.value = '';
             img.classList.add('hidden');
             if (icon) icon.classList.remove('hidden');
@@ -1415,6 +1451,7 @@ document.getElementById('backgroundInput').addEventListener('change', function (
         }
 
         clearImageError('backgroundPreview');
+        clearError('backgroundImage'); // Clear the validation error
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "event_upload");
@@ -1431,12 +1468,13 @@ document.getElementById('backgroundInput').addEventListener('change', function (
                 if (icon) icon.classList.add('hidden');
                 if (text) text.classList.add('hidden');
                 this.dataset.url = data.secure_url;
+                clearError('backgroundImage'); // Ensure error is cleared after successful upload
             } else {
                 throw new Error("Upload failed");
             }
         } catch (error) {
             console.error("Error uploading Background Image:", error);
-            showImageError('backgroundPreview', 'Upload failed. Please try again.');
+            showError('backgroundImage', 'Upload failed. Please try again.');
             this.value = '';
             img.classList.add('hidden');
             if (icon) icon.classList.remove('hidden');
@@ -1452,11 +1490,15 @@ document.getElementById('organizerLogoInput').addEventListener('change', functio
     const img = document.getElementById('organizerLogoImage');
     const icon = preview.querySelector('.upload-icon');
     const text = preview.querySelector('.upload-text');
-    if (!file) return;
+    if (!file) {
+        showError('organizerLogo', 'Organizer Logo is required');
+        return;
+    }
+
     // Check size (275x275)
     checkImageDimensions(file, 275, 275, async (isValid, errorMessage) => {
         if (!isValid) {
-            showImageError('organizerLogoPreview', errorMessage);
+            showError('organizerLogo', errorMessage);
             this.value = '';
             img.classList.add('hidden');
             if (icon) icon.classList.remove('hidden');
@@ -1465,6 +1507,7 @@ document.getElementById('organizerLogoInput').addEventListener('change', functio
         }
 
         clearImageError('organizerLogoPreview');
+        clearError('organizerLogo'); // Clear the validation error
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "event_upload");
@@ -1481,12 +1524,13 @@ document.getElementById('organizerLogoInput').addEventListener('change', functio
                 if (icon) icon.classList.add('hidden');
                 if (text) text.classList.add('hidden');
                 this.dataset.url = data.secure_url;
+                clearError('organizerLogo'); // Ensure error is cleared after successful upload
             } else {
                 throw new Error("Upload failed");
             }
         } catch (error) {
             console.error("Error uploading Organizer Logo:", error);
-            showImageError('organizerLogoPreview', 'Upload failed. Please try again.');
+            showError('organizerLogo', 'Upload failed. Please try again.');
             this.value = '';
             img.classList.add('hidden');
             if (icon) icon.classList.remove('hidden');
@@ -1585,29 +1629,29 @@ async function submitEventForm() {
         }
     });
 
-    // Collect seats with ticketTypeName from all ticketTypes across all showtimes
+    // Trong hàm submitEventForm, sửa phần tạo seats như sau:
+    // Trong submitEventForm, sửa phần tạo seats:
     let seats = [];
     if (eventType === 'seatedevent') {
-        const seatsByRow = calculateSeatSummary();
+        const seatsByRow = calculateSeatSummary(); // Lấy thông tin ghế từ calculateSeatSummary
         // Lặp qua từng showtime và ticket type để tạo danh sách ghế đầy đủ
         showTimeElements.forEach((showTime, showTimeIndex) => {
-            const showTimeId = showTime.querySelector('input[name="showStartDate"]')?.value || '';
             const ticketElements = showTime.querySelectorAll('.saved-ticket');
             ticketElements.forEach((ticket) => {
                 const ticketName = ticket.querySelector('.ticket-label').getAttribute('data-ticket-name') || '';
                 const seatsText = ticket.querySelector('.ticket-details div:nth-child(5) span')?.textContent || '';
                 const selectedSeats = seatsText.split(', ').map(seat => {
-                    const [row, col] = seat.split(' ');
-                    return row; // Chỉ lấy row (e.g., "A", "B") để kiểm tra
+                    const [row, col] = seat.split(' '); // Ví dụ: "A 10" -> row = "A", col = "10"
+                    return { seatRow: row, seatCol: col }; // Lấy cả row và col từ giao diện
                 });
 
                 // Gán ticketTypeName và seatCol cho mỗi row được chọn trong ticket type này
-                selectedSeats.forEach(row => {
-                    if (seatsByRow[row]) {
+                selectedSeats.forEach(seat => {
+                    if (seatsByRow[seat.seatRow]) {
                         seats.push({
-                            ticketTypeName: ticketName, // Sử dụng tên vé thực tế (e.g., "ggggggggggggggggggg")
-                            seatRow: row,
-                            seatCol: seatsByRow[row].seatNum.toString()
+                            ticketTypeName: ticketName, // Sử dụng tên vé thực tế (e.g., "VIP", "Normal")
+                            seatRow: seat.seatRow,
+                            seatCol: seat.seatCol // Sử dụng số ghế thực tế từ giao diện (e.g., "10", "16", "15")
                         });
                     }
                 });
@@ -1683,5 +1727,137 @@ document.addEventListener('DOMContentLoaded', () => {
             clearError('accountHolder');
         }
         updateSaveButtonState();
+    });
+});
+
+// Validation tab event information
+document.addEventListener('DOMContentLoaded', () => {
+    // Event Name
+    const eventNameInput = document.querySelector('#event-info input[placeholder="Event Name"]');
+    eventNameInput.addEventListener('input', () => {
+        if (eventNameInput.value.trim()) {
+            clearError('eventName');
+        } else {
+            showError('eventName', 'Event Name is required');
+        }
+    });
+
+    // Event Category
+    const eventCategorySelect = document.querySelector('#event-info select');
+    eventCategorySelect.addEventListener('input', () => {
+        if (eventCategorySelect.value) {
+            clearError('eventCategory');
+        } else {
+            showError('eventCategory', 'Event Category is required');
+        }
+    });
+
+    // Province
+    const provinceSelect = document.getElementById('province');
+    provinceSelect.addEventListener('input', () => {
+        if (provinceSelect.value) {
+            clearError('province');
+        } else {
+            showError('province', 'Province/City is required');
+        }
+    });
+
+    // District
+    const districtSelect = document.getElementById('district');
+    districtSelect.addEventListener('input', () => {
+        if (districtSelect.value) {
+            clearError('district');
+        } else {
+            showError('district', 'District is required');
+        }
+    });
+
+    // Ward
+    const wardSelect = document.getElementById('ward');
+    wardSelect.addEventListener('input', () => {
+        if (wardSelect.value) {
+            clearError('ward');
+        } else {
+            showError('ward', 'Ward is required');
+        }
+    });
+
+    // Full Address
+    const fullAddressInput = document.getElementById('fullAddress');
+    fullAddressInput.addEventListener('input', () => {
+        if (fullAddressInput.value.trim()) {
+            clearError('fullAddress');
+        } else {
+            showError('fullAddress', 'Full Address is required');
+        }
+    });
+
+    // Event Info
+    const eventInfoTextarea = document.querySelector('#event-info textarea');
+    eventInfoTextarea.addEventListener('input', () => {
+        if (eventInfoTextarea.value.trim()) {
+            clearError('eventInfo');
+        } else {
+            showError('eventInfo', 'Event Information is required');
+        }
+    });
+
+    // Organizer Name
+    const organizerNameInput = document.querySelector('#event-info .organizer-row input[placeholder="Organizer Name"]');
+    organizerNameInput.addEventListener('input', () => {
+        if (organizerNameInput.value.trim()) {
+            clearError('organizerName');
+        } else {
+            showError('organizerName', 'Organizer Name is required');
+        }
+    });
+
+    // Logo, Background, Organizer Logo (kiểm tra qua sự kiện change của input file)
+    const logoEventInput = document.getElementById('logoEventInput');
+    logoEventInput.addEventListener('change', () => {
+        if (logoEventInput.dataset.url) {
+            clearError('logoEvent');
+        } else {
+            showError('logoEvent', 'Event Logo is required');
+        }
+    });
+
+    const backgroundInput = document.getElementById('backgroundInput');
+    backgroundInput.addEventListener('change', () => {
+        if (backgroundInput.dataset.url) {
+            clearError('backgroundImage');
+        } else {
+            showError('backgroundImage', 'Background Image is required');
+        }
+    });
+
+    const organizerLogoInput = document.getElementById('organizerLogoInput');
+    organizerLogoInput.addEventListener('change', () => {
+        if (organizerLogoInput.dataset.url) {
+            clearError('organizerLogo');
+        } else {
+            showError('organizerLogo', 'Organizer Logo is required');
+        }
+    });
+});
+
+// Time & Logistics
+document.addEventListener('DOMContentLoaded', () => {
+    // Event Type
+    const eventTypeSelect = document.getElementById('eventType');
+    eventTypeSelect.addEventListener('input', () => {
+        if (eventTypeSelect.value) {
+            clearError('eventType');
+        } else {
+            showError('eventType', 'Type of Event is required');
+        }
+    });
+
+    // Show Time Date Inputs
+    const showTimeInputs = document.querySelectorAll('input[type="datetime-local"]');
+    showTimeInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            validateDateTime(input); // Hàm này đã có logic kiểm tra và xóa lỗi
+        });
     });
 });

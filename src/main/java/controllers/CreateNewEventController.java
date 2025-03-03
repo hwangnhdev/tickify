@@ -189,6 +189,7 @@ public class CreateNewEventController extends HttpServlet {
             }
 
             // Process Seats (if seated event)
+            // Trong doPost, phần xử lý seats:
             List<Seat> seats = new ArrayList<>();
             if ("seatedevent".equals(eventType)) {
                 JsonArray seatsArray = jsonData.has("seats") ? jsonData.getAsJsonArray("seats") : null;
@@ -200,6 +201,7 @@ public class CreateNewEventController extends HttpServlet {
                     Seat seat = new Seat();
                     seat.setTicketTypeName(seatObj.has("ticketTypeName") ? seatObj.get("ticketTypeName").getAsString() : "");
                     seat.setSeatRow(seatObj.has("seatRow") ? seatObj.get("seatRow").getAsString() : "");
+                    seat.setSeatCol(seatObj.has("seatCol") ? seatObj.get("seatCol").getAsString() : ""); // Lấy seatCol từ JSON
                     seat.setStatus(seatObj.has("status") ? seatObj.get("status").getAsString() : "Available");
                     if (seat.getTicketTypeName().isEmpty() || seat.getSeatRow().isEmpty()) {
                         throw new IllegalArgumentException("TicketTypeName and SeatRow are required for each seat");
@@ -207,7 +209,6 @@ public class CreateNewEventController extends HttpServlet {
                     seats.add(seat);
                 }
             }
-
             // Call EventDAO to create the event
             EventDAO.EventCreationResult result = eventDAO.createEvent(
                     customerId, organizationName, accountHolder, accountNumber, bankName,

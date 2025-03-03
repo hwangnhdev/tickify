@@ -15,486 +15,7 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
         <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
-        <style>
-            /* General Styling for the Entire Page */
-            body {
-                background-color: #1F2937; /* Dark gray background */
-                color: #D1D5DB; /* Light gray text color */
-                font-family: 'Arial', sans-serif; /* Default font */
-            }
-
-            /* Sidebar Styling */
-            .sidebar {
-                background-color: #15803D; /* Green background for sidebar */
-                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3); /* Shadow effect on right side */
-                transition: all 0.3s ease; /* Smooth transition for all properties */
-            }
-            .sidebar a:hover {
-                color: #A7F3D0; /* Light green text on hover */
-                transition: color 0.2s ease; /* Smooth color transition */
-            }
-
-            /* Header Styling */
-            header.fixed {
-                position: fixed; /* Fixed position at the top */
-                top: 0; /* Align to top */
-                left: 16rem; /* Offset to accommodate sidebar width (256px) */
-                right: 0; /* Extend to the right edge */
-                z-index: 50; /* Ensure header stays above other content */
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Shadow to distinguish when scrolled */
-                background-color: #1F2937; /* Same dark gray as body */
-            }
-
-            /* Main Content Styling */
-            main {
-                margin-top: 4rem; /* Space to avoid overlap with fixed header (64px) */
-                padding-top: 1rem; /* Additional padding below header */
-            }
-
-            /* Tab Button Styling */
-            .tab-button {
-                width: 32px; /* Fixed width */
-                height: 32px; /* Fixed height */
-                background-color: #4B5563; /* Medium gray background */
-                border: none; /* No border */
-                transition: background-color 0.3s ease; /* Smooth background color change */
-            }
-            .tab-button.active {
-                background-color: #15803D; /* Green background when active */
-                transform: scale(1.1); /* Slightly larger when active */
-            }
-            .tab-button:hover {
-                background-color: #6B7280; /* Lighter gray on hover */
-            }
-
-            /* Upload Area Styling */
-            .upload-area {
-                background-color: #4B5563; /* Medium gray background */
-                border: 2px dashed #6B7280; /* Dashed light gray border */
-                border-radius: 8px; /* Rounded corners */
-                transition: all 0.3s ease; /* Smooth transition for all properties */
-            }
-            .upload-area:hover {
-                border-color: #15803D; /* Green border on hover */
-                background-color: #374151; /* Darker gray background on hover */
-            }
-
-            /* Form Elements Styling */
-            .form-control, .form-select {
-                background-color: #4B5563; /* Medium gray background */
-                color: #FFFFFF; /* White text */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 6px; /* Rounded corners */
-                transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
-            }
-            .form-control:focus, .form-select:focus {
-                border-color: #15803D; /* Green border on focus */
-                box-shadow: 0 0 5px rgba(21, 128, 61, 0.5); /* Green glow effect */
-                background-color: #374151; /* Darker gray background */
-                color: #FFFFFF; /* White text */
-            }
-            .form-control::placeholder {
-                color: #D1D5DB; /* Light gray placeholder text */
-            }
-            .form-label {
-                font-weight: 500; /* Medium font weight */
-                color: #E5E7EB; /* Very light gray text */
-            }
-
-            /* Seat Section Styling */
-            .seat-container {
-                background-color: #374151; /* Dark gray background */
-                border-radius: 8px; /* Rounded corners */
-                padding: 20px; /* Inner padding */
-                margin-bottom: 20px; /* Space below */
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-            }
-            .seat-grid {
-                display: grid; /* Grid layout */
-                gap: 15px; /* Spacing between items */
-                margin-top: 15px; /* Space above */
-            }
-            .seat-input {
-                display: flex; /* Flexbox layout */
-                align-items: center; /* Center vertically */
-                gap: 10px; /* Spacing between children */
-                background-color: #4B5563; /* Medium gray background */
-                padding: 10px; /* Inner padding */
-                border-radius: 6px; /* Rounded corners */
-                border: 1px solid #6B7280; /* Light gray border */
-                transition: transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
-            }
-            .seat-input:hover {
-                transform: translateY(-2px); /* Slight lift on hover */
-                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3); /* Green shadow */
-            }
-            .seat-input label {
-                display: block; /* Block display */
-                margin-bottom: 5px; /* Space below */
-                color: #D1D5DB; /* Light gray text */
-                font-weight: 400; /* Normal font weight */
-                flex: 0 0 auto; /* Fixed size */
-            }
-            .seat-input input {
-                width: 150px; /* Fixed width */
-                margin-bottom: 0; /* No margin below */
-                color: #FFFFFF; /* White text */
-                flex: 1; /* Flexible width */
-            }
-            .seat-input button {
-                margin-top: 30px; /* Space above */
-                flex: 0 0 auto; /* Fixed size */
-            }
-            #seatSummary {
-                color: #34D399; /* Light green text */
-                font-weight: bold; /* Bold text */
-                margin-top: 15px; /* Space above */
-                padding: 10px; /* Inner padding */
-                background-color: #4A5568; /* Slightly lighter gray background */
-                border-radius: 6px; /* Rounded corners */
-                border-left: 4px solid #10B981; /* Green left border */
-                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-                display: block; /* Block display */
-            }
-
-            /* Show Time Section Styling */
-            .ticket-section {
-                background-color: #374151; /* Dark gray background */
-                border-radius: 8px; /* Rounded corners */
-                padding: 20px; /* Inner padding */
-                margin-bottom: 20px; /* Space below */
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-            }
-            .show-time {
-                background-color: #4B5563; /* Medium gray background */
-                border-radius: 6px; /* Rounded corners */
-                padding: 0; /* No padding (adjusted from 15px) */
-                margin-bottom: 15px; /* Space below */
-                transition: all 0.3s ease; /* Smooth transition */
-                border: 1px solid #6B7280; /* Light gray border */
-                overflow: hidden; /* Prevent content overflow */
-            }
-            .show-time:hover {
-                background-color: #6B7280; /* Lighter gray on hover */
-                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3); /* Green shadow */
-            }
-            .saved-ticket {
-                background-color: #374151; /* Dark gray background */
-                border-radius: 6px; /* Rounded corners */
-                padding: 0; /* No padding (adjusted from 10px) */
-                margin-top: 10px; /* Space above */
-                border-left: 4px solid #15803D; /* Green left border */
-                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-                overflow: hidden; /* Prevent content overflow */
-            }
-            .show-time-details {
-                padding: auto; /* Auto padding */
-                margin: 0; /* No margin */
-                min-height: 0; /* No fixed minimum height */
-            }
-            .grid.grid-cols-1.md:grid-cols-2.gap-4 {
-                gap: 8px; /* Reduced gap from 16px to 8px */
-            }
-            .space-y-2 {
-                margin-top: 0; /* Remove excess top margin */
-                margin-bottom: 0; /* Remove excess bottom margin */
-            }
-
-            /* Toggle Buttons Styling */
-            .toggle-btn {
-                background-color: #4B5563; /* Medium gray background */
-                color: #FFFFFF; /* White text */
-                border: none; /* No border */
-                padding: 6px 12px; /* Padding */
-                border-radius: 6px; /* Rounded corners */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
-                margin-right: 10px; /* Space to the right */
-            }
-            .toggle-btn:hover {
-                background-color: #6B7280; /* Lighter gray on hover */
-                transform: translateY(-2px); /* Slight lift */
-            }
-            .collapsible-content {
-                height: auto; /* Auto height when expanded */
-                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out; /* Smooth collapse/expand */
-                overflow: hidden; /* Hide overflow */
-            }
-            .collapsible-content.collapsed {
-                height: 0; /* Collapsed height */
-                opacity: 0; /* Fully transparent */
-                padding: 0; /* No padding when collapsed */
-            }
-
-            /* General Buttons Styling */
-            .add-ticket-btn, .save-seat-btn {
-                background-color: #15803D; /* Green background */
-                color: white; /* White text */
-                border: none; /* No border */
-                padding: 6px 12px; /* Padding */
-                border-radius: 6px; /* Rounded corners */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
-                margin-left: 5px; /* Space to the left */
-            }
-            .add-ticket-btn:hover, .save-seat-btn:hover {
-                background-color: #166534; /* Darker green on hover */
-                transform: translateY(-2px); /* Slight lift */
-            }
-            .btn-danger {
-                background-color: #DC2626; /* Red background */
-                border: none; /* No border */
-                padding: 6px 12px; /* Padding */
-                border-radius: 6px; /* Rounded corners */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
-            }
-            .btn-danger:hover {
-                background-color: #B91C1C; /* Darker red on hover */
-                transform: translateY(-2px); /* Slight lift */
-            }
-
-            /* Datetime Inputs Styling */
-            .datetime-local {
-                background-color: #4B5563; /* Medium gray background */
-                color: #FFFFFF; /* White text */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 6px; /* Rounded corners */
-                padding: 8px; /* Inner padding */
-                width: 100%; /* Full width */
-                cursor: pointer; /* Pointer cursor */
-            }
-            .datetime-local:focus {
-                border-color: #15803D; /* Green border on focus */
-                box-shadow: 0 0 5px rgba(21, 128, 61, 0.5); /* Green glow */
-                color: #FFFFFF; /* White text */
-            }
-
-            /* Modal Styling */
-            .modal-content {
-                background-color: #374151; /* Dark gray background */
-                border: none; /* No border */
-                border-radius: 8px; /* Rounded corners */
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Deep shadow */
-            }
-            .modal-header {
-                border-bottom: 1px solid #6B7280; /* Light gray bottom border */
-            }
-            .modal-footer {
-                border-top: 1px solid #6B7280; /* Light gray top border */
-            }
-            .btn-secondary {
-                background-color: #6B7280; /* Light gray background */
-                border: none; /* No border */
-                transition: background-color 0.3s ease; /* Smooth transition */
-            }
-            .btn-secondary:hover {
-                background-color: #4B5563; /* Darker gray on hover */
-            }
-            .btn-success {
-                background-color: #15803D; /* Green background */
-                border: none; /* No border */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
-            }
-            .btn-success:hover {
-                background-color: #166534; /* Darker green on hover */
-                transform: translateY(-2px); /* Slight lift */
-            }
-            .btn-success:disabled {
-                background-color: #6B7280; /* Gray when disabled */
-                cursor: not-allowed; /* Disabled cursor */
-                transform: none; /* No transform */
-            }
-            .btn-success:disabled:hover {
-                background-color: #6B7280; /* Same gray on hover when disabled */
-            }
-
-            /* Color Picker Styling */
-            .color-picker-container {
-                position: relative; /* Relative positioning */
-            }
-            .color-picker-container input[type="color"] {
-                padding: 0; /* No padding */
-                height: 40px; /* Fixed height */
-                appearance: none; /* Remove default styling */
-                -webkit-appearance: none; /* Remove default styling for Webkit */
-                border: none; /* No border */
-                background: none; /* Transparent background */
-                cursor: pointer; /* Pointer cursor */
-            }
-            .color-picker-container input[type="color"]::-webkit-color-swatch-wrapper {
-                padding: 0; /* No padding */
-            }
-            .color-picker-container input[type="color"]::-webkit-color-swatch,
-            .color-picker-container input[type="color"]::-moz-color-swatch {
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 4px; /* Rounded corners */
-            }
-
-            /* Event Logo Preview Styling (720x958) */
-            #logoPreview {
-                width: 284px; /* Fixed width (approx. 9rem) */
-                height: 420px; /* Fixed height (approx. 12rem) */
-                background-color: #4B5563; /* Medium gray background */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 8px; /* Rounded corners */
-                display: flex; /* Flexbox layout */
-                flex-direction: column; /* Vertical alignment */
-                justify-content: center; /* Center vertically */
-                align-items: center; /* Center horizontally */
-                cursor: pointer; /* Pointer cursor */
-                transition: background-color 0.3s ease; /* Smooth background change */
-                overflow: hidden; /* Prevent overflow */
-            }
-            #logoPreview:hover {
-                background-color: #374151; /* Darker gray on hover */
-            }
-            #logoPreview i {
-                font-size: 1.5rem; /* Large icon (text-2xl) */
-                margin-bottom: 0.5rem; /* Space below (mb-2) */
-                color: #10B981; /* Green icon */
-            }
-            #logoPreview p {
-                font-size: 0.875rem; /* Small text (text-sm) */
-                color: #D1D5DB; /* Light gray text */
-                text-align: center; /* Centered text */
-            }
-            #logoImage {
-                width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
-                border-radius: 8px; /* Rounded corners */
-                display: block; /* Block display */
-            }
-
-            /* Background Image Preview Styling (1280x720) */
-            #backgroundPreview {
-                width: 856px; /* Fixed width (approx. 53.5rem) */
-                height: 418px; /* Fixed height (approx. 26.125rem) */
-                background-color: #4B5563; /* Medium gray background */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 8px; /* Rounded corners */
-                display: flex; /* Flexbox layout */
-                flex-direction: column; /* Vertical alignment */
-                justify-content: center; /* Center vertically */
-                align-items: center; /* Center horizontally */
-                cursor: pointer; /* Pointer cursor */
-                transition: background-color 0.3s ease; /* Smooth background change */
-                overflow: hidden; /* Prevent overflow */
-            }
-            #backgroundPreview:hover {
-                background-color: #374151; /* Darker gray on hover */
-            }
-            #backgroundPreview i {
-                font-size: 1.5rem; /* Large icon (text-2xl) */
-                margin-bottom: 0.5rem; /* Space below (mb-2) */
-                color: #10B981; /* Green icon */
-            }
-            #backgroundPreview p {
-                font-size: 0.875rem; /* Small text (text-sm) */
-                color: #D1D5DB; /* Light gray text */
-                text-align: center; /* Centered text */
-            }
-            #backgroundImage {
-                width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
-                border-radius: 8px; /* Rounded corners */
-                display: block; /* Block display */
-            }
-
-            /* Organizer Logo Preview Styling (275x275) */
-            #organizerLogoPreview {
-                width: 170px; /* Fixed width (approx. 10.625rem) */
-                height: 216px; /* Fixed height (approx. 13.5rem) */
-                background-color: #4B5563; /* Medium gray background */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 8px; /* Rounded corners */
-                display: flex; /* Flexbox layout */
-                flex-direction: column; /* Vertical alignment */
-                justify-content: center; /* Center vertically */
-                align-items: center; /* Center horizontally */
-                cursor: pointer; /* Pointer cursor */
-                transition: background-color 0.3s ease; /* Smooth background change */
-                overflow: hidden; /* Prevent overflow */
-            }
-            #organizerLogoPreview:hover {
-                background-color: #374151; /* Darker gray on hover */
-            }
-            #organizerLogoPreview i {
-                font-size: 1.5rem; /* Large icon (text-2xl) */
-                margin-bottom: 0.5rem; /* Space below (mb-2) */
-                color: #10B981; /* Green icon */
-            }
-            #organizerLogoPreview p {
-                font-size: 0.875rem; /* Small text (text-sm) */
-                color: #D1D5DB; /* Light gray text */
-                text-align: center; /* Centered text */
-            }
-            #organizerLogoImage {
-                width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
-                border-radius: 8px; /* Rounded corners */
-                display: block; /* Block display */
-            }
-
-            /* Image Layout Styling */
-            .image-group {
-                display: flex; /* Flexbox layout */
-                gap: 20px; /* Space between images */
-                justify-content: center; /* Center horizontally */
-                flex-wrap: wrap; /* Wrap to next line if needed */
-            }
-            .organizer-row {
-                display: flex; /* Flexbox layout */
-                align-items: center; /* Center vertically */
-                gap: 20px; /* Space between items */
-                justify-content: center; /* Center horizontally */
-                margin-top: 20px; /* Space above */
-            }
-            .organizer-row .input-container {
-                flex: 1; /* Flexible width */
-                max-width: 300px; /* Maximum width */
-            }
-
-            /* Miscellaneous Styling */
-            .upload-icon.hidden, .upload-text.hidden {
-                display: none; /* Hide elements with 'hidden' class */
-            }
-            .image-error, .error-message {
-                color: #EF4444; /* Red text */
-                font-size: 0.875rem; /* Small text (text-sm) */
-                margin-top: 0.5rem; /* Space above (mt-2) */
-                text-align: center; /* Centered text */
-            }
-            .error-message {
-                margin-top: 0.25rem; /* Reduced space (mt-1) */
-                display: none; /* Hidden by default */
-            }
-
-            /* Textarea Styling */
-            .event-info-textarea {
-                width: 100%; /* Full width */
-                padding: 0.5rem; /* Inner padding (p-2) */
-                border-radius: 0.375rem; /* Rounded corners */
-                background-color: #4B5563; /* Medium gray background */
-                border: 1px solid #6B7280; /* Light gray border */
-                color: #FFFFFF; /* White text */
-                outline: none; /* No outline on focus */
-                resize: vertical; /* Vertical resize only */
-                min-height: 100px; /* Minimum height */
-                max-height: 400px; /* Maximum height */
-                overflow-y: auto; /* Scroll if content overflows */
-                box-shadow: 0 0 0 2px transparent; /* Transparent ring by default */
-                transition: border-color 0.3s ease, box-shadow 0.3s ease, height 0.3s ease; /* Smooth transitions */
-                height: 300px; /* Fixed height */
-                line-height: 1; /* Consistent line height */
-            }
-            .event-info-textarea:focus {
-                border-color: #15803D; /* Green border on focus */
-                box-shadow: 0 0 0 2px #15803D; /* Green ring on focus */
-                background-color: #374151; /* Darker gray background */
-                color: #FFFFFF; /* White text */
-            }
-        </style>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/organizerPage/createEvent.css"/>
     </head>
     <body class="bg-gray-900 text-white">
         <div class="flex h-screen">
@@ -578,7 +99,7 @@
                         <div class="md:col-span-2">
                             <label class="block text-gray-300 mb-2">Full Address</label>
                             <input type="text" id="fullAddress" name="fullAddress" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Building number, Street name, Ward, District, Province/City" required>
-                            <span class="error-message" id="fullAddress_error"></span>
+                            <!--<span class="error-message" id="fullAddress_error"></span>-->
                         </div>
                         <!-- Trong phần tab Event Info, thay thế hoặc thêm vào phần textarea hiện có -->
                         <div class="md:col-span-2">
@@ -610,8 +131,8 @@ Notes and VAT Terms</textarea>
                                     <p class="text-gray-300 text-sm upload-text">Event Logo (720x958)</p>
                                     <input type="file" id="logoEventInput" class="hidden">
                                     <img id="logoImage" src="" alt="Event Logo Preview" class="w-full h-full object-cover rounded hidden">
+                                    <span class="error-message" id="logoEvent_error"></span>
                                 </div>
-                                <span class="error-message" id="logoEvent_error"></span>
 
                                 <!-- Event Background Image -->
                                 <div id="backgroundPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
@@ -619,27 +140,28 @@ Notes and VAT Terms</textarea>
                                     <p class="text-gray-300 text-sm upload-text">Add Event Background Image (1280x720)</p>
                                     <input type="file" id="backgroundInput" class="hidden">
                                     <img id="backgroundImage" src="" alt="Event Background Preview" class="w-full h-full object-cover rounded hidden">
+                                    <span class="error-message" id="backgroundImage_error"></span>
                                 </div>
-                                <span class="error-message" id="backgroundImage_error"></span>
                             </div>
                         </div>
                         <div class="md:col-span-2 p-4 rounded bg-gray-800 text-center">
                             <!-- Organizer Image và Organizer Name nằm ngang nhau -->
-                            <div class="organizer-row">
+                            <div class="organizer-row grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Organizer Logo -->
                                 <div id="organizerLogoPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
                                     <i class="fas fa-upload text-2xl mb-2 text-green-500 upload-icon"></i>
                                     <p class="text-gray-300 text-sm upload-text">Organizer Logo (275x275)</p>
                                     <input type="file" id="organizerLogoInput" class="hidden">
                                     <img id="organizerLogoImage" src="" alt="Organizer Logo Preview" class="w-full h-full object-cover rounded hidden">
+                                    <span class="error-message" id="organizerLogo_error"></span>
                                 </div>
-                                <span class="error-message" id="organizerLogo_error"></span>
 
                                 <div class="input-container">
                                     <label class="block text-gray-300 mb-2">Organizer Name</label>
                                     <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Organizer Name" required>
                                     <span class="error-message" id="organizerName_error"></span>
                                 </div>
+
                             </div>
                         </div>
                     </div>

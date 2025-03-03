@@ -86,6 +86,10 @@
         <servlet-name>CreateNewEventController</servlet-name>
         <servlet-class>controllers.CreateNewEventController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UpdateEventController</servlet-name>
+        <servlet-class>controllers.UpdateEventController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -166,6 +170,10 @@
     <servlet-mapping>
         <servlet-name>CreateNewEventController</servlet-name>
         <url-pattern>/createNewEvent</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateEventController</servlet-name>
+        <url-pattern>/updateEvent</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
