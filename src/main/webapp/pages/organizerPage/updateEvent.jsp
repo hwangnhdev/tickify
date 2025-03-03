@@ -1,6 +1,6 @@
 <%-- 
-    Document   : createEvent
-    Created on : Feb 25, 2025, 5:44:28 PM
+    Document   : updateEvent
+    Created on : Mar 3, 2025, 12:13:21 AM
     Author     : Tang Thanh Vui - CE180901
 --%>
 
@@ -11,488 +11,516 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Create Event - Tickify Organizer</title>
+        <title>Update Event - Tickify Organizer</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
         <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
         <style>
-            /* General Styling for the Entire Page */
+            /* General styling */
             body {
-                background-color: #1F2937; /* Dark gray background */
-                color: #D1D5DB; /* Light gray text color */
-                font-family: 'Arial', sans-serif; /* Default font */
+                background-color: #1F2937;
+                color: #D1D5DB;
+                font-family: 'Arial', sans-serif;
             }
 
-            /* Sidebar Styling */
+            /* Sidebar */
             .sidebar {
-                background-color: #15803D; /* Green background for sidebar */
-                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3); /* Shadow effect on right side */
-                transition: all 0.3s ease; /* Smooth transition for all properties */
+                background-color: #15803D;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+                transition: all 0.3s ease;
             }
             .sidebar a:hover {
-                color: #A7F3D0; /* Light green text on hover */
-                transition: color 0.2s ease; /* Smooth color transition */
+                color: #A7F3D0;
+                transition: color 0.2s ease;
             }
-
-            /* Header Styling */
+            /*Header*/
+            /* Thêm vào phần <style> hiện có */
             header.fixed {
-                position: fixed; /* Fixed position at the top */
-                top: 0; /* Align to top */
-                left: 16rem; /* Offset to accommodate sidebar width (256px) */
-                right: 0; /* Extend to the right edge */
-                z-index: 50; /* Ensure header stays above other content */
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Shadow to distinguish when scrolled */
-                background-color: #1F2937; /* Same dark gray as body */
+                position: fixed;
+                top: 0;
+                left: 16rem; /* Độ rộng của sidebar (16rem = 256px) */
+                right: 0;
+                z-index: 50; /* Đảm bảo header nằm trên các nội dung khác */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Thêm shadow để phân biệt khi cuộn */
+                background-color: #1F2937; /* Giữ màu nền phù hợp với giao diện */
             }
 
-            /* Main Content Styling */
             main {
-                margin-top: 4rem; /* Space to avoid overlap with fixed header (64px) */
-                padding-top: 1rem; /* Additional padding below header */
+                margin-top: 4rem; /* margin-top để tránh nội dung bị che bởi header (4rem ~ 64px) */
+                padding-top: 1rem; /* Padding thêm cho nội dung bên dưới header */
             }
-
-            /* Tab Button Styling */
+            /* Tab buttons */
             .tab-button {
-                width: 32px; /* Fixed width */
-                height: 32px; /* Fixed height */
-                background-color: #4B5563; /* Medium gray background */
-                border: none; /* No border */
-                transition: background-color 0.3s ease; /* Smooth background color change */
+                width: 32px;
+                height: 32px;
+                background-color: #4B5563;
+                border: none;
+                transition: background-color 0.3s ease;
             }
             .tab-button.active {
-                background-color: #15803D; /* Green background when active */
-                transform: scale(1.1); /* Slightly larger when active */
+                background-color: #15803D;
+                transform: scale(1.1);
             }
             .tab-button:hover {
-                background-color: #6B7280; /* Lighter gray on hover */
+                background-color: #6B7280;
             }
 
-            /* Upload Area Styling */
+            /* Upload area */
             .upload-area {
-                background-color: #4B5563; /* Medium gray background */
-                border: 2px dashed #6B7280; /* Dashed light gray border */
-                border-radius: 8px; /* Rounded corners */
-                transition: all 0.3s ease; /* Smooth transition for all properties */
+                background-color: #4B5563;
+                border: 2px dashed #6B7280;
+                border-radius: 8px;
+                transition: all 0.3s ease;
             }
             .upload-area:hover {
-                border-color: #15803D; /* Green border on hover */
-                background-color: #374151; /* Darker gray background on hover */
+                border-color: #15803D;
+                background-color: #374151;
             }
 
-            /* Form Elements Styling */
+            /* Form elements */
             .form-control, .form-select {
-                background-color: #4B5563; /* Medium gray background */
-                color: #FFFFFF; /* White text */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 6px; /* Rounded corners */
-                transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+                background-color: #4B5563;
+                color: #FFFFFF;
+                border: 1px solid #6B7280;
+                border-radius: 6px;
+                transition: border-color 0.3s ease, box-shadow 0.3s ease;
             }
             .form-control:focus, .form-select:focus {
-                border-color: #15803D; /* Green border on focus */
-                box-shadow: 0 0 5px rgba(21, 128, 61, 0.5); /* Green glow effect */
-                background-color: #374151; /* Darker gray background */
-                color: #FFFFFF; /* White text */
+                border-color: #15803D;
+                box-shadow: 0 0 5px rgba(21, 128, 61, 0.5);
+                background-color: #374151;
+                color: #FFFFFF;
             }
             .form-control::placeholder {
-                color: #D1D5DB; /* Light gray placeholder text */
+                color: #D1D5DB;
             }
             .form-label {
-                font-weight: 500; /* Medium font weight */
-                color: #E5E7EB; /* Very light gray text */
+                font-weight: 500;
+                color: #E5E7EB;
             }
 
-            /* Seat Section Styling */
+            /* Seat section */
             .seat-container {
-                background-color: #374151; /* Dark gray background */
-                border-radius: 8px; /* Rounded corners */
-                padding: 20px; /* Inner padding */
-                margin-bottom: 20px; /* Space below */
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+                background-color: #374151;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             }
             .seat-grid {
-                display: grid; /* Grid layout */
-                gap: 15px; /* Spacing between items */
-                margin-top: 15px; /* Space above */
+                display: grid;
+                gap: 15px;
+                margin-top: 15px;
             }
             .seat-input {
-                display: flex; /* Flexbox layout */
-                align-items: center; /* Center vertically */
-                gap: 10px; /* Spacing between children */
-                background-color: #4B5563; /* Medium gray background */
-                padding: 10px; /* Inner padding */
-                border-radius: 6px; /* Rounded corners */
-                border: 1px solid #6B7280; /* Light gray border */
-                transition: transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background-color: #4B5563;
+                padding: 10px;
+                border-radius: 6px;
+                border: 1px solid #6B7280;
+                transition: transform 0.2s ease, box-shadow 0.3s ease;
             }
             .seat-input:hover {
-                transform: translateY(-2px); /* Slight lift on hover */
-                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3); /* Green shadow */
+                transform: translateY(-2px);
+                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3);
             }
             .seat-input label {
-                display: block; /* Block display */
-                margin-bottom: 5px; /* Space below */
-                color: #D1D5DB; /* Light gray text */
-                font-weight: 400; /* Normal font weight */
-                flex: 0 0 auto; /* Fixed size */
+                display: block;
+                margin-bottom: 5px;
+                color: #D1D5DB;
+                font-weight: 400;
+                flex: 0 0 auto;
             }
             .seat-input input {
-                width: 150px; /* Fixed width */
-                margin-bottom: 0; /* No margin below */
-                color: #FFFFFF; /* White text */
-                flex: 1; /* Flexible width */
+                width: 150px;
+                margin-bottom: 0;
+                color: #FFFFFF;
+                flex: 1;
             }
             .seat-input button {
-                margin-top: 30px; /* Space above */
-                flex: 0 0 auto; /* Fixed size */
+                margin-top: 30px;
+                flex: 0 0 auto;
             }
             #seatSummary {
-                color: #34D399; /* Light green text */
-                font-weight: bold; /* Bold text */
-                margin-top: 15px; /* Space above */
-                padding: 10px; /* Inner padding */
-                background-color: #4A5568; /* Slightly lighter gray background */
-                border-radius: 6px; /* Rounded corners */
-                border-left: 4px solid #10B981; /* Green left border */
-                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-                display: block; /* Block display */
+                color: #34D399;
+                font-weight: bold;
+                margin-top: 15px;
+                padding: 10px;
+                background-color: #4A5568;
+                border-radius: 6px;
+                border-left: 4px solid #10B981;
+                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+                display: block;
             }
 
-            /* Show Time Section Styling */
+            /* Show time section */
             .ticket-section {
-                background-color: #374151; /* Dark gray background */
-                border-radius: 8px; /* Rounded corners */
-                padding: 20px; /* Inner padding */
-                margin-bottom: 20px; /* Space below */
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+                background-color: #374151;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             }
             .show-time {
-                background-color: #4B5563; /* Medium gray background */
-                border-radius: 6px; /* Rounded corners */
-                padding: 0; /* No padding (adjusted from 15px) */
-                margin-bottom: 15px; /* Space below */
-                transition: all 0.3s ease; /* Smooth transition */
-                border: 1px solid #6B7280; /* Light gray border */
-                overflow: hidden; /* Prevent content overflow */
+                background-color: #4B5563;
+                border-radius: 6px;
+                padding: 0; /* Đã giảm padding từ 15px về 0 */
+                margin-bottom: 15px;
+                transition: all 0.3s ease;
+                border: 1px solid #6B7280;
+                overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài */
             }
             .show-time:hover {
-                background-color: #6B7280; /* Lighter gray on hover */
-                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3); /* Green shadow */
+                background-color: #6B7280;
+                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3);
             }
             .saved-ticket {
-                background-color: #374151; /* Dark gray background */
-                border-radius: 6px; /* Rounded corners */
-                padding: 0; /* No padding (adjusted from 10px) */
-                margin-top: 10px; /* Space above */
-                border-left: 4px solid #15803D; /* Green left border */
-                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-                overflow: hidden; /* Prevent content overflow */
+                background-color: #374151;
+                border-radius: 6px;
+                padding: 0; /* Đã giảm padding từ 10px về 0 */
+                margin-top: 10px;
+                border-left: 4px solid #15803D;
+                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+                overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài */
             }
             .show-time-details {
-                padding: auto; /* Auto padding */
-                margin: 0; /* No margin */
-                min-height: 0; /* No fixed minimum height */
+                padding: auto; /* Giữ padding nhưng đảm bảo không làm tràn nội dung */
+                margin: 0;
+                min-height: 0; /* Xóa min-height cố định nếu có */
             }
             .grid.grid-cols-1.md:grid-cols-2.gap-4 {
-                gap: 8px; /* Reduced gap from 16px to 8px */
-            }
-            .space-y-2 {
-                margin-top: 0; /* Remove excess top margin */
-                margin-bottom: 0; /* Remove excess bottom margin */
+                gap: 8px; /* Giảm gap từ 1rem (16px) về 8px */
             }
 
-            /* Toggle Buttons Styling */
+            .space-y-2 {
+                margin-top: 0; /* Xóa margin-top dư thừa */
+                margin-bottom: 0;
+            }
+            /* Toggle buttons */
             .toggle-btn {
-                background-color: #4B5563; /* Medium gray background */
-                color: #FFFFFF; /* White text */
-                border: none; /* No border */
-                padding: 6px 12px; /* Padding */
-                border-radius: 6px; /* Rounded corners */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
-                margin-right: 10px; /* Space to the right */
+                background-color: #4B5563;
+                color: #FFFFFF;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 6px;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                margin-right: 10px;
             }
             .toggle-btn:hover {
-                background-color: #6B7280; /* Lighter gray on hover */
-                transform: translateY(-2px); /* Slight lift */
+                background-color: #6B7280;
+                transform: translateY(-2px);
             }
             .collapsible-content {
-                height: auto; /* Auto height when expanded */
-                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out; /* Smooth collapse/expand */
-                overflow: hidden; /* Hide overflow */
+                height: auto; /* Đảm bảo chiều cao tự động khi không bị thu gọn */
+                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+                overflow: hidden;
             }
             .collapsible-content.collapsed {
-                height: 0; /* Collapsed height */
-                opacity: 0; /* Fully transparent */
-                padding: 0; /* No padding when collapsed */
+                height: 0;
+                opacity: 0;
+                padding: 0; /* Xóa padding khi thu gọn */
             }
-
-            /* General Buttons Styling */
+            /* Buttons */
             .add-ticket-btn, .save-seat-btn {
-                background-color: #15803D; /* Green background */
-                color: white; /* White text */
-                border: none; /* No border */
-                padding: 6px 12px; /* Padding */
-                border-radius: 6px; /* Rounded corners */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
-                margin-left: 5px; /* Space to the left */
+                background-color: #15803D;
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 6px;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                margin-left: 5px;
             }
             .add-ticket-btn:hover, .save-seat-btn:hover {
-                background-color: #166534; /* Darker green on hover */
-                transform: translateY(-2px); /* Slight lift */
+                background-color: #166534;
+                transform: translateY(-2px);
             }
             .btn-danger {
-                background-color: #DC2626; /* Red background */
-                border: none; /* No border */
-                padding: 6px 12px; /* Padding */
-                border-radius: 6px; /* Rounded corners */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+                background-color: #DC2626;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 6px;
+                transition: background-color 0.3s ease, transform 0.2s ease;
             }
             .btn-danger:hover {
-                background-color: #B91C1C; /* Darker red on hover */
-                transform: translateY(-2px); /* Slight lift */
+                background-color: #B91C1C;
+                transform: translateY(-2px);
             }
 
-            /* Datetime Inputs Styling */
+            /* Datetime-local inputs */
             .datetime-local {
-                background-color: #4B5563; /* Medium gray background */
-                color: #FFFFFF; /* White text */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 6px; /* Rounded corners */
-                padding: 8px; /* Inner padding */
-                width: 100%; /* Full width */
-                cursor: pointer; /* Pointer cursor */
+                background-color: #4B5563;
+                color: #FFFFFF;
+                border: 1px solid #6B7280;
+                border-radius: 6px;
+                padding: 8px;
+                width: 100%;
+                cursor: pointer;
             }
             .datetime-local:focus {
-                border-color: #15803D; /* Green border on focus */
-                box-shadow: 0 0 5px rgba(21, 128, 61, 0.5); /* Green glow */
-                color: #FFFFFF; /* White text */
+                border-color: #15803D;
+                box-shadow: 0 0 5px rgba(21, 128, 61, 0.5);
+                color: #FFFFFF;
             }
 
-            /* Modal Styling */
+            /* Modal */
             .modal-content {
-                background-color: #374151; /* Dark gray background */
-                border: none; /* No border */
-                border-radius: 8px; /* Rounded corners */
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Deep shadow */
+                background-color: #374151;
+                border: none;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             }
             .modal-header {
-                border-bottom: 1px solid #6B7280; /* Light gray bottom border */
+                border-bottom: 1px solid #6B7280;
             }
             .modal-footer {
-                border-top: 1px solid #6B7280; /* Light gray top border */
+                border-top: 1px solid #6B7280;
             }
             .btn-secondary {
-                background-color: #6B7280; /* Light gray background */
-                border: none; /* No border */
-                transition: background-color 0.3s ease; /* Smooth transition */
+                background-color: #6B7280;
+                border: none;
+                transition: background-color 0.3s ease;
             }
             .btn-secondary:hover {
-                background-color: #4B5563; /* Darker gray on hover */
+                background-color: #4B5563;
             }
             .btn-success {
-                background-color: #15803D; /* Green background */
-                border: none; /* No border */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+                background-color: #15803D;
+                border: none;
+                transition: background-color 0.3s ease, transform 0.2s ease;
             }
             .btn-success:hover {
-                background-color: #166534; /* Darker green on hover */
-                transform: translateY(-2px); /* Slight lift */
-            }
-            .btn-success:disabled {
-                background-color: #6B7280; /* Gray when disabled */
-                cursor: not-allowed; /* Disabled cursor */
-                transform: none; /* No transform */
-            }
-            .btn-success:disabled:hover {
-                background-color: #6B7280; /* Same gray on hover when disabled */
+                background-color: #166534;
+                transform: translateY(-2px);
             }
 
-            /* Color Picker Styling */
+            /* Color picker container */
             .color-picker-container {
-                position: relative; /* Relative positioning */
+                position: relative;
             }
+
             .color-picker-container input[type="color"] {
-                padding: 0; /* No padding */
-                height: 40px; /* Fixed height */
-                appearance: none; /* Remove default styling */
-                -webkit-appearance: none; /* Remove default styling for Webkit */
-                border: none; /* No border */
-                background: none; /* Transparent background */
-                cursor: pointer; /* Pointer cursor */
+                padding: 0;
+                height: 40px;
+                appearance: none;
+                -webkit-appearance: none;
+                border: none;
+                background: none;
+                cursor: pointer;
             }
+
             .color-picker-container input[type="color"]::-webkit-color-swatch-wrapper {
-                padding: 0; /* No padding */
+                padding: 0;
             }
-            .color-picker-container input[type="color"]::-webkit-color-swatch,
+
+            .color-picker-container input[type="color"]::-webkit-color-swatch {
+                border: 1px solid #6B7280;
+                border-radius: 4px;
+            }
+
             .color-picker-container input[type="color"]::-moz-color-swatch {
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 4px; /* Rounded corners */
+                border: 1px solid #6B7280;
+                border-radius: 4px;
             }
 
-            /* Event Logo Preview Styling (720x958) */
+            /* Event Logo (720x958) */
             #logoPreview {
-                width: 284px; /* Fixed width (approx. 9rem) */
-                height: 420px; /* Fixed height (approx. 12rem) */
-                background-color: #4B5563; /* Medium gray background */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 8px; /* Rounded corners */
-                display: flex; /* Flexbox layout */
-                flex-direction: column; /* Vertical alignment */
-                justify-content: center; /* Center vertically */
-                align-items: center; /* Center horizontally */
-                cursor: pointer; /* Pointer cursor */
-                transition: background-color 0.3s ease; /* Smooth background change */
-                overflow: hidden; /* Prevent overflow */
+                width: 284px; /* Giữ chiều rộng cố định dựa trên thiết kế (w-36 ~ 9rem) */
+                height: 420px; /* Giữ chiều cao cố định (h-48 ~ 12rem) */
+                background-color: #4B5563; /* Màu xám của giao diện */
+                border: 1px solid #6B7280; /* Viền */
+                border-radius: 8px; /* Bo góc */
+                display: flex;
+                flex-direction: column; /* Căn thẳng đứng */
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                overflow: hidden; /* Đảm bảo nội dung không vượt ra ngoài */
             }
+
             #logoPreview:hover {
-                background-color: #374151; /* Darker gray on hover */
+                background-color: #374151; /* Màu tối hơn khi hover */
             }
+
             #logoPreview i {
-                font-size: 1.5rem; /* Large icon (text-2xl) */
-                margin-bottom: 0.5rem; /* Space below (mb-2) */
-                color: #10B981; /* Green icon */
+                font-size: 1.5rem; /* text-2xl */
+                margin-bottom: 0.5rem; /* mb-2 */
+                color: #10B981; /* Màu xanh lá */
             }
+
             #logoPreview p {
-                font-size: 0.875rem; /* Small text (text-sm) */
-                color: #D1D5DB; /* Light gray text */
-                text-align: center; /* Centered text */
+                font-size: 0.875rem; /* text-sm */
+                color: #D1D5DB; /* Màu chữ xám nhạt */
+                text-align: center;
             }
+
+            /* Event Logo (720x958) */
             #logoImage {
-                width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
-                border-radius: 8px; /* Rounded corners */
-                display: block; /* Block display */
+                width: 100%;
+                height: 100%;
+                object-fit: cover; /* Thay đổi từ contain thành cover để phủ toàn bộ khung */
+                border-radius: 8px; /* Bo góc */
+                display: block; /* Đảm bảo hiển thị đúng */
             }
 
-            /* Background Image Preview Styling (1280x720) */
+            /* Background Image (1280x720) */
             #backgroundPreview {
-                width: 856px; /* Fixed width (approx. 53.5rem) */
-                height: 418px; /* Fixed height (approx. 26.125rem) */
-                background-color: #4B5563; /* Medium gray background */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 8px; /* Rounded corners */
-                display: flex; /* Flexbox layout */
-                flex-direction: column; /* Vertical alignment */
-                justify-content: center; /* Center vertically */
-                align-items: center; /* Center horizontally */
-                cursor: pointer; /* Pointer cursor */
-                transition: background-color 0.3s ease; /* Smooth background change */
-                overflow: hidden; /* Prevent overflow */
+                width: 856px; /* Giữ chiều rộng cố định (khoảng 53.5rem, phù hợp với layout) */
+                height: 418px; /* Giữ chiều cao cố định (khoảng 26.125rem, phù hợp với tỷ lệ 1280x720) */
+                background-color: #4B5563; /* Màu xám của giao diện */
+                border: 1px solid #6B7280; /* Viền */
+                border-radius: 8px; /* Bo góc */
+                display: flex;
+                flex-direction: column; /* Căn thẳng đứng */
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                overflow: hidden; /* Đảm bảo nội dung không vượt ra ngoài */
             }
+
             #backgroundPreview:hover {
-                background-color: #374151; /* Darker gray on hover */
+                background-color: #374151; /* Màu tối hơn khi hover */
             }
+
             #backgroundPreview i {
-                font-size: 1.5rem; /* Large icon (text-2xl) */
-                margin-bottom: 0.5rem; /* Space below (mb-2) */
-                color: #10B981; /* Green icon */
+                font-size: 1.5rem; /* text-2xl */
+                margin-bottom: 0.5rem; /* mb-2 */
+                color: #10B981; /* Màu xanh lá */
             }
+
             #backgroundPreview p {
-                font-size: 0.875rem; /* Small text (text-sm) */
-                color: #D1D5DB; /* Light gray text */
-                text-align: center; /* Centered text */
+                font-size: 0.875rem; /* text-sm */
+                color: #D1D5DB; /* Màu chữ xám nhạt */
+                text-align: center;
             }
+
+            /* Background Image (1280x720) */
             #backgroundImage {
-                width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
-                border-radius: 8px; /* Rounded corners */
-                display: block; /* Block display */
+                width: 100%;
+                height: 100%;
+                object-fit: cover; /* Thay đổi từ contain thành cover để phủ toàn bộ khung */
+                border-radius: 8px; /* Bo góc */
+                display: block; /* Đảm bảo hiển thị đúng */
             }
 
-            /* Organizer Logo Preview Styling (275x275) */
+            /* Organizer Logo (275x275) */
             #organizerLogoPreview {
-                width: 170px; /* Fixed width (approx. 10.625rem) */
-                height: 216px; /* Fixed height (approx. 13.5rem) */
-                background-color: #4B5563; /* Medium gray background */
-                border: 1px solid #6B7280; /* Light gray border */
-                border-radius: 8px; /* Rounded corners */
-                display: flex; /* Flexbox layout */
-                flex-direction: column; /* Vertical alignment */
-                justify-content: center; /* Center vertically */
-                align-items: center; /* Center horizontally */
-                cursor: pointer; /* Pointer cursor */
-                transition: background-color 0.3s ease; /* Smooth background change */
-                overflow: hidden; /* Prevent overflow */
+                width: 170px; /* Giữ chiều rộng cố định (khoảng 10.625rem, phù hợp với layout) */
+                height: 216px; /* Giữ chiều cao cố định (khoảng 13.5rem, phù hợp với tỷ lệ 275x275 khi giữ tỷ lệ) */
+                background-color: #4B5563; /* Màu xám của giao diện */
+                border: 1px solid #6B7280; /* Viền */
+                border-radius: 8px; /* Bo góc */
+                display: flex;
+                flex-direction: column; /* Căn thẳng đứng */
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                overflow: hidden; /* Đảm bảo nội dung không vượt ra ngoài */
             }
+
             #organizerLogoPreview:hover {
-                background-color: #374151; /* Darker gray on hover */
+                background-color: #374151; /* Màu tối hơn khi hover */
             }
+
             #organizerLogoPreview i {
-                font-size: 1.5rem; /* Large icon (text-2xl) */
-                margin-bottom: 0.5rem; /* Space below (mb-2) */
-                color: #10B981; /* Green icon */
+                font-size: 1.5rem; /* text-2xl */
+                margin-bottom: 0.5rem; /* mb-2 */
+                color: #10B981; /* Màu xanh lá */
             }
+
             #organizerLogoPreview p {
-                font-size: 0.875rem; /* Small text (text-sm) */
-                color: #D1D5DB; /* Light gray text */
-                text-align: center; /* Centered text */
+                font-size: 0.875rem; /* text-sm */
+                color: #D1D5DB; /* Màu chữ xám nhạt */
+                text-align: center;
             }
+
+            /* Organizer Logo (275x275) */
             #organizerLogoImage {
-                width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
-                border-radius: 8px; /* Rounded corners */
-                display: block; /* Block display */
+                width: 100%;
+                height: 100%;
+                object-fit: cover; /* Thay đổi từ contain thành cover để phủ toàn bộ khung */
+                border-radius: 8px; /* Bo góc */
+                display: block; /* Đảm bảo hiển thị đúng */
             }
 
-            /* Image Layout Styling */
+            /* Các class hiện có vẫn giữ nguyên */
             .image-group {
-                display: flex; /* Flexbox layout */
-                gap: 20px; /* Space between images */
-                justify-content: center; /* Center horizontally */
-                flex-wrap: wrap; /* Wrap to next line if needed */
-            }
-            .organizer-row {
-                display: flex; /* Flexbox layout */
-                align-items: center; /* Center vertically */
-                gap: 20px; /* Space between items */
-                justify-content: center; /* Center horizontally */
-                margin-top: 20px; /* Space above */
-            }
-            .organizer-row .input-container {
-                flex: 1; /* Flexible width */
-                max-width: 300px; /* Maximum width */
+                display: flex;
+                gap: 20px; /* Khoảng cách giữa Event Image và Background Image */
+                justify-content: center; /* Căn giữa theo chiều ngang */
+                flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ không gian */
             }
 
-            /* Miscellaneous Styling */
-            .upload-icon.hidden, .upload-text.hidden {
-                display: none; /* Hide elements with 'hidden' class */
+            .organizer-row {
+                display: flex;
+                align-items: center; /* Căn giữa theo chiều dọc */
+                gap: 20px; /* Khoảng cách giữa Organizer Image và Organizer Name */
+                justify-content: center; /* Căn giữa theo chiều ngang */
+                margin-top: 20px; /* Khoảng cách giữa group ảnh và organizer-row */
             }
-            .image-error, .error-message {
-                color: #EF4444; /* Red text */
-                font-size: 0.875rem; /* Small text (text-sm) */
-                margin-top: 0.5rem; /* Space above (mt-2) */
-                text-align: center; /* Centered text */
+
+            .organizer-row .input-container {
+                flex: 1; /* Cho phép input mở rộng để điền đủ chiều dài */
+                max-width: 300px; /* Giới hạn chiều rộng của input để không quá dài */
+            }
+
+            /* Thêm vào phần <style> hiện có */
+            .upload-icon.hidden, .upload-text.hidden {
+                display: none; /* Đảm bảo các phần tử ẩn hoàn toàn khi có class 'hidden' */
+            }
+            .image-error {
+                color: #EF4444;
+                font-size: 0.875rem;
+                margin-top: 0.5rem;
+                text-align: center;
             }
             .error-message {
-                margin-top: 0.25rem; /* Reduced space (mt-1) */
-                display: none; /* Hidden by default */
+                color: #EF4444; /* Màu đỏ */
+                font-size: 0.875rem; /* text-sm */
+                margin-top: 0.25rem; /* mt-1 */
+                display: none; /* Mặc định ẩn */
             }
-
-            /* Textarea Styling */
+            /* Thêm hoặc cập nhật class cho textarea */
             .event-info-textarea {
-                width: 100%; /* Full width */
-                padding: 0.5rem; /* Inner padding (p-2) */
-                border-radius: 0.375rem; /* Rounded corners */
-                background-color: #4B5563; /* Medium gray background */
-                border: 1px solid #6B7280; /* Light gray border */
-                color: #FFFFFF; /* White text */
-                outline: none; /* No outline on focus */
-                resize: vertical; /* Vertical resize only */
-                min-height: 100px; /* Minimum height */
-                max-height: 400px; /* Maximum height */
-                overflow-y: auto; /* Scroll if content overflows */
-                box-shadow: 0 0 0 2px transparent; /* Transparent ring by default */
-                transition: border-color 0.3s ease, box-shadow 0.3s ease, height 0.3s ease; /* Smooth transitions */
-                height: 300px; /* Fixed height */
-                line-height: 1; /* Consistent line height */
+                width: 100%; /* Đảm bảo textarea chiếm toàn bộ chiều rộng của container */
+                padding: 0.5rem; /* p-2 tương ứng 0.5rem trong Tailwind */
+                border-radius: 0.375rem; /* rounded */
+                background-color: #4B5563; /* bg-gray-700 */
+                border: 1px solid #6B7280; /* border-gray-600 */
+                color: #FFFFFF; /* Màu chữ trắng */
+                outline: none; /* focus:outline-none */
+                resize: vertical; /* Cho phép người dùng kéo dọc để thay đổi kích thước */
+                min-height: 100px; /* Chiều cao tối thiểu */
+                max-height: 400px; /* Chiều cao tối đa (tùy chỉnh theo nhu cầu) */
+                overflow-y: auto; /* Hiển thị thanh cuộn nếu nội dung vượt quá chiều cao tối đa */
+                box-shadow: 0 0 0 2px transparent; /* focus:ring-2 focus:ring-green-500 (ban đầu ẩn) */
+                transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng chuyển đổi */
             }
             .event-info-textarea:focus {
-                border-color: #15803D; /* Green border on focus */
-                box-shadow: 0 0 0 2px #15803D; /* Green ring on focus */
-                background-color: #374151; /* Darker gray background */
-                color: #FFFFFF; /* White text */
+                border-color: #15803D; /* focus:ring-green-500 */
+                box-shadow: 0 0 0 2px #15803D; /* focus:ring-2 focus:ring-green-500 */
+                background-color: #374151; /* Tối hơn khi focus */
+                color: #FFFFFF; /* Giữ màu chữ trắng */
+            }
+            /* Tự động mở rộng theo nội dung (dùng JavaScript nếu cần, nhưng CSS có thể hỗ trợ cơ bản) */
+            .event-info-textarea {
+                height: 300px;
+                line-height: 1; /* Điều chỉnh dòng chữ để tính chiều cao chính xác */
+            }
+            .event-info-textarea {
+                transition: height 0.3s ease;
+            }
+            .btn-success:disabled {
+                background-color: #6B7280; /* Màu xám khi bị vô hiệu hóa */
+                cursor: not-allowed;
+                transform: none; /* Không có hiệu ứng hover khi disabled */
+            }
+            .btn-success:disabled:hover {
+                background-color: #6B7280; /* Giữ nguyên màu khi hover */
             }
         </style>
     </head>
@@ -508,8 +536,8 @@
                     <a class="flex items-center w-full p-2 rounded-lg hover:bg-green-700 transition duration-200" href="${pageContext.request.contextPath}/pages/organizerPage/organizerCenter.jsp">
                         <i class="fas fa-ticket-alt mr-2"></i>My Event
                     </a>
-                    <a class="flex items-center w-full p-2 bg-green-700 rounded-lg" href="createEvent.jsp">
-                        <i class="fas fa-plus mr-2"></i>Create Event
+                    <a class="flex items-center w-full p-2 bg-green-700 rounded-lg" href="updateEvent.jsp">
+                        <i class="fas fa-plus mr-2"></i>Update Event
                     </a>
                 </nav>
             </aside>
@@ -528,7 +556,7 @@
                             <span>Payment Information</span>
                         </div>
                         <div class="flex gap-3">
-                            <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200" onclick="submitEventForm()">Create</button>
+                            <button class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200" onclick="submitEventForm()">Update</button>
                             <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200" onclick="nextTab()">Continue</button>
                         </div>
                     </div>
@@ -813,6 +841,6 @@ Notes and VAT Terms</textarea>
             </div>
         </div>
 
-        <script src="${pageContext.request.contextPath}/pages/organizerPage/createEvent.js"></script>
+        <script src="${pageContext.request.contextPath}/pages/organizerPage/updateEvent.js"></script>
     </body>
 </html>

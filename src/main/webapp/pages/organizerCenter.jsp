@@ -1,10 +1,4 @@
-<%-- 
-    Document   : organizerCenter
-    Created on : Feb 28, 2025, 5:58:09 PM
-    Author     : Tang Thanh Vui - CE180901
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -27,6 +21,12 @@
                         <i class="fas fa-ticket-alt mr-2"></i>My Event
                     </a>
                 </nav>
+                <div class="absolute bottom-4 left-4">
+                    <button class="flex items-center text-white">
+                        <img alt="Language flag" class="mr-2" height="20" src="https://storage.googleapis.com/a1aa/image/FttG3v8LrPhRWO3yto2jIur9Qa2Eh8dCq64-tXdRGak.jpg" width="20"/>
+                        Eng
+                    </button>
+                </div>
             </aside>
             <!-- Main Content -->
             <main class="flex-1 flex flex-col">
@@ -108,20 +108,20 @@
                                         <i class="fas fa-chart-pie text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Overview</span>
                                     </button>
-                                    <button type="button" onclick="location.href = 'viewAllOrders.jsp'" 
+                                    <button type="button" onclick="location.href = 'viewdetail.jsp'" 
                                             class="group flex items-center justify-center bg-transparent p-3 rounded-lg transition duration-200 cursor-pointer hover:bg-gray-700">
                                         <i class="fas fa-list text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Orders</span>
                                     </button>
-                                    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/pages/seatSelectionPage/seatSelection.jsp'" 
+                                    <button type="button" onclick="location.href = 'viewdetail.jsp'" 
                                             class="group flex items-center justify-center bg-transparent p-3 rounded-lg transition duration-200 cursor-pointer hover:bg-gray-700">
                                         <i class="fas fa-chair text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Seating Chart</span>
                                     </button>
-                                    <button type="button" onclick="location.href = 'updateEvent.jsp'" 
+                                    <button type="button" onclick="location.href = 'viewdetail.jsp'" 
                                             class="group flex items-center justify-center bg-transparent p-3 rounded-lg transition duration-200 cursor-pointer hover:bg-gray-700">
                                         <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Update</span>
+                                        <span class="text-gray-400 group-hover:text-white">Edit</span>
                                     </button>
                                 </div>
                             </div>
