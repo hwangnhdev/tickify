@@ -1,37 +1,36 @@
 package controllers;
 
-import dals.TicketDAO;
-import models.Ticket;
+import dals.OrderDAO;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import models.TicketDetailDTO;
 import java.io.IOException;
 
-@WebServlet(name = "TicketDetailController", urlPatterns = {"/viewticketdetail"})
+@WebServlet(name = "TicketDetailController", urlPatterns = {"/viewTicketDetail"})
 public class TicketDetailController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String ticketIdParam = request.getParameter("ticketId");
-        int ticketId = 0;
-        try {
-            ticketId = Integer.parseInt(ticketIdParam);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
+        // Lấy ticketCode từ request (giả sử truyền qua URL)
+        String ticketCode = request.getParameter("ticketCode");
+        // Giả sử customerId được lấy từ session (hoặc request parameter) - ví dụ: 1
+        int customerId = 2; // Thay thế bằng logic lấy customerId từ session nếu cần
         
-        TicketDAO ticketDAO = new TicketDAO();
-        Ticket ticket = ticketDAO.getTicketById(ticketId);
+        OrderDAO orderDAO = new OrderDAO();
+        TicketDetailDTO ticketDetail = orderDAO.getTicketDetail(ticketCode, customerId);
         
-        if (ticket == null) {
-            request.setAttribute("message", "Không tìm thấy vé!");
+        if(ticketDetail == null) {
+            request.setAttribute("errorMessage", "Không tìm thấy chi tiết vé!");
         } else {
-            request.setAttribute("ticket", ticket);
+            request.setAttribute("ticketDetail", ticketDetail);
         }
-        request.getRequestDispatcher("/pages/ticket/ticketDetail.jsp").forward(request, response);
+        RequestDispatcher rd = request.getRequestDispatcher("/pages/ticketPage/ticketDetail.jsp");
+        rd.forward(request, response);
     }
 
     @Override

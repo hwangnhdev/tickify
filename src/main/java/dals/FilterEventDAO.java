@@ -32,7 +32,7 @@ public class FilterEventDAO extends DBContext {
                 + "FROM Events e "
                 + "LEFT JOIN TicketTypes t ON e.event_id = t.event_id "
                 + "LEFT JOIN EventImages ei ON ei.event_id = e.event_id "
-                + "WHERE 1 = 1 AND ei.image_title LIKE '%logo_banner%' ");
+                + "WHERE 1 = 1 AND ei.image_title LIKE '%banner%' ");
 
         // List to store query parameters
         List<Object> parameters = new ArrayList<>();

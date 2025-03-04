@@ -9,7 +9,6 @@ package models;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class Seat {
-
     private int seatId;
     private int eventId;
     private String seatRow;
@@ -22,12 +21,6 @@ public class Seat {
     public Seat(int seatId, int eventId, String seatRow, String seatNumber, String status) {
         this.seatId = seatId;
         this.eventId = eventId;
-        this.seatRow = seatRow;
-        this.seatNumber = seatNumber;
-        this.status = status;
-    }
-
-    public Seat(String seatRow, String seatNumber, String status) {
         this.seatRow = seatRow;
         this.seatNumber = seatNumber;
         this.status = status;
@@ -72,5 +65,6 @@ public class Seat {
     public void setStatus(String status) {
         this.status = status;
     }
-
+    
+    
 }

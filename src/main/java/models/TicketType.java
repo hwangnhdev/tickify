@@ -36,14 +36,7 @@ public class TicketType {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
-    public TicketType(String name, String description, double price, int totalQuantity) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.totalQuantity = totalQuantity;
-    }
-
+//
     public int getTicketTypeId() {
         return ticketTypeId;
     }

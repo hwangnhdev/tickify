@@ -151,8 +151,6 @@ public class CategoryDAO extends DBContext {
             System.out.println("Error fetching: " + e.getMessage());
         }
     }
-    
-    
 
     public static void main(String[] args) {
         /*getCategoryByName*/
