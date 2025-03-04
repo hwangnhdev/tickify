@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -14,19 +15,23 @@ public class Organizer {
 
     private int organizerId;
     private int customerId;
-    private int eventId;
     private String organizationName;
-    private Date createdAt;
-    private Date updatedAt;
+    private String accountHolder;
+    private String accountNumber;
+    private String bankName;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Organizer() {
     }
 
-    public Organizer(int organizerId, int customerId, int eventId, String organizationName, Date createdAt, Date updatedAt) {
+    public Organizer(int organizerId, int customerId, String organizationName, String accountHolder, String accountNumber, String bankName, Timestamp createdAt, Timestamp updatedAt) {
         this.organizerId = organizerId;
         this.customerId = customerId;
-        this.eventId = eventId;
         this.organizationName = organizationName;
+        this.accountHolder = accountHolder;
+        this.accountNumber = accountNumber;
+        this.bankName = bankName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -47,14 +52,6 @@ public class Organizer {
         this.customerId = customerId;
     }
 
-    public int getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
-    }
-
     public String getOrganizationName() {
         return organizationName;
     }
@@ -63,19 +60,43 @@ public class Organizer {
         this.organizationName = organizationName;
     }
 
-    public Date getCreatedAt() {
+    public String getAccountHolder() {
+        return accountHolder;
+    }
+
+    public void setAccountHolder(String accountHolder) {
+        this.accountHolder = accountHolder;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

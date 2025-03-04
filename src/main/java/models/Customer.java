@@ -19,9 +19,6 @@ public class Customer {
     private String phone;
     private String profilePicture;
     private Boolean status;
-    private Date dob;
-    private String gender;
-    private String password;
 
     public Customer() {
     }
@@ -34,20 +31,6 @@ public class Customer {
         this.phone = phone;
         this.profilePicture = profilePicture;
         this.status = status;
-    }
-
-    /*Create for change password and change profile*/
-    public Customer(int customerId, String fullName, String email, String address, String phone, String profilePicture, Boolean status, Date dob, String gender, String password) {
-        this.customerId = customerId;
-        this.fullName = fullName;
-        this.email = email;
-        this.address = address;
-        this.phone = phone;
-        this.profilePicture = profilePicture;
-        this.status = status;
-        this.dob = dob;
-        this.gender = gender;
-        this.password = password;
     }
 
     public int getCustomerId() {
@@ -104,43 +87,6 @@ public class Customer {
 
     public void setStatus(Boolean status) {
         this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "Customer{"
-                + "customerId=" + customerId
-                + ", fullName='" + fullName + '\''
-                + ", email='" + email + '\''
-                + ", address='" + address + '\''
-                + ", phone='" + phone + '\''
-                + ", profilePicture='" + profilePicture + '\''
-                + ", status=" + status
-                + '}';
-    }
-
-    public Date getDob() {
-        return dob;
-    }
-
-    public void setDob(Date dob) {
-        this.dob = dob;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
 }

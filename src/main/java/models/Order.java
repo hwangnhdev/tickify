@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -19,13 +20,13 @@ public class Order {
     private Date orderDate;
     private String paymentStatus;
     private String transactionId;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Order() {
     }
 
-    public Order(int orderId, int customerId, int voucherId, double totalPrice, Date orderDate, String paymentStatus, String transactionId, Date createdAt, Date updatedAt) {
+    public Order(int orderId, int customerId, int voucherId, double totalPrice, Date orderDate, String paymentStatus, String transactionId, Timestamp createdAt, Timestamp updatedAt) {
         this.orderId = orderId;
         this.customerId = customerId;
         this.voucherId = voucherId;
@@ -93,19 +94,19 @@ public class Order {
         this.transactionId = transactionId;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

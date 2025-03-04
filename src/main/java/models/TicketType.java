@@ -4,7 +4,7 @@
  */
 package models;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -13,35 +13,30 @@ import java.sql.Date;
 public class TicketType {
 
     private int ticketTypeId;
-    private int eventId;
+    private int showtimeId;
     private String name;
     private String description;
     private double price;
+    private String color;
     private int totalQuantity;
     private int soldQuantity;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public TicketType() {
     }
 
-    public TicketType(int ticketTypeId, int eventId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+    public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Timestamp createdAt, Timestamp updatedAt) {
         this.ticketTypeId = ticketTypeId;
-        this.eventId = eventId;
+        this.showtimeId = showtimeId;
         this.name = name;
         this.description = description;
         this.price = price;
+        this.color = color;
         this.totalQuantity = totalQuantity;
         this.soldQuantity = soldQuantity;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public TicketType(String name, String description, double price, int totalQuantity) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.totalQuantity = totalQuantity;
     }
 
     public int getTicketTypeId() {
@@ -52,12 +47,12 @@ public class TicketType {
         this.ticketTypeId = ticketTypeId;
     }
 
-    public int getEventId() {
-        return eventId;
+    public int getShowtimeId() {
+        return showtimeId;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    public void setShowtimeId(int showtimeId) {
+        this.showtimeId = showtimeId;
     }
 
     public String getName() {
@@ -84,6 +79,14 @@ public class TicketType {
         this.price = price;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     public int getTotalQuantity() {
         return totalQuantity;
     }
@@ -100,19 +103,19 @@ public class TicketType {
         this.soldQuantity = soldQuantity;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 

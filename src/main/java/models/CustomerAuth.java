@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -14,31 +15,23 @@ public class CustomerAuth {
 
     private int customerAuthId;
     private int customerId;
-    private String password;
     private String authProvider;
+    private String password;
     private String providerId;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public CustomerAuth() {
     }
 
-    public CustomerAuth(int customerAuthId, int customerId, String password, String authProvider, String providerId, Date createdAt, Date updatedAt) {
+    public CustomerAuth(int customerAuthId, int customerId, String authProvider, String password, String providerId, Timestamp createdAt, Timestamp updatedAt) {
         this.customerAuthId = customerAuthId;
         this.customerId = customerId;
-        this.password = password;
         this.authProvider = authProvider;
+        this.password = password;
         this.providerId = providerId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-    
-    public CustomerAuth(int customerAuthId, int customerId, String password, String authProvider, String providerId) {
-        this.customerAuthId = customerAuthId;
-        this.customerId = customerId;
-        this.password = password;
-        this.authProvider = authProvider;
-        this.providerId = providerId;
     }
 
     public int getCustomerAuthId() {
@@ -57,20 +50,20 @@ public class CustomerAuth {
         this.customerId = customerId;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getAuthProvider() {
         return authProvider;
     }
 
     public void setAuthProvider(String authProvider) {
         this.authProvider = authProvider;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getProviderId() {
@@ -81,31 +74,25 @@ public class CustomerAuth {
         this.providerId = providerId;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 
     @Override
     public String toString() {
-        return "CustomerAuth{"
-                + "customerId=" + customerId
-                + ", password='" + password + '\''
-                + ", authProvider='" + authProvider + '\''
-                + ", providerId='" + providerId + '\''
-                + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt
-                + '}';
+        return "CustomerAuth{" + "customerAuthId=" + customerAuthId + ", customerId=" + customerId + ", authProvider=" + authProvider + ", password=" + password + ", providerId=" + providerId + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
+
 }

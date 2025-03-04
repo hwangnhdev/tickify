@@ -66,18 +66,20 @@ public class EventImageDAO extends DBContext {
     public static void main(String[] args) {
         /*getAllImageEvents*/
 //        EventImageDAO ld = new EventImageDAO();
-//        List<EventImages> list = ld.getAllImageEvents();
+//        List<EventImage> list = ld.getAllImageEvents();
 //        for (EventImage event : list) {
 //            System.out.println(event.getEventId());
 //            System.out.println(event.getImageUrl());
+//            System.out.println(event.getImage_title());
 //        }
 
         /*getImagesByEventId*/
 //        EventImageDAO ld = new EventImageDAO();
-//        List<EventImage> list = ld.getImagesByEventId(1);
+//        List<EventImage> list = ld.getImagesByEventId(574);
 //        for (EventImage event : list) {
 //            System.out.println(event.getEventId());
 //            System.out.println(event.getImageUrl());
+//            System.out.println(event.getImage_title());
 //        }
     }
 }

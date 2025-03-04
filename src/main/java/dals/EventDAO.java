@@ -1,24 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dals;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.sql.Date;
 import java.util.List;
 import models.Category;
-import models.EventImage;
 import models.Event;
+import models.EventImage;
+import models.Organizer;
 import models.Seat;
+import models.ShowTime;
 import models.TicketType;
 import utils.DBContext;
 
@@ -28,671 +25,696 @@ import utils.DBContext;
  */
 public class EventDAO extends DBContext {
 
-    /*getEventsByPage*/
-    public List<Event> getEventsByPage(int page, int pageSize) {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "WITH EventPagination AS (\n"
-                + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.*\n"
-                + "    FROM Events e\n"
-                + "),\n"
-                + "EventImagesFiltered AS (\n"
-                + "    SELECT ei.event_id, MIN(ei.image_url) AS image_url, MIN(ei.image_title) AS image_title\n"
-                + "    FROM EventImages ei\n"
-                + "    WHERE ei.image_title LIKE '%banner%'\n"
-                + "    GROUP BY ei.event_id\n"
-                + ")\n"
-                + "SELECT ep.*, eif.image_url, eif.image_title\n"
-                + "FROM EventPagination ep\n"
-                + "LEFT JOIN EventImagesFiltered eif \n"
-                + "ON ep.event_id = eif.event_id\n"
-                + "WHERE ep.rownum BETWEEN ? AND ?;";
+    // Phương thức để cập nhật sự kiện bằng stored procedure [dbo].[UpdateEventByID]
+    public boolean updateEventByID(
+            int eventId,
+            int customerId,
+            String organizationName,
+            String accountHolder,
+            String accountNumber,
+            String bankName,
+            int categoryId,
+            String eventName,
+            String location,
+            String eventType,
+            String description,
+            String status,
+            String eventLogoUrl,
+            String backgroundImageUrl,
+            String organizerImageUrl,
+            List<ShowTime> showTimes,
+            List<TicketType> ticketTypes,
+            List<Seat> seats) {
 
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            int start = (page - 1) * pageSize + 1;
-            int end = page * pageSize;
-            st.setInt(1, start);
-            st.setInt(2, end);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("event_name"),
-                        rs.getString("image_url"), // Lấy ảnh (có thể null)
-                        rs.getString("image_title") // Lấy image_title (có thể null)
-                );
-                listEvents.add(event);
+        // Khởi tạo Gson với định dạng ngày giờ khớp với SQL Server DATETIME (yyyy-MM-dd HH:mm:ss)
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                .create();
+
+        // Chuẩn bị JSON cho ShowTimes, TicketTypes và Seats
+        String showTimesJson = prepareShowTimesJson(showTimes, gson);
+        String ticketTypesJson = prepareTicketTypesJson(ticketTypes, showTimes, gson);
+        String seatsJson = (seats != null && !seats.isEmpty()) ? prepareSeatsJson(seats, gson) : null;
+
+        String sql = "{CALL [dbo].[UpdateEventByID](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+
+        try ( CallableStatement stmt = connection.prepareCall(sql)) {
+            // Thiết lập các tham số đầu vào khớp với stored procedure
+            stmt.setInt(1, eventId);
+            stmt.setInt(2, customerId);
+            stmt.setString(3, organizationName);
+            stmt.setString(4, accountHolder);
+            stmt.setString(5, accountNumber);
+            stmt.setString(6, bankName);
+            stmt.setInt(7, categoryId);
+            stmt.setString(8, eventName);
+            stmt.setString(9, location);
+            stmt.setString(10, eventType);
+            stmt.setString(11, description);
+            stmt.setString(12, status);
+            stmt.setString(13, eventLogoUrl);
+            stmt.setString(14, backgroundImageUrl);
+            stmt.setString(15, organizerImageUrl);
+            stmt.setString(16, showTimesJson);
+            stmt.setString(17, ticketTypesJson);
+            if (seatsJson != null) {
+                stmt.setString(18, seatsJson);
+            } else {
+                stmt.setNull(18, Types.NVARCHAR);
             }
+
+            // Thực thi stored procedure
+            stmt.execute();
+
+            // Nếu thực thi thành công, trả về true
+            return true;
+
         } catch (SQLException e) {
-            System.out.println("Error fetching paginated events: " + e.getMessage());
+            System.err.println("Lỗi khi cập nhật sự kiện: " + e.getMessage());
+            e.printStackTrace(); // In stack trace để debug
+            return false;
         }
-        return listEvents;
     }
 
-    /*getTotalEvents*/
-    public int getTotalEvents() {
-        String sql = "SELECT COUNT(DISTINCT e.event_id) \n"
-                + "FROM Events e\n"
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%';";
+    // Method to create an event using the stored procedure [dbo].[CreateEvent]
+    public EventCreationResult createEvent(
+            int customerId,
+            String organizationName,
+            String accountHolder,
+            String accountNumber,
+            String bankName,
+            int categoryId,
+            String eventName,
+            String location,
+            String eventType,
+            String description,
+            String status,
+            String eventLogoUrl,
+            String backgroundImageUrl,
+            String organizerImageUrl,
+            List<ShowTime> showTimes,
+            List<TicketType> ticketTypes,
+            List<Seat> seats) {
 
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
+        // Initialize Gson with custom date format matching SQL Server DATETIME (yyyy-MM-dd HH:mm:ss)
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                .create();
+
+        // Prepare JSON for ShowTimes, TicketTypes, and Seats
+        String showTimesJson = prepareShowTimesJson(showTimes, gson);
+        String ticketTypesJson = prepareTicketTypesJson(ticketTypes, showTimes, gson);
+        String seatsJson = (seats != null && !seats.isEmpty()) ? prepareSeatsJson(seats, gson) : null; // Removed ticketTypes parameter since ticketTypeName is now in Seat
+
+        String sql = "{CALL [dbo].[CreateEvent](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+        EventCreationResult result = new EventCreationResult();
+
+        try ( CallableStatement stmt = connection.prepareCall(sql)) {
+            // Set input parameters (match stored procedure parameters)
+            stmt.setInt(1, customerId);
+            stmt.setString(2, organizationName);
+            stmt.setString(3, accountHolder);
+            stmt.setString(4, accountNumber);
+            stmt.setString(5, bankName);
+            stmt.setInt(6, categoryId);
+            stmt.setString(7, eventName);
+            stmt.setString(8, location);
+            stmt.setString(9, eventType);
+            stmt.setString(10, description);
+            stmt.setString(11, status);
+            stmt.setString(12, eventLogoUrl);
+            stmt.setString(13, backgroundImageUrl);
+            stmt.setString(14, organizerImageUrl);
+            stmt.setString(15, showTimesJson);
+            stmt.setString(16, ticketTypesJson);
+            if (seatsJson != null) {
+                stmt.setString(17, seatsJson);
+            } else {
+                stmt.setNull(17, Types.NVARCHAR);
             }
+
+            // Register output parameters
+            stmt.registerOutParameter(18, Types.INTEGER); // @EventId
+            stmt.registerOutParameter(19, Types.INTEGER); // @OrganizerId
+
+            // Execute the stored procedure and log for debugging
+            System.out.println("Executing stored procedure with ShowTimes JSON: " + showTimesJson);
+            System.out.println("Executing stored procedure with TicketTypes JSON: " + ticketTypesJson);
+            System.out.println("Executing stored procedure with Seats JSON: " + seatsJson);
+            stmt.execute();
+
+            // Retrieve output parameters
+            result.eventId = stmt.getInt(18);
+            result.organizerId = stmt.getInt(19);
+
+            // Check if the creation was successful
+            if (result.eventId == -1 || result.organizerId == -1) {
+                throw new SQLException("Failed to create event. EventId or OrganizerId returned -1. Check SQL Server logs for details.");
+            }
+
         } catch (SQLException e) {
-            System.out.println("Error counting events: " + e.getMessage());
+            System.err.println("Error creating event: " + e.getMessage());
+            e.printStackTrace(); // Log full stack trace for debugging
+            result.eventId = -1;
+            result.organizerId = -1;
         }
-        return 0;
+
+        return result;
     }
 
-    /*getAllEvents*/
-    public List<Event> getAllEvents() {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "SELECT * FROM Events";
-
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getInt("category_id"),
-                        rs.getString("event_name"),
-                        rs.getString("location"),
-                        rs.getString("event_type"),
-                        rs.getString("status"),
-                        rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
-                );
-                listEvents.add(event);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching events: " + e.getMessage());
+    // Helper method to prepare ShowTimes JSON
+    private String prepareShowTimesJson(List<ShowTime> showTimes, Gson gson) {
+        if (showTimes == null || showTimes.isEmpty()) {
+            throw new IllegalArgumentException("ShowTimes list cannot be null or empty");
         }
-        return listEvents;
+
+        List<Object> showTimesList = new ArrayList<>();
+        for (ShowTime st : showTimes) {
+            if (st.getStartDate() == null || st.getEndDate() == null) {
+                throw new IllegalArgumentException("StartDate and EndDate in ShowTimes cannot be null");
+            }
+            showTimesList.add(new ShowTimeJson(
+                    st.getStartDate(),
+                    st.getEndDate(),
+                    st.getStatus() != null ? st.getStatus() : "Scheduled"
+            ));
+        }
+        return gson.toJson(showTimesList);
     }
 
-    /*getTop10LatestEvents*/
-    public List<Event> getTop10LatestEvents() {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "SELECT TOP 10 "
-                + "e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
-                + "e.status, e.description, e.start_date, e.end_date, e.created_at, e.updated_at, "
-                + "ei.image_url, ei.image_title "
-                + "FROM Events e "
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_event%' "
-                + "ORDER BY e.created_at DESC";
-
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("event_name"),
-                        rs.getString("image_url"),
-                        rs.getString("image_title")
-                );
-                listEvents.add(event);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching events: " + e.getMessage());
+    // Helper method to prepare TicketTypes JSON
+    private String prepareTicketTypesJson(List<TicketType> ticketTypes, List<ShowTime> showTimes, Gson gson) {
+        if (ticketTypes == null || ticketTypes.isEmpty()) {
+            throw new IllegalArgumentException("TicketTypes list cannot be null or empty");
         }
-        return listEvents;
+        if (showTimes == null || showTimes.isEmpty()) {
+            throw new IllegalArgumentException("ShowTimes list cannot be null or empty for TicketTypes mapping");
+        }
+
+        List<Object> ticketTypesList = new ArrayList<>();
+        int showTimeIndex = 0;
+
+        for (TicketType tt : ticketTypes) {
+            if (tt.getName() == null || tt.getTotalQuantity() <= 0) {
+                throw new IllegalArgumentException("Ticket name and totalQuantity are required for each ticket type");
+            }
+
+            if (showTimeIndex < showTimes.size()) {
+                ShowTime matchingShowTime = showTimes.get(showTimeIndex);
+                ticketTypesList.add(new TicketTypeJson(
+                        matchingShowTime.getStartDate(),
+                        matchingShowTime.getEndDate(),
+                        tt.getName(),
+                        tt.getDescription() != null ? tt.getDescription() : "",
+                        tt.getPrice(),
+                        tt.getColor() != null ? tt.getColor() : "#000000",
+                        tt.getTotalQuantity()
+                ));
+                showTimeIndex++;
+                if (showTimeIndex >= showTimes.size()) {
+                    showTimeIndex = 0; // Reset index to reuse ShowTimes if more ticket types than show times
+                }
+            } else {
+                throw new IllegalArgumentException("Insufficient ShowTimes for mapping TicketTypes");
+            }
+        }
+        return gson.toJson(ticketTypesList);
     }
 
-    /*getUpcomingEvents*/
-    public List<Event> getUpcomingEvents() {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "SELECT TOP 10 "
-                + "e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
-                + "e.status, e.description, e.start_date, e.end_date, e.created_at, e.updated_at, "
-                + "ei.image_url, ei.image_title "
-                + "FROM Events e "
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
-                + "WHERE e.start_date >= GETDATE() "
-                + "ORDER BY e.start_date ASC";
-
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("event_name"),
-                        rs.getString("image_url"),
-                        rs.getString("image_title")
-                );
-                listEvents.add(event);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching upcoming events: " + e.getMessage());
+    // Helper method to prepare Seats JSON
+    private String prepareSeatsJson(List<Seat> seats, Gson gson) {
+        if (seats == null || seats.isEmpty()) {
+            return null; // Return null for empty or null seats (handled by stored procedure)
         }
-        return listEvents;
+
+        List<Object> seatsList = new ArrayList<>();
+        for (Seat seat : seats) {
+            if (seat.getTicketTypeName() == null || seat.getSeatRow() == null) {
+                throw new IllegalArgumentException("ticketTypeName and seatRow are required for each seat");
+            }
+            seatsList.add(new SeatJson(
+                    seat.getTicketTypeName(),
+                    seat.getSeatRow(),
+                    seat.getSeatCol() // Lấy seatCol từ model Seat
+            ));
+        }
+        return gson.toJson(seatsList);
     }
 
-    /*getTopPicksForYou*/
-    public List<Event> getTopPicksForYou(int customerId) {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "WITH AvgPrice AS ( "
-                + "    SELECT AVG(tt.price) AS userBudget "
-                + "    FROM Orders o "
-                + "    JOIN OrderDetails od ON o.order_id = od.order_id "
-                + "    JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-                + "    WHERE o.customer_id = ? "
-                + "), "
-                + "SuggestedPrice AS ( "
-                + "    SELECT TOP 10 tt.price AS defaultBudget "
-                + "    FROM TicketTypes tt "
-                + "    JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id "
-                + "    GROUP BY tt.price "
-                + "    ORDER BY COUNT(*) DESC "
-                + "), "
-                + "UserBudget AS ( "
-                + "    SELECT COALESCE((SELECT userBudget FROM AvgPrice), "
-                + "                    (SELECT defaultBudget FROM SuggestedPrice), "
-                + "                    100.00) AS budget "
-                + ") "
-                + "SELECT DISTINCT TOP 10 "
-                + "    e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
-                + "    e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
-                + "    MIN(tt.price) AS min_price, "
-                + "    ei.image_url, ei.image_title "
-                + "FROM Events e "
-                + "JOIN TicketTypes tt ON e.event_id = tt.event_id "
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' "
-                + "CROSS JOIN UserBudget "
-                + "WHERE tt.price <= UserBudget.budget "
-                + "GROUP BY e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
-                + "         e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
-                + "         ei.image_url, ei.image_title "
-                + "ORDER BY min_price DESC;";
+    // Inner class to hold the result of event creation
+    public static class EventCreationResult {
 
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, customerId);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("event_name"),
-                        rs.getString("image_url"),
-                        rs.getString("image_title")
-                );
-                listEvents.add(event);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching recommended events: " + e.getMessage());
+        public int eventId;
+        public int organizerId;
+
+        public EventCreationResult() {
+            this.eventId = -1;
+            this.organizerId = -1;
         }
-        return listEvents;
     }
 
-    /*getRecommendedEvents*/
-    public List<Event> getRecommendedEvents(int customerId) {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "WITH UserCategories AS ( "
-                + "    SELECT DISTINCT e.category_id "
-                + "    FROM Orders o "
-                + "    JOIN OrderDetails od ON o.order_id = od.order_id "
-                + "    JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-                + "    JOIN Events e ON tt.event_id = e.event_id "
-                + "    WHERE o.customer_id = ? "
-                + "), "
-                + "AllCategories AS ( "
-                + "    SELECT category_id FROM Categories "
-                + "), "
-                + "CategoriesToRecommend AS ( "
-                + "    SELECT category_id FROM UserCategories "
-                + "    UNION "
-                + "    SELECT category_id FROM AllCategories "
-                + "    WHERE NOT EXISTS (SELECT 1 FROM UserCategories) "
-                + ") "
-                + "SELECT TOP 10 "
-                + "    e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
-                + "    e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
-                + "    MIN(tt.price) AS min_price, "
-                + "    ei.image_url, ei.image_title "
-                + "FROM Events e "
-                + "JOIN TicketTypes tt ON e.event_id = tt.event_id "
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%' "
-                + "WHERE e.category_id IN (SELECT category_id FROM CategoriesToRecommend) "
-                + "GROUP BY e.event_id, e.category_id, e.event_name, e.location, e.event_type, "
-                + "         e.status, e.start_date, e.end_date, e.created_at, e.updated_at, "
-                + "         ei.image_url, ei.image_title "
-                + "ORDER BY min_price DESC;";
+    // Inner classes to match stored procedure JSON structure
+    private static class ShowTimeJson {
 
-        try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, customerId);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("event_name"),
-                        rs.getString("image_url"),
-                        rs.getString("image_title")
-                );
-                listEvents.add(event);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching recommended events: " + e.getMessage());
+        public Timestamp startDate;
+        public Timestamp endDate;
+        public String status;
+
+        public ShowTimeJson(Timestamp startDate, Timestamp endDate, String status) {
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.status = status;
         }
-        return listEvents;
     }
 
-    /*getTopEventsWithLimit*/
-    public List<Event> getTopEventsWithLimit() {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "SELECT TOP 10 \n"
-                + "    e.event_id, \n"
-                + "    e.event_name, \n"
-                + "    COALESCE(SUM(od.quantity), 0) AS total_tickets, \n"
-                + "    ei.image_url, \n"
-                + "    ei.image_title\n"
-                + "FROM Events e\n"
-                + "JOIN TicketTypes tt ON e.event_id = tt.event_id\n"
-                + "LEFT JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id\n"
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%'\n"
-                + "GROUP BY e.event_id, e.event_name, ei.image_url, ei.image_title\n"
-                + "ORDER BY total_tickets DESC;";
+    private static class TicketTypeJson {
 
-        try {
-            // Prepare SQL statement
-            PreparedStatement st = connection.prepareStatement(sql);
-            ResultSet rs = st.executeQuery();
+        public Timestamp showTimeStartDate;
+        public Timestamp showTimeEndDate;
+        public String name;
+        public String description;
+        public double price;
+        public String color;
+        public int totalQuantity;
 
-            // Fetch event data
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("event_name"),
-                        rs.getString("image_url"),
-                        rs.getString("image_title")
-                );
-                listEvents.add(event);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching top events: " + e.getMessage());
+        public TicketTypeJson(Timestamp showTimeStartDate, Timestamp showTimeEndDate, String name, String description, double price, String color, int totalQuantity) {
+            this.showTimeStartDate = showTimeStartDate;
+            this.showTimeEndDate = showTimeEndDate;
+            this.name = name;
+            this.description = description;
+            this.price = price;
+            this.color = color;
+            this.totalQuantity = totalQuantity;
         }
-        return listEvents;
     }
 
-    /*selectEventByID*/
-    public Event selectEventByID(int id) {
-        String sql = "SELECT * FROM Events\n"
+    private static class SeatJson {
+
+        public String ticketTypeName;
+        public String seatRow;
+        public String seatCol; // Thêm trường seatCol
+
+        public SeatJson(String ticketTypeName, String seatRow, String seatCol) {
+            this.ticketTypeName = ticketTypeName;
+            this.seatRow = seatRow;
+            this.seatCol = seatCol; // Khởi tạo seatCol
+        }
+    }
+
+    /**
+     * Retrieves the event details based on the provided event ID.
+     *
+     * @param eventId The ID of the event to retrieve.
+     * @return An Event object if found, otherwise null.
+     */
+    public Event getEventById(int eventId) {
+        String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
+                + "FROM Events "
                 + "WHERE event_id = ?";
-
-        try {
-            // Prepare SQL statement
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, id);
-            ResultSet rs = st.executeQuery();
-
-            // Fetch event data
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                Event event = new Event(
+                return new Event(
                         rs.getInt("event_id"),
                         rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
                         rs.getString("event_name"),
                         rs.getString("location"),
                         rs.getString("event_type"),
                         rs.getString("status"),
                         rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
                 );
-                return event;
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching top events: " + e.getMessage());
+            System.err.println("Error retrieving event: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
 
-    /*selectEventImagesByID*/
-    public EventImage selectEventImagesByID(int id) {
-        String sql = "SELECT * FROM EventImages\n"
-                + "WHERE event_id = ? AND image_title LIKE '%banner%';";
-
-        try {
-            // Prepare SQL statement
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, id);
-            ResultSet rs = st.executeQuery();
-
-            // Fetch event data
-            if (rs.next()) {
-                EventImage eventImage = new EventImage(
+    /**
+     * Retrieves the list of images associated with the specified event ID.
+     *
+     * @param eventId The ID of the event.
+     * @return A list of EventImage objects.
+     */
+    public List<EventImage> getEventImagesByEventId(int eventId) {
+        List<EventImage> images = new ArrayList<>();
+        String sql = "SELECT image_id, event_id, image_url, image_title "
+                + "FROM EventImages "
+                + "WHERE event_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                EventImage image = new EventImage(
                         rs.getInt("image_id"),
                         rs.getInt("event_id"),
                         rs.getString("image_url"),
                         rs.getString("image_title")
                 );
-                return eventImage;
+                images.add(image);
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching top events: " + e.getMessage());
+            System.err.println("Error retrieving event images: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return images;
+    }
+
+    /**
+     * Retrieves the organizer details for the specified event ID.
+     *
+     * @param eventId The ID of the event.
+     * @return An Organizer object if found, otherwise null.
+     */
+    public Organizer getOrganizerByEventId(int eventId) {
+        String sql = "SELECT o.organizer_id, o.customer_id, o.organization_name, o.account_holder, o.account_number, o.bank_name, o.created_at, o.updated_at "
+                + "FROM Events e "
+                + "INNER JOIN Organizers o ON e.organizer_id = o.organizer_id "
+                + "WHERE e.event_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Organizer(
+                        rs.getInt("organizer_id"),
+                        rs.getInt("customer_id"),
+                        rs.getString("organization_name"),
+                        rs.getString("account_holder"),
+                        rs.getString("account_number"),
+                        rs.getString("bank_name"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving organizer: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
 
-    /*selectEventCategoriesID*/
-    public Category selectEventCategoriesID(int id) {
-        String sql = "SELECT * FROM Categories\n"
-                + "INNER JOIN Events ON Categories.category_id = Events.category_id\n"
+    /**
+     * Retrieves the list of show times for the specified event ID.
+     *
+     * @param eventId The ID of the event.
+     * @return A list of ShowTime objects.
+     */
+    public List<ShowTime> getShowTimesByEventId(int eventId) {
+        List<ShowTime> showTimes = new ArrayList<>();
+        String sql = "SELECT showtime_id, event_id, start_date, end_date, status, created_at, updated_at "
+                + "FROM Showtimes "
                 + "WHERE event_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ShowTime showTime = new ShowTime(
+                        rs.getInt("showtime_id"),
+                        rs.getInt("event_id"),
+                        rs.getTimestamp("start_date"),
+                        rs.getTimestamp("end_date"),
+                        rs.getString("status"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                showTimes.add(showTime);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving show times: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return showTimes;
+    }
+
+    /**
+     * Retrieves the list of ticket types for the specified event ID.
+     *
+     * @param eventId The ID of the event.
+     * @return A list of TicketType objects.
+     */
+    public List<TicketType> getTicketTypesByEventId(int eventId) {
+        List<TicketType> ticketTypes = new ArrayList<>();
+        String sql = "SELECT tt.ticket_type_id, tt.showtime_id, tt.name, tt.description, tt.price, tt.color, tt.total_quantity, tt.sold_quantity, tt.created_at, tt.updated_at "
+                + "FROM Showtimes st "
+                + "INNER JOIN TicketTypes tt ON st.showtime_id = tt.showtime_id "
+                + "WHERE st.event_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                TicketType ticketType = new TicketType(
+                        rs.getInt("ticket_type_id"),
+                        rs.getInt("showtime_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getDouble("price"),
+                        rs.getString("color"),
+                        rs.getInt("total_quantity"),
+                        rs.getInt("sold_quantity"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                ticketTypes.add(ticketType);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving ticket types: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return ticketTypes;
+    }
+
+    /**
+     * Retrieves the list of seats for the specified event ID.
+     *
+     * @param eventId The ID of the event.
+     * @return A list of Seat objects.
+     */
+    public List<Seat> getSeatsByEventId(int eventId) {
+        List<Seat> seats = new ArrayList<>();
+        String sql = "SELECT s.seat_id, s.ticket_type_id, s.seat_row, s.seat_col, s.status "
+                + "FROM Seats s "
+                + "INNER JOIN TicketTypes tt ON s.ticket_type_id = tt.ticket_type_id "
+                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
+                + "WHERE st.event_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Seat seat = new Seat(
+                        rs.getInt("seat_id"),
+                        rs.getInt("ticket_type_id"),
+                        rs.getString("seat_row"),
+                        rs.getString("seat_col"),
+                        rs.getString("status")
+                );
+                seats.add(seat);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving seats: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return seats;
+    }
+
+    /*getCategoryByName*/
+    public Category getCategoryByEventID(int eventId) {
+        String sql = "SELECT Categories.category_id, Categories.category_name, Categories.description, Categories.created_at, Categories.updated_at\n"
+                + "FROM Categories \n"
+                + "INNER JOIN Events ON Categories.category_id = Events.category_id\n"
+                + "WHERE Events.event_id = ?";
 
         try {
-            // Prepare SQL statement
             PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, id);
+            st.setInt(1, eventId);
             ResultSet rs = st.executeQuery();
 
-            // Fetch event data
             if (rs.next()) {
-                Category eventCategories = new Category(
+                Category category = new Category(
                         rs.getInt("category_id"),
                         rs.getString("category_name"),
                         rs.getString("description"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
                 );
-                return eventCategories;
+                return category;
             }
+
         } catch (SQLException e) {
-            System.out.println("Error fetching top events: " + e.getMessage());
+            System.out.println("Error fetching: " + e.getMessage());
         }
+
         return null;
     }
 
-    /*searchEventsByQuery*/
-    public List<Event> searchEventsByQuery(String query) {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "SELECT * FROM Events\n"
-                + "WHERE event_name LIKE ?";
-
-        try {
-            // Prepare SQL statement
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setString(1, "%" + query + "%");
-            ResultSet rs = st.executeQuery();
-
-            // Fetch event data
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getInt("category_id"),
-                        rs.getString("event_name"),
-                        rs.getString("location"),
-                        rs.getString("event_type"),
-                        rs.getString("status"),
-                        rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
-                );
-                listEvents.add(event);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching top events: " + e.getMessage());
-        }
-        return listEvents;
-    }
-
-    /*getSoldTicketsStatistic*/
-    public List<Event> getSoldTicketsStatistic() {
-        List<Event> listEvents = new ArrayList<>();
-        String sql = "SELECT * FROM Events\n"
-                + "WHERE event_name LIKE ?";
-
-        try {
-            // Prepare SQL statement
-            PreparedStatement st = connection.prepareStatement(sql);
-            ResultSet rs = st.executeQuery();
-
-            // Fetch event data
-            while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getInt("category_id"),
-                        rs.getString("event_name"),
-                        rs.getString("location"),
-                        rs.getString("event_type"),
-                        rs.getString("status"),
-                        rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
-                        rs.getDate("created_at"),
-                        rs.getDate("updated_at")
-                );
-                listEvents.add(event);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching top events: " + e.getMessage());
-        }
-        return listEvents;
-    }
-
-    /*createEvent*/
-    public void createEvent(Event event, List<EventImage> images, int customerId, String organizationName,
-            List<TicketType> ticketTypes, List<Seat> seats) {
-        String sql = "{CALL InsertEventWithImages(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
-
-        try ( CallableStatement stmt = connection.prepareCall(sql)) {
-            // Set parameters for Events
-            stmt.setString(1, event.getEventName());
-            stmt.setString(2, event.getLocation());
-            stmt.setString(3, event.getEventType());
-            stmt.setString(4, event.getStatus());
-            stmt.setString(5, event.getDescription());
-            stmt.setTimestamp(6, new Timestamp(event.getStartDate().getTime())); // Giữ giờ
-            stmt.setTimestamp(7, new Timestamp(event.getEndDate().getTime()));   // Giữ giờ
-
-            // Set categoryId (nullable)
-            stmt.setInt(8, event.getCategoryId());
-
-            // Set Organizer parameters
-            stmt.setInt(9, customerId);
-            stmt.setString(10, organizationName);
-
-            // Convert images to JSON
-            Gson gson = new Gson();
-            String imagesJson = gson.toJson(images);
-            stmt.setNString(11, imagesJson);
-
-            // Convert ticket types to JSON
-            String ticketTypesJson = gson.toJson(ticketTypes);
-            stmt.setNString(12, ticketTypesJson);
-
-            // Convert seats to JSON (nullable)
-            String seatsJson = (seats != null && !seats.isEmpty()) ? gson.toJson(seats) : null;
-            stmt.setNString(13, seatsJson);
-
-            // Execute the stored procedure
-            stmt.execute();
-            System.out.println("Event created successfully with all related data.");
-        } catch (SQLException e) {
-            System.out.println("Error creating event: " + e.getMessage());
-            throw new RuntimeException("Failed to create event", e);
-        }
-    }
-
-    /*main*/
+    // Example main method to test createEvent
     public static void main(String[] args) {
-        /*createEvent*/
-        EventDAO eventDAO = new EventDAO();
 
-        // Create Event object
-        Event event = new Event(
-                0, // eventId will be auto-generated
-                2, // categoryId
-                "Festival 2025",
-                "Saigon",
-                "Cultural",
-                "Active",
-                "A vibrant festival",
-                new Date(Timestamp.valueOf(LocalDateTime.of(2025, 4, 1, 9, 0)).getTime()), // 2025-04-01 09:00:00
-                new Date(Timestamp.valueOf(LocalDateTime.of(2025, 4, 3, 18, 0)).getTime()), // 2025-04-03 18:00:00
-                null, // createdAt
-                null // updatedAt
-        );
-
-        // Create list of EventImage
-        List<EventImage> images = Arrays.asList(
-                new EventImage("https://res.cloudinary.com/dnvpphtov/image/upload/v1739624793/sbtebivpbkgr9indbdhy.jpg", "Music logo_banner"),
-                new EventImage("https://res.cloudinary.com/dnvpphtov/image/upload/v1739624800/k240hpwtibcpxwgeibay.jpg", "Music logo_event"),
-                new EventImage("https://res.cloudinary.com/dnvpphtov/image/upload/v1739624800/k240hpwtibcpxwgeibay.jpg", "Music logo_organizer")
-        );
-
-        // Organizer info
-        int customerId = 2;
-        String organizationName = "Vivid Corp";
-
-        // Create list of TicketType
-        List<TicketType> ticketTypes = Arrays.asList(
-                new TicketType("VIP", "VIP seating", 150.00, 50),
-                new TicketType("General", "General admission", 50.00, 200)
-        );
-
-        // Create list of Seat (optional)
-        List<Seat> seats = Arrays.asList(
-                new Seat("A", "1", "Available"),
-                new Seat("A", "2", "Available")
-        );
-        // Nếu không cần ghế, có thể truyền null: List<Seat> seats = null;
-
-        // Call createEvent method
-        eventDAO.createEvent(event, images, customerId, organizationName, ticketTypes, seats);
-
-        /*searchEventsByQuery*/
-//        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.searchEventsByQuery("Rock Festival");
-//        int count = 0;
-//        for (Event event : list) {
-//            System.out.println(event.getEventName());
-//            count++;
-//        }
-//        System.out.println(count);
-
-        /*selectEventByID*/
-//        EventDAO ld = new EventDAO();
-//        Event event = ld.selectEventByID(1);
-//        System.out.println(event.getEventName());
-
-        /*selectEventByID*/
-//        EventDAO ld = new EventDAO();
-//        EventImage event = ld.selectEventImagesByID(1);
-//        System.out.println(event.getImageId());
-
-        /*selectEventCategoriesID*/
-//        EventDAO ld = new EventDAO();
-//        Category event = ld.selectEventCategoriesID(1);
-//        System.out.println(event.getCategoryName());
-
-        /*getTopEventsWithLimit*/
-//        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getTopEventsWithLimit();
-//        for (Event event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getImageURL());
-//            System.out.println(event.getImageTitle());
-//        }
-
-        /*getTop10LatestEvents*/
-//        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getTop10LatestEvents();
-//        for (Event event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getImageURL());
-//        }
-
-        /*getUpcomingEvents*/
-//        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getUpcomingEvents();
-//        for (Event event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getImageURL());
-//            System.out.println(event.getImageTitle());
-//        }
-
-        /*getTopPicksForYou*/
-//        EventDAO ld = new EventDAO();
-//        List<Event> list = ld.getTopPicksForYou(3);
-//        for (Event event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getImageURL());
-//            System.out.println(event.getImageTitle());
-//        }
-
-        /*getRecommendedEvents*/
-//        EventDAO ld = new EventDAO();
-//        List<Event> list = ld.getRecommendedEvents(1);
-//        for (Event event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getImageURL());
-//            System.out.println(event.getImageTitle());
-//        }
-
-        /*getTotalEvents*/
-//        EventDAO ld = new EventDAO();
-//        int countEvents = ld.getTotalEvents();
-//        System.out.println(countEvents);
-//        EventDAO ld = new EventDAO();
-//        List<Events> list = ld.getAllEvents();
-//        for (Event event : list) {
-//            System.out.println(event.getEventName());
-//            System.out.println(event.getCategoryId());
-//        }
-
-        /*getTopEventsWithLimit*/
-        // Create instance of EventDAO
-//        EventDAO eventDAO = new EventDAO();
-//        // Test fetching top 10 best-selling events
-//        int limit = 10;
-//        List<Event> events = eventDAO.getTopEventsWithLimit();
-//        // Print results to check if the query works correctly
-//        System.out.println("===== Top " + limit + " Best-Selling Event =====");
-//        for (Event event : events) {
-//            System.out.println("Event ID: " + event.getEventId()
-//                    + " | Name: " + event.getEventName()
-//            );
-//            System.out.println(event.getImageURL());
-//        }
-//        // Check if the result contains the correct number of events
-//        if (events.size() == limit) {
-//            System.out.println("Test Passed: Retrieved " + limit + " events successfully.");
-//        } else {
-//            System.out.println("Test Failed: Expected " + limit + " events but got " + events.size());
-//        }
-
-        /*getEventsByPage*/
+        /*Create Event*/
 //        EventDAO eventDAO = new EventDAO();
 //
-//        // Kiểm tra với trang đầu tiên, mỗi trang 9 sự kiện
-//        int page = 1;
-//        int pageSize = 16;
+//        // Sample data for testing (matching stored procedure test data)
+//        int customerId = 8;
+//        String organizationName = "Huynh Le Cong Bien";
+//        String accountHolder = "John Doe";
+//        String accountNumber = "1234567890";
+//        String bankName = "Sample Bank";
+//        int categoryId = 1;
+//        String eventName = "Sample Concert";
+//        String location = "Hanoi, Vietnam";
+//        String eventType = "seatedevent";
+//        String description = "A sample concert event";
+//        String status = "Pending";
+//        String eventLogoUrl = "https://example.com/logo.png";
+//        String backgroundImageUrl = "https://example.com/background.png";
+//        String organizerImageUrl = "https://example.com/organizer.png";
 //
-//        int totalEvents = eventDAO.getTotalEvents();
-//        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+//        // Sample ShowTimes
+//        List<ShowTime> showTimes = new ArrayList<>();
+//        showTimes.add(new ShowTime(0, 0, Timestamp.valueOf("2025-03-01 14:00:00"), Timestamp.valueOf("2025-03-01 16:00:00"), "Scheduled", null, null));
+//        showTimes.add(new ShowTime(0, 0, Timestamp.valueOf("2025-04-01 14:00:00"), Timestamp.valueOf("2025-04-01 16:00:00"), "Scheduled", null, null));
 //
-//        System.out.println("Total Event: " + totalEvents);
-//        System.out.println("Total Pages: " + totalPages);
+//        // Sample TicketTypes
+//        List<TicketType> ticketTypes = new ArrayList<>();
+//        ticketTypes.add(new TicketType(0, 0, "VIP", "VIP seating", 150000, "#FF0000", 16, 0, null, null));
+//        ticketTypes.add(new TicketType(0, 0, "Normal", "Normal seating", 80000, "#00FF00", 30, 0, null, null));
+//        ticketTypes.add(new TicketType(0, 0, "VIP Vui", "VIP seating", 150000, "#FF0000", 16, 0, null, null));
+//        ticketTypes.add(new TicketType(0, 0, "Normal Vui", "Normal seating", 80000, "#00FF00", 16, 0, null, null));
 //
-//        for (int i = 1; i <= totalPages; i++) {
-//            List<Events> events = eventDAO.getEventsByPage(i, pageSize);
-//            System.out.println("===== Event on Page " + i + " =====");
-//            for (Event event : events) {
-//                System.out.println("Event ID: " + event.getEventId() + " | Name: " + event.getEventName());
-//                System.out.println("Event ID: " + event.getImageURL() + " | Name: " + event.getImageTitle());
+//        // Sample Seats with seatCol (reflecting actual seat quantities for each row)
+//        List<Seat> seats = new ArrayList<>();
+//        seats.add(new Seat(0, 0, "A", "10", "Available", "VIP")); // Row A with 10 seats for VIP
+//        seats.add(new Seat(0, 0, "B", "16", "Available", "VIP")); // Row B with 16 seats for VIP
+//        seats.add(new Seat(0, 0, "C", "15", "Available", "Normal")); // Row C with 15 seats for Normal
+//        seats.add(new Seat(0, 0, "D", "15", "Available", "Normal")); // Row D with 15 seats for Normal
+//        seats.add(new Seat(0, 0, "E", "16", "Available", "VIP Vui")); // Row E with 16 seats for VIP Vui
+//        seats.add(new Seat(0, 0, "F", "16", "Available", "Normal Vui")); // Row F with 16 seats for Normal Vui
+//
+//        // Call createEvent method
+//        EventCreationResult result = eventDAO.createEvent(
+//                customerId, organizationName, accountHolder, accountNumber, bankName,
+//                categoryId, eventName, location, eventType, description, status,
+//                eventLogoUrl, backgroundImageUrl, organizerImageUrl,
+//                showTimes, ticketTypes, seats
+//        );
+//
+//        // Print result
+//        System.out.println("Created Event ID: " + result.eventId);
+//        System.out.println("Organizer ID: " + result.organizerId);
+        /*Update Event*/
+//        EventDAO eventDAO = new EventDAO();
+//
+//        // Dữ liệu mẫu để cập nhật sự kiện với ID 574
+//        int eventId = 574;
+//        int customerId = 9;
+//        String organizationName = "Updated Tang Thanh Vui";
+//        String accountHolder = "Updated John Doe";
+//        String accountNumber = "0987654321";
+//        String bankName = "Updated Bank";
+//        int categoryId = 2;
+//        String eventName = "Updated Sample Concert";
+//        String location = "Ho Chi Minh City, Vietnam";
+//        String eventType = "seatedevent";
+//        String description = "An updated sample concert event";
+//        String status = "Pending";
+//        String eventLogoUrl = "https://example.com/updated_logo.png";
+//        String backgroundImageUrl = "https://example.com/updated_background.png";
+//        String organizerImageUrl = "https://example.com/updated_organizer.png";
+//
+//        // Dữ liệu ShowTimes mẫu
+//        List<ShowTime> showTimes = new ArrayList<>();
+//        showTimes.add(new ShowTime(0, 0, Timestamp.valueOf("2025-03-02 14:00:00"), Timestamp.valueOf("2025-03-02 16:00:00"), "Scheduled", null, null));
+//
+//        // Dữ liệu TicketTypes mẫu
+//        List<TicketType> ticketTypes = new ArrayList<>();
+//        ticketTypes.add(new TicketType(0, 0, "VIP Updated", "Updated VIP seating", 200000, "#FF0000", 10, 0, null, null));
+//
+//        // Dữ liệu Seats mẫu
+//        List<Seat> seats = new ArrayList<>();
+//        seats.add(new Seat(0, 0, "A", "1", "Available", "VIP Updated"));
+//
+//        // Gọi phương thức updateEventByID
+//        boolean success = eventDAO.updateEventByID(
+//                eventId, customerId, organizationName, accountHolder, accountNumber, bankName,
+//                categoryId, eventName, location, eventType, description, status,
+//                eventLogoUrl, backgroundImageUrl, organizerImageUrl,
+//                showTimes, ticketTypes, seats
+//        );
+//
+//        // In kết quả
+//        System.out.println("Update Successfully: " + success);
+
+        /*Test all method get by eventid*/
+//        // Tạo một instance của EventDAO
+//        EventDAO eventDAO = new EventDAO();
+//
+//        // Chọn một event ID có sẵn trong cơ sở dữ liệu để test
+//        int testEventId = 572; // Thay bằng một ID thực tế từ cơ sở dữ liệu của bạn
+//
+//        try {
+//            // 1. Kiểm tra getEventById
+//            Event event = eventDAO.getEventById(testEventId);
+//            System.out.println("Event Information:");
+//            if (event != null) {
+//                System.out.println(event);
+//            } else {
+//                System.out.println("Không tìm thấy sự kiện.");
 //            }
+//
+//            // 2. Kiểm tra getEventImagesByEventId
+//            List<EventImage> images = eventDAO.getEventImagesByEventId(testEventId);
+//            System.out.println("\nEventImages:");
+//            for (EventImage image : images) {
+//                System.out.println(image);
+//            }
+//
+//            // 3. Kiểm tra getOrganizerByEventId
+//            Organizer organizer = eventDAO.getOrganizerByEventId(testEventId);
+//            System.out.println("\nOrganizer:");
+//            if (organizer != null) {
+//                System.out.println(organizer);
+//            } else {
+//                System.out.println("Không tìm thấy người tổ chức.");
+//            }
+//
+//            // 4. Kiểm tra getShowTimesByEventId
+//            List<ShowTime> showTimes = eventDAO.getShowTimesByEventId(testEventId);
+//            System.out.println("\nShowtimes:");
+//            for (ShowTime showTime : showTimes) {
+//                System.out.println(showTime);
+//            }
+//
+//            // 5. Kiểm tra getTicketTypesByEventId
+//            List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(testEventId);
+//            System.out.println("\nTicketTypes:");
+//            for (TicketType ticketType : ticketTypes) {
+//                System.out.println(ticketType);
+//            }
+//
+//            // 6. Kiểm tra getSeatsByEventId
+//            List<Seat> seats = eventDAO.getSeatsByEventId(testEventId);
+//            System.out.println("\nSeats:");
+//            for (Seat seat : seats) {
+//                System.out.println(seat);
+//            }
+//
+//            // 3. Kiểm tra getOrganizerByEventId
+//            Category category = eventDAO.getCategoryByEventID(testEventId);
+//            System.out.println("\nCategory:");
+//            if (category != null) {
+//                System.out.println(category);
+//            } else {
+//                System.out.println("Không tìm thấy người tổ chức.");
+//            }
+//        } catch (Exception e) {
+//            // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra
+//            System.err.println("Đã xảy ra lỗi trong quá trình kiểm tra: " + e.getMessage());
+//            e.printStackTrace();
 //        }
     }
+
 }

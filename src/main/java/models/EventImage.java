@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package models;
 
 /**
@@ -54,12 +50,11 @@ public class EventImage {
         this.imageUrl = imageUrl;
     }
 
-    public String getImage_title() {
+    public String getImageTitle() { // Sửa từ getImage_title() thành getImageTitle()
         return imageTitle;
     }
 
-    public void setImage_title(String image_title) {
-        this.imageTitle = image_title;
+    public void setImageTitle(String imageTitle) { // Sửa từ setImage_title() thành setImageTitle()
+        this.imageTitle = imageTitle;
     }
-
 }

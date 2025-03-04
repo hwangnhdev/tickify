@@ -4,7 +4,7 @@
  */
 package models;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -14,40 +14,29 @@ public class Event {
 
     private int eventId;
     private int categoryId;
+    private int organizerId;
     private String eventName;
     private String location;
     private String eventType;
     private String status;
     private String description;
-    private Date startDate;
-    private Date endDate;
-    private Date createdAt;
-    private Date updatedAt;
-    private String imageURL;
-    private String imageTitle;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Event() {
     }
 
-    public Event(int eventId, int categoryId, String eventName, String location, String eventType, String status, String description, Date startDate, Date endDate, Date createdAt, Date updatedAt) {
+    public Event(int eventId, int categoryId, int organizerId, String eventName, String location, String eventType, String status, String description, Timestamp createdAt, Timestamp updatedAt) {
         this.eventId = eventId;
         this.categoryId = categoryId;
+        this.organizerId = organizerId;
         this.eventName = eventName;
         this.location = location;
         this.eventType = eventType;
         this.status = status;
         this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public Event(int eventId, String eventName, String imageURL, String imageTitle) {
-        this.eventId = eventId;
-        this.eventName = eventName;
-        this.imageURL = imageURL;
-        this.imageTitle = imageTitle;
     }
 
     public int getEventId() {
@@ -64,6 +53,14 @@ public class Event {
 
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public int getOrganizerId() {
+        return organizerId;
+    }
+
+    public void setOrganizerId(int organizerId) {
+        this.organizerId = organizerId;
     }
 
     public String getEventName() {
@@ -106,52 +103,20 @@ public class Event {
         this.description = description;
     }
 
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public String getImageURL() {
-        return imageURL;
-    }
-
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
-    }
-
-    public String getImageTitle() {
-        return imageTitle;
-    }
-
-    public void setImageTitle(String imageTitle) {
-        this.imageTitle = imageTitle;
     }
 
 }

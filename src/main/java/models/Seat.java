@@ -11,28 +11,33 @@ package models;
 public class Seat {
 
     private int seatId;
-    private int eventId;
+    private int ticketTypeId;
     private String seatRow;
-    private String seatNumber;
+    private String seatCol;
     private String status;
+    private String ticketTypeName; // Vui add to store json
 
     public Seat() {
     }
 
-    public Seat(int seatId, int eventId, String seatRow, String seatNumber, String status) {
+    public Seat(int seatId, int ticketTypeId, String seatRow, String seatCol, String status) {
         this.seatId = seatId;
-        this.eventId = eventId;
+        this.ticketTypeId = ticketTypeId;
         this.seatRow = seatRow;
-        this.seatNumber = seatNumber;
+        this.seatCol = seatCol;
         this.status = status;
     }
 
-    public Seat(String seatRow, String seatNumber, String status) {
+    // Vui add to store json
+    public Seat(int seatId, int ticketTypeId, String seatRow, String seatCol, String status, String ticketTypeName) {
+        this.seatId = seatId;
+        this.ticketTypeId = ticketTypeId;
         this.seatRow = seatRow;
-        this.seatNumber = seatNumber;
+        this.seatCol = seatCol;
         this.status = status;
+        this.ticketTypeName = ticketTypeName;
     }
-
+    
     public int getSeatId() {
         return seatId;
     }
@@ -41,12 +46,12 @@ public class Seat {
         this.seatId = seatId;
     }
 
-    public int getEventId() {
-        return eventId;
+    public int getTicketTypeId() {
+        return ticketTypeId;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    public void setTicketTypeId(int ticketTypeId) {
+        this.ticketTypeId = ticketTypeId;
     }
 
     public String getSeatRow() {
@@ -57,12 +62,12 @@ public class Seat {
         this.seatRow = seatRow;
     }
 
-    public String getSeatNumber() {
-        return seatNumber;
+    public String getSeatCol() {
+        return seatCol;
     }
 
-    public void setSeatNumber(String seatNumber) {
-        this.seatNumber = seatNumber;
+    public void setSeatCol(String seatCol) {
+        this.seatCol = seatCol;
     }
 
     public String getStatus() {
@@ -71,6 +76,15 @@ public class Seat {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getTicketTypeName() {
+        return ticketTypeName;
+    }
+
+    // Vui add to return json for controller
+    public void setTicketTypeName(String ticketTypeName) {
+        this.ticketTypeName = ticketTypeName;
     }
 
 }
