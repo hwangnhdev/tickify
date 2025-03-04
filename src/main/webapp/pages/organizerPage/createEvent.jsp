@@ -56,7 +56,6 @@
                 </header>
 
                 <!-- Tab Event Info -->
-                <!-- Tab Event Info -->
                 <section id="event-info" class="tab-content">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -168,7 +167,6 @@ Notes and VAT Terms</textarea>
                 </section>
 
                 <!-- Tab Time & Logistics -->
-                <!-- Tab Time & Logistics -->
                 <section id="time-logistics" class="tab-content hidden">
                     <div class="space-y-6">
                         <div>
@@ -247,7 +245,6 @@ Notes and VAT Terms</textarea>
                 </section>
 
                 <!-- Tab Payment Info -->
-                <!-- Tab Payment Info -->
                 <section id="payment-info" class="tab-content hidden">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -276,7 +273,6 @@ Notes and VAT Terms</textarea>
             </main>
         </div>
 
-        <!-- Modal -->
         <!-- Modal -->
         <div id="newTicketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
             <div class="bg-gray-800 rounded-lg w-full max-w-4xl p-6">

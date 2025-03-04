@@ -118,7 +118,7 @@
                                         <i class="fas fa-chair text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Seating Chart</span>
                                     </button>
-                                    <button type="button" onclick="location.href = 'updateEvent.jsp'" 
+                                    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/updateEvent'" 
                                             class="group flex items-center justify-center bg-transparent p-3 rounded-lg transition duration-200 cursor-pointer hover:bg-gray-700">
                                         <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Update</span>

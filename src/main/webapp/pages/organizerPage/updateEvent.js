@@ -1179,11 +1179,47 @@ function nextTab() {
 }
 
 // Load Banks
+// Load Banks
 async function loadBanks() {
-    const response = await fetch("https://api.vietqr.io/v2/banks");
-    const data = await response.json();
-    const bankSelect = document.getElementById("bank");
-    bankSelect.innerHTML = '<option value="">Bank Name</option>' + data.data.map(bank => `<option value="${bank.code}">${bank.shortName} - ${bank.name}</option>`).join('');
+    // Kiểm tra xem banks đã có trong session chưa
+    const banks = sessionStorage.getItem('banks');
+    if (banks) {
+        const bankData = JSON.parse(banks);
+        const bankSelect = document.getElementById("bank");
+        bankSelect.innerHTML = '<option value="">Bank Name</option>' +
+            bankData.map(bank => `<option value="${bank.code}">${bank.shortName} - ${bank.name}</option>`).join('');
+        selectDefaultBank(bankSelect); // Chọn giá trị mặc định sau khi load
+        return;
+    }
+
+    // Nếu không có, gọi API (dùng như một fallback)
+    try {
+        const response = await fetch("https://api.vietqr.io/v2/banks");
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        const bankSelect = document.getElementById("bank");
+        bankSelect.innerHTML = '<option value="">Bank Name</option>' +
+            data.data.map(bank => `<option value="${bank.code}">${bank.shortName} - ${bank.name}</option>`).join('');
+        sessionStorage.setItem('banks', JSON.stringify(data.data));
+        selectDefaultBank(bankSelect); // Chọn giá trị mặc định sau khi load
+    } catch (error) {
+        console.error("Error loading banks:", error);
+        alert("Failed to load bank list. Please try again later.");
+    }
+}
+
+// Hàm chọn giá trị mặc định cho Bank Name
+function selectDefaultBank(bankSelect) {
+    const organizerBankName = "${organizer.bankName}"; // Lấy từ JSP
+    if (organizerBankName) {
+        const options = bankSelect.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === organizerBankName) { // Kiểm tra khớp chính xác với bank.code
+                bankSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
 }
 
 // Update color value display
@@ -1223,13 +1259,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Load Provinces
 async function loadProvinces() {
+    // Kiểm tra xem provinces đã có trong session chưa
+    const provinces = sessionStorage.getItem('provinces');
+    if (provinces) {
+        const provinceData = JSON.parse(provinces);
+        const provinceSelect = document.getElementById("province");
+        provinceSelect.innerHTML = '<option value="">-- Select Province/City --</option>' +
+            provinceData.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
+        return;
+    }
+
+    // Nếu không có, gọi API và lưu vào sessionStorage
     const response = await fetch("https://provinces.open-api.vn/api/p/");
-    const provinces = await response.json();
+    const provincesData = await response.json();
+    sessionStorage.setItem('provinces', JSON.stringify(provincesData));
     const provinceSelect = document.getElementById("province");
     provinceSelect.innerHTML = '<option value="">-- Select Province/City --</option>' +
-        provinces.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
+        provincesData.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
 }
-
 // Load Districts based on selected Province
 async function updateDistricts() {
     const provinceSelect = document.getElementById("province");
@@ -1508,7 +1555,12 @@ async function submitEventForm() {
         return;
     }
 
-    // ... (giữ nguyên phần thu thập dữ liệu và gửi request)
+    // Get eventId from URL or session
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('eventId') || 577; // ID sự kiện cần cập nhật
+    const customerId = 9; // Thay bằng cách lấy customerId thực tế từ session hoặc context
+
+    // Thu thập dữ liệu từ form
     const eventName = document.querySelector('#event-info input[placeholder="Event Name"]')?.value.trim() || '';
     const eventCategory = document.querySelector('#event-info select')?.value || '';
     const province = document.getElementById('province')?.value || '';
@@ -1525,7 +1577,7 @@ async function submitEventForm() {
     const bankAccount = document.querySelector('input[name="bankAccount"]')?.value.trim() || '';
     const accountHolder = document.querySelector('input[name="accountHolder"]')?.value.trim() || '';
 
-    // Collect showTimes
+    // Collect showTimes, ticketTypes, seats (giữ nguyên logic này)
     const showTimes = [];
     const showTimeElements = document.querySelectorAll('.show-time');
     showTimeElements.forEach((showTime) => {
@@ -1540,9 +1592,8 @@ async function submitEventForm() {
         }
     });
 
-    // Collect ticketTypes with seat information
     const ticketTypes = [];
-    const seatAssignments = {}; // Để theo dõi ghế đã được gán cho ticket nào
+    const seatAssignments = {};
     showTimeElements.forEach((showTime) => {
         const showTimeId = showTime.querySelector('input[name="showStartDate"]')?.value || '';
         const showEndTime = showTime.querySelector('input[name="showEndDate"]')?.value || '';
@@ -1561,51 +1612,42 @@ async function submitEventForm() {
                     return { seatRow: row, seatCol: col };
                 });
 
-                // Validation: kiểm tra ghế trùng lặp trong cùng showtime
                 selectedSeats.forEach(seat => {
                     const rowKey = `${showTimeId}-${seat.seatRow}`;
                     if (seatAssignments[rowKey]) {
-                        console.error(`Row ${seat.seatRow} already assigned to ticket ${seatAssignments[rowKey]} in showtime ${showTimeId}`);
                         throw new Error(`Row ${seat.seatRow} cannot be assigned to multiple tickets in the same showtime.`);
                     }
                     seatAssignments[rowKey] = ticketName;
                 });
 
                 ticketTypes.push({
-                    showTimeStartDate: formatDateTime(showTimeId),
-                    showTimeEndDate: formatDateTime(showEndTime),
                     name: ticketName,
                     description: ticketDescription,
                     price: ticketPrice,
                     color: ticketColor,
-                    totalQuantity: ticketQuantity,
-                    seats: selectedSeats.length > 0 ? selectedSeats : null
+                    totalQuantity: ticketQuantity
                 });
             });
         }
     });
 
-    // Collect seats with ticketTypeName from all ticketTypes across all showtimes
     let seats = [];
     if (eventType === 'seatedevent') {
         const seatsByRow = calculateSeatSummary();
-        // Lặp qua từng showtime và ticket type để tạo danh sách ghế đầy đủ
-        showTimeElements.forEach((showTime, showTimeIndex) => {
-            const showTimeId = showTime.querySelector('input[name="showStartDate"]')?.value || '';
+        showTimeElements.forEach((showTime) => {
             const ticketElements = showTime.querySelectorAll('.saved-ticket');
             ticketElements.forEach((ticket) => {
                 const ticketName = ticket.querySelector('.ticket-label').getAttribute('data-ticket-name') || '';
                 const seatsText = ticket.querySelector('.ticket-details div:nth-child(5) span')?.textContent || '';
                 const selectedSeats = seatsText.split(', ').map(seat => {
                     const [row, col] = seat.split(' ');
-                    return row; // Chỉ lấy row (e.g., "A", "B") để kiểm tra
+                    return row;
                 });
 
-                // Gán ticketTypeName và seatCol cho mỗi row được chọn trong ticket type này
                 selectedSeats.forEach(row => {
                     if (seatsByRow[row]) {
                         seats.push({
-                            ticketTypeName: ticketName, // Sử dụng tên vé thực tế (e.g., "ggggggggggggggggggg")
+                            ticketTypeName: ticketName,
                             seatRow: row,
                             seatCol: seatsByRow[row].seatNum.toString()
                         });
@@ -1615,8 +1657,10 @@ async function submitEventForm() {
         });
     }
 
+    // Tạo dữ liệu gửi lên với eventId riêng biệt
     const eventData = {
-        customerId: 8,
+        eventId: eventId, // Thêm eventId để xác định sự kiện cần cập nhật
+        customerId: customerId,
         organizationName: organizerName,
         accountHolder: accountHolder,
         accountNumber: bankAccount,
@@ -1632,13 +1676,13 @@ async function submitEventForm() {
         organizerImageUrl: organizerLogo,
         showTimes: showTimes,
         ticketTypes: ticketTypes,
-        seats: seats.length > 0 ? seats : null // Gửi tất cả ghế với ticketTypeName từ ticketTypes cho tất cả showtimes
+        seats: seats.length > 0 ? seats : null
     };
 
     console.log("Final event data being sent:", JSON.stringify(eventData, null, 2));
 
     try {
-        const response = await fetch('createNewEvent', {
+        const response = await fetch('updateEvent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(eventData)
@@ -1647,14 +1691,14 @@ async function submitEventForm() {
         const result = await response.json();
         console.log("Server response:", result);
         if (result.success) {
-            alert('Event created successfully!');
-            window.location.href = result.redirectUrl || 'createNewEvent?success=true';
+            alert('Event updated successfully!');
+            window.location.href = result.redirectUrl || 'pages/organizerPage/organizerCenter.jsp';
         } else {
-            alert('Failed to create event: ' + (result.message || 'Unknown error.'));
+            alert('Failed to update event: ' + (result.message || 'Unknown error.'));
         }
     } catch (error) {
         console.error('Error submitting event:', error);
-        alert('An error occurred while submitting the form: ' + error.message);
+        alert('An error occurred while updating the event: ' + error.message);
     }
 }
 
