@@ -246,7 +246,7 @@ public class CreateNewEventController extends HttpServlet {
                 responseJson.addProperty("success", true);
                 responseJson.addProperty("eventId", result.eventId);
                 responseJson.addProperty("organizerId", result.organizerId);
-                responseJson.addProperty("redirectUrl", "createNewEvent");
+                responseJson.addProperty("redirectUrl", "pages/organizerPage/organizerCenter.jsp");
             } else {
                 responseJson.addProperty("success", false);
                 responseJson.addProperty("message", "Failed to create event");

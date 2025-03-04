@@ -20,7 +20,7 @@ public class DBContext {
         try {
             String url = "jdbc:sqlserver://localhost:1433;databaseName=Tickify_version_2;trustServerCertificate=true";
             String username = "sa";
-            String password = "admin";
+            String password = "123456";
 
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, username, password);

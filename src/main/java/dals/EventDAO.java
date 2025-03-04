@@ -496,13 +496,31 @@ public class EventDAO extends DBContext {
      */
     public List<Seat> getSeatsByEventId(int eventId) {
         List<Seat> seats = new ArrayList<>();
-        String sql = "SELECT s.seat_id, s.ticket_type_id, s.seat_row, s.seat_col, s.status "
-                + "FROM Seats s "
-                + "INNER JOIN TicketTypes tt ON s.ticket_type_id = tt.ticket_type_id "
-                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
-                + "WHERE st.event_id = ?";
+        String sql = "WITH MaxSeats AS (\n"
+                + "    SELECT \n"
+                + "        Seats.seat_row,\n"
+                + "        MAX(CAST(Seats.seat_col AS INT)) AS max_seat_col\n"
+                + "    FROM Seats\n"
+                + "    INNER JOIN TicketTypes ON Seats.ticket_type_id = TicketTypes.ticket_type_id\n"
+                + "    INNER JOIN Showtimes ON TicketTypes.showtime_id = Showtimes.showtime_id\n"
+                + "    WHERE Showtimes.event_id = ?\n"
+                + "    GROUP BY Seats.seat_row\n"
+                + ")\n"
+                + "SELECT \n"
+                + "    s.seat_id,\n"
+                + "    s.ticket_type_id,\n"
+                + "    s.seat_row,\n"
+                + "    s.seat_col,\n"
+                + "    s.status\n"
+                + "FROM Seats s\n"
+                + "INNER JOIN TicketTypes tt ON s.ticket_type_id = tt.ticket_type_id\n"
+                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
+                + "INNER JOIN MaxSeats ms ON s.seat_row = ms.seat_row AND CAST(s.seat_col AS INT) = ms.max_seat_col\n"
+                + "WHERE st.event_id = ?\n"
+                + "ORDER BY s.seat_row;";
         try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
+            stmt.setInt(2, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Seat seat = new Seat(
@@ -649,72 +667,72 @@ public class EventDAO extends DBContext {
 //        System.out.println("Update Successfully: " + success);
 
         /*Test all method get by eventid*/
-//        // Tạo một instance của EventDAO
-//        EventDAO eventDAO = new EventDAO();
-//
-//        // Chọn một event ID có sẵn trong cơ sở dữ liệu để test
-//        int testEventId = 572; // Thay bằng một ID thực tế từ cơ sở dữ liệu của bạn
-//
-//        try {
-//            // 1. Kiểm tra getEventById
-//            Event event = eventDAO.getEventById(testEventId);
-//            System.out.println("Event Information:");
-//            if (event != null) {
-//                System.out.println(event);
-//            } else {
-//                System.out.println("Không tìm thấy sự kiện.");
-//            }
-//
-//            // 2. Kiểm tra getEventImagesByEventId
-//            List<EventImage> images = eventDAO.getEventImagesByEventId(testEventId);
-//            System.out.println("\nEventImages:");
-//            for (EventImage image : images) {
-//                System.out.println(image);
-//            }
-//
-//            // 3. Kiểm tra getOrganizerByEventId
-//            Organizer organizer = eventDAO.getOrganizerByEventId(testEventId);
-//            System.out.println("\nOrganizer:");
-//            if (organizer != null) {
-//                System.out.println(organizer);
-//            } else {
-//                System.out.println("Không tìm thấy người tổ chức.");
-//            }
-//
-//            // 4. Kiểm tra getShowTimesByEventId
-//            List<ShowTime> showTimes = eventDAO.getShowTimesByEventId(testEventId);
-//            System.out.println("\nShowtimes:");
-//            for (ShowTime showTime : showTimes) {
-//                System.out.println(showTime);
-//            }
-//
-//            // 5. Kiểm tra getTicketTypesByEventId
-//            List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(testEventId);
-//            System.out.println("\nTicketTypes:");
-//            for (TicketType ticketType : ticketTypes) {
-//                System.out.println(ticketType);
-//            }
-//
-//            // 6. Kiểm tra getSeatsByEventId
-//            List<Seat> seats = eventDAO.getSeatsByEventId(testEventId);
-//            System.out.println("\nSeats:");
-//            for (Seat seat : seats) {
-//                System.out.println(seat);
-//            }
-//
-//            // 3. Kiểm tra getOrganizerByEventId
-//            Category category = eventDAO.getCategoryByEventID(testEventId);
-//            System.out.println("\nCategory:");
-//            if (category != null) {
-//                System.out.println(category);
-//            } else {
-//                System.out.println("Không tìm thấy người tổ chức.");
-//            }
-//        } catch (Exception e) {
-//            // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra
-//            System.err.println("Đã xảy ra lỗi trong quá trình kiểm tra: " + e.getMessage());
-//            e.printStackTrace();
-//        }
+        // Tạo một instance của EventDAO
+        EventDAO eventDAO = new EventDAO();
+
+        // Chọn một event ID có sẵn trong cơ sở dữ liệu để test
+        int testEventId = 577; // Thay bằng một ID thực tế từ cơ sở dữ liệu của bạn
+
+        try {
+            // 1. Kiểm tra getEventById
+            Event event = eventDAO.getEventById(testEventId);
+            System.out.println("Event Information:");
+            if (event != null) {
+                System.out.println(event);
+            } else {
+                System.out.println("Không tìm thấy sự kiện.");
+            }
+
+            // 2. Kiểm tra getEventImagesByEventId
+            List<EventImage> images = eventDAO.getEventImagesByEventId(testEventId);
+            System.out.println("\nEventImages:");
+            for (EventImage image : images) {
+                System.out.println(image);
+            }
+
+            // 3. Kiểm tra getOrganizerByEventId
+            Organizer organizer = eventDAO.getOrganizerByEventId(testEventId);
+            System.out.println("\nOrganizer:");
+            if (organizer != null) {
+                System.out.println(organizer);
+            } else {
+                System.out.println("Không tìm thấy người tổ chức.");
+            }
+
+            // 4. Kiểm tra getShowTimesByEventId
+            List<ShowTime> showTimes = eventDAO.getShowTimesByEventId(testEventId);
+            System.out.println("\nShowtimes:");
+            for (ShowTime showTime : showTimes) {
+                System.out.println(showTime);
+            }
+
+            // 5. Kiểm tra getTicketTypesByEventId
+            List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(testEventId);
+            System.out.println("\nTicketTypes:");
+            for (TicketType ticketType : ticketTypes) {
+                System.out.println(ticketType);
+            }
+
+            // 6. Kiểm tra getSeatsByEventId
+            List<Seat> seats = eventDAO.getSeatsByEventId(testEventId);
+            System.out.println("\nSeats:");
+            for (Seat seat : seats) {
+                System.out.println(seat.getSeatRow());
+            }
+
+            // 3. Kiểm tra getOrganizerByEventId
+            Category category = eventDAO.getCategoryByEventID(testEventId);
+            System.out.println("\nCategory:");
+            if (category != null) {
+                System.out.println(category);
+            } else {
+                System.out.println("Không tìm thấy người tổ chức.");
+            }
+        } catch (Exception e) {
+            // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra
+            System.err.println("Đã xảy ra lỗi trong quá trình kiểm tra: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 }

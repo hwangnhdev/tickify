@@ -708,12 +708,12 @@
                                 <option value="seatedevent" <c:if test="${event.eventType == 'seatedevent'}">selected</c:if>>Seated Event</option>
                                 </select>
                                 <span class="error-message" id="eventType_error"></span>
-                            </div>
+                        </div>
 
-                            <!-- Seat Management (if seated event) -->
-                            <div id="seatSection" class="">
-                                <h5 class="text-white mb-3">Seat Management (Seated Event)</h5>
-                                <div id="seatsContainer" class="space-y-4">
+                        <!-- Seat Management (if seated event) -->
+                        <div id="seatSection" class="">
+                            <h5 class="text-white mb-3">Seat Management (Seated Event)</h5>
+                            <div id="seatsContainer" class="space-y-4">
                                 <c:forEach var="seat" items="${seats}" varStatus="loop">
                                     <div class="seat-input flex flex-col md:flex-row gap-4">
                                         <div class="flex-1">
@@ -736,7 +736,7 @@
                             <!-- Add error message container -->
                             <div id="seatError" class="mt-2 text-red-500 hidden"></div>
                             <button type="button" class="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" onclick="addSeat()">+ Add Seat</button>
-                            <div id="seatSummary" class="mt-3 text-gray-300"></div>
+                            <div id="seatSummary" class="mt-3 text-gray-300"></div>         
                         </div>
 
                         <!-- Show Times -->
@@ -888,8 +888,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Price -->
                         <div>
-                            <label class="block text-gray-300 mb-2">Price ($)</label>
-                            <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 150000" step="1000">
+                            <label class="block text-gray-300 mb-2">Price (VND)</label>
+                            <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 15" step="1000">
                             <span class="error-message" id="modalTicketPrice_error"></span>
                         </div>
                         <!-- Quantity -->

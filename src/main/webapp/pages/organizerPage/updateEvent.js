@@ -1692,7 +1692,7 @@ async function submitEventForm() {
         console.log("Server response:", result);
         if (result.success) {
             alert('Event updated successfully!');
-            window.location.href = result.redirectUrl || 'pages/organizerPage/organizerCenter.jsp';
+            window.location.href = result.redirectUrl || 'createNewEvent?success=true';
         } else {
             alert('Failed to update event: ' + (result.message || 'Unknown error.'));
         }
