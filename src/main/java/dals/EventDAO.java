@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Category;
 import models.Event;
+import models.EventDTO;
 import models.EventImage;
 import models.Organizer;
 import models.Seat;
@@ -24,6 +25,98 @@ import utils.DBContext;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class EventDAO extends DBContext {
+
+    /**
+     * Retrieve a list of events for the given organizer with an optional
+     * filter.
+     *
+     * @param organizerId the organizer's ID.
+     * @param filter one of "all", "pending", "paid", "upcoming", "past".
+     * @return List of EventDTO objects.
+     */
+    public List<EventDTO> getEventsByOrganizer(int organizerId, String filter) {
+        List<EventDTO> events = new ArrayList<>();
+
+        // Base SQL query, đã thêm eventId
+        String baseSql = "SELECT \n"
+                + "    e.event_id AS eventId,\n"
+                + "    e.event_name AS eventName,\n"
+                + "    MIN(s.start_date) AS startDate,\n"
+                + "    MAX(s.end_date) AS endDate,\n"
+                + "    e.location AS location,\n"
+                + "    (\n"
+                + "        SELECT TOP 1 o.payment_status\n"
+                + "        FROM Orders o\n"
+                + "        JOIN OrderDetails od ON o.order_id = od.order_id\n"
+                + "        JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "        JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
+                + "        WHERE s2.event_id = e.event_id\n"
+                + "        ORDER BY o.created_at DESC\n"
+                + "    ) AS paymentStatus,\n"
+                + "    (\n"
+                + "        SELECT TOP 1 image_url\n"
+                + "        FROM EventImages\n"
+                + "        WHERE event_id = e.event_id\n"
+                + "        ORDER BY image_id\n"
+                + "    ) AS image\n"
+                + "FROM Events e\n"
+                + "JOIN Showtimes s ON e.event_id = s.event_id\n"
+                + "WHERE e.organizer_id = ? ";
+
+        // Các điều kiện bổ sung theo bộ lọc
+        String extraWhere = "";
+        String groupBy = " GROUP BY e.event_id, e.event_name, e.location ";
+        String havingClause = "";
+
+        if (filter != null && !filter.equalsIgnoreCase("all")) {
+            // Lọc theo payment status: pending hoặc paid
+            if (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid")) {
+                extraWhere += " AND (\n"
+                        + "     SELECT TOP 1 o.payment_status\n"
+                        + "     FROM Orders o\n"
+                        + "     JOIN OrderDetails od ON o.order_id = od.order_id\n"
+                        + "     JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                        + "     JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
+                        + "     WHERE s2.event_id = e.event_id\n"
+                        + "     ORDER BY o.created_at DESC\n"
+                        + " ) = ? ";
+            } // Lọc các sự kiện sắp diễn ra (upcoming)
+            else if (filter.equalsIgnoreCase("upcoming")) {
+                havingClause = " HAVING MIN(s.start_date) > GETDATE() ";
+            } // Lọc các sự kiện đã qua (past)
+            else if (filter.equalsIgnoreCase("past")) {
+                havingClause = " HAVING MAX(s.end_date) < GETDATE() ";
+            }
+        }
+
+        String finalSql = baseSql + extraWhere + groupBy + havingClause;
+
+        try ( PreparedStatement ps = connection.prepareStatement(finalSql)) {
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, organizerId);
+            if (filter != null && (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid"))) {
+                ps.setString(paramIndex++, filter);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                EventDTO event = new EventDTO();
+                // Ánh xạ trường eventId
+                event.setEventId(rs.getInt("eventId"));
+                event.setEventName(rs.getString("eventName"));
+                event.setStartDate(rs.getDate("startDate"));
+                event.setEndDate(rs.getDate("endDate"));
+                event.setLocation(rs.getString("location"));
+                event.setPaymentStatus(rs.getString("paymentStatus"));
+                event.setImage(rs.getString("image"));
+                events.add(event);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Có thể xử lý lỗi chi tiết hơn tại đây nếu cần
+        }
+        return events;
+    }
 
     // Phương thức để cập nhật sự kiện bằng stored procedure [dbo].[UpdateEventByID]
     public boolean updateEventByID(
@@ -569,6 +662,46 @@ public class EventDAO extends DBContext {
         return null;
     }
 
+    /**
+     * Retrieves the list of events by name using a partial match for a specific
+     * organizer.
+     *
+     * @param eventName The name or partial name of the event to search for.
+     * @param organizerId The ID of the organizer to filter events.
+     * @return A list of Event objects matching the search criteria.
+     */
+    public List<Event> searchEventByName(String eventName, int organizerId) {
+        List<Event> events = new ArrayList<>();
+        String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
+                + "FROM Events "
+                + "WHERE event_name LIKE ? AND organizer_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            // Thêm ký tự % để tìm kiếm gần đúng
+            stmt.setString(1, "%" + eventName + "%");
+            stmt.setInt(2, organizerId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Event event = new Event(
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                events.add(event);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving events: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return events;
+    }
+
     // Example main method to test createEvent
     public static void main(String[] args) {
 
@@ -727,6 +860,13 @@ public class EventDAO extends DBContext {
                 System.out.println(category);
             } else {
                 System.out.println("Không tìm thấy người tổ chức.");
+            }
+
+            // 6. Kiểm tra getSeatsByEventId
+            List<Event> listEvent = eventDAO.searchEventByName("Thien dang", 1);
+            System.out.println("\nEvents:");
+            for (Event event1 : listEvent) {
+                System.out.println(event1.getEventName());
             }
         } catch (Exception e) {
             // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra

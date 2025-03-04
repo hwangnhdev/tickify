@@ -133,7 +133,15 @@
         <servlet-name>UpdateEventController</servlet-name>
         <servlet-class>controllers.UpdateEventController</servlet-class>
     </servlet>
-    
+    <servlet>
+        <servlet-name>SearchEventServlet</servlet-name>
+        <servlet-class>controllers.SearchEventServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SearchEventServlet</servlet-name>
+        <url-pattern>/SearchEventServlet</url-pattern>
+    </servlet-mapping>
     <!-- Define Servlet Mappings -->
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
