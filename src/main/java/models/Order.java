@@ -1,23 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package models;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 
-/**
- *
- * @author Nguyen Huy Hoang - CE182102
- */
+// Model đại diện cho đối tượng Order (đơn hàng)
 public class Order {
-
     private int orderId;
-    private int customerId;
-    private int voucherId;
-    private double totalPrice;
     private Date orderDate;
+    private double totalPrice;
     private String paymentStatus;
     private String transactionId;
     private Timestamp createdAt;
@@ -41,57 +31,32 @@ public class Order {
     public int getOrderId() {
         return orderId;
     }
-
     public void setOrderId(int orderId) {
         this.orderId = orderId;
     }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
-    }
-
-    public int getVoucherId() {
-        return voucherId;
-    }
-
-    public void setVoucherId(int voucherId) {
-        this.voucherId = voucherId;
-    }
-
-    public double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
     public Date getOrderDate() {
         return orderDate;
     }
-
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
-
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
     public String getPaymentStatus() {
         return paymentStatus;
     }
-
     public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
     }
-
-    public String getTransactionId() {
-        return transactionId;
+    public String getCustomerName() {
+        return customerName;
     }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public Timestamp getCreatedAt() {
@@ -109,5 +74,4 @@ public class Order {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

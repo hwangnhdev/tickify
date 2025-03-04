@@ -9,7 +9,6 @@ package models;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class Seat {
-
     private int seatId;
     private int ticketTypeId;
     private String seatRow;

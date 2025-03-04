@@ -9,21 +9,16 @@ public class EventImage {
     private int imageId;
     private int eventId;
     private String imageUrl;
-    private String imageTitle;
+    private String image_title;
 
     public EventImage() {
     }
 
-    public EventImage(int imageId, int eventId, String imageUrl, String imageTitle) {
+    public EventImage(int imageId, int eventId, String imageUrl, String image_title) {
         this.imageId = imageId;
         this.eventId = eventId;
         this.imageUrl = imageUrl;
-        this.imageTitle = imageTitle;
-    }
-
-    public EventImage(String imageUrl, String imageTitle) {
-        this.imageUrl = imageUrl;
-        this.imageTitle = imageTitle;
+        this.image_title = image_title;
     }
 
     public int getImageId() {
