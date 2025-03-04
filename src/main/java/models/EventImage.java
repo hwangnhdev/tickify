@@ -9,7 +9,7 @@ public class EventImage {
     private int imageId;
     private int eventId;
     private String imageUrl;
-    private String image_title;
+    private String imageTitle;
 
     public EventImage() {
     }
@@ -18,7 +18,7 @@ public class EventImage {
         this.imageId = imageId;
         this.eventId = eventId;
         this.imageUrl = imageUrl;
-        this.image_title = image_title;
+        this.imageTitle = image_title;
     }
 
     public int getImageId() {
@@ -45,11 +45,11 @@ public class EventImage {
         this.imageUrl = imageUrl;
     }
 
-    public String getImageTitle() { // Sửa từ getImage_title() thành getImageTitle()
+    public String getImageTitle() {
         return imageTitle;
     }
 
-    public void setImageTitle(String imageTitle) { // Sửa từ setImage_title() thành setImageTitle()
+    public void setImageTitle(String imageTitle) { 
         this.imageTitle = imageTitle;
     }
 }

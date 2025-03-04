@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //package controllers;
 //
 //
@@ -61,7 +60,6 @@
 //        return "OrganizerEventDetailController retrieves event detail for an organizer";
 //    }
 //}
-=======
 package controllers;
 
 
@@ -124,4 +122,3 @@ public class OrganizerEventDetailController extends HttpServlet {
         return "OrganizerEventDetailController retrieves event detail for an organizer";
     }
 }
->>>>>>> 585b0290f07709a285fc8c831893312cd6e42e68

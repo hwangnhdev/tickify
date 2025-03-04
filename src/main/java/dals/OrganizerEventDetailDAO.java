@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //package dals;
 //
 //
@@ -70,7 +69,6 @@
 //        return detail;
 //    }
 //}
-=======
 package dals;
 
 
@@ -142,4 +140,3 @@ public class OrganizerEventDetailDAO extends DBContext {
         return detail;
     }
 }
->>>>>>> 585b0290f07709a285fc8c831893312cd6e42e68

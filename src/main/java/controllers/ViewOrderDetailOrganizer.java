@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //package controllers;
 //
 //import dals.OrderDetailDAO;
@@ -51,7 +50,6 @@
 //        }
 //    }
 //}
-=======
 package controllers;
 
 import dals.OrderDetailDAO;
@@ -104,4 +102,3 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
         }
     }
 }
->>>>>>> 585b0290f07709a285fc8c831893312cd6e42e68
