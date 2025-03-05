@@ -20,7 +20,7 @@ import models.EventDTO;
 import models.EventImage;
 import models.Organizer;
 import models.Seat;
-import models.ShowTime;
+import models.Showtime;
 import models.TicketType;
 import utils.DBContext;
 
@@ -139,7 +139,7 @@ public class EventDAO extends DBContext {
             String eventLogoUrl,
             String backgroundImageUrl,
             String organizerImageUrl,
-            List<ShowTime> showTimes,
+            List<Showtime> showTimes,
             List<TicketType> ticketTypes,
             List<Seat> seats) {
 
@@ -209,7 +209,7 @@ public class EventDAO extends DBContext {
             String eventLogoUrl,
             String backgroundImageUrl,
             String organizerImageUrl,
-            List<ShowTime> showTimes,
+            List<Showtime> showTimes,
             List<TicketType> ticketTypes,
             List<Seat> seats) {
 
@@ -280,13 +280,13 @@ public class EventDAO extends DBContext {
     }
 
     // Helper method to prepare ShowTimes JSON
-    private String prepareShowTimesJson(List<ShowTime> showTimes, Gson gson) {
+    private String prepareShowTimesJson(List<Showtime> showTimes, Gson gson) {
         if (showTimes == null || showTimes.isEmpty()) {
             throw new IllegalArgumentException("ShowTimes list cannot be null or empty");
         }
 
         List<Object> showTimesList = new ArrayList<>();
-        for (ShowTime st : showTimes) {
+        for (Showtime st : showTimes) {
             if (st.getStartDate() == null || st.getEndDate() == null) {
                 throw new IllegalArgumentException("StartDate and EndDate in ShowTimes cannot be null");
             }
@@ -300,7 +300,7 @@ public class EventDAO extends DBContext {
     }
 
     // Helper method to prepare TicketTypes JSON
-    private String prepareTicketTypesJson(List<TicketType> ticketTypes, List<ShowTime> showTimes, Gson gson) {
+    private String prepareTicketTypesJson(List<TicketType> ticketTypes, List<Showtime> showTimes, Gson gson) {
         if (ticketTypes == null || ticketTypes.isEmpty()) {
             throw new IllegalArgumentException("TicketTypes list cannot be null or empty");
         }
@@ -317,7 +317,7 @@ public class EventDAO extends DBContext {
             }
 
             if (showTimeIndex < showTimes.size()) {
-                ShowTime matchingShowTime = showTimes.get(showTimeIndex);
+                Showtime matchingShowTime = showTimes.get(showTimeIndex);
                 ticketTypesList.add(new TicketTypeJson(
                         matchingShowTime.getStartDate(),
                         matchingShowTime.getEndDate(),
@@ -521,8 +521,8 @@ public class EventDAO extends DBContext {
      * @param eventId The ID of the event.
      * @return A list of ShowTime objects.
      */
-    public List<ShowTime> getShowTimesByEventId(int eventId) {
-        List<ShowTime> showTimes = new ArrayList<>();
+    public List<Showtime> getShowTimesByEventId(int eventId) {
+        List<Showtime> showTimes = new ArrayList<>();
         String sql = "SELECT showtime_id, event_id, start_date, end_date, status, created_at, updated_at "
                 + "FROM Showtimes "
                 + "WHERE event_id = ?";
@@ -530,7 +530,7 @@ public class EventDAO extends DBContext {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                ShowTime showTime = new ShowTime(
+                Showtime showTime = new Showtime(
                         rs.getInt("showtime_id"),
                         rs.getInt("event_id"),
                         rs.getTimestamp("start_date"),
@@ -751,6 +751,39 @@ public class EventDAO extends DBContext {
         return listEventImage;
     }
 
+    /*selectEventByID*/
+    public Event selectEventByID(int id) {
+        String sql = "SELECT * FROM Events\n"
+                + "WHERE event_id = ?";
+
+        try {
+            // Prepare SQL statement
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+
+            // Fetch event data
+            if (rs.next()) {
+                Event event = new Event(
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                return event;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
+        return null;
+    }
+
     // Example main method to test createEvent
     public static void main(String[] args) {
 
@@ -882,9 +915,9 @@ public class EventDAO extends DBContext {
             }
 
             // 4. Kiểm tra getShowTimesByEventId
-            List<ShowTime> showTimes = eventDAO.getShowTimesByEventId(testEventId);
+            List<Showtime> showTimes = eventDAO.getShowTimesByEventId(testEventId);
             System.out.println("\nShowtimes:");
-            for (ShowTime showTime : showTimes) {
+            for (Showtime showTime : showTimes) {
                 System.out.println(showTime);
             }
 

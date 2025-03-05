@@ -24,6 +24,14 @@ public class CustomerAuth {
     public CustomerAuth() {
     }
 
+    public CustomerAuth(int customerAuthId, int customerId, String authProvider, String password, String providerId) {
+        this.customerAuthId = customerAuthId;
+        this.customerId = customerId;
+        this.authProvider = authProvider;
+        this.password = password;
+        this.providerId = providerId;
+    }
+
     public CustomerAuth(int customerAuthId, int customerId, String authProvider, String password, String providerId, Timestamp createdAt, Timestamp updatedAt) {
         this.customerAuthId = customerAuthId;
         this.customerId = customerId;

@@ -4,7 +4,7 @@
  */
 package models;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -15,7 +15,6 @@ public class Seat extends TicketType {
     private int seatId;
     private int ticketTypeId;
     private String seatRow;
-    private String seatCol;
     private String seatCol;
     private String status;
     private String ticketTypeName; // Vui add to store json
@@ -32,9 +31,10 @@ public class Seat extends TicketType {
         this.status = status;
     }
 
-    public Seat(int seatId, int eventId, String seatRow, String seatCol, String status, int ticketTypeId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
-        super(ticketTypeId, eventId, name, description, price, totalQuantity, soldQuantity, createdAt, updatedAt);
+    public Seat(int seatId, int ticketTypeId, String seatRow, String seatCol, String status, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Timestamp createdAt, Timestamp updatedAt) {
+        super(ticketTypeId, showtimeId, name, description, price, color, totalQuantity, soldQuantity, createdAt, updatedAt);
         this.seatId = seatId;
+        this.ticketTypeId = ticketTypeId;
         this.seatRow = seatRow;
         this.seatCol = seatCol;
         this.status = status;
@@ -49,7 +49,7 @@ public class Seat extends TicketType {
         this.status = status;
         this.ticketTypeName = ticketTypeName;
     }
-    
+
     public int getSeatId() {
         return seatId;
     }
@@ -58,10 +58,12 @@ public class Seat extends TicketType {
         this.seatId = seatId;
     }
 
+    @Override
     public int getTicketTypeId() {
         return ticketTypeId;
     }
 
+    @Override
     public void setTicketTypeId(int ticketTypeId) {
         this.ticketTypeId = ticketTypeId;
     }
@@ -99,7 +101,6 @@ public class Seat extends TicketType {
         this.ticketTypeName = ticketTypeName;
     }
 
-
     @Override
     public String toString() {
         return "Seat{"
@@ -108,7 +109,7 @@ public class Seat extends TicketType {
                 + ", seatCol='" + seatCol + '\''
                 + ", status='" + status + '\''
                 + ", ticketTypeId=" + getTicketTypeId()
-                + ", eventId=" + getEventId()
+                + ", getTicketTypeId=" + getTicketTypeId()
                 + ", name='" + getName() + '\''
                 + ", description='" + getDescription() + '\''
                 + ", price=" + getPrice()

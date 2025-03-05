@@ -14,11 +14,9 @@ public class TicketType {
 
     private int ticketTypeId;
     private int showtimeId;
-    private int showtimeId;
     private String name;
     private String description;
     private double price;
-    private String color;
     private String color;
     private int totalQuantity;
     private int soldQuantity;
@@ -52,12 +50,8 @@ public class TicketType {
 
     public int getShowtimeId() {
         return showtimeId;
-    public int getShowtimeId() {
-        return showtimeId;
     }
 
-    public void setShowtimeId(int showtimeId) {
-        this.showtimeId = showtimeId;
     public void setShowtimeId(int showtimeId) {
         this.showtimeId = showtimeId;
     }
@@ -84,14 +78,6 @@ public class TicketType {
 
     public void setPrice(double price) {
         this.price = price;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
     }
 
     public String getColor() {

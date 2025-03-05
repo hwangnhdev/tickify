@@ -41,7 +41,7 @@ public class SeatDAO extends DBContext {
     private Seat mapResultSetToSeat(ResultSet rs) throws SQLException {
         Seat seat = new Seat();
         seat.setSeatId(rs.getInt("seat_id"));
-        seat.setEventId(rs.getInt("event_id"));
+        seat.setTicketTypeId(rs.getInt("event_id"));
         seat.setSeatRow(rs.getString("seat_row"));
         seat.setSeatCol(rs.getString("seat_col"));
         seat.setStatus(rs.getString("status"));
@@ -134,7 +134,7 @@ public class SeatDAO extends DBContext {
     public boolean insertSeat(Seat seat) {
         try {
             PreparedStatement st = connection.prepareStatement(INSERT_SEAT);
-            st.setInt(1, seat.getEventId());
+            st.setInt(1, seat.getTicketTypeId());
             st.setString(2, seat.getSeatRow());
             st.setString(3, seat.getSeatCol());
             st.setString(4, seat.getStatus());

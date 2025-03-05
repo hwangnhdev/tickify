@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Category;
 import models.Seat;
-import models.ShowTime;
+import models.Showtime;
 import models.TicketType;
 
 @MultipartConfig // Thêm annotation để xử lý multipart/form-data
@@ -46,7 +46,7 @@ public class CreateNewEventController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -101,7 +101,7 @@ public class CreateNewEventController extends HttpServlet {
 
         System.out.println("Received request to /createNewEvent");
         StringBuilder jsonBuffer = new StringBuilder();
-        try (BufferedReader reader = request.getReader()) {
+        try ( BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
                 jsonBuffer.append(line);
@@ -150,14 +150,14 @@ public class CreateNewEventController extends HttpServlet {
             }
 
             // Process ShowTimes
-            List<ShowTime> showTimes = new ArrayList<>();
+            List<Showtime> showTimes = new ArrayList<>();
             JsonArray showTimesArray = jsonData.has("showTimes") ? jsonData.getAsJsonArray("showTimes") : null;
             if (showTimesArray == null || showTimesArray.size() == 0) {
                 throw new IllegalArgumentException("ShowTimes is required and cannot be empty");
             }
             for (JsonElement showTimeElement : showTimesArray) {
                 JsonObject showTimeObj = showTimeElement.getAsJsonObject();
-                ShowTime showTime = new ShowTime();
+                Showtime showTime = new Showtime();
                 // Ensure date format matches yyyy-MM-dd HH:mm:ss
                 String startDateStr = showTimeObj.get("startDate").getAsString();
                 String endDateStr = showTimeObj.get("endDate").getAsString();
@@ -231,7 +231,7 @@ public class CreateNewEventController extends HttpServlet {
                     }
                 }
             }
-            
+
             // Call EventDAO to create the event
             EventDAO.EventCreationResult result = eventDAO.createEvent(
                     customerId, organizationName, accountHolder, accountNumber, bankName,

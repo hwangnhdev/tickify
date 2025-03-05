@@ -32,7 +32,7 @@ import models.EventImage;
 import models.Organizer;
 import models.Province;
 import models.Seat;
-import models.ShowTime;
+import models.Showtime;
 import models.TicketType;
 
 /**
@@ -105,7 +105,7 @@ public class UpdateEventController extends HttpServlet {
         List<EventImage> eventImages = eventDAO.getEventImagesByEventId(eventId);
         Category category = eventDAO.getCategoryByEventID(eventId);
         Organizer organizer = eventDAO.getOrganizerByEventId(eventId);
-        List<ShowTime> showTimes = eventDAO.getShowTimesByEventId(eventId);
+        List<Showtime> showTimes = eventDAO.getShowTimesByEventId(eventId);
         List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(eventId);
         List<Seat> seats = eventDAO.getSeatsByEventId(eventId);
         List<Category> listCategories = categoryDAO.getAllCategories();
@@ -241,12 +241,12 @@ public class UpdateEventController extends HttpServlet {
             }
 
             // Process ShowTimes
-            List<ShowTime> showTimes = new ArrayList<>();
+            List<Showtime> showTimes = new ArrayList<>();
             JsonArray showTimesArray = jsonData.has("showTimes") ? jsonData.getAsJsonArray("showTimes") : null;
             if (showTimesArray != null && showTimesArray.size() > 0) {
                 for (JsonElement showTimeElement : showTimesArray) {
                     JsonObject showTimeObj = showTimeElement.getAsJsonObject();
-                    ShowTime showTime = new ShowTime();
+                    Showtime showTime = new Showtime();
                     String startDateStr = showTimeObj.get("startDate").getAsString();
                     String endDateStr = showTimeObj.get("endDate").getAsString();
                     showTime.setStartDate(Timestamp.valueOf(startDateStr));
