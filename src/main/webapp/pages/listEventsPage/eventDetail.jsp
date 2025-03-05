@@ -175,24 +175,28 @@
     <body>
         <!--Header-->
         <jsp:include page="../../components/header.jsp"></jsp:include>
+        <c:set var="event" value="${eventDetail}" />
+        <c:set var="category" value="${eventCategories}" />
+        <c:set var="organizer" value="${organizer}" />
+        <c:set var="listShowtimes" value="${listShowtimes}" />
+        <input value="${eventId}" name="eventID" hidden/>
+        <input value="${event.organizerId}" name="organizerId" hidden/>
 
-            <div class="container-event_detail">
-                <div class="event-card-event_detail">
-                    <div class="event-details">
-                    <c:set var="event" value="${eventDetail}" />
-                    <c:set var="category" value="${eventCategories}" />
+        <div class="container-event_detail">
+            <div class="event-card-event_detail">
+                <div class="event-details">
                     <h1>${event.eventName}</h1>
-                    <p><strong>Date & Time:</strong> ${event.startDate} - ${event.endDate}</p>
                     <p><strong>Category:</strong> ${category.categoryName}</p>
                     <p><strong>Category Description:</strong> ${category.description}</p>
                     <p><strong>Venue:</strong> ${event.location}</p>
-                    <p class="price">From 270.000 ₫</p>
                     <p><strong>Description:</strong> ${event.description}</p>
+                    <p><strong>Type Of Event:</strong> ${event.eventType}</p>
+                    <p><strong>Organizer:</strong> ${organizer.organizationName}</p>
+                    <p><strong>Status:</strong> ${event.status}</p>
                     <a class="btn" href="pages/seatSelectionPage/seatSelection.jsp">Order Ticket Now</a>
                 </div>
                 <div class="event-image-event_detail">
-                    <c:set var="image" value="${eventImage}" />
-                    <img src="${image.imageUrl}" alt="${image.image_title}" />
+                    <img src="${logoBannerImage}" alt="${titleEventImage}" />
                 </div>
             </div>
         </div>
@@ -201,21 +205,27 @@
             <h2>Event Information Details</h2>
             <ul>
                 <li>
-                    <strong>Performance:</strong> A comedy show filled with joy and
-                    laughter.
+                    <strong>Event Name: </strong> ${category.categoryName}
                 </li>
                 <li>
-                    <strong>Description:</strong> "Cái gì Vui Vẻ thì mình Ưu Tiên" brings
-                    you an unforgettable evening of laughter, emotions, and a touch of
-                    cultural humor.
+                    <strong>Description:</strong> ${event.description}
                 </li>
                 <li>
-                    <strong>Venue Address:</strong> Số 28 Lê Thánh Tôn, Bến Nghé Ward, 1
-                    District, Ho Chi Minh City.
+                    <strong>Venue Address:</strong> ${event.location}
                 </li>
-                <li><strong>Duration:</strong> 3 hours</li>
                 <li><strong>Seating Capacity:</strong> 500 seats</li>
+                <li><strong>Organizer Name:</strong> ${organizer.organizationName}</li>
+                <img style="margin-left: 25%;" src="${logoOrganizerImage}" alt="${titleOrganizerImage}" />
+                <li><strong>All Images Of Event</strong></li>
+                <img style="margin-left: 25%;" src="${logoBannerImage}" alt="${titleEventImage}" />
+                <img style="margin-left: 25%; margin-top: 2%;" src="${logoEventImage}" alt="${titleEventImage}" />
             </ul>
+        </div>
+        <div class="event-info-event_detail">
+            <h2>Event Information Details</h2>
+            <c:forEach items="">
+                
+            </c:forEach>
         </div>
 
         <div class="event-info-event_detail">

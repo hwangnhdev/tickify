@@ -784,6 +784,42 @@ public class EventDAO extends DBContext {
         return null;
     }
 
+    /**
+     * Retrieves the list of show times for the specified event ID.
+     *
+     * @param eventId The ID of the event.
+     * @return A list of ShowTime objects.
+     */
+    public List<TicketType> getTicketTypeByShowtimeId(int showtimeId) {
+        List<TicketType> ticketTypes = new ArrayList<>();
+        String sql = "SELECT ticket_type_id, showtime_id, name, description, price, color, total_quantity, sold_quantity, created_at, updated_at\n"
+                + "FROM     TicketTypes\n"
+                + "WHERE showtime_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, showtimeId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                TicketType ticketType = new TicketType(
+                        rs.getInt("ticket_type_id"),
+                        rs.getInt("showtime_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getDouble("price"),
+                        rs.getString("color"),
+                        rs.getInt("total_quantity"),
+                        rs.getInt("sold_quantity"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                ticketTypes.add(ticketType);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving show times: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return ticketTypes;
+    }
+
     /*=======================================Home Event==============================================================================================*/
  /*getEventsByPage*/
     public List<EventImage> getEventsByPage(int page, int pageSize) {
@@ -1035,6 +1071,93 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
+    /*selectEventImagesByID*/
+    public EventImage selectEventImagesByID(int id) {
+        String sql = "SELECT * FROM EventImages\n"
+                + "WHERE event_id = ? AND image_title LIKE '%banner%';";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getInt("image_id"),
+                        rs.getInt("event_id"),
+                        rs.getString("image_url"),
+                        rs.getString("image_title")
+                );
+                return eventImage;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching event images: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /*getTopEventsWithLimit*/
+    public List<EventImage> getImageEventsByEventId(int eventId) {
+        List<EventImage> listEvents = new ArrayList<>();
+        String sql = "SELECT\n"
+                + "e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
+                + "FROM Events e\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id\n"
+                + "WHERE e.event_id = ?";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, eventId);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEvents.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
+    /*selectEventCategoriesID*/
+    public Category selectEventCategoriesID(int id) {
+        String sql = "SELECT c.*\n"
+                + "FROM Categories c\n"
+                + "INNER JOIN Events e ON c.category_id = e.category_id\n"
+                + "WHERE e.event_id = ?;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                Category eventCategories = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                return eventCategories;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching event categories: " + e.getMessage());
+        }
+        return null;
+    }
+
     /*==========================================================================main==========================================================================*/
     public static void main(String[] args) {
         // Example main method to test createEvent
@@ -1140,13 +1263,28 @@ public class EventDAO extends DBContext {
         int testEventId = 577; // Thay bằng một ID thực tế từ cơ sở dữ liệu của bạn
 
         try {
-            List<EventImage> listEventImage = eventDAO.getUpcomingEvents();
-            System.out.println("\nEvents:");
-            for (EventImage eventImage : listEventImage) {
-                System.out.println(eventImage.getEventId());
-                System.out.println(eventImage.getEventName());
-                System.out.println(eventImage.getImageTitle());
-                System.out.println(eventImage.getImageUrl());
+//            List<EventImage> listEventImage = eventDAO.getImageEventsByEventId(1);
+//            System.out.println("\nEvents:");
+//            for (EventImage eventImage : listEventImage) {
+//                if (eventImage.getImageTitle().equalsIgnoreCase("logo_event")) {
+//                    System.out.println(eventImage.getEventId());
+//                    System.out.println(eventImage.getEventName());
+//                    System.out.println(eventImage.getImageTitle());
+//                    System.out.println(eventImage.getImageUrl());
+//                }
+//            }
+
+            List<Showtime> listShowtimes = eventDAO.getShowTimesByEventId(272);
+            for (Showtime listShowtime : listShowtimes) {
+                System.out.println(listShowtime.getShowtimeId());
+                System.out.println(listShowtime.getStartDate());
+                System.out.println(listShowtime.getEndDate());
+                List<TicketType> listTicketTypes = eventDAO.getTicketTypeByShowtimeId(listShowtime.getShowtimeId());
+                for (TicketType listTicketType : listTicketTypes) {
+                    System.out.println(listTicketType.getTicketTypeId());
+                    System.out.println(listTicketType.getName());
+                    System.out.println(listTicketType.getPrice());
+                }
             }
         } catch (Exception e) {
             // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra
