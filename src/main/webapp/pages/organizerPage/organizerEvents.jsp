@@ -219,7 +219,8 @@
                 // Xử lý phím mũi tên và Enter
                 $('#searchInput').on('keydown', function (e) {
                     var suggestions = $('#suggestions div');
-                    if (suggestions.length === 0) return;
+                    if (suggestions.length === 0)
+                        return;
 
                     if (e.key === 'ArrowDown') {
                         e.preventDefault();
@@ -313,11 +314,11 @@
                     $.each(events, function (index, event) {
                         var eventHtml = `
                             <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden flex w-full mb-4">
-                                <img src="${event.image}" alt="Event image" class="w-1/4 object-cover">
+                                <img style="object-fit: fill; width: 400px;" src="` + event.imageUrl + `" alt="` + event.imageTitle + `" class="w-1/4 object-cover">
                                 <div class="p-4 flex-1">
                                     <h2 class="text-xl font-bold text-white cursor-pointer hover:text-gray-400" 
                                         onclick="location.href = '${pageContext.request.contextPath}/organizerEventDetail?eventId=` + event.eventId + `'">
-                                        ` + event.eventName + `
+                                        ` + event.eventName + ` ` + event.eventId + `
                                     </h2>
                                     <div class="flex items-center text-green-400 mt-2">
                                         <i class="fas fa-map-marker-alt mr-2"></i>

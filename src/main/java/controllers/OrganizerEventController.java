@@ -1,6 +1,7 @@
 package controllers;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dals.EventDAO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -11,51 +12,64 @@ import java.io.IOException;
 import java.util.List;
 import models.Event;
 import models.EventDTO;
+import models.EventImage;
 
 public class OrganizerEventController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy organizerId từ session hoặc đặt mặc định
-        int organizerId = 98; // ví dụ, lấy từ session nếu cần
-        String filter = request.getParameter("filter");
-        if (filter == null || filter.trim().isEmpty()) {
-            filter = "all";
+        try {
+            int organizerId = 98; // Nên lấy từ session
+            String filter = request.getParameter("filter");
+            if (filter == null || filter.trim().isEmpty()) {
+                filter = "all";
+            }
+
+            EventDAO eventDAO = new EventDAO();
+            List<EventDTO> events = eventDAO.getEventsByOrganizer(organizerId, filter);
+
+            request.setAttribute("events", events);
+            request.setAttribute("currentFilter", filter);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/organizerEvents.jsp");
+            dispatcher.forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace(); // Ghi log lỗi
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing your request.");
         }
-
-        EventDAO eventDAO = new EventDAO();
-        List<EventDTO> events = eventDAO.getEventsByOrganizer(organizerId, filter);
-
-        // Set danh sách sự kiện và filter hiện tại vào request để JSP hiển thị
-        request.setAttribute("events", events);
-        request.setAttribute("currentFilter", filter);
-
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/organizerEvents.jsp");
-        dispatcher.forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy organizerId từ session hoặc đặt mặc định
-        int organizerId = 98; // Ví dụ, nên lấy từ session nếu có: (int) request.getSession().getAttribute("organizerId");
+        try {
+            Integer organizerId = (Integer) request.getSession().getAttribute("organizerId");
+            if (organizerId == null) {
+                organizerId = 98;
+            }
 
-        // Kiểm tra xem có tham số eventName không (dành cho AJAX)
-        String eventName = request.getParameter("eventName");
-        EventDAO eventDAO = new EventDAO();
+            String eventName = request.getParameter("eventName");
+            if (eventName == null || eventName.trim().isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Event name is required.");
+                return;
+            }
 
-        // Xử lý yêu cầu AJAX tìm kiếm theo tên
-        List<Event> events = eventDAO.searchEventByName(eventName, organizerId);
+            EventDAO eventDAO = new EventDAO();
+            List<EventImage> listEventImages = eventDAO.searchEventByNameImage(eventName, organizerId);
 
-        // Chuyển đổi danh sách sự kiện thành JSON
-        Gson gson = new Gson();
-        String json = gson.toJson(events);
+            Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()// Chỉ serialize các trường có @Expose
+                    .create();
+            String json = gson.toJson(listEventImages);
 
-        // Thiết lập phản hồi JSON
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(json);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(json);
+        } catch (Exception e) {
+            e.printStackTrace(); // Ghi log lỗi
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing search request: " + e.getMessage());
+        }
     }
 
     @Override

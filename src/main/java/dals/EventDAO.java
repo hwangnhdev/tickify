@@ -702,6 +702,51 @@ public class EventDAO extends DBContext {
         return events;
     }
 
+    /**
+     * Retrieves the list of events by name using a partial match for a specific
+     * organizer.
+     *
+     * @param eventName The name or partial name of the event to search for.
+     * @param organizerId The ID of the organizer to filter events.
+     * @return A list of Event objects matching the search criteria.
+     */
+    public List<EventImage> searchEventByNameImage(String eventName, int organizerId) {
+        List<EventImage> listEventImage = new ArrayList<>();
+        String sql = "SELECT e.event_id, e.category_id, e.organizer_id, e.event_name, e.location, e.event_type, e.status, e.description, e.created_at, e.updated_at, ei.image_id, ei.image_url, ei.image_title\n"
+                + "                FROM Events e\n"
+                + "                LEFT JOIN (SELECT event_id, image_id, image_url, image_title\n"
+                + "                FROM EventImages\n"
+                + "                WHERE image_title = 'logo_banner') ei ON e.event_id = ei.event_id\n"
+                + "                WHERE e.event_name LIKE ? AND e.organizer_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, "%" + eventName + "%");
+            stmt.setInt(2, organizerId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getInt("image_id"),
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEventImage.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving events: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return listEventImage;
+    }
+
     // Example main method to test createEvent
     public static void main(String[] args) {
 
@@ -867,6 +912,16 @@ public class EventDAO extends DBContext {
             System.out.println("\nEvents:");
             for (Event event1 : listEvent) {
                 System.out.println(event1.getEventName());
+            }
+
+            // 6. Kiểm tra getSeatsByEventId
+            List<EventImage> listEventImage = eventDAO.searchEventByNameImage("Vui", 98);
+            System.out.println("\nEvents:");
+            for (EventImage eventImage : listEventImage) {
+                System.out.println(eventImage.getEventId());
+                System.out.println(eventImage.getEventName());
+                System.out.println(eventImage.getImageTitle());
+                System.out.println(eventImage.getImageUrl());
             }
         } catch (Exception e) {
             // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra

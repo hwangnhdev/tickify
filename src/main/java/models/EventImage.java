@@ -1,14 +1,20 @@
 package models;
 
+import com.google.gson.annotations.Expose;
+import java.sql.Timestamp;
+
 /**
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class EventImage {
+public class EventImage extends Event {
 
+    @Expose
     private int imageId;
     private int eventId;
+    @Expose
     private String imageUrl;
+    @Expose
     private String imageTitle;
 
     public EventImage() {
@@ -19,6 +25,13 @@ public class EventImage {
         this.eventId = eventId;
         this.imageUrl = imageUrl;
         this.imageTitle = image_title;
+    }
+
+    public EventImage(int imageId, String imageUrl, String imageTitle, int eventId, int categoryId, int organizerId, String eventName, String location, String eventType, String status, String description, Timestamp createdAt, Timestamp updatedAt) {
+        super(eventId, categoryId, organizerId, eventName, location, eventType, status, description, createdAt, updatedAt);
+        this.imageId = imageId;
+        this.imageUrl = imageUrl;
+        this.imageTitle = imageTitle;
     }
 
     public int getImageId() {
@@ -49,7 +62,7 @@ public class EventImage {
         return imageTitle;
     }
 
-    public void setImageTitle(String imageTitle) { 
+    public void setImageTitle(String imageTitle) {
         this.imageTitle = imageTitle;
     }
 }

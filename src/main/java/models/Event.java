@@ -4,6 +4,7 @@
  */
 package models;
 
+import com.google.gson.annotations.Expose;
 import java.sql.Timestamp;
 
 /**
@@ -12,15 +13,25 @@ import java.sql.Timestamp;
  */
 public class Event {
 
+    @Expose
     private int eventId;
+    @Expose
     private int categoryId;
+    @Expose
     private int organizerId;
+    @Expose
     private String eventName;
+    @Expose
     private String location;
+    @Expose
     private String eventType;
+    @Expose
     private String status;
+    @Expose
     private String description;
+    @Expose
     private Timestamp createdAt;
+    @Expose
     private Timestamp updatedAt;
 
     public Event() {
