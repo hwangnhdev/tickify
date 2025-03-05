@@ -159,7 +159,7 @@
                                  class="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md hidden" style="color: black;">
                                 <a href="<%= request.getContextPath()%>/profile" class="block px-4 py-2 hover:bg-gray-100 text-black">My Profile</a>
                                 <a href="<%= request.getContextPath()%>/viewAllTickets" class="block px-4 py-2 hover:bg-gray-100 text-black">My Tickets</a>
-                                <a href="#" class="block px-4 py-2 hover:bg-gray-100 text-black">My Events</a>
+                                <a href="OrganizerEventController" class="block px-4 py-2 hover:bg-gray-100 text-black">My Events</a>
                                 <a href="<%= request.getContextPath()%>/logout" class="block px-4 py-2 hover:bg-gray-100 text-black">Log Out</a>
                             </div>
                         </div>

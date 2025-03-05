@@ -73,14 +73,14 @@ public class ViewSeatController extends HttpServlet {
     protected void viewSeatEvent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 //        int showtimeId = Integer.parseInt(request.getParameter("showtimeId"));
-        int eventId = Integer.parseInt(request.getParameter("eventId"));
-        System.out.println(eventId);
-        Event event = eventDAO.selectEventByID(eventId);
-        Showtime showtime = showtimeDAO.selectShowtimeById(eventId);
-        List<TicketType> ticketTypes = ticketTypeDAO.selectTicketTypeByShowtimeId(eventId);
+//        int eventId = Integer.parseInt(request.getParameter("eventId"));
+        System.out.println(2);
+        Event event = eventDAO.selectEventByID(2);
+        Showtime showtime = showtimeDAO.selectShowtimeById(2);
+        List<TicketType> ticketTypes = ticketTypeDAO.selectTicketTypeByShowtimeId(2);
 
-        Customer customer = cusDAO.selectCustomerById(eventId);
-        List<Seat> seats = seatDAO.selectSeatsByShowtimeId(eventId);
+        Customer customer = cusDAO.selectCustomerById(2);
+        List<Seat> seats = seatDAO.selectSeatsByShowtimeId(2);
 
         for (Seat seat : seats) {
             System.out.println(seat);

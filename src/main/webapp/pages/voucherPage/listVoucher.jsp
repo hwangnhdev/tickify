@@ -35,7 +35,7 @@
                     <a class="flex items-center text-white bg-green-700 p-2 rounded" href="listVoucher.jsp">
                         <i class="fas fa-tags mr-2"></i>Voucher
                     </a>
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="orders.jsp">
+                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/organizerOrders">
                         <i class="fas fa-list mr-2"></i>Order List
                     </a>
                 </nav>
@@ -48,7 +48,7 @@
                 <header class="flex justify-between items-center bg-gray-800 p-4">
                     <h1 class="text-xl font-bold">Vouchers</h1>
                     <div class="flex items-center space-x-4">
-                        <button type="button" onclick="location.href = 'createEvent.jsp'" class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
+                        <button type="button" onclick="location.href = 'createNewEvent'" class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
                             + Create Event
                         </button>
                         <button class="flex items-center text-white">

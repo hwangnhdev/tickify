@@ -339,6 +339,10 @@
         <servlet-name>ViewApprovedDetailController</servlet-name>
         <url-pattern>/admin/viewApprovedDetail</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
