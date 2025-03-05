@@ -4,26 +4,37 @@
  */
 package models;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  *
- * @author Nguyen Huy Hoang - CE182102
+ * @author Tang Thanh Vui - CE180901
  */
-public class Showtime {
+public class ShowTime {
 
     private int showtimeId;
     private int eventId;
-    private Timestamp startDate;
-    private Timestamp endDate;
+    private Timestamp startDate; // Changed from Date to Timestamp
+    private Timestamp endDate;   // Changed from Date to Timestamp
     private String status;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private Timestamp createdAt; // Changed from Date to Timestamp
+    private Timestamp updatedAt; // Changed from Date to Timestamp
+    private List<TicketType> ticketTypes;
 
-    public Showtime() {
+    public List<TicketType> getTicketTypes() {
+        return ticketTypes;
     }
 
-    public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt) {
+    public void setTicketTypes(List<TicketType> ticketTypes) {
+        this.ticketTypes = ticketTypes;
+    }
+
+    public ShowTime() {
+    }
+
+    public ShowTime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt) {
         this.showtimeId = showtimeId;
         this.eventId = eventId;
         this.startDate = startDate;
@@ -89,16 +100,4 @@ public class Showtime {
         this.updatedAt = updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "Showtime{"
-                + "showtimeId=" + showtimeId
-                + ", eventId=" + eventId
-                + ", startDate=" + startDate
-                + ", endDate=" + endDate
-                + ", status='" + status + '\''
-                + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt
-                + '}';
-    }
 }
