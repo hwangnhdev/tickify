@@ -12,11 +12,487 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Create Event - Tickify Organizer</title>
+        <title>Update Event - Tickify Organizer</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
         <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/organizerPage/updateEvent.css"/>
+        <style>
+            body {
+                background-color: #1F2937; /* Dark gray background */
+                color: #D1D5DB; /* Light gray text color */
+                font-family: 'Arial', sans-serif; /* Default font */
+            }
+
+            /* Sidebar Styling */
+            .sidebar {
+                background-color: #15803D; /* Green background for sidebar */
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3); /* Shadow effect on right side */
+                transition: all 0.3s ease; /* Smooth transition for all properties */
+            }
+            .sidebar a:hover {
+                color: #A7F3D0; /* Light green text on hover */
+                transition: color 0.2s ease; /* Smooth color transition */
+            }
+
+            /* Header Styling */
+            header.fixed {
+                position: fixed; /* Fixed position at the top */
+                top: 0; /* Align to top */
+                left: 16rem; /* Offset to accommodate sidebar width (256px) */
+                right: 0; /* Extend to the right edge */
+                z-index: 50; /* Ensure header stays above other content */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Shadow to distinguish when scrolled */
+                background-color: #1F2937; /* Same dark gray as body */
+            }
+
+            /* Main Content Styling */
+            main {
+                margin-top: 4rem; /* Space to avoid overlap with fixed header (64px) */
+                padding-top: 1rem; /* Additional padding below header */
+            }
+
+            /* Tab Button Styling */
+            .tab-button {
+                width: 32px; /* Fixed width */
+                height: 32px; /* Fixed height */
+                background-color: #4B5563; /* Medium gray background */
+                border: none; /* No border */
+                transition: background-color 0.3s ease; /* Smooth background color change */
+            }
+            .tab-button.active {
+                background-color: #15803D; /* Green background when active */
+                transform: scale(1.1); /* Slightly larger when active */
+            }
+            .tab-button:hover {
+                background-color: #6B7280; /* Lighter gray on hover */
+            }
+
+            /* Upload Area Styling */
+            .upload-area {
+                background-color: #4B5563; /* Medium gray background */
+                border: 2px dashed #6B7280; /* Dashed light gray border */
+                border-radius: 8px; /* Rounded corners */
+                transition: all 0.3s ease; /* Smooth transition for all properties */
+            }
+            .upload-area:hover {
+                border-color: #15803D; /* Green border on hover */
+                background-color: #374151; /* Darker gray background on hover */
+            }
+
+            /* Form Elements Styling */
+            .form-control, .form-select {
+                background-color: #4B5563; /* Medium gray background */
+                color: #FFFFFF; /* White text */
+                border: 1px solid #6B7280; /* Light gray border */
+                border-radius: 6px; /* Rounded corners */
+                transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            }
+            .form-control:focus, .form-select:focus {
+                border-color: #15803D; /* Green border on focus */
+                box-shadow: 0 0 5px rgba(21, 128, 61, 0.5); /* Green glow effect */
+                background-color: #374151; /* Darker gray background */
+                color: #FFFFFF; /* White text */
+            }
+            .form-control::placeholder {
+                color: #D1D5DB; /* Light gray placeholder text */
+            }
+            .form-label {
+                font-weight: 500; /* Medium font weight */
+                color: #E5E7EB; /* Very light gray text */
+            }
+
+            /* Seat Section Styling */
+            .seat-container {
+                background-color: #374151; /* Dark gray background */
+                border-radius: 8px; /* Rounded corners */
+                padding: 20px; /* Inner padding */
+                margin-bottom: 20px; /* Space below */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            }
+            .seat-grid {
+                display: grid; /* Grid layout */
+                gap: 15px; /* Spacing between items */
+                margin-top: 15px; /* Space above */
+            }
+            .seat-input {
+                display: flex; /* Flexbox layout */
+                align-items: center; /* Center vertically */
+                gap: 10px; /* Spacing between children */
+                background-color: #4B5563; /* Medium gray background */
+                padding: 10px; /* Inner padding */
+                border-radius: 6px; /* Rounded corners */
+                border: 1px solid #6B7280; /* Light gray border */
+                transition: transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            }
+            .seat-input:hover {
+                transform: translateY(-2px); /* Slight lift on hover */
+                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3); /* Green shadow */
+            }
+            .seat-input label {
+                display: block; /* Block display */
+                margin-bottom: 5px; /* Space below */
+                color: #D1D5DB; /* Light gray text */
+                font-weight: 400; /* Normal font weight */
+                flex: 0 0 auto; /* Fixed size */
+            }
+            .seat-input input {
+                width: 150px; /* Fixed width */
+                margin-bottom: 0; /* No margin below */
+                color: #FFFFFF; /* White text */
+                flex: 1; /* Flexible width */
+            }
+            .seat-input button {
+                margin-top: 30px; /* Space above */
+                flex: 0 0 auto; /* Fixed size */
+            }
+            #seatSummary {
+                color: #34D399; /* Light green text */
+                font-weight: bold; /* Bold text */
+                margin-top: 15px; /* Space above */
+                padding: 10px; /* Inner padding */
+                background-color: #4A5568; /* Slightly lighter gray background */
+                border-radius: 6px; /* Rounded corners */
+                border-left: 4px solid #10B981; /* Green left border */
+                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+                display: block; /* Block display */
+            }
+
+            /* Show Time Section Styling */
+            .ticket-section {
+                background-color: #374151; /* Dark gray background */
+                border-radius: 8px; /* Rounded corners */
+                padding: 20px; /* Inner padding */
+                margin-bottom: 20px; /* Space below */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            }
+            .show-time {
+                background-color: #4B5563; /* Medium gray background */
+                border-radius: 6px; /* Rounded corners */
+                padding: 0; /* No padding (adjusted from 15px) */
+                margin-bottom: 15px; /* Space below */
+                transition: all 0.3s ease; /* Smooth transition */
+                border: 1px solid #6B7280; /* Light gray border */
+                overflow: hidden; /* Prevent content overflow */
+            }
+            .show-time:hover {
+                background-color: #6B7280; /* Lighter gray on hover */
+                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3); /* Green shadow */
+            }
+            .saved-ticket {
+                background-color: #374151; /* Dark gray background */
+                border-radius: 6px; /* Rounded corners */
+                padding: 0; /* No padding (adjusted from 10px) */
+                margin-top: 10px; /* Space above */
+                border-left: 4px solid #15803D; /* Green left border */
+                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+                overflow: hidden; /* Prevent content overflow */
+            }
+            .show-time-details {
+                padding: auto; /* Auto padding */
+                margin: 0; /* No margin */
+                min-height: 0; /* No fixed minimum height */
+            }
+            .grid.grid-cols-1.md:grid-cols-2.gap-4 {
+                gap: 8px; /* Reduced gap from 16px to 8px */
+            }
+            .space-y-2 {
+                margin-top: 0; /* Remove excess top margin */
+                margin-bottom: 0; /* Remove excess bottom margin */
+            }
+
+            /* Toggle Buttons Styling */
+            .toggle-btn {
+                background-color: #4B5563; /* Medium gray background */
+                color: #FFFFFF; /* White text */
+                border: none; /* No border */
+                padding: 6px 12px; /* Padding */
+                border-radius: 6px; /* Rounded corners */
+                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+                margin-right: 10px; /* Space to the right */
+            }
+            .toggle-btn:hover {
+                background-color: #6B7280; /* Lighter gray on hover */
+                transform: translateY(-2px); /* Slight lift */
+            }
+            .collapsible-content {
+                height: auto; /* Auto height when expanded */
+                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out; /* Smooth collapse/expand */
+                /*                overflow: hidden;  Hide overflow */
+            }
+            .collapsible-content.collapsed {
+                height: 0; /* Collapsed height */
+                opacity: 0; /* Fully transparent */
+                padding: 0; /* No padding when collapsed */
+            }
+
+            /* General Buttons Styling */
+            .add-ticket-btn, .save-seat-btn {
+                background-color: #15803D; /* Green background */
+                color: white; /* White text */
+                border: none; /* No border */
+                padding: 6px 12px; /* Padding */
+                border-radius: 6px; /* Rounded corners */
+                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+                margin-left: 5px; /* Space to the left */
+            }
+            .add-ticket-btn:hover, .save-seat-btn:hover {
+                background-color: #166534; /* Darker green on hover */
+                transform: translateY(-2px); /* Slight lift */
+            }
+            .btn-danger {
+                background-color: #DC2626; /* Red background */
+                border: none; /* No border */
+                padding: 6px 12px; /* Padding */
+                border-radius: 6px; /* Rounded corners */
+                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+            }
+            .btn-danger:hover {
+                background-color: #B91C1C; /* Darker red on hover */
+                transform: translateY(-2px); /* Slight lift */
+            }
+
+            /* Datetime Inputs Styling */
+            .datetime-local {
+                background-color: #4B5563; /* Medium gray background */
+                color: #FFFFFF; /* White text */
+                border: 1px solid #6B7280; /* Light gray border */
+                border-radius: 6px; /* Rounded corners */
+                padding: 8px; /* Inner padding */
+                width: 100%; /* Full width */
+                cursor: pointer; /* Pointer cursor */
+            }
+            .datetime-local:focus {
+                border-color: #15803D; /* Green border on focus */
+                box-shadow: 0 0 5px rgba(21, 128, 61, 0.5); /* Green glow */
+                color: #FFFFFF; /* White text */
+            }
+
+            /* Modal Styling */
+            .modal-content {
+                background-color: #374151; /* Dark gray background */
+                border: none; /* No border */
+                border-radius: 8px; /* Rounded corners */
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Deep shadow */
+            }
+            .modal-header {
+                border-bottom: 1px solid #6B7280; /* Light gray bottom border */
+            }
+            .modal-footer {
+                border-top: 1px solid #6B7280; /* Light gray top border */
+            }
+            .btn-secondary {
+                background-color: #6B7280; /* Light gray background */
+                border: none; /* No border */
+                transition: background-color 0.3s ease; /* Smooth transition */
+            }
+            .btn-secondary:hover {
+                background-color: #4B5563; /* Darker gray on hover */
+            }
+            .btn-success {
+                background-color: #15803D; /* Green background */
+                border: none; /* No border */
+                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+            }
+            .btn-success:hover {
+                background-color: #166534; /* Darker green on hover */
+                transform: translateY(-2px); /* Slight lift */
+            }
+            .btn-success:disabled {
+                background-color: #6B7280; /* Gray when disabled */
+                cursor: not-allowed; /* Disabled cursor */
+                transform: none; /* No transform */
+            }
+            .btn-success:disabled:hover {
+                background-color: #6B7280; /* Same gray on hover when disabled */
+            }
+
+            /* Color Picker Styling */
+            .color-picker-container {
+                position: relative; /* Relative positioning */
+            }
+            .color-picker-container input[type="color"] {
+                padding: 0; /* No padding */
+                height: 40px; /* Fixed height */
+                appearance: none; /* Remove default styling */
+                -webkit-appearance: none; /* Remove default styling for Webkit */
+                border: none; /* No border */
+                background: none; /* Transparent background */
+                cursor: pointer; /* Pointer cursor */
+            }
+            .color-picker-container input[type="color"]::-webkit-color-swatch-wrapper {
+                padding: 0; /* No padding */
+            }
+            .color-picker-container input[type="color"]::-webkit-color-swatch,
+            .color-picker-container input[type="color"]::-moz-color-swatch {
+                border: 1px solid #6B7280; /* Light gray border */
+                border-radius: 4px; /* Rounded corners */
+            }
+
+            /* Event Logo Preview Styling (720x958) */
+            #logoPreview {
+                width: 284px; /* Fixed width (approx. 9rem) */
+                height: 420px; /* Fixed height (approx. 12rem) */
+                background-color: #4B5563; /* Medium gray background */
+                border: 1px solid #6B7280; /* Light gray border */
+                border-radius: 8px; /* Rounded corners */
+                display: flex; /* Flexbox layout */
+                flex-direction: column; /* Vertical alignment */
+                justify-content: center; /* Center vertically */
+                align-items: center; /* Center horizontally */
+                cursor: pointer; /* Pointer cursor */
+                transition: background-color 0.3s ease; /* Smooth background change */
+                overflow: hidden; /* Prevent overflow */
+            }
+            #logoPreview:hover {
+                background-color: #374151; /* Darker gray on hover */
+            }
+            #logoPreview i {
+                font-size: 1.5rem; /* Large icon (text-2xl) */
+                margin-bottom: 0.5rem; /* Space below (mb-2) */
+                color: #10B981; /* Green icon */
+            }
+            #logoPreview p {
+                font-size: 0.875rem; /* Small text (text-sm) */
+                color: #D1D5DB; /* Light gray text */
+                text-align: center; /* Centered text */
+            }
+            #logoImage {
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                object-fit: cover; /* Cover entire area */
+                border-radius: 8px; /* Rounded corners */
+            }
+
+            /* Background Image Preview Styling (1280x720) */
+            #backgroundPreview {
+                width: 856px; /* Fixed width (approx. 53.5rem) */
+                height: 418px; /* Fixed height (approx. 26.125rem) */
+                background-color: #4B5563; /* Medium gray background */
+                border: 1px solid #6B7280; /* Light gray border */
+                border-radius: 8px; /* Rounded corners */
+                display: flex; /* Flexbox layout */
+                flex-direction: column; /* Vertical alignment */
+                justify-content: center; /* Center vertically */
+                align-items: center; /* Center horizontally */
+                cursor: pointer; /* Pointer cursor */
+                transition: background-color 0.3s ease; /* Smooth background change */
+                overflow: hidden; /* Prevent overflow */
+            }
+            #backgroundPreview:hover {
+                background-color: #374151; /* Darker gray on hover */
+            }
+            #backgroundPreview i {
+                font-size: 1.5rem; /* Large icon (text-2xl) */
+                margin-bottom: 0.5rem; /* Space below (mb-2) */
+                color: #10B981; /* Green icon */
+            }
+            #backgroundPreview p {
+                font-size: 0.875rem; /* Small text (text-sm) */
+                color: #D1D5DB; /* Light gray text */
+                text-align: center; /* Centered text */
+            }
+            #backgroundImage {
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                object-fit: cover; /* Cover entire area */
+                border-radius: 8px; /* Rounded corners */
+            }
+
+            /* Organizer Logo Preview Styling (275x275) */
+            #organizerLogoPreview {
+                width: 170px; /* Fixed width (approx. 10.625rem) */
+                height: 216px; /* Fixed height (approx. 13.5rem) */
+                background-color: #4B5563; /* Medium gray background */
+                border: 1px solid #6B7280; /* Light gray border */
+                border-radius: 8px; /* Rounded corners */
+                display: flex; /* Flexbox layout */
+                flex-direction: column; /* Vertical alignment */
+                justify-content: center; /* Center vertically */
+                align-items: center; /* Center horizontally */
+                cursor: pointer; /* Pointer cursor */
+                transition: background-color 0.3s ease; /* Smooth background change */
+                overflow: hidden; /* Prevent overflow */
+                margin-left: 39%; /* Left for image */
+            }
+            #organizerLogoPreview:hover {
+                background-color: #374151; /* Darker gray on hover */
+            }
+            #organizerLogoPreview i {
+                font-size: 1.5rem; /* Large icon (text-2xl) */
+                margin-bottom: 0.5rem; /* Space below (mb-2) */
+                color: #10B981; /* Green icon */
+            }
+            #organizerLogoPreview p {
+                font-size: 0.875rem; /* Small text (text-sm) */
+                color: #D1D5DB; /* Light gray text */
+                text-align: center; /* Centered text */
+            }
+            #organizerLogoImage {
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                object-fit: cover; /* Cover entire area */
+                border-radius: 8px; /* Rounded corners */
+            }
+
+            /* Image Layout Styling */
+            .image-group {
+                display: flex; /* Flexbox layout */
+                gap: 20px; /* Space between images */
+                justify-content: center; /* Center horizontally */
+                flex-wrap: wrap; /* Wrap to next line if needed */
+            }
+            .organizer-row {
+                display: flex; /* Flexbox layout */
+                align-items: center; /* Center vertically */
+                gap: 20px; /* Space between items */
+                justify-content: center; /* Center horizontally */
+                margin-top: 20px; /* Space above */
+            }
+            .organizer-row .input-container {
+                flex: 1; /* Flexible width */
+                max-width: 300px; /* Maximum width */
+            }
+
+            /* Miscellaneous Styling */
+            .upload-icon.hidden, .upload-text.hidden {
+                display: none; /* Hide elements with 'hidden' class */
+            }
+            .image-error, .error-message {
+                color: #EF4444; /* Red text */
+                font-size: 0.875rem; /* Small text (text-sm) */
+                margin-top: 0.5rem; /* Space above (mt-2) */
+                text-align: center; /* Centered text */
+            }
+            .error-message {
+                margin-top: 0.25rem; /* Reduced space (mt-1) */
+                display: none; /* Hidden by default */
+            }
+
+            /* Textarea Styling */
+            .event-info-textarea {
+                width: 100%; /* Full width */
+                padding: 0.5rem; /* Inner padding (p-2) */
+                border-radius: 0.375rem; /* Rounded corners */
+                background-color: #4B5563; /* Medium gray background */
+                border: 1px solid #6B7280; /* Light gray border */
+                color: #FFFFFF; /* White text */
+                outline: none; /* No outline on focus */
+                resize: vertical; /* Vertical resize only */
+                min-height: 100px; /* Minimum height */
+                max-height: 400px; /* Maximum height */
+                overflow-y: auto; /* Scroll if content overflows */
+                box-shadow: 0 0 0 2px transparent; /* Transparent ring by default */
+                transition: border-color 0.3s ease, box-shadow 0.3s ease, height 0.3s ease; /* Smooth transitions */
+                height: 300px; /* Fixed height */
+                line-height: 1; /* Consistent line height */
+            }
+            .event-info-textarea:focus {
+                border-color: #15803D; /* Green border on focus */
+                box-shadow: 0 0 0 2px #15803D; /* Green ring on focus */
+                background-color: #374151; /* Darker gray background */
+                color: #FFFFFF; /* White text */
+            }
+        </style>
     </head>
     <body class="bg-gray-900 text-white">
         <div class="flex h-screen">
@@ -58,7 +534,6 @@
                 </header>
 
                 <!-- Tab Event Info -->
-                <!-- Tab Event Info -->
                 <section id="event-info" class="tab-content">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Event Name -->
@@ -95,9 +570,20 @@
                                     <c:set var="locationParts" value="${fn:split(event.location, ',')}" />
                                     <c:if test="${not empty locationParts and fn:length(locationParts) > 0}">
                                         <c:set var="province" value="${fn:trim(locationParts[fn:length(locationParts) - 1])}" />
-                                        <option value="${province}" selected>${province}</option>
+                                        <c:set var="normalizedProvince" value="${fn:replace(province, 'Thành phố ', '')}" />
+                                        <c:forEach var="prov" items="${provinces}">
+                                            <c:set var="provName" value="${fn:trim(prov.name)}" />
+                                            <c:if test="${fn:contains(provName, normalizedProvince) || fn:contains(provName, province)}">
+                                                <option value="${prov.name}" selected>${prov.name}</option>
+                                            </c:if>
+                                        </c:forEach>
                                     </c:if>
                                 </c:if>
+                                <c:forEach var="prov" items="${provinces}">
+                                    <c:if test="${empty provinceMatch}">
+                                        <option value="${prov.name}">${prov.name}</option>
+                                    </c:if>
+                                </c:forEach>
                             </select>
                             <span class="error-message" id="province_error"></span>
                         </div>
@@ -162,10 +648,10 @@
                                     <p class="text-gray-300 text-sm upload-text hidden">Event Logo (720x958)</p>
                                     <input type="file" id="logoEventInput" class="hidden" 
                                            data-url="<c:forEach var='image' items='${eventImages}'><c:if test='${image.imageTitle == "logo_event"}'>${image.imageUrl}</c:if></c:forEach>">
-                                    <span class="error-message" id="logoEvent_error"></span>
-                                </div>
+                                               <span class="error-message" id="logoEvent_error"></span>
+                                           </div>
 
-                                <div id="backgroundPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
+                                           <div id="backgroundPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
                                     <c:if test="${not empty eventImages}">
                                         <c:forEach var="image" items="${eventImages}">
                                             <c:if test="${image.imageTitle == 'logo_banner'}">
@@ -177,14 +663,14 @@
                                     <p class="text-gray-300 text-sm upload-text hidden">Add Event Background Image (1280x720)</p>
                                     <input type="file" id="backgroundInput" class="hidden" 
                                            data-url="<c:forEach var='image' items='${eventImages}'><c:if test='${image.imageTitle == "logo_banner"}'>${image.imageUrl}</c:if></c:forEach>">
-                                    <span class="error-message" id="backgroundImage_error"></span>
+                                               <span class="error-message" id="backgroundImage_error"></span>
+                                           </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="md:col-span-2 p-4 rounded bg-gray-800 text-center">
-                            <div class="organizer-row grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div id="organizerLogoPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
+                                <div class="md:col-span-2 p-4 rounded bg-gray-800 text-center">
+                                    <div class="organizer-row grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div id="organizerLogoPreview" class="w-36 h-48 bg-gray-700 border border-gray-600 rounded cursor-pointer flex items-center justify-center flex-col hover:bg-gray-600 transition duration-200">
                                     <c:if test="${not empty eventImages}">
                                         <c:forEach var="image" items="${eventImages}">
                                             <c:if test="${image.imageTitle == 'logo_organizer'}">
@@ -196,13 +682,13 @@
                                     <p class="text-gray-300 text-sm upload-text hidden">Organizer Logo (275x275)</p>
                                     <input type="file" id="organizerLogoInput" class="hidden" 
                                            data-url="<c:forEach var='image' items='${eventImages}'><c:if test='${image.imageTitle == "logo_organizer"}'>${image.imageUrl}</c:if></c:forEach>">
-                                    <span class="error-message" id="organizerLogo_error"></span>
-                                </div>
+                                               <span class="error-message" id="organizerLogo_error"></span>
+                                           </div>
 
-                                <div class="input-container">
-                                    <label class="block text-gray-300 mb-2">Organizer Name</label>
-                                    <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" 
-                                           value="${organizer.organizationName}" placeholder="Organizer Name" required>
+                                           <div class="input-container">
+                                               <label class="block text-gray-300 mb-2">Organizer Name</label>
+                                               <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" 
+                                                      value="${organizer.organizationName}" placeholder="Organizer Name" required>
                                     <span class="error-message" id="organizerName_error"></span>
                                 </div>
                             </div>
@@ -210,7 +696,6 @@
                     </div>
                 </section>
 
-                <!-- Tab Time & Logistics -->
                 <!-- Tab Time & Logistics -->
                 <section id="time-logistics" class="tab-content hidden">
                     <div class="space-y-6">
@@ -221,12 +706,12 @@
                                 <option value="">-- Please Select Type --</option>
                                 <option value="standingevent" <c:if test="${event.eventType == 'standingevent'}">selected</c:if>>Standing Event</option>
                                 <option value="seatedevent" <c:if test="${event.eventType == 'seatedevent'}">selected</c:if>>Seated Event</option>
-                            </select>
-                            <span class="error-message" id="eventType_error"></span>
+                                </select>
+                                <span class="error-message" id="eventType_error"></span>
                         </div>
 
                         <!-- Seat Management (if seated event) -->
-                        <div id="seatSection" class="hidden">
+                        <div id="seatSection" class="">
                             <h5 class="text-white mb-3">Seat Management (Seated Event)</h5>
                             <div id="seatsContainer" class="space-y-4">
                                 <c:forEach var="seat" items="${seats}" varStatus="loop">
@@ -251,7 +736,7 @@
                             <!-- Add error message container -->
                             <div id="seatError" class="mt-2 text-red-500 hidden"></div>
                             <button type="button" class="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" onclick="addSeat()">+ Add Seat</button>
-                            <div id="seatSummary" class="mt-3 text-gray-300"></div>
+                            <div id="seatSummary" class="mt-3 text-gray-300"></div>         
                         </div>
 
                         <!-- Show Times -->
@@ -265,70 +750,70 @@
                             <div id="showTimeContent" class="collapsible-content">
                                 <div id="showTimeList" class="space-y-4">
                                     <c:forEach var="showTime" items="${showTimes}" varStatus="loop">
-                                    <div class="show-time bg-gray-800 p-4 rounded">
-                                        <div class="flex justify-between items-center mb-3">
-                                            <h6 class="text-white"><span class="show-time-label">Show Time #${loop.count}</span></h6>
-                                            <div class="flex gap-2">
-                                                <button class="toggle-btn" onclick="toggleShowTime(this)">
-                                                    <i class="fas fa-chevron-down"></i>
-                                                </button>
-                                                <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeShowTime(this)">Delete</button>
+                                        <div class="show-time bg-gray-800 p-4 rounded">
+                                            <div class="flex justify-between items-center mb-3">
+                                                <h6 class="text-white"><span class="show-time-label">Show Time #${loop.count}</span></h6>
+                                                <div class="flex gap-2">
+                                                    <button class="toggle-btn" onclick="toggleShowTime(this)">
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                    <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeShowTime(this)">Delete</button>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="collapsible-content show-time-details">
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div>
-                                                <label class="text-gray-300">Start Date</label>
-                                                <input type="datetime-local" name="showStartDate" id="showStartDate_${loop.count}"
-                                                       class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none"
-                                                       value="<c:if test="${not empty showTime.startDate}"><fmt:formatDate value='${showTime.startDate}' pattern='yyyy-MM-dd\'T\'HH:mm'/></c:if>"
-                                                       onchange="updateShowTimeLabel(this)" required>
-                                                <span class="error-message" id="showStartDate_${loop.count}_error"></span>
-                                            </div>
-                                            <div>
-                                                <label class="text-gray-300">End Date</label>
-                                                <input type="datetime-local" name="showEndDate" id="showEndDate_${loop.count}"
-                                                       class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none"
-                                                       value="<c:if test="${not empty showTime.endDate}"><fmt:formatDate value='${showTime.endDate}' pattern='yyyy-MM-dd\'T\'HH:mm'/></c:if>"
-                                                       onchange="updateShowTimeLabel(this)" required>
-                                                <span class="error-message" id="showEndDate_${loop.count}_error"></span>
-                                            </div>
-                                            </div>
-                                            <div id="ticketList_${loop.count}" class="mt-3 space-y-2">
-                                                <c:forEach var="ticket" items="${ticketTypes}" varStatus="ticketLoop">
-                                                    <c:if test="${ticket.showtimeId == showTime.showtimeId}">
-                                                        <div class="saved-ticket bg-gray-700 p-3 rounded">
-                                                            <div class="flex justify-between items-center mb-2">
-                                                                <h6 class="text-white"><span class="ticket-label" data-ticket-name="${ticket.name}" data-ticket-id="${ticket.ticketTypeId}">${ticket.name}</span></h6>
-                                                                <div class="flex gap-2">
-                                                                    <button class="toggle-btn" onclick="toggleTicket(this)">
-                                                                        <i class="fas fa-chevron-down"></i>
-                                                                    </button>
-                                                                    <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition duration-200" onclick="editTicket(this, '${loop.count}')">Edit</button>
-                                                                    <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeTicket(this, '${loop.count}')">Delete</button>
+                                            <div class="collapsible-content show-time-details">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label class="text-gray-300">Start Date</label>
+                                                        <input type="datetime-local" name="showStartDate" id="showStartDate_${loop.count}"
+                                                               class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none"
+                                                               value="<c:if test="${not empty showTime.startDate}"><fmt:formatDate value='${showTime.startDate}' pattern='yyyy-MM-dd\'T\'HH:mm'/></c:if>"
+                                                                   onchange="updateShowTimeLabel(this)" required>
+                                                               <span class="error-message" id="showStartDate_${loop.count}_error"></span>
+                                                    </div>
+                                                    <div>
+                                                        <label class="text-gray-300">End Date</label>
+                                                        <input type="datetime-local" name="showEndDate" id="showEndDate_${loop.count}"
+                                                               class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none"
+                                                               value="<c:if test="${not empty showTime.endDate}"><fmt:formatDate value='${showTime.endDate}' pattern='yyyy-MM-dd\'T\'HH:mm'/></c:if>"
+                                                                   onchange="updateShowTimeLabel(this)" required>
+                                                               <span class="error-message" id="showEndDate_${loop.count}_error"></span>
+                                                    </div>
+                                                </div>
+                                                <div id="ticketList_${loop.count}" class="mt-3 space-y-2">
+                                                    <c:forEach var="ticket" items="${ticketTypes}" varStatus="ticketLoop">
+                                                        <c:if test="${ticket.showtimeId == showTime.showtimeId}">
+                                                            <div class="saved-ticket bg-gray-700 p-3 rounded">
+                                                                <div class="flex justify-between items-center mb-2">
+                                                                    <h6 class="text-white"><span class="ticket-label" data-ticket-name="${ticket.name}" data-ticket-id="${ticket.ticketTypeId}">${ticket.name}</span></h6>
+                                                                    <div class="flex gap-2">
+                                                                        <button class="toggle-btn" onclick="toggleTicket(this)">
+                                                                            <i class="fas fa-chevron-down"></i>
+                                                                        </button>
+                                                                        <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition duration-200" onclick="editTicket(this, '${loop.count}')">Edit</button>
+                                                                        <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200" onclick="removeTicket(this, '${loop.count}')">Delete</button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="collapsible-content ticket-details">
+                                                                    <div class="space-y-2 text-gray-300">
+                                                                        <div><label>Description:</label> <span>${ticket.description}</span></div>
+                                                                        <div><label>Price (VND):</label> <span>${ticket.price}</span></div>
+                                                                        <div><label>Quantity:</label> <span>${ticket.totalQuantity}</span></div>
+                                                                        <div><label>Color:</label> <span style="color: ${ticket.color}">${ticket.color}</span></div>
+                                                                            <c:forEach var="seat" items="${seats}">
+                                                                                <c:if test="${seat.ticketTypeId == ticket.ticketTypeId}">
+                                                                                <div><label>Seats:</label> <span>${seat.seatRow} ${seat.seatCol}</span></div>
+                                                                            </c:if>
+                                                                        </c:forEach>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="collapsible-content ticket-details">
-                                                                <div class="space-y-2 text-gray-300">
-                                                                    <div><label>Description:</label> <span>${ticket.description}</span></div>
-                                                                    <div><label>Price (VND):</label> <span>${ticket.price}</span></div>
-                                                                    <div><label>Quantity:</label> <span>${ticket.totalQuantity}</span></div>
-                                                                    <div><label>Color:</label> <span style="color: ${ticket.color}">${ticket.color}</span></div>
-                                                                    <c:forEach var="seat" items="${seats}">
-                                                                        <c:if test="${seat.ticketTypeId == ticket.ticketTypeId}">
-                                                                            <div><label>Seats:</label> <span>${seat.seatRow} ${seat.seatCol}</span></div>
-                                                                        </c:if>
-                                                                    </c:forEach>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </c:if>
-                                                </c:forEach>
+                                                        </c:if>
+                                                    </c:forEach>
+                                                </div>
+                                                <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" data-show-time="${loop.count}" onclick="openModal(this)">+ Add Ticket Type</button>
                                             </div>
-                                            <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" data-show-time="${loop.count}" onclick="openModal(this)">+ Add Ticket Type</button>
                                         </div>
-                                    </div>
-                                </c:forEach>
+                                    </c:forEach>
                                 </div>
                                 <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" onclick="addNewShowTime()">+ Create New Show Time</button>
                             </div>
@@ -336,7 +821,6 @@
                     </div>
                 </section>
 
-                <!-- Tab Payment Info -->
                 <!-- Tab Payment Info -->
                 <section id="payment-info" class="tab-content hidden">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -351,10 +835,12 @@
                             <label class="block text-gray-300 mb-2">Bank Name</label>
                             <select id="bank" name="bankName" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" required>
                                 <option value="">Bank Name</option>
-                                <!-- Logic để chọn Bank Name dựa trên organizer.bankName -->
-                                <c:if test="${not empty organizer.bankName}">
-                                    <option value="${organizer.bankName}" selected>${organizer.bankName}</option>
-                                </c:if>
+                                <c:forEach var="bank" items="${banks}">
+                                    <option value="${bank.code}"
+                                            <c:if test="${organizer.bankName eq bank.code}">selected</c:if>>
+                                        ${bank.shortName} - ${bank.name}
+                                    </option>
+                                </c:forEach>
                             </select>
                             <span class="error-message" id="bank_error"></span>
                         </div>
@@ -380,7 +866,6 @@
         </div>
 
         <!-- Modal -->
-        <!-- Modal -->
         <div id="newTicketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
             <div class="bg-gray-800 rounded-lg w-full max-w-4xl p-6">
                 <div class="flex justify-between items-center mb-4">
@@ -404,7 +889,7 @@
                         <!-- Price -->
                         <div>
                             <label class="block text-gray-300 mb-2">Price (VND)</label>
-                            <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 150000" step="1000">
+                            <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 15" step="1000">
                             <span class="error-message" id="modalTicketPrice_error"></span>
                         </div>
                         <!-- Quantity -->

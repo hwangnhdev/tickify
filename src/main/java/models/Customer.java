@@ -89,4 +89,17 @@ public class Customer {
         this.status = status;
     }
 
+    @Override
+    public String toString() {
+        return "Customer{"
+                + "customerId=" + customerId
+                + ", fullName='" + fullName + '\''
+                + ", email='" + email + '\''
+                + ", address='" + address + '\''
+                + ", phone='" + phone + '\''
+                + ", profilePicture='" + profilePicture + '\''
+                + ", status=" + status
+                + '}';
+    }
+
 }

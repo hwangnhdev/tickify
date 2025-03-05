@@ -29,6 +29,7 @@ public class TicketType {
     public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Timestamp createdAt, Timestamp updatedAt) {
         this.ticketTypeId = ticketTypeId;
         this.showtimeId = showtimeId;
+        this.showtimeId = showtimeId;
         this.name = name;
         this.description = description;
         this.price = price;

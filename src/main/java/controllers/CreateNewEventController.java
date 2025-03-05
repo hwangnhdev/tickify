@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Category;
 import models.Seat;
-import models.ShowTime;
+import models.Showtime;
 import models.TicketType;
 
 @MultipartConfig // Thêm annotation để xử lý multipart/form-data
@@ -46,7 +46,7 @@ public class CreateNewEventController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -101,7 +101,7 @@ public class CreateNewEventController extends HttpServlet {
 
         System.out.println("Received request to /createNewEvent");
         StringBuilder jsonBuffer = new StringBuilder();
-        try (BufferedReader reader = request.getReader()) {
+        try ( BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
                 jsonBuffer.append(line);
@@ -150,14 +150,14 @@ public class CreateNewEventController extends HttpServlet {
             }
 
             // Process ShowTimes
-            List<ShowTime> showTimes = new ArrayList<>();
+            List<Showtime> showTimes = new ArrayList<>();
             JsonArray showTimesArray = jsonData.has("showTimes") ? jsonData.getAsJsonArray("showTimes") : null;
             if (showTimesArray == null || showTimesArray.size() == 0) {
                 throw new IllegalArgumentException("ShowTimes is required and cannot be empty");
             }
             for (JsonElement showTimeElement : showTimesArray) {
                 JsonObject showTimeObj = showTimeElement.getAsJsonObject();
-                ShowTime showTime = new ShowTime();
+                Showtime showTime = new Showtime();
                 // Ensure date format matches yyyy-MM-dd HH:mm:ss
                 String startDateStr = showTimeObj.get("startDate").getAsString();
                 String endDateStr = showTimeObj.get("endDate").getAsString();
@@ -189,26 +189,49 @@ public class CreateNewEventController extends HttpServlet {
             }
 
             // Process Seats (if seated event)
-            // Trong doPost, phần xử lý seats:
             List<Seat> seats = new ArrayList<>();
             if ("seatedevent".equals(eventType)) {
                 JsonArray seatsArray = jsonData.has("seats") ? jsonData.getAsJsonArray("seats") : null;
                 if (seatsArray == null || seatsArray.size() == 0) {
                     throw new IllegalArgumentException("Seats are required for seated events");
                 }
+
+                // Lặp qua từng object trong seatsArray từ JSON
                 for (JsonElement seatElement : seatsArray) {
                     JsonObject seatObj = seatElement.getAsJsonObject();
-                    Seat seat = new Seat();
-                    seat.setTicketTypeName(seatObj.has("ticketTypeName") ? seatObj.get("ticketTypeName").getAsString() : "");
-                    seat.setSeatRow(seatObj.has("seatRow") ? seatObj.get("seatRow").getAsString() : "");
-                    seat.setSeatCol(seatObj.has("seatCol") ? seatObj.get("seatCol").getAsString() : ""); // Lấy seatCol từ JSON
-                    seat.setStatus(seatObj.has("status") ? seatObj.get("status").getAsString() : "Available");
-                    if (seat.getTicketTypeName().isEmpty() || seat.getSeatRow().isEmpty()) {
-                        throw new IllegalArgumentException("TicketTypeName and SeatRow are required for each seat");
+
+                    // Lấy thông tin cơ bản từ JSON
+                    String ticketTypeName = seatObj.has("ticketTypeName") ? seatObj.get("ticketTypeName").getAsString() : "";
+                    String seatRow = seatObj.has("seatRow") ? seatObj.get("seatRow").getAsString() : "";
+                    String seatColStr = seatObj.has("seatCol") ? seatObj.get("seatCol").getAsString() : "";
+
+                    if (ticketTypeName.isEmpty() || seatRow.isEmpty() || seatColStr.isEmpty()) {
+                        throw new IllegalArgumentException("TicketTypeName, SeatRow, and SeatCol are required for each seat");
                     }
-                    seats.add(seat);
+
+                    // Chuyển seatCol từ String sang int để biết số lần lặp
+                    int totalSeats;
+                    try {
+                        totalSeats = Integer.parseInt(seatColStr);
+                        if (totalSeats <= 0) {
+                            throw new IllegalArgumentException("SeatCol must be a positive number");
+                        }
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException("SeatCol must be a valid number");
+                    }
+
+                    // Tạo danh sách ghế từ 1 đến totalSeats (ví dụ A1 đến A15 hoặc B1 đến B16)
+                    for (int i = 1; i <= totalSeats; i++) {
+                        Seat seat = new Seat();
+                        seat.setTicketTypeName(ticketTypeName);
+                        seat.setSeatRow(seatRow); // Giữ nguyên hàng (ví dụ "A" hoặc "B")
+                        seat.setSeatCol(String.valueOf(i)); // Số ghế từ 1 đến totalSeats
+                        seat.setStatus(seatObj.has("status") ? seatObj.get("status").getAsString() : "Available");
+                        seats.add(seat);
+                    }
                 }
             }
+
             // Call EventDAO to create the event
             EventDAO.EventCreationResult result = eventDAO.createEvent(
                     customerId, organizationName, accountHolder, accountNumber, bankName,
@@ -223,7 +246,7 @@ public class CreateNewEventController extends HttpServlet {
                 responseJson.addProperty("success", true);
                 responseJson.addProperty("eventId", result.eventId);
                 responseJson.addProperty("organizerId", result.organizerId);
-                responseJson.addProperty("redirectUrl", "createNewEvent");
+                responseJson.addProperty("redirectUrl", "pages/organizerPage/organizerCenter.jsp");
             } else {
                 responseJson.addProperty("success", false);
                 responseJson.addProperty("message", "Failed to create event");

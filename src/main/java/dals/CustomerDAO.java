@@ -163,7 +163,7 @@ public class CustomerDAO extends DBContext {
                 + "where customer_id = ?";
         try ( PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, customerId);
-            try ( ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Customer customer = new Customer();
                     customer.setCustomerId(rs.getInt("customer_id"));
@@ -211,7 +211,7 @@ public class CustomerDAO extends DBContext {
      */
     public boolean updatePassword(int customerId, String newPassword) {
         String sql = "UPDATE Customer_auths SET password=? WHERE customer_id=?";
-        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt()); // Hash newPasword
             ps.setString(1, hashedPassword);
             ps.setInt(2, customerId);

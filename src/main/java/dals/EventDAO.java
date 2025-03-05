@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package dals;
 
 import com.google.gson.Gson;
@@ -12,10 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Category;
 import models.Event;
+import models.EventDTO;
 import models.EventImage;
 import models.Organizer;
 import models.Seat;
-import models.ShowTime;
+import models.Showtime;
 import models.TicketType;
 import utils.DBContext;
 
@@ -24,6 +29,98 @@ import utils.DBContext;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class EventDAO extends DBContext {
+
+    /**
+     * Retrieve a list of events for the given organizer with an optional
+     * filter.
+     *
+     * @param organizerId the organizer's ID.
+     * @param filter one of "all", "pending", "paid", "upcoming", "past".
+     * @return List of EventDTO objects.
+     */
+    public List<EventDTO> getEventsByOrganizer(int organizerId, String filter) {
+        List<EventDTO> events = new ArrayList<>();
+
+        // Base SQL query, đã thêm eventId
+        String baseSql = "SELECT \n"
+                + "    e.event_id AS eventId,\n"
+                + "    e.event_name AS eventName,\n"
+                + "    MIN(s.start_date) AS startDate,\n"
+                + "    MAX(s.end_date) AS endDate,\n"
+                + "    e.location AS location,\n"
+                + "    (\n"
+                + "        SELECT TOP 1 o.payment_status\n"
+                + "        FROM Orders o\n"
+                + "        JOIN OrderDetails od ON o.order_id = od.order_id\n"
+                + "        JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "        JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
+                + "        WHERE s2.event_id = e.event_id\n"
+                + "        ORDER BY o.created_at DESC\n"
+                + "    ) AS paymentStatus,\n"
+                + "    (\n"
+                + "        SELECT TOP 1 image_url\n"
+                + "        FROM EventImages\n"
+                + "        WHERE event_id = e.event_id\n"
+                + "        ORDER BY image_id\n"
+                + "    ) AS image\n"
+                + "FROM Events e\n"
+                + "JOIN Showtimes s ON e.event_id = s.event_id\n"
+                + "WHERE e.organizer_id = ? ";
+
+        // Các điều kiện bổ sung theo bộ lọc
+        String extraWhere = "";
+        String groupBy = " GROUP BY e.event_id, e.event_name, e.location ";
+        String havingClause = "";
+
+        if (filter != null && !filter.equalsIgnoreCase("all")) {
+            // Lọc theo payment status: pending hoặc paid
+            if (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid")) {
+                extraWhere += " AND (\n"
+                        + "     SELECT TOP 1 o.payment_status\n"
+                        + "     FROM Orders o\n"
+                        + "     JOIN OrderDetails od ON o.order_id = od.order_id\n"
+                        + "     JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                        + "     JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
+                        + "     WHERE s2.event_id = e.event_id\n"
+                        + "     ORDER BY o.created_at DESC\n"
+                        + " ) = ? ";
+            } // Lọc các sự kiện sắp diễn ra (upcoming)
+            else if (filter.equalsIgnoreCase("upcoming")) {
+                havingClause = " HAVING MIN(s.start_date) > GETDATE() ";
+            } // Lọc các sự kiện đã qua (past)
+            else if (filter.equalsIgnoreCase("past")) {
+                havingClause = " HAVING MAX(s.end_date) < GETDATE() ";
+            }
+        }
+
+        String finalSql = baseSql + extraWhere + groupBy + havingClause;
+
+        try ( PreparedStatement ps = connection.prepareStatement(finalSql)) {
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, organizerId);
+            if (filter != null && (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid"))) {
+                ps.setString(paramIndex++, filter);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                EventDTO event = new EventDTO();
+                // Ánh xạ trường eventId
+                event.setEventId(rs.getInt("eventId"));
+                event.setEventName(rs.getString("eventName"));
+                event.setStartDate(rs.getDate("startDate"));
+                event.setEndDate(rs.getDate("endDate"));
+                event.setLocation(rs.getString("location"));
+                event.setPaymentStatus(rs.getString("paymentStatus"));
+                event.setImage(rs.getString("image"));
+                events.add(event);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Có thể xử lý lỗi chi tiết hơn tại đây nếu cần
+        }
+        return events;
+    }
 
     // Phương thức để cập nhật sự kiện bằng stored procedure [dbo].[UpdateEventByID]
     public boolean updateEventByID(
@@ -42,7 +139,7 @@ public class EventDAO extends DBContext {
             String eventLogoUrl,
             String backgroundImageUrl,
             String organizerImageUrl,
-            List<ShowTime> showTimes,
+            List<Showtime> showTimes,
             List<TicketType> ticketTypes,
             List<Seat> seats) {
 
@@ -112,7 +209,7 @@ public class EventDAO extends DBContext {
             String eventLogoUrl,
             String backgroundImageUrl,
             String organizerImageUrl,
-            List<ShowTime> showTimes,
+            List<Showtime> showTimes,
             List<TicketType> ticketTypes,
             List<Seat> seats) {
 
@@ -183,13 +280,13 @@ public class EventDAO extends DBContext {
     }
 
     // Helper method to prepare ShowTimes JSON
-    private String prepareShowTimesJson(List<ShowTime> showTimes, Gson gson) {
+    private String prepareShowTimesJson(List<Showtime> showTimes, Gson gson) {
         if (showTimes == null || showTimes.isEmpty()) {
             throw new IllegalArgumentException("ShowTimes list cannot be null or empty");
         }
 
         List<Object> showTimesList = new ArrayList<>();
-        for (ShowTime st : showTimes) {
+        for (Showtime st : showTimes) {
             if (st.getStartDate() == null || st.getEndDate() == null) {
                 throw new IllegalArgumentException("StartDate and EndDate in ShowTimes cannot be null");
             }
@@ -203,7 +300,7 @@ public class EventDAO extends DBContext {
     }
 
     // Helper method to prepare TicketTypes JSON
-    private String prepareTicketTypesJson(List<TicketType> ticketTypes, List<ShowTime> showTimes, Gson gson) {
+    private String prepareTicketTypesJson(List<TicketType> ticketTypes, List<Showtime> showTimes, Gson gson) {
         if (ticketTypes == null || ticketTypes.isEmpty()) {
             throw new IllegalArgumentException("TicketTypes list cannot be null or empty");
         }
@@ -220,7 +317,7 @@ public class EventDAO extends DBContext {
             }
 
             if (showTimeIndex < showTimes.size()) {
-                ShowTime matchingShowTime = showTimes.get(showTimeIndex);
+                Showtime matchingShowTime = showTimes.get(showTimeIndex);
                 ticketTypesList.add(new TicketTypeJson(
                         matchingShowTime.getStartDate(),
                         matchingShowTime.getEndDate(),
@@ -424,8 +521,8 @@ public class EventDAO extends DBContext {
      * @param eventId The ID of the event.
      * @return A list of ShowTime objects.
      */
-    public List<ShowTime> getShowTimesByEventId(int eventId) {
-        List<ShowTime> showTimes = new ArrayList<>();
+    public List<Showtime> getShowTimesByEventId(int eventId) {
+        List<Showtime> showTimes = new ArrayList<>();
         String sql = "SELECT showtime_id, event_id, start_date, end_date, status, created_at, updated_at "
                 + "FROM Showtimes "
                 + "WHERE event_id = ?";
@@ -433,7 +530,7 @@ public class EventDAO extends DBContext {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                ShowTime showTime = new ShowTime(
+                Showtime showTime = new Showtime(
                         rs.getInt("showtime_id"),
                         rs.getInt("event_id"),
                         rs.getTimestamp("start_date"),
@@ -496,13 +593,31 @@ public class EventDAO extends DBContext {
      */
     public List<Seat> getSeatsByEventId(int eventId) {
         List<Seat> seats = new ArrayList<>();
-        String sql = "SELECT s.seat_id, s.ticket_type_id, s.seat_row, s.seat_col, s.status "
-                + "FROM Seats s "
-                + "INNER JOIN TicketTypes tt ON s.ticket_type_id = tt.ticket_type_id "
-                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
-                + "WHERE st.event_id = ?";
+        String sql = "WITH MaxSeats AS (\n"
+                + "    SELECT \n"
+                + "        Seats.seat_row,\n"
+                + "        MAX(CAST(Seats.seat_col AS INT)) AS max_seat_col\n"
+                + "    FROM Seats\n"
+                + "    INNER JOIN TicketTypes ON Seats.ticket_type_id = TicketTypes.ticket_type_id\n"
+                + "    INNER JOIN Showtimes ON TicketTypes.showtime_id = Showtimes.showtime_id\n"
+                + "    WHERE Showtimes.event_id = ?\n"
+                + "    GROUP BY Seats.seat_row\n"
+                + ")\n"
+                + "SELECT \n"
+                + "    s.seat_id,\n"
+                + "    s.ticket_type_id,\n"
+                + "    s.seat_row,\n"
+                + "    s.seat_col,\n"
+                + "    s.status\n"
+                + "FROM Seats s\n"
+                + "INNER JOIN TicketTypes tt ON s.ticket_type_id = tt.ticket_type_id\n"
+                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
+                + "INNER JOIN MaxSeats ms ON s.seat_row = ms.seat_row AND CAST(s.seat_col AS INT) = ms.max_seat_col\n"
+                + "WHERE st.event_id = ?\n"
+                + "ORDER BY s.seat_row;";
         try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
+            stmt.setInt(2, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Seat seat = new Seat(
@@ -548,6 +663,124 @@ public class EventDAO extends DBContext {
             System.out.println("Error fetching: " + e.getMessage());
         }
 
+        return null;
+    }
+
+    /**
+     * Retrieves the list of events by name using a partial match for a specific
+     * organizer.
+     *
+     * @param eventName The name or partial name of the event to search for.
+     * @param organizerId The ID of the organizer to filter events.
+     * @return A list of Event objects matching the search criteria.
+     */
+    public List<Event> searchEventByName(String eventName, int organizerId) {
+        List<Event> events = new ArrayList<>();
+        String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
+                + "FROM Events "
+                + "WHERE event_name LIKE ? AND organizer_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            // Thêm ký tự % để tìm kiếm gần đúng
+            stmt.setString(1, "%" + eventName + "%");
+            stmt.setInt(2, organizerId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Event event = new Event(
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                events.add(event);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving events: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return events;
+    }
+
+    /**
+     * Retrieves the list of events by name using a partial match for a specific
+     * organizer.
+     *
+     * @param eventName The name or partial name of the event to search for.
+     * @param organizerId The ID of the organizer to filter events.
+     * @return A list of Event objects matching the search criteria.
+     */
+    public List<EventImage> searchEventByNameImage(String eventName, int organizerId) {
+        List<EventImage> listEventImage = new ArrayList<>();
+        String sql = "SELECT e.event_id, e.category_id, e.organizer_id, e.event_name, e.location, e.event_type, e.status, e.description, e.created_at, e.updated_at, ei.image_id, ei.image_url, ei.image_title\n"
+                + "                FROM Events e\n"
+                + "                LEFT JOIN (SELECT event_id, image_id, image_url, image_title\n"
+                + "                FROM EventImages\n"
+                + "                WHERE image_title = 'logo_banner') ei ON e.event_id = ei.event_id\n"
+                + "                WHERE e.event_name LIKE ? AND e.organizer_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, "%" + eventName + "%");
+            stmt.setInt(2, organizerId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getInt("image_id"),
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEventImage.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving events: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return listEventImage;
+    }
+
+    /*selectEventByID*/
+    public Event selectEventByID(int id) {
+        String sql = "SELECT * FROM Events\n"
+                + "WHERE event_id = ?";
+
+        try {
+            // Prepare SQL statement
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+
+            // Fetch event data
+            if (rs.next()) {
+                Event event = new Event(
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                return event;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
         return null;
     }
 
@@ -649,72 +882,89 @@ public class EventDAO extends DBContext {
 //        System.out.println("Update Successfully: " + success);
 
         /*Test all method get by eventid*/
-//        // Tạo một instance của EventDAO
-//        EventDAO eventDAO = new EventDAO();
-//
-//        // Chọn một event ID có sẵn trong cơ sở dữ liệu để test
-//        int testEventId = 572; // Thay bằng một ID thực tế từ cơ sở dữ liệu của bạn
-//
-//        try {
-//            // 1. Kiểm tra getEventById
-//            Event event = eventDAO.getEventById(testEventId);
-//            System.out.println("Event Information:");
-//            if (event != null) {
-//                System.out.println(event);
-//            } else {
-//                System.out.println("Không tìm thấy sự kiện.");
-//            }
-//
-//            // 2. Kiểm tra getEventImagesByEventId
-//            List<EventImage> images = eventDAO.getEventImagesByEventId(testEventId);
-//            System.out.println("\nEventImages:");
-//            for (EventImage image : images) {
-//                System.out.println(image);
-//            }
-//
-//            // 3. Kiểm tra getOrganizerByEventId
-//            Organizer organizer = eventDAO.getOrganizerByEventId(testEventId);
-//            System.out.println("\nOrganizer:");
-//            if (organizer != null) {
-//                System.out.println(organizer);
-//            } else {
-//                System.out.println("Không tìm thấy người tổ chức.");
-//            }
-//
-//            // 4. Kiểm tra getShowTimesByEventId
-//            List<ShowTime> showTimes = eventDAO.getShowTimesByEventId(testEventId);
-//            System.out.println("\nShowtimes:");
-//            for (ShowTime showTime : showTimes) {
-//                System.out.println(showTime);
-//            }
-//
-//            // 5. Kiểm tra getTicketTypesByEventId
-//            List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(testEventId);
-//            System.out.println("\nTicketTypes:");
-//            for (TicketType ticketType : ticketTypes) {
-//                System.out.println(ticketType);
-//            }
-//
-//            // 6. Kiểm tra getSeatsByEventId
-//            List<Seat> seats = eventDAO.getSeatsByEventId(testEventId);
-//            System.out.println("\nSeats:");
-//            for (Seat seat : seats) {
-//                System.out.println(seat);
-//            }
-//
-//            // 3. Kiểm tra getOrganizerByEventId
-//            Category category = eventDAO.getCategoryByEventID(testEventId);
-//            System.out.println("\nCategory:");
-//            if (category != null) {
-//                System.out.println(category);
-//            } else {
-//                System.out.println("Không tìm thấy người tổ chức.");
-//            }
-//        } catch (Exception e) {
-//            // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra
-//            System.err.println("Đã xảy ra lỗi trong quá trình kiểm tra: " + e.getMessage());
-//            e.printStackTrace();
-//        }
+        // Tạo một instance của EventDAO
+        EventDAO eventDAO = new EventDAO();
+
+        // Chọn một event ID có sẵn trong cơ sở dữ liệu để test
+        int testEventId = 577; // Thay bằng một ID thực tế từ cơ sở dữ liệu của bạn
+
+        try {
+            // 1. Kiểm tra getEventById
+            Event event = eventDAO.getEventById(testEventId);
+            System.out.println("Event Information:");
+            if (event != null) {
+                System.out.println(event);
+            } else {
+                System.out.println("Không tìm thấy sự kiện.");
+            }
+
+            // 2. Kiểm tra getEventImagesByEventId
+            List<EventImage> images = eventDAO.getEventImagesByEventId(testEventId);
+            System.out.println("\nEventImages:");
+            for (EventImage image : images) {
+                System.out.println(image);
+            }
+
+            // 3. Kiểm tra getOrganizerByEventId
+            Organizer organizer = eventDAO.getOrganizerByEventId(testEventId);
+            System.out.println("\nOrganizer:");
+            if (organizer != null) {
+                System.out.println(organizer);
+            } else {
+                System.out.println("Không tìm thấy người tổ chức.");
+            }
+
+            // 4. Kiểm tra getShowTimesByEventId
+            List<Showtime> showTimes = eventDAO.getShowTimesByEventId(testEventId);
+            System.out.println("\nShowtimes:");
+            for (Showtime showTime : showTimes) {
+                System.out.println(showTime);
+            }
+
+            // 5. Kiểm tra getTicketTypesByEventId
+            List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(testEventId);
+            System.out.println("\nTicketTypes:");
+            for (TicketType ticketType : ticketTypes) {
+                System.out.println(ticketType);
+            }
+
+            // 6. Kiểm tra getSeatsByEventId
+            List<Seat> seats = eventDAO.getSeatsByEventId(testEventId);
+            System.out.println("\nSeats:");
+            for (Seat seat : seats) {
+                System.out.println(seat.getSeatRow());
+            }
+
+            // 3. Kiểm tra getOrganizerByEventId
+            Category category = eventDAO.getCategoryByEventID(testEventId);
+            System.out.println("\nCategory:");
+            if (category != null) {
+                System.out.println(category);
+            } else {
+                System.out.println("Không tìm thấy người tổ chức.");
+            }
+
+            // 6. Kiểm tra getSeatsByEventId
+            List<Event> listEvent = eventDAO.searchEventByName("Thien dang", 1);
+            System.out.println("\nEvents:");
+            for (Event event1 : listEvent) {
+                System.out.println(event1.getEventName());
+            }
+
+            // 6. Kiểm tra getSeatsByEventId
+            List<EventImage> listEventImage = eventDAO.searchEventByNameImage("Vui", 98);
+            System.out.println("\nEvents:");
+            for (EventImage eventImage : listEventImage) {
+                System.out.println(eventImage.getEventId());
+                System.out.println(eventImage.getEventName());
+                System.out.println(eventImage.getImageTitle());
+                System.out.println(eventImage.getImageUrl());
+            }
+        } catch (Exception e) {
+            // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra
+            System.err.println("Đã xảy ra lỗi trong quá trình kiểm tra: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 }

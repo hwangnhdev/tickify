@@ -5,11 +5,8 @@
 
 package controllers;
 
-import dals.CustomerDAO;
-import dals.EventDAO;
-import dals.SeatDAO;
-import dals.ShowtimeDAO;
-import dals.TicketTypeDAO;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -17,33 +14,16 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.lang.reflect.Type;
 import java.util.List;
-import models.Customer;
-import models.Event;
-import models.Seat;
-import models.Showtime;
-import models.TicketType;
+import java.util.Map;
 
 /**
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class ViewSeatController extends HttpServlet {
-    private SeatDAO seatDAO;
-    private EventDAO eventDAO;
-    private ShowtimeDAO showtimeDAO;
-    private TicketTypeDAO ticketTypeDAO;
-    private CustomerDAO cusDAO;
-
-    @Override
-    public void init() {
-        seatDAO = new SeatDAO();
-        eventDAO = new EventDAO();
-        showtimeDAO = new ShowtimeDAO();
-        ticketTypeDAO = new TicketTypeDAO();
-        cusDAO = new CustomerDAO();
-    }
-    
+public class ViewPaymentController extends HttpServlet {
+   
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -59,43 +39,13 @@ public class ViewSeatController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ViewSeatController</title>");  
+            out.println("<title>Servlet ViewPaymentController</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ViewSeatController at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet ViewPaymentController at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-    } 
-    
-    protected void viewSeatEvent(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-//        int showtimeId = Integer.parseInt(request.getParameter("showtimeId"));
-        
-        Event event = eventDAO.selectEventByID(1);
-        Showtime showtime = showtimeDAO.selectShowtimeById(1);
-        List<TicketType> ticketTypes = ticketTypeDAO.selectTicketTypeByShowtimeId(1);
-        
-        Customer customer = cusDAO.selectCustomerById(1);
-        List<Seat> seats = seatDAO.selectSeatsByShowtimeId(1);
-        
-        for (Seat seat : seats) {
-            System.out.println(seat);
-        }
-
-        HttpSession session = request.getSession();
-        session.setAttribute("customer", customer);
-        session.setAttribute("event", event);
-        session.setAttribute("showtime", showtime);
-        session.setAttribute("ticketTypes", ticketTypes);
-        session.setAttribute("seatsForEvent", seats);
-        
-//        request.setAttribute("customer", customer);
-//        request.setAttribute("event", event);
-//        request.setAttribute("showtime", showtime);
-//        request.setAttribute("ticketTypes", ticketTypes);
-//        request.setAttribute("seatsForEvent", seats);
-        request.getRequestDispatcher("pages/seatSelectionPage/seatSelection.jsp").forward(request, response);
     } 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -109,8 +59,7 @@ public class ViewSeatController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-//        processRequest(request, response);
-        viewSeatEvent(request, response);
+        processRequest(request, response);
     } 
 
     /** 
@@ -123,7 +72,24 @@ public class ViewSeatController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-//        processRequest(request, response);
+        String selectedSeats = request.getParameter("selectedSeats");
+        String selectedDataJson = request.getParameter("selectedData");
+        String subtotal = request.getParameter("subtotal"); // Nhận tổng tiền
+
+        System.out.println("Selected Seats: " + selectedSeats);
+        System.out.println("Selected Data: " + selectedDataJson);
+        System.out.println("Subtotal: " + subtotal);
+
+        Gson gson = new Gson();
+        Type listType = new TypeToken<List<Map<String, Object>>>() {}.getType();
+        List<Map<String, Object>> seatDataList = gson.fromJson(selectedDataJson, listType);
+
+        HttpSession session = request.getSession();
+        session.setAttribute("selectedSeats", selectedSeats);
+        session.setAttribute("seatDataList", seatDataList);
+        session.setAttribute("subtotal", subtotal); // Lưu subtotal vào session
+
+        response.sendRedirect("pages/paymentPage/payment.jsp");
     }
 
     /** 
