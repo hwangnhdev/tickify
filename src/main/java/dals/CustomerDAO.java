@@ -138,7 +138,7 @@ public class CustomerDAO extends DBContext {
 //    }
     public boolean updateCustomer(Customer customer) {
         String query = "UPDATE Customers SET full_name = ?, address = ?, phone = ?, profile_picture = ? WHERE customer_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try ( PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, customer.getFullName());
             ps.setString(2, customer.getAddress());
             ps.setString(3, customer.getPhone());
@@ -161,7 +161,7 @@ public class CustomerDAO extends DBContext {
         String query = "select customer_id, full_name, address, phone, email, profile_picture, status\n"
                 + "	from Customers\n"
                 + "where customer_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try ( PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, customerId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -226,9 +226,9 @@ public class CustomerDAO extends DBContext {
         CustomerAuth pass = null;
         String sql = "SELECT password FROM Customer_auths WHERE customer_id=?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, customerId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     pass = new CustomerAuth();
                     pass.setPassword(rs.getString("password"));

@@ -74,6 +74,14 @@ public class Event {
         this.organizerId = organizerId;
     }
 
+    public int getOrganizerId() {
+        return organizerId;
+    }
+
+    public void setOrganizerId(int organizerId) {
+        this.organizerId = organizerId;
+    }
+
     public String getEventName() {
         return eventName;
     }

@@ -1,13 +1,44 @@
-//package dals;
-//
-//import models.TicketType;
-//import utils.DBContext;
-//import java.sql.*;
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//public class TicketTypeDAO {
-//
+package dals;
+
+import models.TicketType;
+import utils.DBContext;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TicketTypeDAO extends DBContext{
+    
+    private static final String SELECT_TICKETTYPE_BY_SHOWTIME_ID = "SELECT * FROM TicketTypes tt WHERE tt.showtime_id = ?;";
+    
+    public List<TicketType> selectTicketTypeByShowtimeId(int showtimeId) {
+        
+        List<TicketType> ticketTypes = new ArrayList<>();
+
+        try (PreparedStatement st = connection.prepareStatement(SELECT_TICKETTYPE_BY_SHOWTIME_ID)) {
+            st.setInt(1, showtimeId);
+
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    TicketType ticketType = new TicketType();
+                    ticketType.setTicketTypeId(rs.getInt("ticket_type_id"));
+                    ticketType.setShowtimeId(rs.getInt("showtime_id"));
+                    ticketType.setName(rs.getString("name"));
+                    ticketType.setDescription(rs.getString("description"));
+                    ticketType.setPrice(rs.getDouble("price"));
+                    ticketType.setColor(rs.getString("color"));
+                    ticketType.setTotalQuantity(rs.getInt("total_quantity"));
+                    ticketType.setSoldQuantity(rs.getInt("sold_quantity"));
+
+                    ticketTypes.add(ticketType);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ticketTypes;
+    }
+}
+
 //    /**
 //     * Lấy thông tin TicketType theo ticketTypeId.
 //     */
@@ -23,7 +54,7 @@
 //            if (rs.next()) {
 //                ticketType = new TicketType();
 //                ticketType.setTicketTypeId(rs.getInt("ticket_type_id"));
-//                ticketType.setEventId(rs.getInt("event_id"));
+//                ticketType.setShowtimeId(rs.getInt("showtime_id"));
 //                ticketType.setName(rs.getString("name"));
 //                ticketType.setDescription(rs.getString("description"));
 //                ticketType.setPrice(rs.getDouble("price"));
@@ -43,7 +74,7 @@
 //     */
 //    public List<TicketType> getTicketTypesByEventId(int eventId) {
 //        List<TicketType> list = new ArrayList<>();
-//        String query = "SELECT ticket_type_id, event_id, name, description, price, totalQuantity, soldQuantity, createdAt, updatedAt " +
+//        String query = "SELECT ticket_type_id, showtime_id, name, description, price, totalQuantity, soldQuantity, createdAt, updatedAt " +
 //                       "FROM TicketTypes WHERE event_id = ?";
 //        try (Connection conn = new DBContext().connection;
 //             PreparedStatement ps = conn.prepareStatement(query)) {
@@ -53,7 +84,7 @@
 //            while (rs.next()) {
 //                TicketType tt = new TicketType();
 //                tt.setTicketTypeId(rs.getInt("ticket_type_id"));
-//                tt.setEventId(rs.getInt("event_id"));
+//                tt.setShowtimeId(rs.getInt("showtime_id"));
 //                tt.setName(rs.getString("name"));
 //                tt.setDescription(rs.getString("description"));
 //                tt.setPrice(rs.getDouble("price"));
@@ -68,4 +99,5 @@
 //        }
 //        return list;
 //    }
-//}
+
+

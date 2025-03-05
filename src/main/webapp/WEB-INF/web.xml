@@ -132,8 +132,21 @@
     <servlet>
         <servlet-name>UpdateEventController</servlet-name>
         <servlet-class>controllers.UpdateEventController</servlet-class>
+    <servlet>
+        <servlet-name>ViewSeatController</servlet-name>
+        <servlet-class>controllers.ViewSeatController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>VnPayReturnController</servlet-name>
+        <servlet-class>vnpay.VnPayReturnController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VnPayAjaxController</servlet-name>
+        <servlet-class>vnpay.VnPayAjaxController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PaymentController</servlet-name>
+        <servlet-class>controllers.PaymentController</servlet-class>
         <servlet-name>SearchEventServlet</servlet-name>
         <servlet-class>controllers.SearchEventServlet</servlet-class>
     </servlet>
@@ -143,6 +156,10 @@
         <url-pattern>/SearchEventServlet</url-pattern>
     </servlet-mapping>
     <!-- Define Servlet Mappings -->
+    <servlet>
+        <servlet-name>ViewPaymentController</servlet-name>
+        <servlet-class>controllers.ViewPaymentController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>

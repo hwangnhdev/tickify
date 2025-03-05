@@ -59,11 +59,10 @@ public class ProfileController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        HttpSession session = request.getSession();
-//        int customerId = (int) session.getAttribute("customerId");
+        HttpSession session = request.getSession();
+        int id = (int) session.getAttribute("customerId");
         CustomerDAO dao = new CustomerDAO();
-//        Customer customer = customerDAO.getCustomerById(customerId);
-        Customer customer = dao.getCustomerById(2);
+        Customer customer = dao.getCustomerById(id);
         request.setAttribute("profile", customer);
         request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
 

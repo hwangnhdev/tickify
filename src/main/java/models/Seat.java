@@ -4,14 +4,18 @@
  */
 package models;
 
+import java.sql.Date;
+
 /**
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Seat {
+public class Seat extends TicketType {
+
     private int seatId;
     private int ticketTypeId;
     private String seatRow;
+    private String seatCol;
     private String seatCol;
     private String status;
     private String ticketTypeName; // Vui add to store json
@@ -22,6 +26,15 @@ public class Seat {
     public Seat(int seatId, int ticketTypeId, String seatRow, String seatCol, String status) {
         this.seatId = seatId;
         this.ticketTypeId = ticketTypeId;
+        this.seatRow = seatRow;
+        this.seatCol = seatCol;
+        this.seatCol = seatCol;
+        this.status = status;
+    }
+
+    public Seat(int seatId, int eventId, String seatRow, String seatCol, String status, int ticketTypeId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+        super(ticketTypeId, eventId, name, description, price, totalQuantity, soldQuantity, createdAt, updatedAt);
+        this.seatId = seatId;
         this.seatRow = seatRow;
         this.seatCol = seatCol;
         this.status = status;
@@ -84,6 +97,27 @@ public class Seat {
     // Vui add to return json for controller
     public void setTicketTypeName(String ticketTypeName) {
         this.ticketTypeName = ticketTypeName;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Seat{"
+                + "seatId=" + seatId
+                + ", seatRow='" + seatRow + '\''
+                + ", seatCol='" + seatCol + '\''
+                + ", status='" + status + '\''
+                + ", ticketTypeId=" + getTicketTypeId()
+                + ", eventId=" + getEventId()
+                + ", name='" + getName() + '\''
+                + ", description='" + getDescription() + '\''
+                + ", price=" + getPrice()
+                + ", color=" + getColor()
+                + ", totalQuantity=" + getTotalQuantity()
+                + ", soldQuantity=" + getSoldQuantity()
+                + ", createdAt=" + getCreatedAt()
+                + ", updatedAt=" + getUpdatedAt()
+                + '}';
     }
 
 }
