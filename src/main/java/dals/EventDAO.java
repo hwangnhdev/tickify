@@ -1158,6 +1158,40 @@ public class EventDAO extends DBContext {
         return null;
     }
 
+    public List<EventImage> searchEventsByQuery(String query) {
+        List<EventImage> listEvents = new ArrayList<>();
+        String sql = "SELECT e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
+                + "FROM Events e\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%'\n"
+                + "WHERE e.event_name LIKE ?";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, "%" + query + "%");
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEvents.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error searching events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
     /*==========================================================================main==========================================================================*/
     public static void main(String[] args) {
         // Example main method to test createEvent
@@ -1285,6 +1319,13 @@ public class EventDAO extends DBContext {
                     System.out.println(listTicketType.getName());
                     System.out.println(listTicketType.getPrice());
                 }
+            }
+
+            List<EventImage> listImages = eventDAO.searchEventsByQuery("Vui");
+            for (EventImage listImage : listImages) {
+                System.out.println(listImage.getEventId());
+                System.out.println(listImage.getEventType());
+                System.out.println(listImage.getImageUrl());
             }
         } catch (Exception e) {
             // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra

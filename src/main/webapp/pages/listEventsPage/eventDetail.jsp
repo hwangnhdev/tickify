@@ -193,7 +193,7 @@
                     <p><strong>Type Of Event:</strong> ${event.eventType}</p>
                     <p><strong>Organizer:</strong> ${organizer.organizationName}</p>
                     <p><strong>Status:</strong> ${event.status}</p>
-                    <a class="btn" href="pages/seatSelectionPage/seatSelection.jsp">Order Ticket Now</a>
+                    <a class="btn" href="viewSeat?eventId=${eventId}">Order Ticket Now</a>
                 </div>
                 <div class="event-image-event_detail">
                     <img src="${logoBannerImage}" alt="${titleEventImage}" />
@@ -222,10 +222,7 @@
             </ul>
         </div>
         <div class="event-info-event_detail">
-            <h2>Event Information Details</h2>
-            <c:forEach items="">
-                
-            </c:forEach>
+            <h2>Event Showtimes</h2>
         </div>
 
         <div class="event-info-event_detail">
