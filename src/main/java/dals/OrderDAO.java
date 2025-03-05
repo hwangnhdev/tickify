@@ -61,10 +61,10 @@ public class OrderDAO extends DBContext {
                 + "LEFT JOIN OrderDetailsCTE d ON h.order_id = d.order_id "
                 + "ORDER BY d.order_detail_id";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             ps.setInt(2, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     if (header == null) {
                         header = new OrganizerOrderHeader();
@@ -130,18 +130,18 @@ public class OrderDAO extends DBContext {
                 + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? ) "
                 + "ORDER BY o.order_date DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             stmt.setString(2, paymentStatus.toLowerCase());
             stmt.setString(3, paymentStatus.toLowerCase());
             stmt.setInt(4, offset);
             stmt.setInt(5, pageSize);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Order order = new Order();
                     order.setOrderId(rs.getInt("order_id"));
                     order.setOrderDate(rs.getTimestamp("order_date"));
-                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setTotalPrice(rs.getDouble("total_price"));
                     order.setPaymentStatus(rs.getString("payment_status"));
                     order.setCustomerName(rs.getString("customer_name"));
                     order.setEventName(rs.getString("event_name"));
@@ -174,11 +174,11 @@ public class OrderDAO extends DBContext {
                 + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
                 + "WHERE org.organizer_id = ? "
                 + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? )";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             stmt.setString(2, paymentStatus.toLowerCase());
             stmt.setString(3, paymentStatus.toLowerCase());
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt("total");
                 }
@@ -190,7 +190,8 @@ public class OrderDAO extends DBContext {
     }
 
     /**
-     * Phương thức mới: Tìm kiếm đơn hàng theo organizer và từ khóa tìm kiếm (theo tên khách hàng).
+     * Phương thức mới: Tìm kiếm đơn hàng theo organizer và từ khóa tìm kiếm
+     * (theo tên khách hàng).
      *
      * @param organizerId ID của organizer.
      * @param keyword Từ khóa tìm kiếm.
@@ -218,15 +219,15 @@ public class OrderDAO extends DBContext {
                 + "WHERE org.organizer_id = ? "
                 + "  AND LOWER(c.full_name) LIKE ? "
                 + "ORDER BY o.order_date DESC";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             stmt.setString(2, "%" + keyword.toLowerCase() + "%");
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Order order = new Order();
                     order.setOrderId(rs.getInt("order_id"));
                     order.setOrderDate(rs.getTimestamp("order_date"));
-                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setTotalPrice(rs.getDouble("total_price"));
                     order.setPaymentStatus(rs.getString("payment_status"));
                     order.setCustomerName(rs.getString("customer_name"));
                     order.setEventName(rs.getString("event_name"));
@@ -276,7 +277,7 @@ public class OrderDAO extends DBContext {
             }
         }
 
-        try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
+        try ( PreparedStatement stmt = connection.prepareStatement(query.toString())) {
             stmt.setInt(1, customerId);
             // Nếu lọc theo paid hoặc pending, gán tham số thứ 2
             if (filter != null && (filter.equalsIgnoreCase("paid") || filter.equalsIgnoreCase("pending"))) {
@@ -356,10 +357,10 @@ public class OrderDAO extends DBContext {
                 + "LEFT JOIN EventImages EI ON EI_sub.min_image_id = EI.image_id "
                 + "LEFT JOIN Vouchers V ON O.voucher_id = V.voucher_id "
                 + "WHERE C.customer_id = ? AND T.ticket_code = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, customerId);
             ps.setString(2, ticketCode);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     detail = new TicketDetailDTO();
                     detail.setOrderCode(rs.getString("orderCode"));

@@ -65,7 +65,7 @@
                 <header class="flex justify-between items-center bg-gray-800 p-4">
                     <h1 class="text-xl font-bold">My Events</h1>
                     <div class="flex items-center space-x-4">
-                        <button type="button" onclick="window.open('${pageContext.request.contextPath}/createEvent.jsp', '_blank')" 
+                        <button type="button" onclick="window.open('${pageContext.request.contextPath}/createNewEvent', '_blank')" 
                                 class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
                             + Create Event
                         </button>
@@ -191,7 +191,7 @@
                                         <span class="text-gray-400 group-hover:text-white">Seating Chart</span>
                                     </button>
                                     <button type="button" 
-                                            onclick="window.open('${pageContext.request.contextPath}/viewdetail.jsp', '_blank')" 
+                                            onclick="window.open('${pageContext.request.contextPath}/updateEvent?eventId=${event.eventId}', '_blank')" 
                                             class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
                                         <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Edit</span>

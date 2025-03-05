@@ -29,7 +29,7 @@ public class EventAdminDAO extends DBContext {
                 + "WHERE E.event_id = ? "
                 + "GROUP BY E.event_id, E.event_name, C.category_name, O.organization_name, E.location, E.event_type, "
                 + "E.status, E.description, E.created_at, E.updated_at";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -71,7 +71,7 @@ public class EventAdminDAO extends DBContext {
                 + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -104,7 +104,7 @@ public class EventAdminDAO extends DBContext {
                 + "WHERE e.status = ? "
                 + orderByClause
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -136,7 +136,7 @@ public class EventAdminDAO extends DBContext {
                 + "WHERE e.status = 'active' "
                 + "ORDER BY e.updated_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -173,7 +173,7 @@ public class EventAdminDAO extends DBContext {
                 + "WHERE e.status = 'active' "
                 + "ORDER BY e.updated_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -212,7 +212,7 @@ public class EventAdminDAO extends DBContext {
         if (connection == null) {
             return 0;
         }
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
@@ -228,7 +228,7 @@ public class EventAdminDAO extends DBContext {
         if (connection == null) {
             return 0;
         }
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, param);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -251,8 +251,6 @@ public class EventAdminDAO extends DBContext {
         event.setLocation(rs.getString("location"));
         event.setEventType(rs.getString("event_type"));
         event.setStatus(rs.getString("status"));
-        event.setImageURL(rs.getString("imageURL"));
-        event.setImageTitle(rs.getString("imageTitle"));
         return event;
     }
 
@@ -276,7 +274,7 @@ public class EventAdminDAO extends DBContext {
     // newStatus: "Active" (Accept) hoặc "Rejected" (Reject)
     public EventAdmin updateEventStatus(int eventId, String newStatus) {
         String sql = "UPDATE Events SET status = ?, updated_at = GETDATE() WHERE event_id = ? AND status = 'Pending'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, newStatus);
             ps.setInt(2, eventId);
             int rowsAffected = ps.executeUpdate();
@@ -307,7 +305,7 @@ public class EventAdminDAO extends DBContext {
                 + "WHERE e.event_name LIKE ? "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -324,7 +322,7 @@ public class EventAdminDAO extends DBContext {
     // Đếm tổng số sự kiện tìm kiếm được theo tên
     public int getTotalSearchEventsByName(String keyword) {
         String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -350,7 +348,7 @@ public class EventAdminDAO extends DBContext {
                 + "WHERE e.event_name LIKE ? AND e.status = 'active' "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -367,7 +365,7 @@ public class EventAdminDAO extends DBContext {
     // Đếm tổng số sự kiện đã duyệt theo từ khóa tìm kiếm
     public int getTotalSearchApprovedEventsByName(String keyword) {
         String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND status = 'active'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -393,7 +391,7 @@ public class EventAdminDAO extends DBContext {
                 + "WHERE e.event_name LIKE ? AND e.status = 'active' "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -410,7 +408,7 @@ public class EventAdminDAO extends DBContext {
     // Đếm tổng số lịch sử sự kiện theo từ khóa tìm kiếm
     public int getTotalSearchHistoryApprovedEventsByName(String keyword) {
         String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND status = ''";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -438,7 +436,7 @@ public class EventAdminDAO extends DBContext {
                 + "WHERE E.event_id = ? AND E.status = 'active' "
                 + "GROUP BY E.event_id, E.event_name, C.category_name, O.organization_name, E.location, E.event_type, "
                 + "E.status, E.description, E.created_at, E.updated_at";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             System.out.println("Executing query for event ID: " + eventId); // Thêm log
             ResultSet rs = ps.executeQuery();

@@ -130,7 +130,7 @@
                     <c:when test="${not empty sessionScope.customerId}">
                         <a class="border border-white text-white rounded-full px-4 py-2" type="button" href="createNewEvent">Create Event</a>
                         <button class="text-white flex items-center"
-                                onclick="window.location.href = '<%= request.getContextPath()%>/viewalltickets'">
+                                onclick="window.location.href = '<%= request.getContextPath()%>/viewAllTickets'">
                             <i class="fas fa-ticket-alt"></i>
                             <span class="ml-2">My Tickets</span>
                         </button>
@@ -158,7 +158,7 @@
                             <div id="dropdown-menu"
                                  class="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md hidden" style="color: black;">
                                 <a href="<%= request.getContextPath()%>/profile" class="block px-4 py-2 hover:bg-gray-100 text-black">My Profile</a>
-                                <a href="<%= request.getContextPath()%>/viewalltickets" class="block px-4 py-2 hover:bg-gray-100 text-black">My Tickets</a>
+                                <a href="<%= request.getContextPath()%>/viewAllTickets" class="block px-4 py-2 hover:bg-gray-100 text-black">My Tickets</a>
                                 <a href="#" class="block px-4 py-2 hover:bg-gray-100 text-black">My Events</a>
                                 <a href="<%= request.getContextPath()%>/logout" class="block px-4 py-2 hover:bg-gray-100 text-black">Log Out</a>
                             </div>

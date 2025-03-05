@@ -25,7 +25,7 @@
                 <nav class="space-y-4">
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="/Tickify/pages/eventOverview.jsp"><i class="fas fa-chart-pie mr-2"></i>Overview</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventAnalyst.jsp"><i class="fas fa-chart-line mr-2"></i>Analyst</a>
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="editEvent.jsp"><i class="fas fa-edit mr-2"></i>Edit Event</a>
+                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="updateEvent"><i class="fas fa-edit mr-2"></i>Edit Event</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="seatingChart.jsp"><i class="fas fa-chair mr-2"></i>Seat Map</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="vouchers.jsp"><i class="fas fa-tags mr-2"></i>Voucher</a>
                     <a class="flex items-center text-white bg-green-700 p-2 rounded" href="/Tickify/organizerOrders"><i class="fas fa-list mr-2"></i>Order List</a>

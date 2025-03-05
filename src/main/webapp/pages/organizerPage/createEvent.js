@@ -1692,7 +1692,7 @@ async function submitEventForm() {
         console.log("Server response:", result);
         if (result.success) {
             alert('Event created successfully!');
-            window.location.href = result.redirectUrl || 'createNewEvent?success=true';
+            window.location.href = result.redirectUrl || 'OrganizerEventController?success=true';
         } else {
             alert('Failed to create event: ' + (result.message || 'Unknown error.'));
         }

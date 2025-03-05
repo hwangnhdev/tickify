@@ -37,8 +37,8 @@ public class Order {
     }
 
     // Kiet add attributes
-        public Order(int orderId, Date orderDate, BigDecimal totalPrice, String paymentStatus,
-                 String customerName, String eventName, String location, String ticketCode) {
+    public Order(int orderId, Timestamp orderDate, double totalPrice, String paymentStatus,
+            String customerName, String eventName, String location, String ticketCode) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.totalPrice = totalPrice;
@@ -128,4 +128,29 @@ public class Order {
     public void setVoucherId(int voucherId) {
         this.voucherId = voucherId;
     }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getTicketCode() {
+        return ticketCode;
+    }
+
+    public void setTicketCode(String ticketCode) {
+        this.ticketCode = ticketCode;
+    }
+
 }
