@@ -784,9 +784,261 @@ public class EventDAO extends DBContext {
         return null;
     }
 
-    // Example main method to test createEvent
-    public static void main(String[] args) {
+    /*=======================================Home Event==============================================================================================*/
+ /*getEventsByPage*/
+    public List<EventImage> getEventsByPage(int page, int pageSize) {
+        List<EventImage> listEvents = new ArrayList<>();
+        String sql = "WITH EventPagination AS (\n"
+                + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.*\n"
+                + "    FROM Events e\n"
+                + "),\n"
+                + "EventImagesFiltered AS (\n"
+                + "    SELECT ei.event_id, ei.image_id, MIN(ei.image_url) AS image_url, MIN(ei.image_title) AS image_title\n"
+                + "    FROM EventImages ei\n"
+                + "    WHERE ei.image_title LIKE '%logo_banner%'\n"
+                + "    GROUP BY ei.event_id, ei.image_id\n"
+                + ")\n"
+                + "SELECT ep.*, eif.image_id, eif.image_url, eif.image_title\n"
+                + "FROM EventPagination ep\n"
+                + "LEFT JOIN EventImagesFiltered eif \n"
+                + "ON ep.event_id = eif.event_id\n"
+                + "WHERE ep.rownum BETWEEN ? AND ?;";
 
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            int start = (page - 1) * pageSize + 1;
+            int end = page * pageSize;
+            st.setInt(1, start);
+            st.setInt(2, end);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEvents.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching paginated events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
+    /*getTotalEvents*/
+    public int getTotalEvents() {
+        String sql = "SELECT COUNT(DISTINCT e.event_id) \n"
+                + "FROM Events e\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%';";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error counting events: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /*getTop10LatestEvents*/
+    public List<EventImage> getTop10LatestEvents() {
+        List<EventImage> listEvents = new ArrayList<>();
+        String sql = "SELECT TOP 20\n"
+                + "e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
+                + "FROM Events e\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_event%'\n"
+                + "WHERE e.status = 'Active'\n"
+                + "ORDER BY e.created_at DESC";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEvents.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top 10 latest events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
+    /*getUpcomingEvents*/
+    public List<EventImage> getUpcomingEvents() {
+        List<EventImage> listEvents = new ArrayList<>();
+        String sql = "SELECT TOP 20\n"
+                + "    e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
+                + "    e.location, e.event_type, e.created_at, e.updated_at, \n"
+                + "    ei.image_url, ei.image_title, \n"
+                + "    MIN(s.start_date) AS start_date, MAX(s.end_date) AS end_date\n"
+                + "FROM Events e\n"
+                + "JOIN Showtimes s ON e.event_id = s.event_id AND s.status = 'Active'\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%'\n"
+                + "WHERE s.start_date >= GETDATE()\n"
+                + "GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
+                + "         e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
+                + "ORDER BY MIN(s.start_date) ASC;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEvents.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching upcoming events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
+    /*getRecommendedEvents*/
+    public List<EventImage> getRecommendedEvents(int customerId) {
+        List<EventImage> listEvents = new ArrayList<>();
+        String sql = "WITH UserCategories AS (\n"
+                + "    SELECT DISTINCT e.category_id\n"
+                + "    FROM Orders o\n"
+                + "    JOIN OrderDetails od ON o.order_id = od.order_id\n"
+                + "    JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "    JOIN Showtimes s ON tt.showtime_id = s.showtime_id\n"
+                + "    JOIN Events e ON s.event_id = e.event_id\n"
+                + "    WHERE o.customer_id = ?\n"
+                + "),\n"
+                + "AllCategories AS (\n"
+                + "    SELECT category_id FROM Categories\n"
+                + "),\n"
+                + "CategoriesToRecommend AS (\n"
+                + "    SELECT category_id FROM UserCategories\n"
+                + "    UNION\n"
+                + "    SELECT category_id FROM AllCategories\n"
+                + "    WHERE NOT EXISTS (SELECT 1 FROM UserCategories)\n"
+                + ")\n"
+                + "SELECT TOP 20\n"
+                + "        e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
+                + "    e.location, e.event_type, e.created_at, e.updated_at, \n"
+                + "    ei.image_url, ei.image_title, MIN(tt.price) AS min_price\n"
+                + "FROM Events e\n"
+                + "JOIN Showtimes s ON e.event_id = s.event_id\n"
+                + "JOIN TicketTypes tt ON s.showtime_id = tt.ticket_type_id \n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%'\n"
+                + "WHERE e.category_id IN (SELECT category_id FROM CategoriesToRecommend) AND E.status = 'Active'\n"
+                + "GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
+                + "    e.location, e.event_type, e.created_at, e.updated_at, \n"
+                + "    ei.image_url, ei.image_title\n"
+                + "ORDER BY min_price DESC;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, customerId);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEvents.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching recommended events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
+    /*getTopEventsWithLimit*/
+    public List<EventImage> getTopEventsWithLimit() {
+        List<EventImage> listEvents = new ArrayList<>();
+        String sql = "SELECT TOP 20\n"
+                + "e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
+                + "e.location, e.event_type, e.created_at, e.updated_at, \n"
+                + "ei.image_url, ei.image_title, COALESCE(SUM(od.quantity), 0) AS total_tickets\n"
+                + "FROM Events e\n"
+                + "LEFT JOIN Showtimes s ON e.event_id = s.event_id\n"
+                + "LEFT JOIN TicketTypes tt ON s.showtime_id = tt.ticket_type_id\n"
+                + "LEFT JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%'\n"
+                + "WHERE e.status = 'Active'\n"
+                + "GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
+                + "e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
+                + "ORDER BY total_tickets DESC;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEvents.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching top events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
+    /*==========================================================================main==========================================================================*/
+    public static void main(String[] args) {
+        // Example main method to test createEvent
+//    public static void main(String[] args) {
         /*Create Event*/
 //        EventDAO eventDAO = new EventDAO();
 //
@@ -881,78 +1133,14 @@ public class EventDAO extends DBContext {
 //        // In kết quả
 //        System.out.println("Update Successfully: " + success);
 
-        /*Test all method get by eventid*/
-        // Tạo một instance của EventDAO
+        /*Test Event Page Home*/
         EventDAO eventDAO = new EventDAO();
 
         // Chọn một event ID có sẵn trong cơ sở dữ liệu để test
         int testEventId = 577; // Thay bằng một ID thực tế từ cơ sở dữ liệu của bạn
 
         try {
-            // 1. Kiểm tra getEventById
-            Event event = eventDAO.getEventById(testEventId);
-            System.out.println("Event Information:");
-            if (event != null) {
-                System.out.println(event);
-            } else {
-                System.out.println("Không tìm thấy sự kiện.");
-            }
-
-            // 2. Kiểm tra getEventImagesByEventId
-            List<EventImage> images = eventDAO.getEventImagesByEventId(testEventId);
-            System.out.println("\nEventImages:");
-            for (EventImage image : images) {
-                System.out.println(image);
-            }
-
-            // 3. Kiểm tra getOrganizerByEventId
-            Organizer organizer = eventDAO.getOrganizerByEventId(testEventId);
-            System.out.println("\nOrganizer:");
-            if (organizer != null) {
-                System.out.println(organizer);
-            } else {
-                System.out.println("Không tìm thấy người tổ chức.");
-            }
-
-            // 4. Kiểm tra getShowTimesByEventId
-            List<Showtime> showTimes = eventDAO.getShowTimesByEventId(testEventId);
-            System.out.println("\nShowtimes:");
-            for (Showtime showTime : showTimes) {
-                System.out.println(showTime);
-            }
-
-            // 5. Kiểm tra getTicketTypesByEventId
-            List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(testEventId);
-            System.out.println("\nTicketTypes:");
-            for (TicketType ticketType : ticketTypes) {
-                System.out.println(ticketType);
-            }
-
-            // 6. Kiểm tra getSeatsByEventId
-            List<Seat> seats = eventDAO.getSeatsByEventId(testEventId);
-            System.out.println("\nSeats:");
-            for (Seat seat : seats) {
-                System.out.println(seat.getSeatRow());
-            }
-
-            // 3. Kiểm tra getOrganizerByEventId
-            Category category = eventDAO.getCategoryByEventID(testEventId);
-            System.out.println("\nCategory:");
-            if (category != null) {
-                System.out.println(category);
-            } else {
-                System.out.println("Không tìm thấy người tổ chức.");
-            }
-
-            // 6. Kiểm tra getSeatsByEventId
-            List<Event> listEvent = eventDAO.searchEventByName("Thien dang", 1);
-            System.out.println("\nEvents:");
-            for (Event event1 : listEvent) {
-                System.out.println(event1.getEventName());
-            }
-
-            // 6. Kiểm tra getSeatsByEventId
-            List<EventImage> listEventImage = eventDAO.searchEventByNameImage("Vui", 98);
+            List<EventImage> listEventImage = eventDAO.getUpcomingEvents();
             System.out.println("\nEvents:");
             for (EventImage eventImage : listEventImage) {
                 System.out.println(eventImage.getEventId());
@@ -966,5 +1154,4 @@ public class EventDAO extends DBContext {
             e.printStackTrace();
         }
     }
-
 }
