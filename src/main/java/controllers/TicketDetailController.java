@@ -18,7 +18,7 @@ public class TicketDetailController extends HttpServlet {
             throws ServletException, IOException {
         // Lấy ticketCode từ request (giả sử truyền qua URL)
         String ticketCode = request.getParameter("ticketCode");
-        // Giả sử customerId được lấy từ session (hoặc request parameter) - ví dụ: 1
+        // Giả sử customerId được lấy từ session (hoặc request parameter) - ví dụ: 2
         int customerId = 2; // Thay thế bằng logic lấy customerId từ session nếu cần
         
         OrderDAO orderDAO = new OrderDAO();

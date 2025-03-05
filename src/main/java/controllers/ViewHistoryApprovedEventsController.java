@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import models.EventAdmin;
 
-public class ViewApprovedEventsController extends HttpServlet {
+public class ViewHistoryApprovedEventsController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final int PAGE_SIZE = 10;
@@ -29,25 +29,25 @@ public class ViewApprovedEventsController extends HttpServlet {
         
         String searchKeyword = request.getParameter("search");
         EventAdminDAO dao = new EventAdminDAO();
-        List<EventAdmin> approvedEvents;
+        List<EventAdmin> historyEvents;
         int totalRecords = 0;
         
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            // Tìm kiếm sự kiện đã duyệt theo tên
-            approvedEvents = dao.searchApprovedEventsByName(searchKeyword, page, PAGE_SIZE);
-            totalRecords = dao.getTotalSearchApprovedEventsByName(searchKeyword);
+            // Tìm kiếm lịch sử sự kiện đã duyệt theo tên
+            historyEvents = dao.searchHistoryEventsByName(searchKeyword, page, PAGE_SIZE);
+            totalRecords = dao.getTotalSearchHistoryApprovedEventsByName(searchKeyword);
         } else {
-            // Lấy danh sách sự kiện đã duyệt mặc định (ví dụ: status = 'active')
-            approvedEvents = dao.getApprovedEvents(page, PAGE_SIZE);
-            totalRecords = dao.getTotalApprovedEvents();
+            // Lấy danh sách lịch sử sự kiện đã duyệt mặc định (ví dụ: status = 'completed')
+            historyEvents = dao.getHistoryApprovedEvents(page, PAGE_SIZE);
+            totalRecords = dao.getTotalHistoryApprovedEvents();
         }
         
         int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
         
-        request.setAttribute("events", approvedEvents);
+        request.setAttribute("events", historyEvents);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("page", page);
         request.setAttribute("searchKeyword", searchKeyword);
-        request.getRequestDispatcher("/pages/adminPage/viewApprovedEvents.jsp").forward(request, response);
+        request.getRequestDispatcher("/pages/adminPage/viewHistoryApprovedEvents.jsp").forward(request, response);
     }
 }

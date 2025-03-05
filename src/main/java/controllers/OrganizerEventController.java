@@ -16,7 +16,7 @@ public class OrganizerEventController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Lấy organizerId từ session hoặc đặt mặc định
-        int organizerId = 1; // ví dụ, lấy từ session nếu cần
+        int organizerId = 2; // ví dụ, lấy từ session nếu cần
         String filter = request.getParameter("filter");
         if (filter == null || filter.trim().isEmpty()) {
             filter = "all";

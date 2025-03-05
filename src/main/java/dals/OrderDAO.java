@@ -1,5 +1,6 @@
 package dals;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import models.CustomerTicketDTO;
 import models.Order;
-import models.OrderSearchDTO;
 import models.OrganizerOrderDetail;
 import models.OrganizerOrderDetailDTO;
 import models.OrganizerOrderHeader;
@@ -24,58 +24,6 @@ public class OrderDAO extends DBContext {
     // Constructor kế thừa từ DBContext để khởi tạo kết nối.
     public OrderDAO() {
         super(); // Gọi constructor của DBContext
-    }
-
-    /**
-     * Tìm kiếm đơn hàng theo từ khóa cho organizer. Từ khóa được áp dụng cho
-     * Order ID (ép sang VARCHAR) hoặc Customer Name.
-     *
-     * @param organizerId ID của organizer (ví dụ: 2)
-     * @param keyword Từ khóa tìm kiếm (ví dụ: "1" hoặc "Alice")
-     * @return Danh sách OrderSearchDTO chứa các đơn hàng phù hợp.
-     */
-    public List<OrderSearchDTO> searchOrders(int organizerId, String keyword) {
-        List<OrderSearchDTO> orders = new ArrayList<>();
-        String sql = "SELECT DISTINCT "
-                + "    o.order_id, "
-                + "    o.order_date, "
-                + "    o.total_price, "
-                + "    o.payment_status, "
-                + "    o.transaction_id, "
-                + "    c.full_name AS customer_name, "
-                + "    c.email AS customer_email, "
-                + "    c.phone AS customer_phone "
-                + "FROM Orders o "
-                + "JOIN Customers c ON o.customer_id = c.customer_id "
-                + "JOIN OrderDetails od ON o.order_id = od.order_id "
-                + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-                + "JOIN Organizers org ON tt.event_id = org.event_id "
-                + "WHERE org.organizer_id = ? "
-                + "  AND (CAST(o.order_id AS VARCHAR(50)) LIKE ? OR c.full_name LIKE ?) "
-                + "ORDER BY o.order_date DESC";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, organizerId);
-            String searchPattern = "%" + keyword + "%";
-            ps.setString(2, searchPattern);
-            ps.setString(3, searchPattern);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    OrderSearchDTO dto = new OrderSearchDTO();
-                    dto.setOrderId(rs.getInt("order_id"));
-                    dto.setOrderDate(rs.getDate("order_date"));
-                    dto.setTotalPrice(rs.getDouble("total_price"));
-                    dto.setPaymentStatus(rs.getString("payment_status"));
-                    dto.setTransactionId(rs.getString("transaction_id"));
-                    dto.setCustomerName(rs.getString("customer_name"));
-                    dto.setCustomerEmail(rs.getString("customer_email"));
-                    dto.setCustomerPhone(rs.getString("customer_phone"));
-                    orders.add(dto);
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return orders;
     }
 
     /**
@@ -193,7 +141,7 @@ public class OrderDAO extends DBContext {
                     Order order = new Order();
                     order.setOrderId(rs.getInt("order_id"));
                     order.setOrderDate(rs.getTimestamp("order_date"));
-                    order.setTotalPrice(rs.getDouble("total_price"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
                     order.setPaymentStatus(rs.getString("payment_status"));
                     order.setCustomerName(rs.getString("customer_name"));
                     order.setEventName(rs.getString("event_name"));
@@ -241,29 +189,99 @@ public class OrderDAO extends DBContext {
         return count;
     }
 
-    public List<CustomerTicketDTO> getTicketsByCustomer(int customerId) {
-        List<CustomerTicketDTO> tickets = new ArrayList<>();
-        String query = "SELECT "
-                + "T.ticket_code AS orderCode, "
-                + "T.status AS ticketStatus, "
-                + "O.payment_status AS paymentStatus, "
-                + "S.start_date AS startDate, "
-                + "S.end_date AS endDate, "
-                + "E.location AS location, "
-                + "E.event_name AS eventName, "
-                + "T.price AS unitPrice "
-                + "FROM Customers C "
-                + "JOIN Orders O ON C.customer_id = O.customer_id "
-                + "JOIN OrderDetails OD ON O.order_id = OD.order_id "
-                + "JOIN Ticket T ON OD.order_detail_id = T.order_detail_id "
-                + "JOIN Seats SE ON T.seat_id = SE.seat_id "
-                + "JOIN TicketTypes TT ON SE.ticket_type_id = TT.ticket_type_id "
-                + "JOIN Showtimes S ON TT.showtime_id = S.showtime_id "
-                + "JOIN Events E ON S.event_id = E.event_id "
-                + "WHERE C.customer_id = ?";
+    /**
+     * Phương thức mới: Tìm kiếm đơn hàng theo organizer và từ khóa tìm kiếm (theo tên khách hàng).
+     *
+     * @param organizerId ID của organizer.
+     * @param keyword Từ khóa tìm kiếm.
+     * @return Danh sách đơn hàng thỏa mãn điều kiện tìm kiếm.
+     */
+    public List<Order> searchOrders(int organizerId, String keyword) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT "
+                + "    o.order_id, "
+                + "    o.order_date, "
+                + "    o.total_price, "
+                + "    o.payment_status, "
+                + "    c.full_name AS customer_name, "
+                + "    e.event_name, "
+                + "    e.location, "
+                + "    t.ticket_code "
+                + "FROM Orders o "
+                + "INNER JOIN Customers c ON o.customer_id = c.customer_id "
+                + "INNER JOIN OrderDetails od ON o.order_id = od.order_id "
+                + "INNER JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
+                + "INNER JOIN Events e ON st.event_id = e.event_id "
+                + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
+                + "INNER JOIN Ticket t ON t.order_detail_id = od.order_detail_id "
+                + "WHERE org.organizer_id = ? "
+                + "  AND LOWER(c.full_name) LIKE ? "
+                + "ORDER BY o.order_date DESC";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, organizerId);
+            stmt.setString(2, "%" + keyword.toLowerCase() + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Order order = new Order();
+                    order.setOrderId(rs.getInt("order_id"));
+                    order.setOrderDate(rs.getTimestamp("order_date"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setPaymentStatus(rs.getString("payment_status"));
+                    order.setCustomerName(rs.getString("customer_name"));
+                    order.setEventName(rs.getString("event_name"));
+                    order.setLocation(rs.getString("location"));
+                    order.setTicketCode(rs.getString("ticket_code"));
+                    orders.add(order);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return orders;
+    }
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+    public List<CustomerTicketDTO> getTicketsByCustomer(int customerId, String filter) {
+        List<CustomerTicketDTO> tickets = new ArrayList<>();
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT ");
+        query.append("T.ticket_code AS orderCode, ");
+        query.append("T.status AS ticketStatus, ");
+        query.append("O.payment_status AS paymentStatus, ");
+        query.append("S.start_date AS startDate, ");
+        query.append("S.end_date AS endDate, ");
+        query.append("E.location AS location, ");
+        query.append("E.event_name AS eventName, ");
+        query.append("T.price AS unitPrice ");
+        query.append("FROM Customers C ");
+        query.append("JOIN Orders O ON C.customer_id = O.customer_id ");
+        query.append("JOIN OrderDetails OD ON O.order_id = OD.order_id ");
+        query.append("JOIN Ticket T ON OD.order_detail_id = T.order_detail_id ");
+        query.append("JOIN Seats SE ON T.seat_id = SE.seat_id ");
+        query.append("JOIN TicketTypes TT ON SE.ticket_type_id = TT.ticket_type_id ");
+        query.append("JOIN Showtimes S ON TT.showtime_id = S.showtime_id ");
+        query.append("JOIN Events E ON S.event_id = E.event_id ");
+        query.append("WHERE C.customer_id = ? ");
+
+        if (filter != null && !filter.equalsIgnoreCase("all")) {
+            // Lọc theo trạng thái thanh toán
+            if (filter.equalsIgnoreCase("paid") || filter.equalsIgnoreCase("pending")) {
+                query.append("AND LOWER(O.payment_status) = ? ");
+            } else if (filter.equalsIgnoreCase("upcoming")) {
+                // Vé sắp diễn ra: ngày bắt đầu sau thời gian hiện tại
+                query.append("AND S.start_date > CURRENT_TIMESTAMP ");
+            } else if (filter.equalsIgnoreCase("past")) {
+                // Vé đã diễn ra: ngày bắt đầu trước thời gian hiện tại
+                query.append("AND S.start_date < CURRENT_TIMESTAMP ");
+            }
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
             stmt.setInt(1, customerId);
+            // Nếu lọc theo paid hoặc pending, gán tham số thứ 2
+            if (filter != null && (filter.equalsIgnoreCase("paid") || filter.equalsIgnoreCase("pending"))) {
+                stmt.setString(2, filter.toLowerCase());
+            }
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 CustomerTicketDTO ticket = new CustomerTicketDTO();

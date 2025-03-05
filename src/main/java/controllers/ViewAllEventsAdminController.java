@@ -13,7 +13,7 @@ import java.util.List;
 @WebServlet(name = "ViewAllEventsAdminController", urlPatterns = {"/admin/events"})
 public class ViewAllEventsAdminController extends HttpServlet {
 
-    private static final int PAGE_SIZE = 20;
+    private static final int PAGE_SIZE = 10;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -23,7 +23,7 @@ public class ViewAllEventsAdminController extends HttpServlet {
         if (status == null) {
             status = "";
         }
-
+        String searchKeyword = request.getParameter("search");
         try {
             String pageParam = request.getParameter("page");
             if (pageParam != null && !pageParam.trim().isEmpty()) {
@@ -37,7 +37,12 @@ public class ViewAllEventsAdminController extends HttpServlet {
         List<Event> events;
         int totalEvents;
 
-        if (status.isEmpty()) {
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            // Nếu có từ khóa tìm kiếm, chỉ tìm theo tên sự kiện (không phân biệt trạng thái)
+            events = dao.searchEventsByName(searchKeyword, page, PAGE_SIZE);
+            totalEvents = dao.getTotalSearchEventsByName(searchKeyword);
+            request.setAttribute("searchKeyword", searchKeyword);
+        } else if (status.isEmpty()) {
             events = dao.getAllEvents(page, PAGE_SIZE);
             totalEvents = dao.getTotalEvents();
         } else {
@@ -54,4 +59,5 @@ public class ViewAllEventsAdminController extends HttpServlet {
 
         request.getRequestDispatcher("/pages/adminPage/viewAllEventsAdmin.jsp").forward(request, response);
     }
+
 }

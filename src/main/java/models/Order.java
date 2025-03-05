@@ -1,19 +1,33 @@
 package models;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
-// Model đại diện cho đối tượng Order (đơn hàng)
 public class Order {
     private int orderId;
     private Date orderDate;
-    private double totalPrice;
+    private BigDecimal totalPrice;
     private String paymentStatus;
     private String customerName;
     private String eventName;
     private String location;
-    private String ticketCode;  // Thêm trường ticketCode
+    private String ticketCode;
 
-    // Getter và Setter cho các trường
+    public Order() {}
+
+    public Order(int orderId, Date orderDate, BigDecimal totalPrice, String paymentStatus,
+                 String customerName, String eventName, String location, String ticketCode) {
+        this.orderId = orderId;
+        this.orderDate = orderDate;
+        this.totalPrice = totalPrice;
+        this.paymentStatus = paymentStatus;
+        this.customerName = customerName;
+        this.eventName = eventName;
+        this.location = location;
+        this.ticketCode = ticketCode;
+    }
+
+    // Getters and Setters
     public int getOrderId() {
         return orderId;
     }
@@ -26,10 +40,10 @@ public class Order {
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
-    public double getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
     public String getPaymentStatus() {

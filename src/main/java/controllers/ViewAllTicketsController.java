@@ -27,14 +27,21 @@ public class ViewAllTicketsController extends HttpServlet {
                 e.printStackTrace();
             }
         }
-        
+
+        // Lấy tham số status để lọc: "all", "paid", "pending", "upcoming", "past"
+        String statusFilter = request.getParameter("status");
+        if (statusFilter == null || statusFilter.isEmpty()) {
+            statusFilter = "all";
+        }
+
         OrderDAO orderDAO = new OrderDAO();
-        // Gọi phương thức lấy vé đã mua của customer theo customerId
-        List<CustomerTicketDTO> tickets = orderDAO.getTicketsByCustomer(customerId);
-        
+        // Gọi phương thức lấy vé đã mua của customer theo customerId và status filter
+        List<CustomerTicketDTO> tickets = orderDAO.getTicketsByCustomer(customerId, statusFilter);
+
         // Đặt dữ liệu vào request attribute để hiển thị trên JSP
         request.setAttribute("tickets", tickets);
-        
+        request.setAttribute("statusFilter", statusFilter);
+
         // Forward sang trang JSP hiển thị danh sách vé (View All Tickets)
         RequestDispatcher rd = request.getRequestDispatcher("/pages/ticketPage/viewAllTickets.jsp");
         rd.forward(request, response);
