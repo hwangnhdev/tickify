@@ -7,7 +7,19 @@
         <meta charset="UTF-8">
         <title>Organizer Events - Tickify Organizer</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"/>
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+            }
+            /* Xử lý text tràn */
+            .truncate-text {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        </style>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <style>
             #suggestions {
@@ -36,12 +48,13 @@
             <!-- Sidebar -->
             <aside class="w-1/6 bg-gradient-to-b from-green-900 to-black p-4 text-white">
                 <div class="flex items-center mb-8">
-                    <img src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" alt="Tickify logo" class="mr-2" height="40" width="40">
+                    <img src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" 
+                         alt="Tickify logo" class="mr-2" height="40" width="40">
                     <span class="text-lg font-bold text-green-500">Organizer Center</span>
                 </div>
                 <nav class="space-y-4">
-                    <a class="flex items-center text-white w-full p-2 rounded-lg hover:bg-green-700 hover:text-white transition duration-200" 
-                       href="${pageContext.request.contextPath}/OrganizerEventController">
+                    <a href="${pageContext.request.contextPath}/OrganizerEventController" 
+                       class="flex items-center text-white w-full p-2 rounded-lg hover:bg-green-700 transition duration-200">
                         <i class="fas fa-ticket-alt mr-2"></i>My Events
                     </a>
                 </nav>
@@ -52,12 +65,13 @@
                 <header class="flex justify-between items-center bg-gray-800 p-4">
                     <h1 class="text-xl font-bold">My Events</h1>
                     <div class="flex items-center space-x-4">
-                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/createEvent.jsp'" 
+                        <button type="button" onclick="window.open('${pageContext.request.contextPath}/createEvent.jsp', '_blank')" 
                                 class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
                             + Create Event
                         </button>
                         <button class="flex items-center text-white">
-                            <img src="https://storage.googleapis.com/a1aa/image/_qCewoK0KXQhWyQzRe9zG7PpYaYijDdWdPLzWZ3kkg8.jpg" alt="User avatar" class="mr-2 rounded-full" height="30" width="30">
+                            <img src="https://storage.googleapis.com/a1aa/image/_qCewoK0KXQhWyQzRe9zG7PpYaYijDdWdPLzWZ3kkg8.jpg" 
+                                 alt="User avatar" class="mr-2 rounded-full" height="30" width="30">
                             My Account
                         </button>
                     </div>
@@ -78,28 +92,29 @@
                         </div>
                         <!-- Filter Buttons -->
                         <div class="flex flex-1 ml-4 space-x-2">
-                            <button class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-200"
-                                    onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=all'">
-                                All
-                            </button>
-                            <button class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-200"
-                                    onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=pending'">
-                                Pending
-                            </button>
-                            <button class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-200"
-                                    onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=paid'">
-                                Paid
-                            </button>
-                            <button class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-200"
-                                    onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=upcoming'">
-                                Upcoming
-                            </button>
-                            <button class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-200"
-                                    onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=past'">
-                                Past
-                            </button>
+                            <div class="flex flex-1 ml-4 space-x-2">
+                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'all' ? 'bg-green-500' : 'bg-gray-600'}" 
+                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=all'">
+                                    All
+                                </button>
+                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'upcoming' ? 'bg-green-500' : 'bg-gray-600'}" 
+                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=upcoming'">
+                                    Upcoming
+                                </button>
+                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'past' ? 'bg-green-500' : 'bg-gray-600'}" 
+                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=past'">
+                                    Past
+                                </button>
+                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'pending' ? 'bg-green-500' : 'bg-gray-600'}" 
+                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=pending'">
+                                    Pending
+                                </button>
+                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'paid' ? 'bg-green-500' : 'bg-gray-600'}" 
+                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=paid'">
+                                    Paid
+                                </button>
+                            </div>
                         </div>
-                    </div>
                 </section>
                 <!-- Events List -->
                 <section class="flex-1 p-4 overflow-y-auto">
@@ -108,51 +123,79 @@
                             <p class="text-center text-gray-300">No events found.</p>
                         </c:if>
                         <c:forEach var="event" items="${events}">
-                            <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden flex w-full mb-4">
-                                <c:if test="${not empty event.image}">
-                                    <img src="${event.image}" alt="Event image" class="w-1/4 object-cover">
-                                </c:if>
-                                <div class="p-4 flex-1">
-                                    <h2 class="text-xl font-bold text-white cursor-pointer hover:text-gray-400" 
-                                        onclick="location.href = '${pageContext.request.contextPath}/organizerEventDetail?eventId=${event.eventId}'">
-                                        ${event.eventName}
-                                    </h2>
-                                    <div class="flex items-center text-green-400 mt-2">
-                                        <i class="far fa-calendar-alt mr-2"></i>
-                                        <span><fmt:formatDate value="${event.startDate}" pattern="HH:mm, EEEE, MMM dd yyyy" /></span>
+                            <!-- Card sự kiện -->
+                            <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-4">
+                                <!-- Phần trên: 2 cột (ảnh và thông tin) -->
+                                <div class="flex">
+                                    <c:if test="${not empty event.image}">
+                                        <div class="w-1/3 flex items-center justify-center bg-gray-800">
+                                            <img src="${event.image}" alt="Event image" class="max-h-full max-w-full object-contain"/>
+                                        </div>
+                                    </c:if>
+                                    <div class="w-2/3 p-4 bg-gray-800 flex flex-col justify-center">
+                                        <h2 class="text-xl font-bold text-white cursor-pointer hover:text-gray-400 mb-4" 
+                                            onclick="window.open('${pageContext.request.contextPath}/OrganizerEventDetailController?eventId=${event.eventId}', '_blank')">
+                                            ${event.eventName}
+                                        </h2>
+                                        <div class="flex flex-col gap-2">
+                                            <c:if test="${not empty event.startDate}">
+                                                <div class="flex items-center text-green-400">
+                                                    <i class="far fa-calendar-alt mr-2 text-white"></i>
+                                                    <span>
+                                                        <fmt:formatDate value="${event.startDate}" pattern="HH:mm, EEEE, MMM dd yyyy" />
+                                                    </span>
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${not empty event.location}">
+                                                <div class="flex items-center text-green-400">
+                                                    <i class="fas fa-map-marker-alt mr-2 text-white"></i>
+                                                    <span>${event.location}</span>
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${not empty event.paymentStatus}">
+                                                <div class="flex items-center text-green-400">
+                                                    <i class="fas fa-credit-card mr-2 text-white"></i>
+                                                    <span>Payment Status: ${event.paymentStatus}</span>
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${not empty event.startDate and not empty event.endDate}">
+                                                <div class="flex items-center text-green-400">
+                                                    <i class="fas fa-hourglass-half mr-2 text-white"></i>
+                                                    <span>Duration: 
+                                                        <fmt:formatDate value="${event.startDate}" pattern="MMM dd, yyyy" /> - 
+                                                        <fmt:formatDate value="${event.endDate}" pattern="MMM dd, yyyy" />
+                                                    </span>
+                                                </div>
+                                            </c:if>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center text-green-400 mt-2">
-                                        <i class="fas fa-map-marker-alt mr-2"></i>
-                                        <span>${event.location}</span>
-                                    </div>
-                                    <p class="text-gray-400 mt-2">
-                                        Payment Status: ${event.paymentStatus}
-                                    </p>
-                                    <p class="text-gray-400 mt-2">
-                                        Duration: <fmt:formatDate value="${event.startDate}" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${event.endDate}" pattern="MMM dd, yyyy" />
-                                    </p>
-                                    <div class="p-4 mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/pages/eventOverview.jsp'" 
-                                                class="group flex items-center justify-center bg-transparent p-3 rounded-lg transition duration-200 cursor-pointer hover:bg-gray-700">
-                                            <i class="fas fa-chart-pie text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                            <span class="text-gray-400 group-hover:text-white">Overview</span>
-                                        </button>
-                                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/viewdetail.jsp'" 
-                                                class="group flex items-center justify-center bg-transparent p-3 rounded-lg transition duration-200 cursor-pointer hover:bg-gray-700">
-                                            <i class="fas fa-list text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                            <span class="text-gray-400 group-hover:text-white">Orders</span>
-                                        </button>
-                                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/viewdetail.jsp'" 
-                                                class="group flex items-center justify-center bg-transparent p-3 rounded-lg transition duration-200 cursor-pointer hover:bg-gray-700">
-                                            <i class="fas fa-chair text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                            <span class="text-gray-400 group-hover:text-white">Seating Chart</span>
-                                        </button>
-                                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/viewdetail.jsp'" 
-                                                class="group flex items-center justify-center bg-transparent p-3 rounded-lg transition duration-200 cursor-pointer hover:bg-gray-700">
-                                            <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                            <span class="text-gray-400 group-hover:text-white">Edit</span>
-                                        </button>
-                                    </div>
+                                </div>
+                                <!-- Phần dưới: Các nút hành động, căn giữa -->
+                                <div class="p-4 border-t border-gray-700 flex justify-center">
+                                    <button type="button" 
+                                            onclick="window.open('${pageContext.request.contextPath}/pages/eventOverview.jsp', '_blank')" 
+                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
+                                        <i class="fas fa-chart-pie text-2xl text-green-400 mr-2 group-hover:text-white"></i>
+                                        <span class="text-gray-400 group-hover:text-white">Overview</span>
+                                    </button>
+                                    <button type="button" 
+                                            onclick="window.open('${pageContext.request.contextPath}/organizerOrders', '_blank')" 
+                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
+                                        <i class="fas fa-list text-2xl text-green-400 mr-2 group-hover:text-white"></i>
+                                        <span class="text-gray-400 group-hover:text-white">Orders</span>
+                                    </button>
+                                    <button type="button" 
+                                            onclick="window.open('${pageContext.request.contextPath}/viewdetail.jsp', '_blank')" 
+                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
+                                        <i class="fas fa-chair text-2xl text-green-400 mr-2 group-hover:text-white"></i>
+                                        <span class="text-gray-400 group-hover:text-white">Seating Chart</span>
+                                    </button>
+                                    <button type="button" 
+                                            onclick="window.open('${pageContext.request.contextPath}/viewdetail.jsp', '_blank')" 
+                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
+                                        <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
+                                        <span class="text-gray-400 group-hover:text-white">Edit</span>
+                                    </button>
                                 </div>
                             </div>
                         </c:forEach>

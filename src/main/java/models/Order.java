@@ -1,9 +1,9 @@
 package models;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-// Model đại diện cho đối tượng Order (đơn hàng)
 public class Order {
 
     private int orderId;
@@ -16,6 +16,10 @@ public class Order {
     private int customerId;
     private int voucherId;
     private String customerName;
+
+    private String eventName;
+    private String location;
+    private String ticketCode;
 
     public Order() {
     }
@@ -30,6 +34,19 @@ public class Order {
         this.transactionId = transactionId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    // Kiet add attributes
+        public Order(int orderId, Date orderDate, BigDecimal totalPrice, String paymentStatus,
+                 String customerName, String eventName, String location, String ticketCode) {
+        this.orderId = orderId;
+        this.orderDate = orderDate;
+        this.totalPrice = totalPrice;
+        this.paymentStatus = paymentStatus;
+        this.customerName = customerName;
+        this.eventName = eventName;
+        this.location = location;
+        this.ticketCode = ticketCode;
     }
 
     public int getOrderId() {

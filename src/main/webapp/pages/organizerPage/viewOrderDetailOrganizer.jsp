@@ -3,130 +3,183 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Chi tiết đơn hàng</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-</head>
-<body class="bg-gray-900 text-white">
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">Chi tiết đơn hàng</h1>
-        <div class="bg-gray-800 p-4 rounded-lg shadow-md">
-            <table class="min-w-full">
-                <tr>
-                    <th class="px-4 py-2">Mã đơn hàng</th>
-                    <td class="px-4 py-2">${orderDetail.orderId}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Ngày đặt hàng</th>
-                    <td class="px-4 py-2">
-                        <fmt:formatDate value="${orderDetail.orderDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Tổng giá tiền</th>
-                    <td class="px-4 py-2">
-                        <fmt:formatNumber value="${orderDetail.totalPrice}" type="currency" currencySymbol="$"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Trạng thái thanh toán</th>
-                    <td class="px-4 py-2">${orderDetail.paymentStatus}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Mã giao dịch</th>
-                    <td class="px-4 py-2">${orderDetail.transactionId}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Ngày tạo đơn hàng</th>
-                    <td class="px-4 py-2">
-                        <fmt:formatDate value="${orderDetail.orderCreatedAt}" pattern="dd/MM/yyyy HH:mm:ss"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Tên khách hàng</th>
-                    <td class="px-4 py-2">${orderDetail.customerName}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Email khách hàng</th>
-                    <td class="px-4 py-2">${orderDetail.customerEmail}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Tên sự kiện</th>
-                    <td class="px-4 py-2">${orderDetail.eventName}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Địa điểm</th>
-                    <td class="px-4 py-2">${orderDetail.location}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Tên tổ chức</th>
-                    <td class="px-4 py-2">${orderDetail.organizationName}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Chủ tài khoản</th>
-                    <td class="px-4 py-2">${orderDetail.accountHolder}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Số tài khoản</th>
-                    <td class="px-4 py-2">${orderDetail.accountNumber}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Ngân hàng</th>
-                    <td class="px-4 py-2">${orderDetail.bankName}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Số lượng vé</th>
-                    <td class="px-4 py-2">
-                        ${orderDetail.quantity} (Tổng: ${orderDetail.totalQuantity})
-                    </td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Mã voucher</th>
-                    <td class="px-4 py-2">${orderDetail.voucherCode}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Loại giảm giá</th>
-                    <td class="px-4 py-2">${orderDetail.discountType}</td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Giá trị giảm giá</th>
-                    <td class="px-4 py-2">
-                        <fmt:formatNumber value="${orderDetail.discountValue}" type="currency" currencySymbol="$"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Tổng tiền sau giảm giá</th>
-                    <td class="px-4 py-2">
-                        <fmt:formatNumber value="${orderDetail.totalPriceAfterDiscount}" type="currency" currencySymbol="$"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Tổng hóa đơn cho tổ chức</th>
-                    <td class="px-4 py-2">
-                        <fmt:formatNumber value="${orderDetail.totalBillForOrganization}" type="currency" currencySymbol="$"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="px-4 py-2">Danh sách ghế</th>
-                    <td class="px-4 py-2">
-                        <c:if test="${not empty orderDetail.seatList}">
-                            ${orderDetail.seatList}
-                        </c:if>
-                        <c:if test="${empty orderDetail.seatList}">
-                            Không có thông tin ghế.
-                        </c:if>
-                    </td>
-                </tr>
-            </table>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Order Details</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <jsp:include page="../../components/header.jsp"></jsp:include>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+        </head>
+        <body class="bg-white text-gray-800">
+            <div class="max-w-4xl mx-auto p-6 space-y-8">
+                <h1 class="text-3xl font-bold text-center mb-6">
+                    <i class="fas fa-receipt mr-2"></i>Order Details
+                </h1>
+
+                <!-- Order Information -->
+                <div class="bg-white border rounded-lg shadow p-6">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>Order Information
+                    </h2>
+                    <table class="w-full">
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <th class="py-2 text-left w-1/3">Order ID</th>
+                                <td class="py-2">${orderDetail.orderId}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Order Date</th>
+                            <td class="py-2">
+                                <fmt:formatDate value="${orderDetail.orderDate}" pattern="dd/MM/yyyy HH:mm:ss" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Total Price</th>
+                            <td class="py-2">
+                                <fmt:formatNumber value="${orderDetail.totalPrice}" type="currency" currencySymbol="đ" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Payment Status</th>
+                            <td class="py-2">${orderDetail.paymentStatus}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Transaction ID</th>
+                            <td class="py-2">${orderDetail.transactionId}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Order Created</th>
+                            <td class="py-2">
+                                <fmt:formatDate value="${orderDetail.orderCreatedAt}" pattern="dd/MM/yyyy HH:mm:ss" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="bg-white border rounded-lg shadow p-6">
+                <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-user mr-2"></i>Customer Information
+                </h2>
+                <table class="w-full">
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <th class="py-2 text-left w-1/3">Customer Name</th>
+                            <td class="py-2">${orderDetail.customerName}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Customer Email</th>
+                            <td class="py-2">${orderDetail.customerEmail}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Event & Organization Information -->
+            <div class="bg-white border rounded-lg shadow p-6">
+                <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-calendar-alt mr-2"></i>Event & Organization
+                </h2>
+                <table class="w-full">
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <th class="py-2 text-left w-1/3">Event Name</th>
+                            <td class="py-2">${orderDetail.eventName}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Location</th>
+                            <td class="py-2">${orderDetail.location}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Organization Name</th>
+                            <td class="py-2">${orderDetail.organizationName}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bank Account Information -->
+            <div class="bg-white border rounded-lg shadow p-6">
+                <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-university mr-2"></i>Bank Account Information
+                </h2>
+                <table class="w-full">
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <th class="py-2 text-left w-1/3">Account Holder</th>
+                            <td class="py-2">${orderDetail.accountHolder}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Account Number</th>
+                            <td class="py-2">${orderDetail.accountNumber}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Bank Name</th>
+                            <td class="py-2">${orderDetail.bankName}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Ticket & Discount Information -->
+            <div class="bg-white border rounded-lg shadow p-6">
+                <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-ticket-alt mr-2"></i>Ticket & Discount Details
+                </h2>
+                <table class="w-full">
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <th class="py-2 text-left w-1/3">Ticket Quantity</th>
+                            <td class="py-2">
+                                ${orderDetail.quantity} (Total: ${orderDetail.totalQuantity})
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Voucher Code</th>
+                            <td class="py-2">${orderDetail.voucherCode}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Discount Type</th>
+                            <td class="py-2">${orderDetail.discountType}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Discount Value</th>
+                            <td class="py-2">
+                                <fmt:formatNumber value="${orderDetail.discountValue}" type="currency" currencySymbol="đ" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Total After Discount</th>
+                            <td class="py-2">
+                                <fmt:formatNumber value="${orderDetail.totalPriceAfterDiscount}" type="currency" currencySymbol="đ" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Organization Invoice Total</th>
+                            <td class="py-2">
+                                <fmt:formatNumber value="${orderDetail.totalBillForOrganization}" type="currency" currencySymbol="đ" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="py-2 text-left">Seat List</th>
+                            <td class="py-2">
+                                <c:choose>
+                                    <c:when test="${not empty orderDetail.seatList}">
+                                        ${orderDetail.seatList}
+                                    </c:when>
+                                    <c:otherwise>
+                                        Not available.
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
         </div>
-        <div class="mt-4">
-            <a href="organizerOrders" class="text-green-400 hover:underline">
-                <i class="fas fa-arrow-left"></i> Quay lại danh sách đơn hàng
-            </a>
-        </div>
-    </div>
-</body>
+    </body>
 </html>

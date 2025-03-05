@@ -20,7 +20,7 @@ public class OrganizerEventController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            int organizerId = 98; // Nên lấy từ session
+            int organizerId = 2; // Nên lấy từ session
             String filter = request.getParameter("filter");
             if (filter == null || filter.trim().isEmpty()) {
                 filter = "all";
@@ -70,6 +70,7 @@ public class OrganizerEventController extends HttpServlet {
             e.printStackTrace(); // Ghi log lỗi
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing search request: " + e.getMessage());
         }
+        doGet(request, response);
     }
 
     @Override

@@ -15,6 +15,7 @@ public class EventAdmin {
     private Date endDate;
     private Date createdAt;
     private Date updatedAt;
+    private Date approvedAt;  // Thuộc tính mới: Ngày duyệt (Approved Date)
     private String imageIds;
     private String imageUrls;
     private String imageTitles;
@@ -91,6 +92,12 @@ public class EventAdmin {
     }
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    public Date getApprovedAt() {
+        return approvedAt;
+    }
+    public void setApprovedAt(Date approvedAt) {
+        this.approvedAt = approvedAt;
     }
     public String getImageIds() {
         return imageIds;
