@@ -118,7 +118,6 @@
 
     <body>
         <div class="profile-container">
-
             <div class="close-btn" onclick="window.location.href = 'event';" style="cursor: pointer;">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M15 3L3 15M3 3l12 12" stroke="#2A2D34" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -126,19 +125,19 @@
             </div>
             </br>
 
-            <div class="profile-picture">
-                <label class="camera-icon">
-                    <input type="file" style="display: none;" />
-                    📷
-                </label>
-            </div>
-
             <form action="profile" method="post">
                 <input type="hidden" name="customerId" value="<%= profile.getCustomerId()%>" />
 
+                <div class="profile-picture">
+                    <label class="camera-icon">
+                        <input type="file" style="display: none;" />
+                        📷
+                    </label>
+                </div>
+                
                 <label>Full Name</label>
                 <input type="text" name="fullname" maxlength="50" value="<%= profile.getFullName()%>" />
-                
+
                 <label>Email</label>
                 <input type="text" name="email" maxlength="40" value="<%= profile.getEmail()%>" disabled />
 

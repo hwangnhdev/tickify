@@ -149,6 +149,22 @@
         <servlet-name>ViewSeatController</servlet-name>
         <servlet-class>controllers.ViewSeatController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>VoucherController</servlet-name>
+        <servlet-class>controllers.VoucherController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewAllVouchersController</servlet-name>
+        <servlet-class>controllers.ViewAllVouchersController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UpdateVoucherStatusController</servlet-name>
+        <servlet-class>controllers.UpdateVoucherStatusController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateVoucherController</servlet-name>
+        <servlet-class>controllers.CreateVoucherController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -280,6 +296,22 @@
     <servlet-mapping>
         <servlet-name>VnPayAjaxController</servlet-name>
         <url-pattern>/vnPayAjax</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VoucherController</servlet-name>
+        <url-pattern>/VoucherController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewAllVouchersController</servlet-name>
+        <url-pattern>/ViewAllVouchersController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateVoucherStatusController</servlet-name>
+        <url-pattern>/UpdateVoucherStatusController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateVoucherController</servlet-name>
+        <url-pattern>/CreateVoucherController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
