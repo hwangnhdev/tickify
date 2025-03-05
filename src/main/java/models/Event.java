@@ -14,6 +14,7 @@ public class Event {
 
     private int eventId;
     private int categoryId;
+    private int organizerId;
     private String eventName;
     private String location;
     private String eventType;
@@ -50,6 +51,20 @@ public class Event {
         this.imageTitle = imageTitle;
     }
 
+    public Event(int eventId, int categoryId, int organizerId, String eventName, String location, String eventType, String status, String description, Date createdAt, Date updatedAt) {
+        this.eventId = eventId;
+        this.categoryId = categoryId;
+        this.organizerId = organizerId;
+        this.eventName = eventName;
+        this.location = location;
+        this.eventType = eventType;
+        this.status = status;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }    
+    
+
     public int getEventId() {
         return eventId;
     }
@@ -64,6 +79,14 @@ public class Event {
 
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public int getOrganizerId() {
+        return organizerId;
+    }
+
+    public void setOrganizerId(int organizerId) {
+        this.organizerId = organizerId;
     }
 
     public String getEventName() {
@@ -154,4 +177,10 @@ public class Event {
         this.imageTitle = imageTitle;
     }
 
+    @Override
+    public String toString() {
+        return eventName;
+    }
+
+    
 }

@@ -330,13 +330,12 @@ public class EventDAO extends DBContext {
                 Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
                         rs.getString("event_name"),
                         rs.getString("location"),
                         rs.getString("event_type"),
                         rs.getString("status"),
                         rs.getString("description"),
-                        rs.getDate("start_date"),
-                        rs.getDate("end_date"),
                         rs.getDate("created_at"),
                         rs.getDate("updated_at")
                 );

@@ -4,25 +4,36 @@
  */
 package models;
 
+import java.sql.Date;
+
 /**
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class Seat {
+public class Seat extends TicketType {
+
     private int seatId;
     private int eventId;
     private String seatRow;
-    private String seatNumber;
+    private String seatCol;
     private String status;
 
     public Seat() {
     }
 
-    public Seat(int seatId, int eventId, String seatRow, String seatNumber, String status) {
+    public Seat(int seatId, int eventId, String seatRow, String seatCol, String status) {
         this.seatId = seatId;
         this.eventId = eventId;
         this.seatRow = seatRow;
-        this.seatNumber = seatNumber;
+        this.seatCol = seatCol;
+        this.status = status;
+    }
+
+    public Seat(int seatId, int eventId, String seatRow, String seatCol, String status, int ticketTypeId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+        super(ticketTypeId, eventId, name, description, price, totalQuantity, soldQuantity, createdAt, updatedAt);
+        this.seatId = seatId;
+        this.seatRow = seatRow;
+        this.seatCol = seatCol;
         this.status = status;
     }
 
@@ -50,12 +61,12 @@ public class Seat {
         this.seatRow = seatRow;
     }
 
-    public String getSeatNumber() {
-        return seatNumber;
+    public String getSeatCol() {
+        return seatCol;
     }
 
-    public void setSeatNumber(String seatNumber) {
-        this.seatNumber = seatNumber;
+    public void setSeatCol(String seatCol) {
+        this.seatCol = seatCol;
     }
 
     public String getStatus() {
@@ -65,6 +76,25 @@ public class Seat {
     public void setStatus(String status) {
         this.status = status;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Seat{"
+                + "seatId=" + seatId
+                + ", seatRow='" + seatRow + '\''
+                + ", seatCol='" + seatCol + '\''
+                + ", status='" + status + '\''
+                + ", ticketTypeId=" + getTicketTypeId()
+                + ", eventId=" + getEventId()
+                + ", name='" + getName() + '\''
+                + ", description='" + getDescription() + '\''
+                + ", price=" + getPrice()
+                + ", color=" + getColor()
+                + ", totalQuantity=" + getTotalQuantity()
+                + ", soldQuantity=" + getSoldQuantity()
+                + ", createdAt=" + getCreatedAt()
+                + ", updatedAt=" + getUpdatedAt()
+                + '}';
+    }
+
 }

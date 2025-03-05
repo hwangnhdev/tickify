@@ -97,8 +97,11 @@
         <servlet-name>PaymentController</servlet-name>
         <servlet-class>controllers.PaymentController</servlet-class>
     </servlet>
-
     <!-- Define Servlet Mappings -->
+    <servlet>
+        <servlet-name>ViewPaymentController</servlet-name>
+        <servlet-class>controllers.ViewPaymentController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -191,12 +194,14 @@
         <servlet-name>PaymentController</servlet-name>
         <url-pattern>/payment</url-pattern>
     </servlet-mapping>
-
     <!-- Session Configuration -->
+    <servlet-mapping>
+        <servlet-name>ViewPaymentController</servlet-name>
+        <url-pattern>/viewPayment</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
     <!-- Welcome File List -->
     <welcome-file-list>
         <welcome-file>event</welcome-file>
