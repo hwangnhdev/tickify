@@ -4,12 +4,12 @@
  */
 package models;
 
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 /**
  *
- * @author Nguyen Huy Hoang - CE182102
+ * @author Dinh Minh Tien - CE190701
  */
 public class Voucher {
 
@@ -19,8 +19,8 @@ public class Voucher {
     private String description;
     private String discountType;
     private double discountValue;
-    private Date startDate;
-    private Date endDate;
+    private Timestamp startDate;
+    private Timestamp endDate;
     private int usageLimit;
     private boolean status;
     private Timestamp createdAt;
@@ -29,7 +29,7 @@ public class Voucher {
     public Voucher() {
     }
 
-    public Voucher(int voucherId, int eventId, String code, String description, String discountType, double discountValue, Date startDate, Date endDate, int usageLimit, boolean status, Timestamp createdAt, Timestamp updatedAt) {
+    public Voucher(int voucherId, int eventId, String code, String description, String discountType, double discountValue, Timestamp startDate, Timestamp endDate, int usageLimit, boolean status, Timestamp createdAt, Timestamp updatedAt) {
         this.voucherId = voucherId;
         this.eventId = eventId;
         this.code = code;
@@ -43,6 +43,8 @@ public class Voucher {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    
 
     public int getVoucherId() {
         return voucherId;
@@ -92,19 +94,19 @@ public class Voucher {
         this.discountValue = discountValue;
     }
 
-    public Date getStartDate() {
+    public Timestamp getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Timestamp startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
 
@@ -140,4 +142,43 @@ public class Voucher {
         this.updatedAt = updatedAt;
     }
 
+    // Helper method to format expiration time
+    public String setFormattedExpirationTime(String string) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return dateFormat.format(startDate) + " - " + dateFormat.format(endDate);
+    }
+
+    // Helper method to determine status label
+    public String setStatusLabel(String string) {
+        return (endDate.getTime() >= System.currentTimeMillis()) ? "Ongoing" : "Expired";
+    }
+
+    // Helper method to format discount
+    public String setFormattedDiscount(String string) {
+        return discountType.equalsIgnoreCase("percentage")
+                ? discountValue + "%" : String.format("%f VND", discountValue);
+    }
+
+    public String getFormattedExpirationTime() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return dateFormat.format(startDate) + " - " + dateFormat.format(endDate);
+    }
+
+    /**
+     * Determine status label
+     * @return 
+     */
+    public String getStatusLabel() {
+        return (endDate.getTime() >= System.currentTimeMillis()) ? "Ongoing" : "Expired";
+    }
+
+    /**
+     * Format discount value
+     * @return 
+     */
+    public String getFormattedDiscount() {
+        return discountType.equalsIgnoreCase("percentage")
+                ? discountValue + "%"
+                : String.format("%.0f VND", discountValue);
+    }
 }

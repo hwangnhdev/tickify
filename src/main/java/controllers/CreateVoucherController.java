@@ -4,18 +4,22 @@
  */
 package controllers;
 
+import dals.VoucherDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import models.Voucher;
 
 /**
  *
- * @author Tang Thanh Vui - CE180901
+ * @author Dinh Minh Tien CE190701
  */
-public class AdminController extends HttpServlet {
+public class CreateVoucherController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,10 +38,10 @@ public class AdminController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminController</title>");            
+            out.println("<title>Servlet CreateVoucherController</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AdminController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet CreateVoucherController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -55,8 +59,7 @@ public class AdminController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        processRequest(request, response);
-        request.getRequestDispatcher("pages/adminPage/sidebar.jsp").forward(request, response);
+        request.getRequestDispatcher("pages/voucherPage/createVoucher.jsp").forward(request, response);
     }
 
     /**
@@ -70,7 +73,34 @@ public class AdminController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            VoucherDAO voucherDAO = new VoucherDAO();
+            Voucher voucher = new Voucher();
+            voucher.setEventId(1);
+            voucher.setCode(request.getParameter("code"));
+            voucher.setDescription(request.getParameter("description"));
+            voucher.setDiscountType(request.getParameter("discountType"));
+            voucher.setDiscountValue(Double.parseDouble(request.getParameter("discountValue")));
+            voucher.setStartDate(Timestamp.valueOf(request.getParameter("startDate").replace("T", " ") + ":00"));
+            voucher.setEndDate(Timestamp.valueOf(request.getParameter("endDate").replace("T", " ") + ":00"));
+            voucher.setUsageLimit(Integer.parseInt(request.getParameter("usageLimit")));
+            voucher.setStatus("true".equals(request.getParameter("status")));
+            
+            boolean success = voucherDAO.insertVoucher(voucher);
+
+            if (success) {
+                response.sendRedirect("ViewAllVouchersController");
+            } else {
+                request.setAttribute("error", "Failed to create voucher");
+                request.getRequestDispatcher("pages/voucherPage/createVoucher.jsp").forward(request, response);
+            }
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", "Validation error: " + e.getMessage());
+            request.getRequestDispatcher("pages/voucherPage/createVoucher.jsp").forward(request, response);
+        } catch (ServletException | IOException e) {
+            request.setAttribute("error", "Error: " + e.getMessage());
+            request.getRequestDispatcher("pages/voucherPage/createVoucher.jsp").forward(request, response);
+        }
     }
 
     /**

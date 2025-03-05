@@ -11,6 +11,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     </head>
     <body class="bg-gray-900 text-white">
+        <!-- Sidebar và giao diện chung không thay đổi -->
         <div class="flex h-screen">
             <!-- Sidebar -->
             <aside class="fixed inset-y-0 left-0 transform w-64 bg-gradient-to-b from-green-900 to-black p-4 text-white transition-transform duration-300 md:w-1/6 md:relative md:transform-none z-50">
@@ -24,9 +25,9 @@
                 <nav class="space-y-4">
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="/Tickify/pages/eventOverview.jsp"><i class="fas fa-chart-pie mr-2"></i>Overview</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventAnalyst.jsp"><i class="fas fa-chart-line mr-2"></i>Analyst</a>
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="editEvent.jsp"><i class="fas fa-edit mr-2"></i>Edit Event</a>
+                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="updateEvent"><i class="fas fa-edit mr-2"></i>Edit Event</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="seatingChart.jsp"><i class="fas fa-chair mr-2"></i>Seat Map</a>
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="vouchers.jsp"><i class="fas fa-tags mr-2"></i>Voucher</a>
+                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/ViewAllVouchersController"><i class="fas fa-tags mr-2"></i>Voucher</a>
                     <a class="flex items-center text-white bg-green-700 p-2 rounded" href="/Tickify/organizerOrders"><i class="fas fa-list mr-2"></i>Order List</a>
                 </nav>
             </aside>
@@ -44,16 +45,25 @@
                 </header>
                 <!-- Main Section -->
                 <section class="flex-1 p-4 overflow-y-auto">
-                    <!-- Filter Form -->
-                    <div class="mb-6">
-                        <form action="organizerOrders" method="get" class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 bg-gray-800 p-4 rounded-lg shadow-md">
-                            <label for="paymentStatus" class="text-white font-medium mb-2 sm:mb-0">Payment Status:</label>
+                    <!-- Filter and Search Section (2 form tách biệt) -->
+                    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-800 p-4 rounded-lg shadow-md">
+                        <!-- Filter Form -->
+                        <form action="organizerOrders" method="get" class="flex items-center space-x-4">
+                            <label for="paymentStatus" class="text-white font-medium">Payment Status:</label>
                             <select name="paymentStatus" id="paymentStatus" class="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-green-500">
                                 <option value="all" ${paymentStatus == 'all' ? 'selected' : ''}>All</option>
                                 <option value="paid" ${paymentStatus == 'paid' ? 'selected' : ''}>Paid</option>
                                 <option value="pending" ${paymentStatus == 'pending' ? 'selected' : ''}>Pending</option>
                             </select>
-                            <input type="submit" value="Filter" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded mt-2 sm:mt-0 transition-colors duration-200"/>
+                            <input type="submit" value="Filter" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition-colors duration-200"/>
+                        </form>
+                        <!-- Search Form -->
+                        <form action="SearchOrderController" method="get" class="flex items-center space-x-4 mt-4 sm:mt-0">
+                            <input type="text" name="searchOrder" placeholder="Tìm theo tên khách hàng" 
+                                   class="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-green-500" />
+                            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition-colors duration-200">
+                                Search
+                            </button>
                         </form>
                     </div>
                     <!-- Orders Table -->
@@ -61,23 +71,43 @@
                         <table class="min-w-full divide-y divide-gray-700">
                             <thead class="bg-gray-700">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"><i class="fas fa-id-badge mr-2"></i>Order ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"><i class="fas fa-calendar-alt mr-2"></i>Order Date</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"><i class="fas fa-dollar-sign mr-2"></i>Total Price</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"><i class="fas fa-check-circle mr-2"></i>Payment Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"><i class="fas fa-user mr-2"></i>Customer Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"><i class="fas fa-ticket-alt mr-2"></i>Event Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"><i class="fas fa-map-marker-alt mr-2"></i>Location</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"><i class="fas fa-barcode mr-2"></i>Ticket Code</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        <i class="fas fa-id-badge mr-2"></i>Order ID
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        <i class="fas fa-calendar-alt mr-2"></i>Order Date
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        <i class="fas fa-dollar-sign mr-2"></i>Total Price
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        <i class="fas fa-check-circle mr-2"></i>Payment Status
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        <i class="fas fa-user mr-2"></i>Customer Name
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        <i class="fas fa-ticket-alt mr-2"></i>Event Name
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        <i class="fas fa-map-marker-alt mr-2"></i>Location
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        <i class="fas fa-barcode mr-2"></i>Ticket Code
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-gray-800 divide-y divide-gray-700">
                                 <c:forEach var="order" items="${orders}">
                                     <tr class="hover:bg-gray-700 transition-colors duration-150 cursor-pointer" 
-                                        onclick="window.location.href = 'orderDetail?orderId=${order.orderId}'">
+                                        onclick="window.open('orderDetail?orderId=${order.orderId}', '_blank')">
                                         <td class="px-6 py-4 text-sm md:whitespace-nowrap">${order.orderId}</td>
-                                        <td class="px-6 py-4 text-sm"><fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-                                        <td class="px-6 py-4 text-sm"><fmt:formatNumber value="${order.totalPrice}" type="currency" currencySymbol="$"/></td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <fmt:formatNumber value="${order.totalPrice}" type="number" pattern="#,##0 đ"/>
+                                        </td>
                                         <td class="px-6 py-4 text-sm">${order.paymentStatus}</td>
                                         <td class="px-6 py-4 text-sm">${order.customerName}</td>
                                         <td class="px-6 py-4 text-sm">${order.eventName}</td>

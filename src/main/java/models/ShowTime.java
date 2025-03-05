@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Tang Thanh Vui - CE180901
  */
-public class ShowTime {
+public class Showtime {
 
     private int showtimeId;
     private int eventId;
@@ -31,10 +31,10 @@ public class ShowTime {
         this.ticketTypes = ticketTypes;
     }
 
-    public ShowTime() {
+    public Showtime() {
     }
 
-    public ShowTime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt) {
+    public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt) {
         this.showtimeId = showtimeId;
         this.eventId = eventId;
         this.startDate = startDate;

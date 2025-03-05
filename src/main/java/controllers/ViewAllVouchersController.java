@@ -4,8 +4,12 @@
  */
 package controllers;
 
-import java.io.IOException;
 import java.io.PrintWriter;
+import dals.VoucherDAO;
+import models.Voucher;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,9 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author Tang Thanh Vui - CE180901
+ * @author Dinh Minh Tien CE190701
  */
-public class AdminController extends HttpServlet {
+public class ViewAllVouchersController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,10 +38,10 @@ public class AdminController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminController</title>");            
+            out.println("<title>Servlet ViewAllVouchersController</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AdminController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ViewAllVouchersController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -55,8 +59,48 @@ public class AdminController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        processRequest(request, response);
-        request.getRequestDispatcher("pages/adminPage/sidebar.jsp").forward(request, response);
+        // Get event ID from request parameter
+//        String eventIdStr = request.getParameter("eventId");
+//
+//        // Validate event ID
+//        if (eventIdStr == null || eventIdStr.isEmpty()) {
+//            response.sendRedirect("pages/profile/profile.jsp"); // Redirect if no event ID is provided
+//            return;
+//        }
+
+        try {
+//            int eventId = Integer.parseInt(eventIdStr);
+            VoucherDAO voucherDAO = new VoucherDAO();
+            List<Voucher> vouchers = voucherDAO.getVouchersByEvent(1);
+
+            // Format expiration time and determine status
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            for (Voucher v : vouchers) {
+                String start = dateFormat.format(v.getStartDate());
+                String end = dateFormat.format(v.getEndDate());
+                v.setFormattedExpirationTime(start + " - " + end);
+
+                // Check if the voucher is expired
+                v.setStatusLabel(v.getEndDate().getTime() >= System.currentTimeMillis() ? "Ongoing" : "Expired");
+
+                // Format discount based on type
+                if ("percentage".equalsIgnoreCase(v.getDiscountType())) {
+                    v.setFormattedDiscount(v.getDiscountValue() + "%");
+                } else {
+                    v.setFormattedDiscount(String.format("%f VND", v.getDiscountValue()));
+                }
+            }
+
+            for (Voucher v : vouchers) {
+                System.out.println("Voucher " + v.getVoucherId() + " status: " + v.isStatus());
+            }
+
+            // Send vouchers to JSP
+            request.setAttribute("vouchers", vouchers);
+            request.getRequestDispatcher("pages/voucherPage/listVoucher.jsp").forward(request, response);
+        } catch (NumberFormatException e) {
+            response.sendRedirect("error.jsp"); // Handle invalid event ID
+        }
     }
 
     /**
@@ -70,7 +114,7 @@ public class AdminController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        doGet(request, response);
     }
 
     /**

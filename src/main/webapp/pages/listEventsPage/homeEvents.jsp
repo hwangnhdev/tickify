@@ -18,6 +18,20 @@
             />
         <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.css"/>
         <style>
+            body {
+                background-color: black;
+                color: white;
+            }
+
+            /*Large Event*/
+            .content-grid-large_events {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                grid-gap: 5px;
+                padding: 30px;
+                margin: 0 40px;
+            }
+
             /*Top-Picks-For-You*/
             .title-top_events {
                 text-align: center;
@@ -330,22 +344,17 @@
                     <c:forEach var="event" items="${carousel1}">
                         <div class="event-card-large_events">
                             <c:choose>
-                                <c:when test="${not empty event.imageURL}">
+                                <c:when test="${not empty event.imageUrl}">
                                     <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                        <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                     </a>
                                 </c:when>
                                 <c:otherwise>
                                     <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageURL}" alt="${event.eventName}" />
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </c:otherwise>
                             </c:choose>
-                            <button class="view-btn-large_events">
-                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                                    View details
-                                </a>
-                            </button>
                         </div>
                     </c:forEach>
                 </div>
@@ -353,29 +362,23 @@
                 <button class="prev-large_events">❮</button>
                 <button class="next-large_events">❯</button>
             </div>
-
             <!-- Carousel 2 -->
             <div class="carousel-large_events">
                 <div class="slides-large_events">
                     <c:forEach var="event" items="${carousel2}">
                         <div class="event-card-large_events">
                             <c:choose>
-                                <c:when test="${not empty event.imageURL}">
+                                <c:when test="${not empty event.imageUrl}">
                                     <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                        <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                     </a>
                                 </c:when>
                                 <c:otherwise>
                                     <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageURL}" alt="${event.eventName}" />
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </c:otherwise>
                             </c:choose>
-                            <button class="view-btn-large_events">
-                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                                    View details
-                                </a>
-                            </button>
                         </div>
                     </c:forEach>
                 </div>
@@ -384,10 +387,9 @@
                 <button class="next-large_events">❯</button>
             </div>
         </div>
-
         <script src="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.js"></script>
 
-        <!--Special-Events-->
+        <!--New Events-->
         <h2 class="title-spec_event">New Events</h2>
         <div class="content-grid-spec_event" id="eventContainer-spec_event">
             <button class="prev-btn-spec_event">❮</button>
@@ -397,7 +399,7 @@
                         <c:forEach var="event" items="${listEvents}">
                             <div class="event-card-spec_event">
                                 <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                                    <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                    <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                 </a>
                             </div>
                         </c:forEach>
@@ -423,7 +425,7 @@
                     const eventCardWidth = eventCards[0].offsetWidth + 20; // Bao gồm margin-right
                     eventCardsContainer.scrollTo({
                         left: eventCardWidth * index,
-                        behavior: "smooth",
+                        behavior: "smooth"
                     });
                 }
 
@@ -455,22 +457,21 @@
             });
         </script>
 
-        <!--Trending-Events--> 
-        <h2 class="title-trend_events">Trending events</h2>
+        <!--Upcoming-Events--> 
+        <h2 class="title-trend_events">Upcoming events</h2>
         <div class="content-grid-trend_events" id="eventContainer-trend_events">
             <button class="prev-btn-trend_events">❮</button>
             <div class="event-cards-trend_events">
                 <c:forEach var="event" items="${upcomingEvents}">
                     <div class="event-card-trend_events">
                         <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                            <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                            <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                         </a>
                     </div>
                 </c:forEach>
             </div>
             <button class="next-btn-trend_events">❯</button>
         </div>
-
         <script>
             document.querySelectorAll(".content-grid-trend_events").forEach((container) => {
                 const prevButton = container.querySelector(".prev-btn-trend_events");
@@ -516,96 +517,21 @@
             });
         </script>
 
-        <!--Top-Picks-For-You-->
-        <h2 class="title-top_events">Top Picks For You</h2>
-        <div class="content-grid-top_events" id="eventContainer-top_events">
-            <button class="prev-btn-top_events">❮</button>
-            <div class="event-cards-top_events">
-                <c:forEach var="event" items="${topTicketEvents}">
-                    <div class="event-card-top_events">
-                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                            <img src="${event.imageURL}" alt="${event.imageTitle}" />
-                        </a>
-                    </div>
-                </c:forEach>
-            </div>
-            <button class="next-btn-top_events">❯</button>
-        </div>
-
-        <script>
-            document.querySelectorAll(".content-grid-top_events").forEach((container) => {
-                const prevButton = container.querySelector(".prev-btn-top_events");
-                const nextButton = container.querySelector(".next-btn-top_events");
-                const eventCardsContainer = container.querySelector(".event-cards-top_events");
-                const eventCards = container.querySelectorAll(".event-card-top_events");
-
-                if (!prevButton || !nextButton || eventCards.length === 0) {
-                    console.warn("Skipping a Top Picks section due to missing elements.");
-                    return;
-                }
-
-                let currentIndex = 0;
-                const totalCards = eventCards.length;
-                const cardWidth = eventCards[0].offsetWidth + 20; // Add margin
-
-                // Function to scroll to the selected event
-                function scrollToEvent(index) {
-                    eventCardsContainer.scrollTo({
-                        left: cardWidth * index,
-                        behavior: "smooth",
-                    });
-                }
-
-                // Handle previous button click
-                prevButton.addEventListener("click", () => {
-                    currentIndex = Math.max(0, currentIndex - 1); // Prevent going below 0
-                    scrollToEvent(currentIndex);
-                });
-
-                // Handle next button click
-                nextButton.addEventListener("click", () => {
-                    currentIndex = Math.min(totalCards - 1, currentIndex + 1); // Prevent exceeding last item
-                    scrollToEvent(currentIndex);
-                });
-
-                // Auto-scroll every 3 seconds
-                let autoScroll = setInterval(() => {
-                    currentIndex = (currentIndex + 1) % totalCards;
-                    scrollToEvent(currentIndex);
-                }, 3000);
-
-                // Pause auto-scroll when hovering
-                eventCardsContainer.addEventListener("mouseenter", () => {
-                    clearInterval(autoScroll);
-                });
-
-                // Resume auto-scroll when leaving
-                eventCardsContainer.addEventListener("mouseleave", () => {
-                    autoScroll = setInterval(() => {
-                        currentIndex = (currentIndex + 1) % totalCards;
-                        scrollToEvent(currentIndex);
-                    }, 1000);
-                });
-            });
-
-        </script>
-
         <!--Recommendation Events--> 
         <h2 class="title-rec_events">Recommendation For You</h2>
         <div class="content-grid-rec_events" id="eventContainer-rec_events">
             <button class="prev-btn-rec_events">❮</button>
             <div class="event-cards-rec_events">
-                <c:forEach var="event" items="${topTicketEvents}">
+                <c:forEach var="event" items="${listRecommendedEvents}">
                     <div class="event-card-rec_events">
                         <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                            <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                            <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                         </a>
                     </div>
                 </c:forEach>
             </div>
             <button class="next-btn-rec_events">❯</button>
         </div>
-
         <script>
             document.querySelectorAll(".content-grid-rec_events").forEach((container) => {
                 const prevButton = container.querySelector(".prev-btn-rec_events");
@@ -672,14 +598,13 @@
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                         <div class="event-card-all_events">
                             <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                                <img src="${event.imageURL}" alt="${event.imageTitle}" />
+                                <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                 <h4>${event.eventName}</h4>
                             </a>
                         </div>
                     </div>
                 </c:forEach>
             </div>
-
             <!-- Pagination -->
             <nav class="mt-4">
                 <ul class="pagination justify-content-center" id="pagination-container">
@@ -703,7 +628,6 @@
                 </ul>
             </nav>
         </div>
-
         <script>
             function loadPage(page) {
                 event.preventDefault();

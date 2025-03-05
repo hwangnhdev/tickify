@@ -34,6 +34,13 @@ public class EventImage extends Event {
         this.imageTitle = imageTitle;
     }
 
+    public EventImage(String imageUrl, String imageTitle, int eventId, int categoryId, int organizerId, String eventName, String location, String eventType, String status, String description, Timestamp createdAt, Timestamp updatedAt) {
+        super(eventId, categoryId, organizerId, eventName, location, eventType, status, description, createdAt, updatedAt);
+        this.eventId = eventId;
+        this.imageUrl = imageUrl;
+        this.imageTitle = imageTitle;
+    }
+
     public int getImageId() {
         return imageId;
     }
@@ -42,10 +49,12 @@ public class EventImage extends Event {
         this.imageId = imageId;
     }
 
+    @Override
     public int getEventId() {
         return eventId;
     }
 
+    @Override
     public void setEventId(int eventId) {
         this.eventId = eventId;
     }

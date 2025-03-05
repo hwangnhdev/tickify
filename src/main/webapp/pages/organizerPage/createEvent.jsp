@@ -26,10 +26,10 @@
                     <span class="text-lg font-bold text-green-500">Organizer Center</span>
                 </div>
                 <nav class="space-y-4">
-                    <a class="flex items-center w-full p-2 rounded-lg hover:bg-green-700 transition duration-200" href="${pageContext.request.contextPath}/pages/organizerPage/organizerCenter.jsp">
-                        <i class="fas fa-ticket-alt mr-2"></i>My Event
+                    <a class="flex items-center w-full p-2 rounded-lg hover:bg-green-700 transition duration-200" href="${pageContext.request.contextPath}/OrganizerEventController">
+                        <i class="fas fa-ticket-alt mr-2"></i>My Events
                     </a>
-                    <a class="flex items-center w-full p-2 bg-green-700 rounded-lg" href="createEvent.jsp">
+                    <a class="flex items-center w-full p-2 bg-green-700 rounded-lg" href="${pageContext.request.contextPath}/createNewEvent">
                         <i class="fas fa-plus mr-2"></i>Create Event
                     </a>
                 </nav>

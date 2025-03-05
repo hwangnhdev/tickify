@@ -13,6 +13,7 @@
 //import jakarta.servlet.http.HttpServletResponse;
 //import java.util.List;
 //import models.Event;
+//import models.EventImage;
 //
 ///**
 // *
@@ -64,7 +65,7 @@
 //        /*Category*/
 //        String querySearch = request.getParameter("query");
 //
-//        List<Event> searchEvents = eventDAO.searchEventsByQuery(querySearch);
+//        List<EventImage> searchEvents = eventDAO.searchEventsByQuery(querySearch);
 //        request.setAttribute("searchEvents", searchEvents);
 //
 //        // Forward the request and response to the home.jsp page to display the events

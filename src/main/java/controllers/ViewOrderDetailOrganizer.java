@@ -61,12 +61,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import models.OrderDetail;
 import java.io.IOException;
 
-
 public class ViewOrderDetailOrganizer extends HttpServlet {
 
     /**
-     * Xử lý yêu cầu GET: lấy thông tin chi tiết đơn hàng theo orderId.
-     * Nếu không truyền tham số orderId, mặc định là 1 để test.
+     * Xử lý yêu cầu GET: lấy thông tin chi tiết đơn hàng theo orderId. Nếu
+     * không truyền tham số orderId, mặc định là 1 để test.
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
