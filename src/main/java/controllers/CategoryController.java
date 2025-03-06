@@ -4,6 +4,7 @@
  */
 package controllers;
 
+import com.google.gson.Gson;
 import dals.CategoryDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -59,9 +60,22 @@ public class CategoryController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         CategoryDAO categoryDAO = new CategoryDAO();
-        List<Category> listCategories = categoryDAO.getAllCategories();
-        request.setAttribute("listCategories", listCategories);
-        request.getRequestDispatcher("pages/adminPage/listCategories.jsp").forward(request, response);
+        String action = request.getParameter("action");
+
+        if ("search".equals(action)) {
+            String query = request.getParameter("query");
+            List<Category> searchResults = categoryDAO.getAllCategories(query); // Sử dụng phương thức GET_ALL_CATEGORY_SEARCH
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
+            Gson gson = new Gson();
+            out.print(gson.toJson(searchResults));
+            out.flush();
+        } else {
+            List<Category> listCategories = categoryDAO.getAllCategories();
+            request.setAttribute("listCategories", listCategories);
+            request.getRequestDispatcher("pages/adminPage/listCategories.jsp").forward(request, response);
+        }
     }
 
     /**

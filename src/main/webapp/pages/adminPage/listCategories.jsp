@@ -38,6 +38,27 @@
                 background: rgba(0, 0, 0, 0.5);
                 z-index: 999;
             }
+            .suggestions {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                border: 1px solid #d1d5db;
+                border-radius: 0 0 4px 4px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 10;
+                display: none;
+            }
+            .suggestion-item {
+                padding: 8px 12px;
+                cursor: pointer;
+            }
+            .suggestion-item:hover {
+                background-color: #f3f4f6;
+            }
         </style>
     </head>
     <body class="bg-gray-100 p-4">
@@ -52,10 +73,13 @@
             <!-- Filter and Search -->
             <div class="flex items-center mb-4">
                 <div class="relative flex-1">
-                    <input type="text" placeholder="Search categories by name" class="border border-gray-300 rounded p-2 w-full pl-10">
+                    <input type="text" id="searchInput" placeholder="Search categories by name" 
+                           class="border border-gray-300 rounded p-2 w-full pl-10" 
+                           onkeyup="fetchSuggestions(this.value)">
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <div id="suggestions" class="suggestions"></div>
                 </div>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded ml-4">Search</button>
+                <button onclick="searchCategories()" class="bg-blue-600 text-white px-4 py-2 rounded ml-4">Search</button>
                 <button onclick="openCreatePopup()" class="bg-blue-600 text-white px-4 py-2 rounded ml-4">Create New</button>
             </div>
 
@@ -69,7 +93,7 @@
                         <th class="border-b p-2 text-left">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="categoryTableBody">
                     <c:forEach var="category" items="${listCategories}">
                         <tr>
                             <td class="border-b p-2">${category.categoryId}</td>
@@ -239,6 +263,73 @@
                 document.getElementById('successPopup').style.display = 'none';
                 document.getElementById('overlay').style.display = 'none';
                 window.location.href = '${pageContext.request.contextPath}/category'; // Reload trang
+            }
+
+            // Hàm lấy gợi ý tìm kiếm
+            function fetchSuggestions(query) {
+                if (query.length === 0) {
+                    document.getElementById('suggestions').style.display = 'none';
+                    return;
+                }
+
+                fetch(`${pageContext.request.contextPath}/category?action=search&query=` + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        const suggestionsDiv = document.getElementById('suggestions');
+                        suggestionsDiv.innerHTML = '';
+                        if (data.length > 0) {
+                            data.forEach(category => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.innerText = category.categoryName;
+                                div.onclick = () => {
+                                    document.getElementById('searchInput').value = category.categoryName;
+                                    suggestionsDiv.style.display = 'none';
+                                    searchCategories(category.categoryName);
+                                };
+                                suggestionsDiv.appendChild(div);
+                            });
+                            suggestionsDiv.style.display = 'block';
+                        } else {
+                            suggestionsDiv.style.display = 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching suggestions:', error));
+            }
+
+            // Hàm tìm kiếm và cập nhật bảng
+            function searchCategories(query = document.getElementById('searchInput').value) {
+                fetch(`${pageContext.request.contextPath}/category?action=search&query=` + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        const tbody = document.getElementById('categoryTableBody');
+                        tbody.innerHTML = '';
+                        if (data.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="4" class="border-b p-2 text-center text-gray-600">Not found category</td>
+                                </tr>
+                            `;
+                        } else {
+                                data.forEach(category => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td class="border-b p-2">`+ category.categoryId +`</td>
+                                        <td class="border-b p-2 text-blue-600">`+ category.categoryName +`</td>
+                                        <td class="border-b p-2">`+ category.description +`</td>
+                                        <td class="border-b p-2">
+                                            <button onclick="openEditPopup('`+ category.categoryId +`', '`+ category.categoryName +`', '`+ category.description +`')" 
+                                                    class="text-yellow-600 hover:text-yellow-800 mr-2">Edit</button>
+                                            <button onclick="openDeletePopup('`+ category.categoryId +`', '`+ category.categoryName +`', '`+ category.description +`')" 
+                                                    class="text-red-600 hover:text-red-800">Delete</button>
+                                        </td>
+                                    `;
+                                    tbody.appendChild(row);
+                                });
+                        }
+                        document.getElementById('suggestions').style.display = 'none';
+                    })
+                    .catch(error => console.error('Error searching categories:', error));
             }
         </script>
     </body>
