@@ -18,100 +18,81 @@ import utils.DBContext;
  */
 public class CategoryDAO extends DBContext {
 
+    private static final String GET_ALL_CATEGORY = "SELECT * FROM Categories";
+    private static final String GET_ALL_CATEGORY_SEARCH = "SELECT * FROM Categories WHERE category_name LIKE ?";
+    private static final String GET_CATEGORY_BY_NAME = "SELECT * FROM Categories WHERE category_name = ?";
+    private static final String GET_CATEGORY_BY_ID = "SELECT * FROM Categories WHERE category_id = ?";
+    private static final String CREATE_CATEGORY = "INSERT INTO Categories (category_name, description, created_at) VALUES (?, ?, GETDATE())";
+    private static final String UPDATE_CATEGORY = "UPDATE Categories SET category_name = ?, description = ?, updated_at = GETDATE() WHERE category_id = ?";
+    private static final String DELETE_CATEGORY = "DELETE Categories WHERE category_id = ?";
+
+    private Category mapResultSetToCategory(ResultSet rs) throws SQLException {
+        Category category = new Category(
+                rs.getInt("category_id"),
+                rs.getString("category_name"),
+                rs.getString("description"),
+                rs.getTimestamp("created_at"),
+                rs.getTimestamp("updated_at")
+        );
+        return category;
+    }
+
     /*getCategoryByName*/
     public Category getCategoryByName(String categoryName) {
-        String sql = "SELECT * FROM Categories\n"
-                + "WHERE category_name = ?";
-
+        Category category = null;
         try {
-            PreparedStatement st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(GET_CATEGORY_BY_NAME);
             st.setString(1, categoryName);
             ResultSet rs = st.executeQuery();
-
             if (rs.next()) {
-                Category category = new Category(
-                        rs.getInt("category_id"),
-                        rs.getString("category_name"),
-                        rs.getString("description"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                category = mapResultSetToCategory(rs);
                 return category;
             }
-
         } catch (SQLException e) {
             System.out.println("Error fetching: " + e.getMessage());
         }
-
         return null;
     }
 
     /*getCategoryByName*/
     public Category getCategoryByID(int categoryID) {
-        String sql = "SELECT * FROM Categories\n"
-                + "WHERE category_id = ?";
-
+        Category category = null;
         try {
-            PreparedStatement st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(GET_CATEGORY_BY_ID);
             st.setInt(1, categoryID);
             ResultSet rs = st.executeQuery();
-
             if (rs.next()) {
-                Category category = new Category(
-                        rs.getInt("category_id"),
-                        rs.getString("category_name"),
-                        rs.getString("description"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                category = mapResultSetToCategory(rs);
                 return category;
             }
-
         } catch (SQLException e) {
             System.out.println("Error fetching: " + e.getMessage());
         }
-
         return null;
     }
 
     /*getAllCategories*/
     public List<Category> getAllCategories() {
         List<Category> listCategories = new ArrayList<>();
-        String sql = "SELECT * FROM Categories";
-
         try {
-            PreparedStatement st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(GET_ALL_CATEGORY);
             ResultSet rs = st.executeQuery();
-
             while (rs.next()) {
-                Category category = new Category(
-                        rs.getInt("category_id"),
-                        rs.getString("category_name"),
-                        rs.getString("description"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
-                listCategories.add(category);
+                listCategories.add(mapResultSetToCategory(rs));
             }
-
         } catch (SQLException e) {
             System.out.println("Error fetching: " + e.getMessage());
         }
-
         return listCategories;
     }
 
     /*createCategory*/
     public void createCategory(Category category) {
-        String sql = "INSERT INTO Categories (category_name, description, created_at)\n"
-                + "VALUES (?, ?, GETDATE())";
-
         try {
-            PreparedStatement st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(CREATE_CATEGORY);
             st.setString(1, category.getCategoryName());
             st.setString(2, category.getDescription());
             st.executeUpdate();
-
         } catch (SQLException e) {
             System.out.println("Error fetching: " + e.getMessage());
         }
@@ -119,19 +100,12 @@ public class CategoryDAO extends DBContext {
 
     /*updateCategory*/
     public void updateCategory(Category category) {
-        String sql = "UPDATE Categories\n"
-                + "SET category_name = ?,\n"
-                + "    description = ?,\n"
-                + "    updated_at = GETDATE()\n"
-                + "WHERE category_id = ?";
-
         try {
-            PreparedStatement st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(UPDATE_CATEGORY);
             st.setString(1, category.getCategoryName());
             st.setString(2, category.getDescription());
             st.setInt(3, category.getCategoryId());
             st.executeUpdate();
-
         } catch (SQLException e) {
             System.out.println("Error fetching: " + e.getMessage());
         }
@@ -139,44 +113,36 @@ public class CategoryDAO extends DBContext {
 
     /*deleteCategory*/
     public void deleteCategory(int categoryID) {
-        String sql = "DELETE Categories\n"
-                + "WHERE category_id = ?";
-
         try {
-            PreparedStatement st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(DELETE_CATEGORY);
             st.setInt(1, categoryID);
             st.executeUpdate();
-
         } catch (SQLException e) {
             System.out.println("Error fetching: " + e.getMessage());
         }
     }
 
+    /*getCategoryByNameSearch*/
+    public List<Category> getAllCategories(String query) {
+        List<Category> listCategories = new ArrayList<>();
+        try {
+            PreparedStatement st = connection.prepareStatement(GET_ALL_CATEGORY_SEARCH);
+            st.setString(1, "%" + query + "%");
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                listCategories.add(mapResultSetToCategory(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching: " + e.getMessage());
+        }
+        return listCategories;
+    }
+
     public static void main(String[] args) {
-        /*getCategoryByName*/
-//        CategoryDAO categoryDAO = new CategoryDAO();
-//        Category category = categoryDAO.getCategoryByName("Music");
-//        System.out.println(category.getCategoryName());
-
-        /*getAllCategories*/
-//        CategoryDAO categoryDAO = new CategoryDAO();
-//        List<Category> listCategories = categoryDAO.getAllCategories();
-//        for (Category category : listCategories) {
-//            System.out.println(category.getCategoryName());
-//        }
-
-        /*createCategory*/
-//        CategoryDAO categoryDAO = new CategoryDAO();
-//        Category category = new Category("Hiphop", "Hiphop never die");
-//        categoryDAO.createCategory(category);
-
-        /*updateCategory*/
-//        CategoryDAO categoryDAO = new CategoryDAO();
-//        Category category = new Category(11, "Hiphop", "Hiphop never die Love you never wrong");
-//        categoryDAO.updateCategory(category);
-
-        /*deleteCategory*/
-//        CategoryDAO categoryDAO = new CategoryDAO();
-//        categoryDAO.deleteCategory(11);
+        CategoryDAO dao = new CategoryDAO();
+        List<Category> cate = dao.getAllCategories("c");
+        for (Category category : cate) {
+            System.out.println(category.getCategoryName());
+        }
     }
 }
