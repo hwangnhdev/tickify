@@ -397,7 +397,7 @@
                 <c:choose>
                     <c:when test="${not empty listEvents}">
                         <c:forEach var="event" items="${listEvents}">
-                            <div class="event-card-spec_event">
+                            <div class="event-card-trend_events">
                                 <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
                                     <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                 </a>
@@ -599,7 +599,7 @@
                         <div class="event-card-all_events">
                             <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
                                 <img src="${event.imageUrl}" alt="${event.imageTitle}" />
-                                <h4>${event.eventName}</h4>
+                                <!--<h4>${event.eventName}</h4>-->
                             </a>
                         </div>
                     </div>

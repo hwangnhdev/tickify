@@ -417,7 +417,7 @@
                         <label>Location</label>
                     </div>
                     <div class="category-list" data-type="location">
-                        <input type="radio" name="location" value="Open Arena" ${selectedLocation == 'Open Arena' ? 'checked' : ''}> Open Arena <br>
+                        <input type="radio" name="location" value="Ben Thanh Theater" ${selectedLocation == 'Ben Thanh Theater' ? 'checked' : ''}> Ben Thanh Theater <br>
                         <input type="radio" name="location" value="Tech Hub" ${selectedLocation == 'Tech Hub' ? 'checked' : ''}> Tech Hub <br>
                         <input type="radio" name="location" value="Sports Arena" ${selectedLocation == 'Sports Arena' ? 'checked' : ''}> Sports Arena <br>
                         <input type="radio" name="location" value="Downtown Plaza" ${selectedLocation == 'Downtown Plaza' ? 'checked' : ''}> Downtown Plaza <br>
@@ -596,7 +596,7 @@
                             <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
                                 <div class="event-card-all_events">
                                     <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageURL}" alt="${event.eventName}" />
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
                                         <h4>${event.eventName}</h4>
                                     </a>
                                 </div>

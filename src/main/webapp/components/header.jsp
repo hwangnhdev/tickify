@@ -118,7 +118,7 @@
             <!-- Search Bar -->
             <div class="search-bar-header">
                 <form action="allEvents" method="GET">
-                    <input type="text" value="${searchQuery != null ? searchQuery : ''}" name="query"
+                    <input style="color: black;" type="text" value="${searchQuery != null ? searchQuery : ''}" name="query"
                            placeholder="What are you looking for today?" required>
                     <button type="submit">Search</button>
                 </form>
@@ -174,19 +174,28 @@
 
         <nav class="categories-header">
             <a style="text-decoration: none; color: white;" href="allEvents?category=1">
-                Concert
+                Music
             </a>
             <a style="text-decoration: none; color: white;" href="allEvents?category=2">
                 Technology
             </a>
             <a style="text-decoration: none; color: white;" href="allEvents?category=3">
-                Sports
+                Concert
             </a>
             <a style="text-decoration: none; color: white;" href="allEvents?category=4">
-                Festival
+                Sports
             </a>
             <a style="text-decoration: none; color: white;" href="allEvents?category=5">
+                Festival
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?category=6">
                 Exhibition
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?category=7">
+                Theater
+            </a>
+            <a style="text-decoration: none; color: white;" href="allEvents?category=8">
+                Workshop
             </a>
         </nav>
 

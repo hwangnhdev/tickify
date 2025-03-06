@@ -99,7 +99,7 @@ public class EventController extends HttpServlet {
 //
         // Get the requested page number, default to 1 if not provided <!--All Event--> 
         int page = 1;
-        int pageSize = 12;
+        int pageSize = 80;
         if (request.getParameter("page") != null) {
             try {
                 page = Integer.parseInt(request.getParameter("page"));

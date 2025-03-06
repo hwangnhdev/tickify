@@ -894,7 +894,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT TOP 20\n"
                 + "e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
                 + "FROM Events e\n"
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_event%'\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%'\n"
                 + "WHERE e.status = 'Active'\n"
                 + "ORDER BY e.created_at DESC";
 
