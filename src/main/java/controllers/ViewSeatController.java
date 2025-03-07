@@ -7,7 +7,11 @@ package controllers;
 
 import dals.CustomerDAO;
 import dals.EventDAO;
+import dals.CustomerDAO;
+import dals.EventDAO;
 import dals.SeatDAO;
+import dals.ShowtimeDAO;
+import dals.TicketTypeDAO;
 import dals.ShowtimeDAO;
 import dals.TicketTypeDAO;
 import java.io.IOException;
@@ -17,10 +21,15 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import models.Customer;
 import models.Event;
+import models.Customer;
+import models.Event;
 import models.Seat;
+import models.Showtime;
+import models.TicketType;
 import models.Showtime;
 import models.TicketType;
 
@@ -29,6 +38,21 @@ import models.TicketType;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class ViewSeatController extends HttpServlet {
+    private SeatDAO seatDAO;
+    private EventDAO eventDAO;
+    private ShowtimeDAO showtimeDAO;
+    private TicketTypeDAO ticketTypeDAO;
+    private CustomerDAO cusDAO;
+
+    @Override
+    public void init() {
+        seatDAO = new SeatDAO();
+        eventDAO = new EventDAO();
+        showtimeDAO = new ShowtimeDAO();
+        ticketTypeDAO = new TicketTypeDAO();
+        cusDAO = new CustomerDAO();
+    }
+    
     private SeatDAO seatDAO;
     private EventDAO eventDAO;
     private ShowtimeDAO showtimeDAO;
@@ -72,11 +96,11 @@ public class ViewSeatController extends HttpServlet {
     throws ServletException, IOException {
 //        int showtimeId = Integer.parseInt(request.getParameter("showtimeId"));
         
+        Customer customer = cusDAO.selectCustomerById(1);
         Event event = eventDAO.selectEventByID(1);
         Showtime showtime = showtimeDAO.selectShowtimeById(1);
-        List<TicketType> ticketTypes = ticketTypeDAO.selectTicketTypeByShowtimeId(1);
         
-        Customer customer = cusDAO.selectCustomerById(1);
+        List<TicketType> ticketTypes = ticketTypeDAO.selectTicketTypeByShowtimeId(1);
         List<Seat> seats = seatDAO.selectSeatsByShowtimeId(1);
         
         for (Seat seat : seats) {

@@ -10,9 +10,109 @@
 <%@page import="java.util.*"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Seat Selection</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <style>
+            body {
+                background-color: #222;
+            }
+            .seat {
+                height: 40px;
+                margin: 5px;
+                text-align: center;
+                line-height: 40px;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s, transform 0.3s;
+            }
+            .seat.available:hover {
+                background-color: #e0f7fa; /* Light blue on hover */
+            }
+            .seat.selected {
+                background-color: #0d6efd;
+                color: white;
+                transform: scale(1.1);
+                border: 3px solid #FFF;
+            }
+            .seat.not-available {
+                background-color: #f44336; /* Red */
+                color: white;
+                cursor: not-allowed;
+            }
+            .seat-container {
+                display: grid;
+                grid-template-columns: repeat(16, 1fr);
+                gap: 5px; /* Add gap between seats */
+            }
+
+            .ticket-item {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: white;
+                color: black;
+                padding: 4px 14px;
+                margin-bottom: 5px;
+                position: relative;
+                font-weight: bold;
+                box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Tạo hình tam giác */
+            .ticket-item::before,
+            .ticket-item::after {
+                content: "";
+                position: absolute;
+                width: 0;
+                height: 0;
+                border-style: solid;
+            }
+
+            .ticket-item::before {
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                border-width: 10px 0 10px 8px;
+                border-color: transparent transparent transparent rgb(56, 56, 61);
+            }
+
+            .ticket-item::after {
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                border-width: 10px 8px 10px 0;
+                border-color: transparent rgb(56, 56, 61) transparent transparent;
+            }
+            .truncate-text {
+                width: 300px;  /* Giới hạn độ rộng */
+                white-space: nowrap;  /* Không cho xuống dòng */
+                overflow: hidden;  /* Ẩn phần bị tràn */
+                text-overflow: ellipsis;  /* Hiển thị dấu "..." */
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mx-auto py-5">
+            <div class="flex flex-wrap -mx-4">
+                <div class="w-full md:w-2/3 px-4">
+                    <h1 class="text-center text-3xl font-bold mb-6" style="color: rgb(45, 194, 117);">Seat Selection</h1>
+                    <div class="flex items-center justify-center space-x-6 mb-6">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 transparent border border-black rounded-lg mr-2 border-4 border-white" style="border-radius: 4px; height: 26px; width: 38px;"></div>
+                            <span class="text-white">Selected</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-gray-500 border border-black rounded-lg mr-2" style="border-radius: 4px; height: 26px; width: 38px;"></div>
+                            <span class="text-white">Not Available</span>
+                        </div>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -126,7 +226,11 @@
                                     <c:set var="seatCursor" value="not-allowed" />
                                 </c:if>
                                 <div class="${seatClass}" 
-                                     data-seat="${seat.seatRow}${seat.seatCol}" data-price="${seat.price * 1000}" data-type="${seat.name}"
+                                     data-ticket_type_id="${seat.ticketTypeId}" 
+                                     data-seat_id="${seat.seatId}" 
+                                     data-seat="${seat.seatRow}${seat.seatCol}" 
+                                     data-price="${seat.price * 1000}" 
+                                     data-type="${seat.name}"
                                      style="background-color: ${seatColor}; color: #FFF; cursor: ${seatCursor}">
                                     ${seat.seatRow}${seat.seatCol}
                                 </div>
@@ -180,6 +284,16 @@
                 </aside>
             </div>
         </div>
+                    <h5 class="text-lg font-bold mb-2">Selected Seats</h5>
+                    <ul id="selectedSeatsList" class="list-disc mb-4 grid grid-cols-6 gap-2"></ul>
+                    <div class="mt-4" style="width: 100%">
+                        <button id="btnSubmit" class="bg-green-500 text-white w-full p-2 rounded-md" style="display: block; text-align: center">
+                            Continue - <span id="totalPrice">Total Price: 0 VND</span>
+                        </button>
+                    </div>
+                </aside>
+            </div>
+        </div>
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -192,21 +306,23 @@
                 const subtotalInput = document.getElementById("subtotal");
 
                 let selectedSeats = [];
-                let seatDataMap = new Map(); // Key: "color-price-name", Value: { count, seats[] }
+                let seatDataMap = new Map(); // Key: "ticketTypeId-color-price-name", Value: { count, seats[] }
 
                 seats.forEach(seat => {
                     seat.addEventListener("click", function () {
+                        const ticketTypeId = this.dataset.ticket_type_id; // Lấy Ticket Type ID
+                        const seatId = this.dataset.seat_id; // Lấy Seat ID
                         const seatName = this.dataset.seat;
                         const seatPrice = parseFloat(this.dataset.price);
                         const seatColor = this.style.backgroundColor;
-                        const ticketType = this.dataset.type; // Lấy tên loại vé từ data-type
+                        const ticketType = this.dataset.type;
 
                         if (this.classList.contains("selected")) {
                             this.classList.remove("selected");
-                            removeSeat(seatName, seatPrice, seatColor, ticketType);
+                            removeSeat(ticketTypeId, seatId, seatName, seatPrice, seatColor, ticketType);
                         } else {
                             this.classList.add("selected");
-                            addSeat(seatName, seatPrice, seatColor, ticketType);
+                            addSeat(ticketTypeId, seatId, seatName, seatPrice, seatColor, ticketType);
                         }
 
                         updateTotalPrice();
@@ -214,7 +330,7 @@
                     });
                 });
 
-                function addSeat(seat, price, color, ticketType) {
+                function addSeat(ticketTypeId, seatId, seat, price, color, ticketType) {
                     selectedSeats.push(seat);
 
                     const li = document.createElement("li");
@@ -226,33 +342,40 @@
                     li.textContent = seat;
                     selectedSeatsList.appendChild(li);
 
-                    const key = color + "-" + price + "-" + ticketType;
+                    const key = ticketTypeId + "-" + color + "-" + price + "-" + ticketType;
                     if (seatDataMap.has(key)) {
                         let seatInfo = seatDataMap.get(key);
                         seatInfo.count++;
-                        seatInfo.seats.push(seat);
+                        seatInfo.seats.push({id: seatId, name: seat});
                     } else {
-                        seatDataMap.set(key, {price, color, name: ticketType, count: 1, seats: [seat]});
+                        seatDataMap.set(key, {
+                            ticketTypeId, // Lưu Ticket Type ID
+                            price,
+                            color,
+                            name: ticketType,
+                            count: 1,
+                            seats: [{id: seatId, name: seat}]
+                        });
                     }
                 }
 
-                function removeSeat(seat, price, color, ticketType) {
+                function removeSeat(ticketTypeId, seatId, seat, price, color, ticketType) {
                     const index = selectedSeats.indexOf(seat);
                     if (index > -1) {
                         selectedSeats.splice(index, 1);
                     }
 
-                    const key = color + "-" + price + "-" + ticketType;
+                    const key = ticketTypeId + "-" + color + "-" + price + "-" + ticketType;
                     if (seatDataMap.has(key)) {
                         let seatInfo = seatDataMap.get(key);
                         if (seatInfo.count > 1) {
                             seatInfo.count--;
-                            seatInfo.seats.splice(seatInfo.seats.indexOf(seat), 1);
+                            seatInfo.seats = seatInfo.seats.filter(s => s.id !== seatId);
                         } else {
                             seatDataMap.delete(key);
                         }
                     }
-                    
+
                     const items = selectedSeatsList.querySelectorAll("li");
                     items.forEach(item => {
                         if (item.dataset.seat === seat) {
@@ -266,6 +389,7 @@
                     seatDataMap.forEach(value => {
                         total += value.price * value.count;
                     });
+
                     totalPriceElement.textContent = "Total Price: " + total.toLocaleString("vi-VN") + " VND";
                     subtotalInput.value = total;
                 }
@@ -276,7 +400,8 @@
                     let seatDataArray = [];
                     seatDataMap.forEach((value, key) => {
                         seatDataArray.push({
-                            name: value.name, // Thêm tên loại vé
+                            ticketTypeId: value.ticketTypeId, // Gửi Ticket Type ID
+                            name: value.name,
                             color: value.color,
                             price: value.price,
                             count: value.count,
@@ -297,7 +422,6 @@
                     }
                 });
             });
-
         </script>
     </body>
 </html>

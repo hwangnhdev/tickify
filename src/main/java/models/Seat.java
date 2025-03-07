@@ -6,31 +6,36 @@ package models;
 
 import java.sql.Date;
 
+import java.sql.Date;
+
 /**
  *
  * @author Nguyen Huy Hoang - CE182102
  */
 public class Seat extends TicketType {
 
+public class Seat extends TicketType {
+
     private int seatId;
-    private int eventId;
+    private int ticketTypeId;
     private String seatRow;
+    private String seatCol;
     private String seatCol;
     private String status;
 
     public Seat() {
     }
 
-    public Seat(int seatId, int eventId, String seatRow, String seatCol, String status) {
+    public Seat(int seatId, int ticketTypeId, String seatRow, String seatCol, String status) {
         this.seatId = seatId;
-        this.eventId = eventId;
+        this.ticketTypeId = ticketTypeId;
         this.seatRow = seatRow;
         this.seatCol = seatCol;
         this.status = status;
     }
 
-    public Seat(int seatId, int eventId, String seatRow, String seatCol, String status, int ticketTypeId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
-        super(ticketTypeId, eventId, name, description, price, totalQuantity, soldQuantity, createdAt, updatedAt);
+    public Seat(int seatId, String seatRow, String seatCol, String status, int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+        super(ticketTypeId, showtimeId, name, description, price, color, totalQuantity, soldQuantity, createdAt, updatedAt);
         this.seatId = seatId;
         this.seatRow = seatRow;
         this.seatCol = seatCol;
@@ -45,12 +50,12 @@ public class Seat extends TicketType {
         this.seatId = seatId;
     }
 
-    public int getEventId() {
-        return eventId;
+    public int getTicketTypeId() {
+        return ticketTypeId;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    public void setTicketTypeId(int ticketTypeId) {
+        this.ticketTypeId = ticketTypeId;
     }
 
     public String getSeatRow() {
@@ -63,8 +68,12 @@ public class Seat extends TicketType {
 
     public String getSeatCol() {
         return seatCol;
+    public String getSeatCol() {
+        return seatCol;
     }
 
+    public void setSeatCol(String seatCol) {
+        this.seatCol = seatCol;
     public void setSeatCol(String seatCol) {
         this.seatCol = seatCol;
     }
@@ -85,7 +94,6 @@ public class Seat extends TicketType {
                 + ", seatCol='" + seatCol + '\''
                 + ", status='" + status + '\''
                 + ", ticketTypeId=" + getTicketTypeId()
-                + ", eventId=" + getEventId()
                 + ", name='" + getName() + '\''
                 + ", description='" + getDescription() + '\''
                 + ", price=" + getPrice()
