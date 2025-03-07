@@ -6,7 +6,6 @@
 /* Large Event */
 // Lấy tất cả các carousel trong trang
 const carousels = document.querySelectorAll(".carousel-large_events");
-
 // Lặp qua từng carousel để thêm logic hoạt động
 carousels.forEach((carousel, index) => {
     const slides = carousel.querySelector(".slides-large_events");
@@ -42,16 +41,6 @@ carousels.forEach((carousel, index) => {
 
     // Tự động chuyển slide với thời gian riêng biệt cho từng carousel
     let slideInterval = setInterval(autoSlide, 2000 + index * 1000); // Thời gian khác nhau cho mỗi carousel
-
-    // Dừng tự động chuyển khi rê chuột vào carousel
-//                carousel.addEventListener("mouseenter", () => {
-//                    clearInterval(slideInterval);
-//                });
-
-    // Tiếp tục tự động chuyển khi rê chuột ra ngoài
-//                carousel.addEventListener("mouseleave", () => {
-//                    slideInterval = setInterval(autoSlide, 2000 + index * 1000);
-//                });
 });
 // Đảm bảo nút luôn căn giữa hình ảnh
 window.addEventListener("resize", () => {

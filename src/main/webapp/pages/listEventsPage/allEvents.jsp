@@ -18,12 +18,17 @@
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vi.js"></script>
         <style>
+
+            body {
+                background-color: black;
+                color: white;
+            }
             /* All Events */
             .title-all_events {
                 text-align: center;
                 font-size: 24px;
                 font-weight: bold;
-                color: #2c3e50;
+                color: white;
                 margin-bottom: 20px;
             }
 
@@ -34,7 +39,7 @@
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
                 text-align: center;
-                width: 320px;
+                /* width: 320px; */
                 transition: transform 0.3s, box-shadow 0.3s;
             }
 
@@ -46,7 +51,7 @@
             .event-card-all_events img {
                 width: 100%;
                 height: 150px;
-                object-fit: cover; /* Sử dụng cover thay vì fill để hình ảnh đẹp hơn */
+                object-fit: fill;
                 background-color: #f0f0f0;
                 display: block;
                 transition: filter 0.3s;
@@ -285,7 +290,7 @@
                 left: 0;
                 right: 0;
                 max-height: 0;
-                overflow: hidden;
+                overflow: auto;
                 transition: max-height 0.3s ease;
                 background: #fff;
                 border-radius: 8px;
@@ -373,26 +378,13 @@
                     </div>
                     <div class="category-list">
                         <c:set var="selectedCategoryList" value="${sessionScope.selectedCategories}" />
-                        <input type="checkbox" name="category" value="1"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 1}">checked</c:if>
-                               </c:forEach>> Concert <br>
-                        <input type="checkbox" name="category" value="2"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 2}">checked</c:if>
-                               </c:forEach>> Technology <br>
-                        <input type="checkbox" name="category" value="3"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 3}">checked</c:if>
-                               </c:forEach>> Sports <br>
-                        <input type="checkbox" name="category" value="4"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 4}">checked</c:if>
-                               </c:forEach>> Festival <br>
-                        <input type="checkbox" name="category" value="5"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 5}">checked</c:if>
-                               </c:forEach>> Exhibition <br>
+                        <c:forEach var="category" items="${listCategories}">
+                            <input type="checkbox" name="category" value="${category.categoryId}"
+                                   <c:forEach var="selected" items="${selectedCategoryList}">
+                                       <c:if test="${selected == category.categoryId}">checked</c:if>
+                                   </c:forEach>> 
+                            ${category.categoryName} <br>
+                        </c:forEach>
                     </div>
                 </div>
 
@@ -433,6 +425,65 @@
             </div>
         </form>
 
+        <!-- Check if there are no filtered events -->
+        <c:choose>
+            <c:when test="${empty filteredEvents}">
+                <p class="text-center">Not Event Found From Your Filter And Search</p>
+                <!--All Event--> 
+                <h2 class="text-center">All Events For You</h2>
+                <div class="container py-4">
+                    <div class="row gy-4" id="event-container">
+                        <!-- Event Cards -->
+                        <c:forEach var="event" items="${paginatedEventsAll}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                <div class="event-card-all_events">
+                                    <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageUrl}" alt="${event.imageTitle}" />
+                                    </a>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </div>
+                    <!-- Pagination -->
+                    <jsp:include page="pagination.jsp">
+                        <jsp:param name="baseUrl" value="/allEvents" />
+                        <jsp:param name="page" value="${pageAll}" />
+                        <jsp:param name="totalPages" value="${totalPagesAll}" />
+                        <jsp:param name="selectedStatus" value="${selectedStatusAll}" />
+                    </jsp:include>
+                </div>
+                <!-- Bootstrap JS for All Events-->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+            </c:when>
+            <c:otherwise>
+                <div class="container py-4">
+                    <div class="row gy-4" id="event-container">
+                        <!-- Loop through paginated events -->
+                        <c:forEach var="event" items="${filteredEvents}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                                <div class="event-card-all_events">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    </a>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <jsp:include page="pagination.jsp">
+                    <jsp:param name="baseUrl" value="/allEvents" />
+                    <jsp:param name="page" value="${currentPage}" />
+                    <jsp:param name="totalPages" value="${totalPages}" />
+                    <jsp:param name="selectedStatus" value="${selectedStatus}" />
+                </jsp:include>
+            </c:otherwise>
+        </c:choose>
+
+        <!--Footer-->
+        <jsp:include page="../../components/footer.jsp"></jsp:include>
+        
         <script>
             // Khởi tạo Flatpickr cho Start Date
             flatpickr("#startDate", {
@@ -465,11 +516,11 @@
                     const ranges = document.createElement('div');
                     ranges.className = 'flatpickr-ranges';
                     ranges.innerHTML = `
-            <button data-range="today">Hôm nay</button>
-            <button data-range="tomorrow">Ngày mai</button>
-            <button data-range="weekend">Cuối tuần này</button>
-            <button data-range="month">Tháng này</button>
-        `;
+                        <button data-range="today">Hôm nay</button>
+                        <button data-range="tomorrow">Ngày mai</button>
+                        <button data-range="weekend">Cuối tuần này</button>
+                        <button data-range="month">Tháng này</button>
+                    `;
                     instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
 
                     ranges.querySelectorAll('button').forEach(button => {
@@ -532,11 +583,11 @@
                     const ranges = document.createElement('div');
                     ranges.className = 'flatpickr-ranges';
                     ranges.innerHTML = `
-            <button data-range="today">Hôm nay</button>
-            <button data-range="tomorrow">Ngày mai</button>
-            <button data-range="weekend">Cuối tuần này</button>
-            <button data-range="month">Tháng này</button>
-        `;
+                        <button data-range="today">Hôm nay</button>
+                        <button data-range="tomorrow">Ngày mai</button>
+                        <button data-range="weekend">Cuối tuần này</button>
+                        <button data-range="month">Tháng này</button>
+                    `;
                     instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
 
                     ranges.querySelectorAll('button').forEach(button => {
@@ -582,61 +633,5 @@
                 });
             });
         </script>
-
-        <!-- Check if there are no filtered events -->
-        <c:choose>
-            <c:when test="${empty filteredEvents}">
-                <p>No events found.</p>
-            </c:when>
-            <c:otherwise>
-                <div class="container py-4">
-                    <div class="row gy-4" id="event-container">
-                        <!-- Loop through paginated events -->
-                        <c:forEach var="event" items="${filteredEvents}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                        <h4>${event.eventName}</h4>
-                                    </a>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </div>
-                </div>
-
-                <!-- Pagination -->
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center" id="pagination-container">
-                        <c:if test="${currentPage > 1}">
-                            <li class="page-item">
-                                <a class="page-link" href="allEvents?page=${currentPage - 1}&query=${searchQuery}&location=${selectedLocation}&startDate=${selectedStartDate}&endDate=${selectedEndDate}&price=${selectedPrice}">
-                                    « Previous
-                                </a>
-                            </li>
-                        </c:if>
-
-                        <c:forEach var="i" begin="1" end="${totalPages}">
-                            <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                <a class="page-link" href="allEvents?page=${i}&query=${searchQuery}&location=${selectedLocation}&startDate=${selectedStartDate}&endDate=${selectedEndDate}&price=${selectedPrice}">
-                                    ${i}
-                                </a>
-                            </li>
-                        </c:forEach>
-
-                        <c:if test="${currentPage < totalPages}">
-                            <li class="page-item">
-                                <a class="page-link" href="allEvents?page=${currentPage + 1}&query=${searchQuery}&location=${selectedLocation}&startDate=${selectedStartDate}&endDate=${selectedEndDate}&price=${selectedPrice}">
-                                    Next »
-                                </a>
-                            </li>
-                        </c:if>
-                    </ul>
-                </nav>
-            </c:otherwise>
-        </c:choose>
-
-        <!--Footer-->
-        <jsp:include page="../../components/footer.jsp"></jsp:include>
     </body>
 </html>

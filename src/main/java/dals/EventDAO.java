@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import models.Category;
 import models.Event;
@@ -346,11 +347,11 @@ public class EventDAO extends DBContext {
 
         List<Object> seatsList = new ArrayList<>();
         for (Seat seat : seats) {
-            if (seat.getTicketTypeName() == null || seat.getSeatRow() == null) {
+            if (seat.getName() == null || seat.getSeatRow() == null) {
                 throw new IllegalArgumentException("ticketTypeName and seatRow are required for each seat");
             }
             seatsList.add(new SeatJson(
-                    seat.getTicketTypeName(),
+                    seat.getName(),
                     seat.getSeatRow(),
                     seat.getSeatCol() // Lấy seatCol từ model Seat
             ));
@@ -1192,145 +1193,73 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-    /*==========================================================================main==========================================================================*/
-    public static void main(String[] args) {
-        // Example main method to test createEvent
-//    public static void main(String[] args) {
-        /*Create Event*/
-//        EventDAO eventDAO = new EventDAO();
-//
-//        // Sample data for testing (matching stored procedure test data)
-//        int customerId = 8;
-//        String organizationName = "Huynh Le Cong Bien";
-//        String accountHolder = "John Doe";
-//        String accountNumber = "1234567890";
-//        String bankName = "Sample Bank";
-//        int categoryId = 1;
-//        String eventName = "Sample Concert";
-//        String location = "Hanoi, Vietnam";
-//        String eventType = "seatedevent";
-//        String description = "A sample concert event";
-//        String status = "Pending";
-//        String eventLogoUrl = "https://example.com/logo.png";
-//        String backgroundImageUrl = "https://example.com/background.png";
-//        String organizerImageUrl = "https://example.com/organizer.png";
-//
-//        // Sample ShowTimes
-//        List<ShowTime> showTimes = new ArrayList<>();
-//        showTimes.add(new ShowTime(0, 0, Timestamp.valueOf("2025-03-01 14:00:00"), Timestamp.valueOf("2025-03-01 16:00:00"), "Scheduled", null, null));
-//        showTimes.add(new ShowTime(0, 0, Timestamp.valueOf("2025-04-01 14:00:00"), Timestamp.valueOf("2025-04-01 16:00:00"), "Scheduled", null, null));
-//
-//        // Sample TicketTypes
-//        List<TicketType> ticketTypes = new ArrayList<>();
-//        ticketTypes.add(new TicketType(0, 0, "VIP", "VIP seating", 150000, "#FF0000", 16, 0, null, null));
-//        ticketTypes.add(new TicketType(0, 0, "Normal", "Normal seating", 80000, "#00FF00", 30, 0, null, null));
-//        ticketTypes.add(new TicketType(0, 0, "VIP Vui", "VIP seating", 150000, "#FF0000", 16, 0, null, null));
-//        ticketTypes.add(new TicketType(0, 0, "Normal Vui", "Normal seating", 80000, "#00FF00", 16, 0, null, null));
-//
-//        // Sample Seats with seatCol (reflecting actual seat quantities for each row)
-//        List<Seat> seats = new ArrayList<>();
-//        seats.add(new Seat(0, 0, "A", "10", "Available", "VIP")); // Row A with 10 seats for VIP
-//        seats.add(new Seat(0, 0, "B", "16", "Available", "VIP")); // Row B with 16 seats for VIP
-//        seats.add(new Seat(0, 0, "C", "15", "Available", "Normal")); // Row C with 15 seats for Normal
-//        seats.add(new Seat(0, 0, "D", "15", "Available", "Normal")); // Row D with 15 seats for Normal
-//        seats.add(new Seat(0, 0, "E", "16", "Available", "VIP Vui")); // Row E with 16 seats for VIP Vui
-//        seats.add(new Seat(0, 0, "F", "16", "Available", "Normal Vui")); // Row F with 16 seats for Normal Vui
-//
-//        // Call createEvent method
-//        EventCreationResult result = eventDAO.createEvent(
-//                customerId, organizationName, accountHolder, accountNumber, bankName,
-//                categoryId, eventName, location, eventType, description, status,
-//                eventLogoUrl, backgroundImageUrl, organizerImageUrl,
-//                showTimes, ticketTypes, seats
-//        );
-//
-//        // Print result
-//        System.out.println("Created Event ID: " + result.eventId);
-//        System.out.println("Organizer ID: " + result.organizerId);
-        /*Update Event*/
-//        EventDAO eventDAO = new EventDAO();
-//
-//        // Dữ liệu mẫu để cập nhật sự kiện với ID 574
-//        int eventId = 574;
-//        int customerId = 9;
-//        String organizationName = "Updated Tang Thanh Vui";
-//        String accountHolder = "Updated John Doe";
-//        String accountNumber = "0987654321";
-//        String bankName = "Updated Bank";
-//        int categoryId = 2;
-//        String eventName = "Updated Sample Concert";
-//        String location = "Ho Chi Minh City, Vietnam";
-//        String eventType = "seatedevent";
-//        String description = "An updated sample concert event";
-//        String status = "Pending";
-//        String eventLogoUrl = "https://example.com/updated_logo.png";
-//        String backgroundImageUrl = "https://example.com/updated_background.png";
-//        String organizerImageUrl = "https://example.com/updated_organizer.png";
-//
-//        // Dữ liệu ShowTimes mẫu
-//        List<ShowTime> showTimes = new ArrayList<>();
-//        showTimes.add(new ShowTime(0, 0, Timestamp.valueOf("2025-03-02 14:00:00"), Timestamp.valueOf("2025-03-02 16:00:00"), "Scheduled", null, null));
-//
-//        // Dữ liệu TicketTypes mẫu
-//        List<TicketType> ticketTypes = new ArrayList<>();
-//        ticketTypes.add(new TicketType(0, 0, "VIP Updated", "Updated VIP seating", 200000, "#FF0000", 10, 0, null, null));
-//
-//        // Dữ liệu Seats mẫu
-//        List<Seat> seats = new ArrayList<>();
-//        seats.add(new Seat(0, 0, "A", "1", "Available", "VIP Updated"));
-//
-//        // Gọi phương thức updateEventByID
-//        boolean success = eventDAO.updateEventByID(
-//                eventId, customerId, organizationName, accountHolder, accountNumber, bankName,
-//                categoryId, eventName, location, eventType, description, status,
-//                eventLogoUrl, backgroundImageUrl, organizerImageUrl,
-//                showTimes, ticketTypes, seats
-//        );
-//
-//        // In kết quả
-//        System.out.println("Update Successfully: " + success);
+    /*getTotalRevenueOfEventById*/
+    public List<Double> getTotalRevenueOfEventById(int eventId, int organizerId) {
+        List<Double> listTotals = new ArrayList<>();
 
-        /*Test Event Page Home*/
-        EventDAO eventDAO = new EventDAO();
-
-        // Chọn một event ID có sẵn trong cơ sở dữ liệu để test
-        int testEventId = 577; // Thay bằng một ID thực tế từ cơ sở dữ liệu của bạn
+        String sql = "SELECT \n"
+                + "    COALESCE(SUM(o.total_price), 0) AS total_revenue,\n"
+                + "    COALESCE(SUM(od.quantity), 0) AS tickets_sold,\n"
+                + "    COALESCE(SUM(tt.total_quantity) - SUM(od.quantity), SUM(tt.total_quantity)) AS tickets_remaining,\n"
+                + "    COALESCE(CAST((SUM(od.quantity) * 100.0 / SUM(tt.total_quantity)) AS DECIMAL(5,2)), 0) AS fill_rate\n"
+                + "FROM \n"
+                + "    [dbo].[Events] e\n"
+                + "    INNER JOIN [dbo].[Organizers] org ON e.organizer_id = org.organizer_id\n"
+                + "    INNER JOIN [dbo].[Showtimes] s ON e.event_id = s.event_id\n"
+                + "    INNER JOIN [dbo].[TicketTypes] tt ON s.showtime_id = tt.showtime_id\n"
+                + "    LEFT JOIN [dbo].[OrderDetails] od ON tt.ticket_type_id = od.ticket_type_id\n"
+                + "    LEFT JOIN [dbo].[Orders] o ON od.order_id = o.order_id AND o.payment_status = 'Paid'\n"
+                + "WHERE \n"
+                + "    e.event_id = ?\n"
+                + "    AND org.customer_id = ?";
 
         try {
-//            List<EventImage> listEventImage = eventDAO.getImageEventsByEventId(1);
-//            System.out.println("\nEvents:");
-//            for (EventImage eventImage : listEventImage) {
-//                if (eventImage.getImageTitle().equalsIgnoreCase("logo_event")) {
-//                    System.out.println(eventImage.getEventId());
-//                    System.out.println(eventImage.getEventName());
-//                    System.out.println(eventImage.getImageTitle());
-//                    System.out.println(eventImage.getImageUrl());
-//                }
-//            }
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, eventId);
+            st.setInt(2, organizerId);
+            ResultSet rs = st.executeQuery();
 
-            List<Showtime> listShowtimes = eventDAO.getShowTimesByEventId(272);
-            for (Showtime listShowtime : listShowtimes) {
-                System.out.println(listShowtime.getShowtimeId());
-                System.out.println(listShowtime.getStartDate());
-                System.out.println(listShowtime.getEndDate());
-                List<TicketType> listTicketTypes = eventDAO.getTicketTypeByShowtimeId(listShowtime.getShowtimeId());
-                for (TicketType listTicketType : listTicketTypes) {
-                    System.out.println(listTicketType.getTicketTypeId());
-                    System.out.println(listTicketType.getName());
-                    System.out.println(listTicketType.getPrice());
-                }
+            while (rs.next()) {
+                listTotals.add(rs.getDouble("total_revenue"));
+                listTotals.add(rs.getDouble("tickets_sold"));
+                listTotals.add(rs.getDouble("tickets_remaining"));
+                listTotals.add(rs.getDouble("fill_rate"));
             }
+        } catch (SQLException e) {
+            System.out.println("Error searching events: " + e.getMessage());
+        }
+        return listTotals;
+    }
 
-            List<EventImage> listImages = eventDAO.searchEventsByQuery("Vui");
-            for (EventImage listImage : listImages) {
-                System.out.println(listImage.getEventId());
-                System.out.println(listImage.getEventType());
-                System.out.println(listImage.getImageUrl());
+    /*getTotalRevenueOfEventById*/
+    public List<Double> getTotalRevenueChartOfEventById(int eventId, int organizerId, int year) {
+        List<Double> monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        String sql = "{call GetEventRevenueByYear(?, ?, ?)}";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, eventId);
+            st.setInt(2, organizerId);
+            st.setInt(3, year);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                int month = rs.getInt("Month") - 1; // MONTH trả về 1-12, List index là 0-11
+                double revenue = rs.getDouble("Revenue");
+                monthlyRevenue.set(month, revenue);
             }
-        } catch (Exception e) {
-            // Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình kiểm tra
-            System.err.println("Đã xảy ra lỗi trong quá trình kiểm tra: " + e.getMessage());
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println("Error searching events: " + e.getMessage());
+        }
+        return monthlyRevenue;
+    }
+
+    public static void main(String[] args) {
+        EventDAO d = new EventDAO();
+        List<Double> monthlyRevenue = d.getTotalRevenueChartOfEventById(1, 1, 2025);
+        for (Double double1 : monthlyRevenue) {
+            System.out.println(double1);
         }
     }
 }

@@ -311,7 +311,7 @@ public class UpdateEventController extends HttpServlet {
                     // Tạo danh sách ghế từ 1 đến totalSeats (ví dụ A1 đến A15 hoặc B1 đến B16)
                     for (int i = 1; i <= totalSeats; i++) {
                         Seat seat = new Seat();
-                        seat.setTicketTypeName(ticketTypeName);
+                        seat.setName(ticketTypeName);
                         seat.setSeatRow(seatRow); // Giữ nguyên hàng (ví dụ "A" hoặc "B")
                         seat.setSeatCol(String.valueOf(i)); // Số ghế từ 1 đến totalSeats
                         seat.setStatus(seatObj.has("status") ? seatObj.get("status").getAsString() : "Available");

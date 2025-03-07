@@ -69,6 +69,7 @@ public class AllEventsController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         FilterEventDAO filterEventDAO = new FilterEventDAO();
+        EventDAO eventDAO = new EventDAO();
 
         // Get filter parameters
         String[] categoryIds = request.getParameterValues("category");
@@ -133,6 +134,28 @@ public class AllEventsController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
 
+        
+        // <!--All Event For You-->  Get the requested page number, default to 1 if not provided 
+        int pageAll = 1;
+        int pageSizeAll = 80;
+        if (request.getParameter("page") != null) {
+            try {
+                pageAll = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException e) {
+                pageAll = 1; // Fallback to page 1 in case of an invalid input
+            }
+        }
+
+        // Get total number of events and calculate total pages
+        int totalEventsAll = eventDAO.getTotalEvents();
+        int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSizeAll);
+
+        // Fetch paginated list of events
+        List<EventImage> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
+        request.setAttribute("paginatedEventsAll", paginatedEventsAll);
+        request.setAttribute("pageAll", pageAll);
+        request.setAttribute("totalPagesAll", totalPagesAll);
+        
         // Forward to JSP
         request.getRequestDispatcher("pages/listEventsPage/allEvents.jsp").forward(request, response);
     }

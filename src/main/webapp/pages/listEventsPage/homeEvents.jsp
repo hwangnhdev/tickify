@@ -12,16 +12,107 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
         <!-- Bootstrap CSS -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            />
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"/>
         <style>
             body {
                 background-color: black;
                 color: white;
             }
+
+            /* Large Event */
+            .content-grid-large_events {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                grid-gap: 10px;
+                padding: 30px;
+                margin: 0 40px;
+            }
+
+            .carousel-large_events {
+                position: relative;
+                overflow: hidden;
+                width: 100%;
+                height: 300px;
+                display: flex;
+                justify-content: center;
+                border-radius: 8px;
+            }
+
+            .slides-large_events {
+                display: flex;
+                transition: transform 0.5s ease-in-out;
+            }
+
+            .event-card-large_events {
+                flex: 0 0 100%;
+                box-sizing: border-box;
+                padding: 0;
+                position: relative;
+                background-color: #f5f5f5;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .event-card-large_events img {
+                width: 100%;
+                height: 100%;
+                object-fit: fill;
+            }
+
+            .view-btn-large_events {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                background-color: #00a651;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+                z-index: 10;
+            }
+
+            .prev-large_events,
+            .next-large_events {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: rgba(0, 0, 0, 0.5);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                z-index: 10;
+            }
+
+            .prev-large_events {
+                left: 20px;
+            }
+
+            .next-large_events {
+                right: 20px;
+            }
+
+            .sidebar-large_events {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .calendar-large_events,
+            .map-large_events {
+                background-color: #f5f5f5;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                padding: 16px;
+                width: 100%;
+                max-width: 300px;
+                margin-bottom: 20px;
+            }
+
 
             /*Large Event*/
             .content-grid-large_events {
@@ -599,48 +690,19 @@
                         <div class="event-card-all_events">
                             <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
                                 <img src="${event.imageUrl}" alt="${event.imageTitle}" />
-                                <!--<h4>${event.eventName}</h4>-->
                             </a>
                         </div>
                     </div>
                 </c:forEach>
             </div>
             <!-- Pagination -->
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center" id="pagination-container">
-                    <c:if test="${currentPage > 1}">
-                        <li class="page-item">
-                            <a class="page-link" href="#" onclick="loadPage(${currentPage - 1})">&laquo; Previous</a>
-                        </li>
-                    </c:if>
-
-                    <c:forEach var="i" begin="1" end="${totalPages}">
-                        <li class="page-item ${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#" onclick="loadPage(${i})">${i}</a>
-                        </li>
-                    </c:forEach>
-
-                    <c:if test="${currentPage < totalPages}">
-                        <li class="page-item">
-                            <a class="page-link" href="#" onclick="loadPage(${currentPage + 1})">Next &raquo;</a>
-                        </li>
-                    </c:if>
-                </ul>
-            </nav>
+            <jsp:include page="pagination.jsp">
+                <jsp:param name="baseUrl" value="/event" />
+                <jsp:param name="page" value="${currentPage}" />
+                <jsp:param name="totalPages" value="${totalPages}" />
+                <jsp:param name="selectedStatus" value="${selectedStatus}" />
+            </jsp:include>
         </div>
-        <script>
-            function loadPage(page) {
-                event.preventDefault();
-                fetch('?page=' + page, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-                        .then(response => response.text())
-                        .then(data => {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(data, 'text/html');
-                            document.getElementById('event-container').innerHTML = doc.getElementById('event-container').innerHTML;
-                            document.getElementById('pagination-container').innerHTML = doc.getElementById('pagination-container').innerHTML;
-                        });
-            }
-        </script>
         <!-- Bootstrap JS for All Events-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     </body>

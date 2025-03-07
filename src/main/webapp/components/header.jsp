@@ -173,30 +173,11 @@
         </header>
 
         <nav class="categories-header">
-            <a style="text-decoration: none; color: white;" href="allEvents?category=1">
-                Music
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?category=2">
-                Technology
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?category=3">
-                Concert
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?category=4">
-                Sports
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?category=5">
-                Festival
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?category=6">
-                Exhibition
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?category=7">
-                Theater
-            </a>
-            <a style="text-decoration: none; color: white;" href="allEvents?category=8">
-                Workshop
-            </a>
+            <c:forEach begin="0" end="5" var="category" items="${listCategories}">
+                <a style="text-decoration: none; color: white;" href="allEvents?category=${category.categoryId}">
+                    ${category.categoryName}
+                </a>
+            </c:forEach>
         </nav>
 
         <!-- JavaScript -->

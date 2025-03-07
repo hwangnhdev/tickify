@@ -4,6 +4,7 @@
  */
 package controllers;
 
+import dals.CategoryDAO;
 import dals.EventDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import models.Category;
 import models.Event;
 import models.EventImage;
 
@@ -117,6 +119,16 @@ public class EventController extends HttpServlet {
         request.setAttribute("paginatedEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+
+        // Create session to store parameter when filter and search
+        HttpSession session = request.getSession();
+        // Call all DAO to get methods in it
+        CategoryDAO categoryDAO = new CategoryDAO();
+
+        // Get all category and store it in list categories
+        List<Category> listCategories = categoryDAO.getAllCategories();
+        // Set attribute for DAO
+        session.setAttribute("listCategories", listCategories);
 
 //        List<Event> topTicketEvents = eventDAO.getTopPicksForYou(3);
 //        request.setAttribute("topTicketEvents", topTicketEvents);
