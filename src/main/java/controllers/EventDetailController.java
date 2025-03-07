@@ -5,16 +5,20 @@
 package controllers;
 
 import dals.EventDAO;
+import dals.FilterEventDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import models.Category;
 import models.EventImage;
 import models.Event;
+import models.FilterEvent;
 import models.Organizer;
 import models.Showtime;
 
@@ -63,6 +67,7 @@ public class EventDetailController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         EventDAO eventDAO = new EventDAO();
+        FilterEventDAO filterEventDAO = new FilterEventDAO();
 
         /*Get ID of Event*/
         String id = request.getParameter("id");
@@ -111,26 +116,61 @@ public class EventDetailController extends HttpServlet {
         request.setAttribute("listShowtimes", listShowtimes);
         System.out.println(listShowtimes);
 
+        // Get filter parameters
+        String[] categoryIds = request.getParameterValues("categoryId");
+        String location = request.getParameter("location");
+        String startDateStr = request.getParameter("startDate");
+        String endDateStr = request.getParameter("endDate");
+        String price = request.getParameter("price");
+        String searchQuery = request.getParameter("query");
 
-        /*Pagination list of events*/
-//        // Get the requested page number, default to 1 if not provided
-//        int page = 1;
-//        int pageSize = 20;
-//        if (request.getParameter("page") != null) {
-//            try {
-//                page = Integer.parseInt(request.getParameter("page"));
-//            } catch (NumberFormatException e) {
-//                page = 1; // Fallback to page 1 in case of an invalid input
-//            }
-//        }
-//        // Get total number of events and calculate total pages
-//        int totalEvents = eventDAO.getTotalEvents();
-//        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
-//        // Fetch paginated list of events
-//        List<EventImage> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
-//        request.setAttribute("paginatedEvents", paginatedEvents);
-//        request.setAttribute("currentPage", page);
-//        request.setAttribute("totalPages", totalPages);
+        // Convert category ID list
+        List<Integer> categories = new ArrayList<>();
+        if (categoryIds != null) {
+            for (String idCat : categoryIds) {
+                categories.add(Integer.parseInt(idCat));
+            }
+        }
+
+        // Convert date parameters
+        Date startDate = (startDateStr != null && !startDateStr.isEmpty()) ? Date.valueOf(startDateStr) : null;
+        Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? Date.valueOf(endDateStr) : null;
+
+        // Create filter object
+        FilterEvent filters = new FilterEvent(categories, null, null, null, null, false, null);
+
+        // Get filtered events
+        List<EventImage> filteredEvents = filterEventDAO.getFilteredEvents(filters);
+        System.out.println("Filtered Events Count: " + filteredEvents.size()); // Debug log
+
+        // Pagination logic
+        int page = 1;
+        int pageSize = 40; // Show 10 events per page
+        int totalEvents = filteredEvents.size();
+        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+
+        // Get requested page number
+        if (request.getParameter("page") != null) {
+            try {
+                page = Integer.parseInt(request.getParameter("page"));
+                if (page < 1 || page > totalPages) {
+                    page = 1; // Reset to page 1 if invalid
+                }
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        // Get events for the requested page
+        int startIndex = (page - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, totalEvents);
+        List<EventImage> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
+
+        // Send attributes to JSP
+        request.setAttribute("filteredEvents", paginatedEvents);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/listEventsPage/eventDetail.jsp").forward(request, response);
     }

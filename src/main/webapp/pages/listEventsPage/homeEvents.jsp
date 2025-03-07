@@ -436,12 +436,12 @@
                         <div class="event-card-large_events">
                             <c:choose>
                                 <c:when test="${not empty event.imageUrl}">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                     </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </c:otherwise>
@@ -460,12 +460,12 @@
                         <div class="event-card-large_events">
                             <c:choose>
                                 <c:when test="${not empty event.imageUrl}">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                     </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </c:otherwise>
@@ -489,7 +489,7 @@
                     <c:when test="${not empty listEvents}">
                         <c:forEach var="event" items="${listEvents}">
                             <div class="event-card-trend_events">
-                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                     <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                 </a>
                             </div>
@@ -555,7 +555,7 @@
             <div class="event-cards-trend_events">
                 <c:forEach var="event" items="${upcomingEvents}">
                     <div class="event-card-trend_events">
-                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                             <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                         </a>
                     </div>
@@ -615,7 +615,7 @@
             <div class="event-cards-rec_events">
                 <c:forEach var="event" items="${listRecommendedEvents}">
                     <div class="event-card-rec_events">
-                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                             <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                         </a>
                     </div>
@@ -688,7 +688,7 @@
                 <c:forEach var="event" items="${paginatedEvents}">
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                         <div class="event-card-all_events">
-                            <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                            <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                 <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                             </a>
                         </div>

@@ -4,6 +4,7 @@
  */
 package controllers;
 
+import dals.CategoryDAO;
 import dals.EventDAO;
 import dals.FilterEventDAO;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import models.Category;
 import models.Event;
 import models.EventImage;
 import models.FilterEvent;
@@ -70,6 +72,13 @@ public class AllEventsController extends HttpServlet {
         HttpSession session = request.getSession();
         FilterEventDAO filterEventDAO = new FilterEventDAO();
         EventDAO eventDAO = new EventDAO();
+
+        // Call all DAO to get methods in it
+        CategoryDAO categoryDAO = new CategoryDAO();
+        // Get all category and store it in list categories
+        List<Category> listCategories = categoryDAO.getAllCategories();
+        // Set attribute for DAO
+        session.setAttribute("listCategories", listCategories);
 
         // Get filter parameters
         String[] categoryIds = request.getParameterValues("category");
@@ -134,7 +143,6 @@ public class AllEventsController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
 
-        
         // <!--All Event For You-->  Get the requested page number, default to 1 if not provided 
         int pageAll = 1;
         int pageSizeAll = 80;
@@ -155,7 +163,7 @@ public class AllEventsController extends HttpServlet {
         request.setAttribute("paginatedEventsAll", paginatedEventsAll);
         request.setAttribute("pageAll", pageAll);
         request.setAttribute("totalPagesAll", totalPagesAll);
-        
+
         // Forward to JSP
         request.getRequestDispatcher("pages/listEventsPage/allEvents.jsp").forward(request, response);
     }

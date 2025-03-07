@@ -11,6 +11,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Event Detail</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"/>
         <style>
             body {
                 font-family: "Roboto", sans-serif;
@@ -159,6 +161,54 @@
                 transition: all 0.3s ease;
             }
 
+            /*All Events*/
+            .title-all_events {
+                text-align: center;
+                font-size: 24px;
+                font-weight: bold;
+            }
+            .event-card-all_events {
+                background-color: #ffffff;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                text-align: center;
+                /* width: 320px; */
+                transition: transform 0.3s, box-shadow 0.3s;
+            }
+
+            .event-card-all_events:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            }
+
+            .event-card-all_events img {
+                width: 100%;
+                height: 150px;
+                object-fit: fill;
+                background-color: #f0f0f0;
+                display: block;
+                transition: filter 0.3s;
+            }
+
+            .event-card-all_events:hover img {
+                filter: brightness(1.1);
+            }
+            .event-card-all_events h4 {
+                font-size: 16px;
+                margin: 10px 0 5px;
+                color: #000000;
+            }
+            .event-card-all_events p {
+                font-size: 14px;
+                margin: 5px 0;
+                color: #000000;
+            }
+            .pagination a {
+                text-decoration: none;
+            }
+
             @media (max-width: 768px) {
                 .event-card-event_detail {
                     flex-direction: column;
@@ -241,9 +291,39 @@
         </div>
 
         <!--Relevant Events-->
-        <jsp:include page="relevantEvents.jsp"></jsp:include>
+        <!-- Check if there are no filtered events -->
+        <h2 class="title-all_events">Relevant Events</h2>
+        <c:choose>
+            <c:when test="${empty filteredEvents}">
+                <p class="text-center">Not Event Found From Your Filter And Search</p>
+            </c:when>
+            <c:otherwise>
+                <div class="container py-4">
+                    <div class="row gy-4" id="event-container">
+                        <!-- Loop through paginated events -->
+                        <c:forEach var="event" items="${filteredEvents}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                                <div class="event-card-all_events">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    </a>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </div>
 
-            <!--Footer-->
+                <!-- Pagination -->
+                <jsp:include page="pagination.jsp">
+                    <jsp:param name="baseUrl" value="/eventDetail" />
+                    <jsp:param name="page" value="${currentPage}" />
+                    <jsp:param name="totalPages" value="${totalPages}" />
+                    <jsp:param name="selectedStatus" value="${selectedStatus}" />
+                </jsp:include>
+            </c:otherwise>
+        </c:choose>
+
+        <!--Footer-->
         <jsp:include page="../../components/footer.jsp"></jsp:include>
     </body>
 </html>
