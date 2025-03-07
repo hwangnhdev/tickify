@@ -13,10 +13,11 @@ import java.sql.Date;
 public class TicketType {
 
     private int ticketTypeId;
-    private int eventId;
+    private int showtimeId;
     private String name;
     private String description;
     private double price;
+    private String color;
     private int totalQuantity;
     private int soldQuantity;
     private Date createdAt;
@@ -25,9 +26,9 @@ public class TicketType {
     public TicketType() {
     }
 
-    public TicketType(int ticketTypeId, int eventId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+    public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
         this.ticketTypeId = ticketTypeId;
-        this.eventId = eventId;
+        this.showtimeId = showtimeId;
         this.name = name;
         this.description = description;
         this.price = price;
@@ -37,6 +38,21 @@ public class TicketType {
         this.updatedAt = updatedAt;
     }
 
+    public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+        this.ticketTypeId = ticketTypeId;
+        this.showtimeId = showtimeId;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.color = color;
+        this.totalQuantity = totalQuantity;
+        this.soldQuantity = soldQuantity;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+    
+    
+
     public int getTicketTypeId() {
         return ticketTypeId;
     }
@@ -45,12 +61,12 @@ public class TicketType {
         this.ticketTypeId = ticketTypeId;
     }
 
-    public int getEventId() {
-        return eventId;
+    public int getShowtimeId() {
+        return showtimeId;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    public void setShowtimeId(int showtimeId) {
+        this.showtimeId = showtimeId;
     }
 
     public String getName() {
@@ -75,6 +91,14 @@ public class TicketType {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public int getTotalQuantity() {

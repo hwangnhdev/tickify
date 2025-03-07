@@ -4,7 +4,7 @@
  */
 package models;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -16,16 +16,16 @@ public class Order {
     private int customerId;
     private int voucherId;
     private double totalPrice;
-    private Date orderDate;
+    private Timestamp orderDate;
     private String paymentStatus;
     private String transactionId;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Order() {
     }
 
-    public Order(int orderId, int customerId, int voucherId, double totalPrice, Date orderDate, String paymentStatus, String transactionId, Date createdAt, Date updatedAt) {
+    public Order(int orderId, int customerId, int voucherId, double totalPrice, Timestamp orderDate, String paymentStatus, String transactionId, Timestamp createdAt, Timestamp updatedAt) {
         this.orderId = orderId;
         this.customerId = customerId;
         this.voucherId = voucherId;
@@ -69,11 +69,11 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
-    public Date getOrderDate() {
+    public Timestamp getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(Date orderDate) {
+    public void setOrderDate(Timestamp orderDate) {
         this.orderDate = orderDate;
     }
 
@@ -93,20 +93,34 @@ public class Order {
         this.transactionId = transactionId;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 
+    @Override
+    public String toString() {
+        return "Order{"
+                + "orderId=" + orderId
+                + ", customerId=" + customerId
+                + ", voucherId=" + voucherId
+                + ", totalPrice=" + totalPrice
+                + ", orderDate=" + orderDate
+                + ", paymentStatus='" + paymentStatus + '\''
+                + ", transactionId='" + transactionId + '\''
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + '}';
+    }
 }

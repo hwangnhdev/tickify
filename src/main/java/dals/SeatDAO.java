@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package dals;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,20 +17,33 @@ import utils.DBContext;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class SeatDAO extends DBContext {
-    
+
     private static final String SELECT_ALL_SEATS = "SELECT * FROM Seats";
     private static final String SELECT_SEATS_BY_EVENT_ID = "SELECT * FROM Seats WHERE event_id = ?";
     private static final String SELECT_SEAT_BY_ID = "SELECT * FROM Seats WHERE seat_id = ?";
+    private static final String SELECT_SEATS_BY_SHOWTIME_ID
+            = "SELECT \n"
+            + "    s.seat_id, \n"
+            + "    s.seat_row, \n"
+            + "    s.seat_col, \n"
+            + "    s.status AS seat_status,\n"
+            + "    tt.ticket_type_id,\n"
+            + "    tt.name AS ticket_type_name,\n"
+            + "    tt.price,\n"
+            + "    tt.color\n"
+            + "FROM Seats s\n"
+            + "JOIN TicketTypes tt ON s.ticket_type_id = tt.ticket_type_id\n"
+            + "WHERE tt.showtime_id = ?;";
     private static final String INSERT_SEAT = "INSERT INTO Seats (event_id, seat_row, seat_number, status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_SEAT_STATUS = "UPDATE Seats SET status = ? WHERE seat_id = ?";
     private static final String DELETE_SEAT = "DELETE FROM Seats WHERE seat_id = ?";
-
+    
     private Seat mapResultSetToSeat(ResultSet rs) throws SQLException {
         Seat seat = new Seat();
         seat.setSeatId(rs.getInt("seat_id"));
-        seat.setEventId(rs.getInt("event_id"));
+        seat.setTicketTypeId(rs.getInt("ticket_type_id"));
         seat.setSeatRow(rs.getString("seat_row"));
-        seat.setSeatNumber(rs.getString("seat_number"));
+        seat.setSeatCol(rs.getString("seat_col"));
         seat.setStatus(rs.getString("status"));
         return seat;
     }
@@ -44,6 +58,33 @@ public class SeatDAO extends DBContext {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 seats.add(mapResultSetToSeat(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return seats;
+    }
+
+    /**
+     * Lấy danh sách ghế theo showtime_id
+     */
+    public List<Seat> selectSeatsByShowtimeId(int showtimeId) {
+        List<Seat> seats = new ArrayList<>();
+        try {
+            PreparedStatement st = connection.prepareStatement(SELECT_SEATS_BY_SHOWTIME_ID);
+            st.setInt(1, showtimeId);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Seat seat = new Seat();
+                seat.setSeatId(rs.getInt("seat_id"));
+                seat.setSeatRow(rs.getString("seat_row"));
+                seat.setSeatCol(rs.getString("seat_col"));
+                seat.setStatus(rs.getString("seat_status"));
+                seat.setTicketTypeId(rs.getInt("ticket_type_id"));
+                seat.setName(rs.getString("ticket_type_name"));
+                seat.setPrice(rs.getDouble("price"));
+                seat.setColor(rs.getString("color"));
+                seats.add(seat);
             }
         } catch (SQLException e) {
             System.out.println(e);
@@ -93,9 +134,9 @@ public class SeatDAO extends DBContext {
     public boolean insertSeat(Seat seat) {
         try {
             PreparedStatement st = connection.prepareStatement(INSERT_SEAT);
-            st.setInt(1, seat.getEventId());
+            st.setInt(1, seat.getTicketTypeId());
             st.setString(2, seat.getSeatRow());
-            st.setString(3, seat.getSeatNumber());
+            st.setString(3, seat.getSeatCol());
             st.setString(4, seat.getStatus());
 
             int rowsInserted = st.executeUpdate();
@@ -107,7 +148,7 @@ public class SeatDAO extends DBContext {
     }
 
     /**
-     * Cập nhật trạng thái ghế (ví dụ: available, not available)
+     * Cập nhật trạng thái ghế (ví dụ: available, unavailable)
      */
     public boolean updateSeatStatus(int seatId, String newStatus) {
         try {
@@ -121,6 +162,24 @@ public class SeatDAO extends DBContext {
             System.out.println(e);
             return false;
         }
+    }
+    
+    public int getSeatIdByTicketTypeIdColRow(int ticketTypeId, String seatRow, int seatCol) {
+        String sql = "SELECT seat_id FROM Seats WHERE ticket_type_id = ? AND seat_row = ? AND seat_col = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, ticketTypeId);
+            ps.setString(2, seatRow);
+            ps.setInt(3, seatCol);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("seat_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Trả về -1 nếu không tìm thấy ghế
     }
 
     /**
@@ -138,12 +197,12 @@ public class SeatDAO extends DBContext {
             return false;
         }
     }
-    
+
     public static void main(String[] args) {
         SeatDAO seatDao = new SeatDAO();
         List<Seat> seatsForEvent = seatDao.selectSeatsByEventId(2);
         for (Seat seat : seatsForEvent) {
-            System.out.println(seat.getSeatRow() + seat.getSeatNumber());
+            System.out.println(seat.getSeatRow() + seat.getSeatCol());
         }
     }
 }

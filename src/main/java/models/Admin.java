@@ -13,15 +13,17 @@ public class Admin {
     private String name;
     private String email;
     private String password;
+    private String profilePicture;
 
     public Admin() {
     }
 
-    public Admin(int adminId, String name, String email, String password) {
+    public Admin(int adminId, String name, String email, String password, String profilePicture) {
         this.adminId = adminId;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profilePicture = profilePicture;
     }
     
     
