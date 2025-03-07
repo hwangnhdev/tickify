@@ -19,7 +19,7 @@
 <c:set var="selectedStatus" value="${param.selectedStatus}" />
 
 <c:if test="${totalPages gt 1}">
-    <div class="mt-6 flex justify-center items-center space-x-4">
+    <div class="mt-6 flex justify-center items-center space-x-4" style="margin-bottom: 2%;">
         <c:set var="displayPages" value="5" />
         <c:set var="startPage" value="${currentPage - (displayPages div 2)}" />
         <c:set var="endPage" value="${currentPage + (displayPages div 2)}" />

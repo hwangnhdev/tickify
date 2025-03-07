@@ -587,6 +587,42 @@ public class EventDAO extends DBContext {
     }
 
     /**
+     * Retrieves the list of ticket types for the specified showtime ID.
+     *
+     * @param showtimeId The ID of the showtime.
+     * @return A list of TicketType objects.
+     */
+    public List<TicketType> getTicketTypesByShowtimeId(int showtimeId) {
+        List<TicketType> ticketTypes = new ArrayList<>();
+        String sql = "SELECT ticket_type_id, showtime_id, name, description, price, color, total_quantity, sold_quantity, created_at, updated_at "
+                + "FROM TicketTypes "
+                + "WHERE showtime_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, showtimeId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                TicketType ticketType = new TicketType(
+                        rs.getInt("ticket_type_id"),
+                        rs.getInt("showtime_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getDouble("price"),
+                        rs.getString("color"),
+                        rs.getInt("total_quantity"),
+                        rs.getInt("sold_quantity"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                ticketTypes.add(ticketType);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving ticket types: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return ticketTypes;
+    }
+
+    /**
      * Retrieves the list of seats for the specified event ID.
      *
      * @param eventId The ID of the event.
@@ -895,7 +931,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT TOP 20\n"
                 + "e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
                 + "FROM Events e\n"
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%'\n"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_event%'\n"
                 + "WHERE e.status = 'Active'\n"
                 + "ORDER BY e.created_at DESC";
 

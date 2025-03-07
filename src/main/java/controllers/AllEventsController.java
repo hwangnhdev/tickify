@@ -117,7 +117,7 @@ public class AllEventsController extends HttpServlet {
 
         // Pagination logic
         int page = 1;
-        int pageSize = 40; // Show 10 events per page
+        int pageSize = 20; // Show 10 events per page
         int totalEvents = filteredEvents.size();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
 
@@ -145,7 +145,7 @@ public class AllEventsController extends HttpServlet {
 
         // <!--All Event For You-->  Get the requested page number, default to 1 if not provided 
         int pageAll = 1;
-        int pageSizeAll = 80;
+        int pageSizeAll = 20;
         if (request.getParameter("page") != null) {
             try {
                 pageAll = Integer.parseInt(request.getParameter("page"));

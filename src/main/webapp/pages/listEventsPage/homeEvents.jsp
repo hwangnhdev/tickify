@@ -25,14 +25,15 @@
                 grid-template-columns: repeat(2, 1fr);
                 grid-gap: 10px;
                 padding: 30px;
-                margin: 0 40px;
+                margin: 0 0;
+                margin-left: 2.5%;
             }
 
             .carousel-large_events {
                 position: relative;
                 overflow: hidden;
-                width: 100%;
-                height: 300px;
+                width: 95%;
+                height: 350px;
                 display: flex;
                 justify-content: center;
                 border-radius: 8px;
@@ -112,17 +113,7 @@
                 max-width: 300px;
                 margin-bottom: 20px;
             }
-
-
-            /*Large Event*/
-            .content-grid-large_events {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                grid-gap: 5px;
-                padding: 30px;
-                margin: 0 40px;
-            }
-
+            
             /*Top-Picks-For-You*/
             .title-top_events {
                 text-align: center;
@@ -428,6 +419,9 @@
     </head>
     <body>        
         <!--Large-Events-->
+        <h2 class="text-xl font-bold text-center" style="margin-top: 2%; margin-bottom: -1.5rem !important;">
+            <i class="fas fa-fire text-red-500 mr-2"></i> Most Popular
+        </h2>
         <div class="content-grid-large_events">
             <!-- Carousel 1 -->
             <div class="carousel-large_events">
@@ -481,15 +475,17 @@
         <script src="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.js"></script>
 
         <!--New Events-->
-        <h2 class="title-spec_event">New Events</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+            <i class="fas fa-star text-yellow-500 mr-2"></i> Special Events
+        </h2>
         <div class="content-grid-spec_event" id="eventContainer-spec_event">
             <button class="prev-btn-spec_event">❮</button>
             <div class="event-cards-spec_event">
                 <c:choose>
                     <c:when test="${not empty listEvents}">
                         <c:forEach var="event" items="${listEvents}">
-                            <div class="event-card-trend_events">
-                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
+                            <div class="event-card-spec_event">
+                                <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
                                     <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                 </a>
                             </div>
@@ -549,7 +545,9 @@
         </script>
 
         <!--Upcoming-Events--> 
-        <h2 class="title-trend_events">Upcoming events</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+            <i class="fas fa-fire text-red-500 mr-2"></i> Upcoming events
+        </h2>
         <div class="content-grid-trend_events" id="eventContainer-trend_events">
             <button class="prev-btn-trend_events">❮</button>
             <div class="event-cards-trend_events">
@@ -609,7 +607,9 @@
         </script>
 
         <!--Recommendation Events--> 
-        <h2 class="title-rec_events">Recommendation For You</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+            <i class="fas fa-thumbs-up text-blue-500 mr-2"></i> Recommendation For You
+        </h2>
         <div class="content-grid-rec_events" id="eventContainer-rec_events">
             <button class="prev-btn-rec_events">❮</button>
             <div class="event-cards-rec_events">
@@ -681,7 +681,9 @@
         </script>
 
         <!--All Event--> 
-        <h2 class="title-all_events">All Events</h2>
+        <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+            <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+        </h2>
         <div class="container py-4">
             <div class="row gy-4" id="event-container">
                 <!-- Event Cards -->

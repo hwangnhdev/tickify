@@ -39,7 +39,6 @@
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
                 text-align: center;
-                /* width: 320px; */
                 transition: transform 0.3s, box-shadow 0.3s;
             }
 
@@ -474,7 +473,9 @@
             <c:when test="${empty filteredEvents}">
                 <p class="text-center">Not Event Found From Your Filter And Search</p>
                 <!--All Event--> 
-                <h2 class="text-center">All Events For You</h2>
+                <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+                    <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+                </h2>
                 <div class="container py-4">
                     <div class="row gy-4" id="event-container">
                         <!-- Event Cards -->
