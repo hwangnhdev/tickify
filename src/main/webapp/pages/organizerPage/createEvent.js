@@ -260,7 +260,8 @@ function isTimeLogisticsValid() {
             const startDate = showTime.querySelector('input[name="showStartDate"]').value;
             const endDate = showTime.querySelector('input[name="showEndDate"]').value;
             const ticketList = showTime.querySelector('.space-y-2').children.length;
-
+            console.log(`Show Time #${i+1}: startDate=${startDate}, endDate=${endDate}, ticketList=${ticketList}`);
+            
             if (!startDate) {
                 showError(`showStartDate_${showTime.querySelector('input[name="showStartDate"]').id}`, 'Start Date is required');
                 hasErrors = true;
@@ -275,18 +276,14 @@ function isTimeLogisticsValid() {
                 clearError(`showEndDate_${showTime.querySelector('input[name="showEndDate"]').id}`);
             }
 
-            if (startDate && endDate && ticketList > 0) {
-                hasValidShowTime = true;
-            }
-
             // Kiểm tra trùng lấn với tất cả các showtime khác
             for (let j = 0; j < showTimes.length; j++) {
-                if (i !== j) { // Không so sánh showtime với chính nó
+                if (i !== j) {
                     const otherShowTime = showTimes[j];
                     const otherStart = otherShowTime.querySelector('input[name="showStartDate"]').value;
                     const otherEnd = otherShowTime.querySelector('input[name="showEndDate"]').value;
                     if (otherStart && otherEnd) {
-                        if (checkShowTimeOverlap(startDate, endDate)) {
+                        if (checkShowTimeOverlap(startDate, endDate, showTime)) {
                             showError(`showStartDate_${showTime.querySelector('input[name="showStartDate"]').id}`, 'This showtime overlaps with another showtime.');
                             showError(`showEndDate_${showTime.querySelector('input[name="showEndDate"]').id}`, 'This showtime overlaps with another showtime.');
                             hasErrors = true;
@@ -298,12 +295,20 @@ function isTimeLogisticsValid() {
                     }
                 }
             }
+
+            // Chỉ yêu cầu Ticket Type nếu đã có Start Date và End Date hợp lệ
+            if (startDate && endDate && ticketList === 0) {
+                showError('showTime_error', 'Please add at least one Ticket Type for each Show Time');
+                hasErrors = true;
+            } else if (startDate && endDate && ticketList > 0) {
+                hasValidShowTime = true;
+                clearError('showTime_error');
+            }
         }
-        if (!hasValidShowTime) {
+
+        if (!hasValidShowTime && showTimes.length > 0) {
             showError('showTime_error', 'Please ensure each Show Time has a Start Date, End Date, and at least one Ticket Type');
             hasErrors = true;
-        } else {
-            clearError('showTime_error');
         }
     }
 
@@ -646,18 +651,22 @@ function checkShowTimeOverlap(newShowTimeStart, newShowTimeEnd, currentShowTime 
     return false; // Không trùng lấn
 }
 
-// Add New Show Time
+// Khởi tạo biến showTimeCount
 let showTimeCount = 1;
+// Hàm cập nhật showTimeCount dựa trên số lượng Show Time hiện có
+function updateShowTimeCount() {
+    showTimeCount = document.querySelectorAll('.show-time').length;
+}
 // Cập nhật addNewShowTime
 function addNewShowTime() {
     console.log('Adding new showtime, showTimeCount:', showTimeCount);
     if (!showTimeCount || showTimeCount < 1) {
         showTimeCount = 1; // Reset về 1 nếu không hợp lệ
     }
-    showTimeCount++;
     const showTimeList = document.getElementById('showTimeList');
     const newShowTime = document.createElement('div');
     newShowTime.className = 'show-time bg-gray-800 p-4 rounded';
+    showTimeCount++; // Tăng showTimeCount sau khi lấy số lượng hiện tại
     newShowTime.innerHTML = `
         <div class="flex justify-between items-center mb-3">
             <h6 class="text-white"><span class="show-time-label">Show Time #${showTimeCount}</span></h6>
@@ -718,29 +727,44 @@ function addNewShowTime() {
         input.addEventListener('input', () => validateDateTime(input)); // Validate on input
         input.addEventListener('change', () => updateShowTimeLabel(input)); // Update label on change
     });
-}
 
-// Remove Show Time
-function removeShowTime(button) {
-    button.closest('.show-time').remove();
-    showTimeCount--;
+    // Cập nhật lại nhãn của tất cả Show Time
     updateShowTimeLabels();
 }
 
-// Update Show Time Labels
+// Cập nhật removeShowTime
+function removeShowTime(button) {
+    button.closest('.show-time').remove();
+    updateShowTimeCount(); // Cập nhật showTimeCount dựa trên số lượng còn lại
+    updateShowTimeLabels(); // Cập nhật lại nhãn theo thứ tự mới
+}
+
+// Cập nhật updateShowTimeLabels
 function updateShowTimeLabels() {
     const showTimes = document.querySelectorAll('.show-time');
     showTimes.forEach((showTime, index) => {
         const labelSpan = showTime.querySelector('.show-time-label');
         const details = showTime.querySelector('.show-time-details');
-        if (details.classList.contains('collapsed')) {
+        if (labelSpan) {
+            const newIndex = index + 1; // Tái lập thứ tự từ 1
+            if (details.classList.contains('collapsed')) {
+                const startDateInput = showTime.querySelector('input[name="showStartDate"]');
+                const endDateInput = showTime.querySelector('input[name="showEndDate"]');
+                const startDate = formatDateTime(startDateInput.value);
+                const endDate = formatDateTime(endDateInput.value);
+                labelSpan.textContent = `Show Time #${newIndex} (${startDate} - ${endDate})`;
+            } else {
+                labelSpan.textContent = `Show Time #${newIndex}`;
+            }
+            // Cập nhật các id để đồng bộ với chỉ số mới
             const startDateInput = showTime.querySelector('input[name="showStartDate"]');
             const endDateInput = showTime.querySelector('input[name="showEndDate"]');
-            const startDate = formatDateTime(startDateInput.value);
-            const endDate = formatDateTime(endDateInput.value);
-            labelSpan.textContent = `Show Time #${index + 1} (${startDate} - ${endDate})`;
-        } else {
-            labelSpan.textContent = `Show Time #${index + 1}`;
+            const ticketList = showTime.querySelector('.space-y-2');
+            const addTicketButton = showTime.querySelector('button[data-show-time]');
+            if (startDateInput) startDateInput.id = `showStartDate_${newIndex}`;
+            if (endDateInput) endDateInput.id = `showEndDate_${newIndex}`;
+            if (ticketList) ticketList.id = `ticketList_${newIndex}`;
+            if (addTicketButton) addTicketButton.setAttribute('data-show-time', newIndex);
         }
     });
 }
@@ -1853,11 +1877,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Cập nhật showTimeCount và nhãn ban đầu
+    updateShowTimeCount();
+    updateShowTimeLabels(); 
     // Show Time Date Inputs
     const showTimeInputs = document.querySelectorAll('input[type="datetime-local"]');
     showTimeInputs.forEach(input => {
         input.addEventListener('input', () => {
             validateDateTime(input); // Hàm này đã có logic kiểm tra và xóa lỗi
         });
+    });
+    
+    const defaultShowTimeInputs = document.querySelectorAll('#showTimeList input[type="datetime-local"]');
+    defaultShowTimeInputs.forEach(input => {
+        input.addEventListener('input', () => validateDateTime(input));
+        input.addEventListener('change', () => updateShowTimeLabel(input));
     });
 });

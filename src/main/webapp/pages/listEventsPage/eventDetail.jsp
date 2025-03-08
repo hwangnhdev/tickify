@@ -320,7 +320,7 @@
                         <c:forEach var="event" items="${filteredEvents}">
                             <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
                                 <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </div>
