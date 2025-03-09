@@ -85,9 +85,9 @@ public class UpdateEventController extends HttpServlet {
         CategoryDAO categoryDAO = new CategoryDAO();
 
         // Get event id from URL parameter (default to 577 if not provided)
-        int eventId = 577;
+        String eventIdParam = request.getParameter("eventId");
+        int eventId = 0;
         try {
-            String eventIdParam = request.getParameter("eventId");
             if (eventIdParam != null && !eventIdParam.isEmpty()) {
                 eventId = Integer.parseInt(eventIdParam);
             }
