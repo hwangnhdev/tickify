@@ -12,26 +12,108 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
         <!-- Bootstrap CSS -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            />
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"/>
         <style>
             body {
                 background-color: black;
                 color: white;
             }
 
-            /*Large Event*/
+            /* Large Event */
             .content-grid-large_events {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                grid-gap: 5px;
+                grid-gap: 10px;
                 padding: 30px;
-                margin: 0 40px;
+                margin: 0 0;
+                margin-left: 2.5%;
             }
 
+            .carousel-large_events {
+                position: relative;
+                overflow: hidden;
+                width: 95%;
+                height: 350px;
+                display: flex;
+                justify-content: center;
+                border-radius: 8px;
+            }
+
+            .slides-large_events {
+                display: flex;
+                transition: transform 0.5s ease-in-out;
+            }
+
+            .event-card-large_events {
+                flex: 0 0 100%;
+                box-sizing: border-box;
+                padding: 0;
+                position: relative;
+                background-color: #f5f5f5;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .event-card-large_events img {
+                width: 100%;
+                height: 100%;
+                object-fit: fill;
+            }
+
+            .view-btn-large_events {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                background-color: #00a651;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+                z-index: 10;
+            }
+
+            .prev-large_events,
+            .next-large_events {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: rgba(0, 0, 0, 0.5);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                z-index: 10;
+            }
+
+            .prev-large_events {
+                left: 20px;
+            }
+
+            .next-large_events {
+                right: 20px;
+            }
+
+            .sidebar-large_events {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .calendar-large_events,
+            .map-large_events {
+                background-color: #f5f5f5;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                padding: 16px;
+                width: 100%;
+                max-width: 300px;
+                margin-bottom: 20px;
+            }
+            
             /*Top-Picks-For-You*/
             .title-top_events {
                 text-align: center;
@@ -337,6 +419,9 @@
     </head>
     <body>        
         <!--Large-Events-->
+        <h2 class="text-xl font-bold text-center" style="margin-top: 2%; margin-bottom: -1.5rem !important;">
+            <i class="fas fa-fire text-red-500 mr-2"></i> Most Popular
+        </h2>
         <div class="content-grid-large_events">
             <!-- Carousel 1 -->
             <div class="carousel-large_events">
@@ -345,12 +430,12 @@
                         <div class="event-card-large_events">
                             <c:choose>
                                 <c:when test="${not empty event.imageUrl}">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                     </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </c:otherwise>
@@ -369,12 +454,12 @@
                         <div class="event-card-large_events">
                             <c:choose>
                                 <c:when test="${not empty event.imageUrl}">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                                     </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                         <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </c:otherwise>
@@ -390,7 +475,9 @@
         <script src="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.js"></script>
 
         <!--New Events-->
-        <h2 class="title-spec_event">New Events</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+            <i class="fas fa-star text-yellow-500 mr-2"></i> Special Events
+        </h2>
         <div class="content-grid-spec_event" id="eventContainer-spec_event">
             <button class="prev-btn-spec_event">❮</button>
             <div class="event-cards-spec_event">
@@ -458,13 +545,15 @@
         </script>
 
         <!--Upcoming-Events--> 
-        <h2 class="title-trend_events">Upcoming events</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+            <i class="fas fa-fire text-red-500 mr-2"></i> Upcoming events
+        </h2>
         <div class="content-grid-trend_events" id="eventContainer-trend_events">
             <button class="prev-btn-trend_events">❮</button>
             <div class="event-cards-trend_events">
                 <c:forEach var="event" items="${upcomingEvents}">
                     <div class="event-card-trend_events">
-                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                             <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                         </a>
                     </div>
@@ -518,13 +607,15 @@
         </script>
 
         <!--Recommendation Events--> 
-        <h2 class="title-rec_events">Recommendation For You</h2>
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+            <i class="fas fa-thumbs-up text-blue-500 mr-2"></i> Recommendation For You
+        </h2>
         <div class="content-grid-rec_events" id="eventContainer-rec_events">
             <button class="prev-btn-rec_events">❮</button>
             <div class="event-cards-rec_events">
                 <c:forEach var="event" items="${listRecommendedEvents}">
                     <div class="event-card-rec_events">
-                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                        <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                             <img src="${event.imageUrl}" alt="${event.imageTitle}" />
                         </a>
                     </div>
@@ -590,57 +681,30 @@
         </script>
 
         <!--All Event--> 
-        <h2 class="title-all_events">All Events</h2>
+        <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+            <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+        </h2>
         <div class="container py-4">
             <div class="row gy-4" id="event-container">
                 <!-- Event Cards -->
                 <c:forEach var="event" items="${paginatedEvents}">
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                         <div class="event-card-all_events">
-                            <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                            <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
                                 <img src="${event.imageUrl}" alt="${event.imageTitle}" />
-                                <h4>${event.eventName}</h4>
                             </a>
                         </div>
                     </div>
                 </c:forEach>
             </div>
             <!-- Pagination -->
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center" id="pagination-container">
-                    <c:if test="${currentPage > 1}">
-                        <li class="page-item">
-                            <a class="page-link" href="#" onclick="loadPage(${currentPage - 1})">&laquo; Previous</a>
-                        </li>
-                    </c:if>
-
-                    <c:forEach var="i" begin="1" end="${totalPages}">
-                        <li class="page-item ${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#" onclick="loadPage(${i})">${i}</a>
-                        </li>
-                    </c:forEach>
-
-                    <c:if test="${currentPage < totalPages}">
-                        <li class="page-item">
-                            <a class="page-link" href="#" onclick="loadPage(${currentPage + 1})">Next &raquo;</a>
-                        </li>
-                    </c:if>
-                </ul>
-            </nav>
+            <jsp:include page="pagination.jsp">
+                <jsp:param name="baseUrl" value="/event" />
+                <jsp:param name="page" value="${currentPage}" />
+                <jsp:param name="totalPages" value="${totalPages}" />
+                <jsp:param name="selectedStatus" value="${selectedStatus}" />
+            </jsp:include>
         </div>
-        <script>
-            function loadPage(page) {
-                event.preventDefault();
-                fetch('?page=' + page, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-                        .then(response => response.text())
-                        .then(data => {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(data, 'text/html');
-                            document.getElementById('event-container').innerHTML = doc.getElementById('event-container').innerHTML;
-                            document.getElementById('pagination-container').innerHTML = doc.getElementById('pagination-container').innerHTML;
-                        });
-            }
-        </script>
         <!-- Bootstrap JS for All Events-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     </body>

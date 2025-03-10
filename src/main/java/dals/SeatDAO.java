@@ -37,11 +37,11 @@ public class SeatDAO extends DBContext {
     private static final String INSERT_SEAT = "INSERT INTO Seats (event_id, seat_row, seat_number, status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_SEAT_STATUS = "UPDATE Seats SET status = ? WHERE seat_id = ?";
     private static final String DELETE_SEAT = "DELETE FROM Seats WHERE seat_id = ?";
-
+    
     private Seat mapResultSetToSeat(ResultSet rs) throws SQLException {
         Seat seat = new Seat();
         seat.setSeatId(rs.getInt("seat_id"));
-        seat.setTicketTypeId(rs.getInt("event_id"));
+        seat.setTicketTypeId(rs.getInt("ticket_type_id"));
         seat.setSeatRow(rs.getString("seat_row"));
         seat.setSeatCol(rs.getString("seat_col"));
         seat.setStatus(rs.getString("status"));
@@ -148,7 +148,7 @@ public class SeatDAO extends DBContext {
     }
 
     /**
-     * Cập nhật trạng thái ghế (ví dụ: available, not available)
+     * Cập nhật trạng thái ghế (ví dụ: available, unavailable)
      */
     public boolean updateSeatStatus(int seatId, String newStatus) {
         try {
@@ -162,6 +162,24 @@ public class SeatDAO extends DBContext {
             System.out.println(e);
             return false;
         }
+    }
+    
+    public int getSeatIdByTicketTypeIdColRow(int ticketTypeId, String seatRow, int seatCol) {
+        String sql = "SELECT seat_id FROM Seats WHERE ticket_type_id = ? AND seat_row = ? AND seat_col = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, ticketTypeId);
+            ps.setString(2, seatRow);
+            ps.setInt(3, seatCol);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("seat_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Trả về -1 nếu không tìm thấy ghế
     }
 
     /**

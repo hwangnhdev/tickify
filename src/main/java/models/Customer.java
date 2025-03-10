@@ -88,6 +88,11 @@ public class Customer {
     public void setStatus(Boolean status) {
         this.status = status;
     }
+    // Phương thức getter cho statusText, JSP sẽ sử dụng nó
+
+    public String getStatusText() {
+        return (status != null && status) ? "Active" : "Inactive";
+    }
 
     @Override
     public String toString() {

@@ -28,7 +28,6 @@ import models.TicketType;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class ViewSeatController extends HttpServlet {
-
     private SeatDAO seatDAO;
     private EventDAO eventDAO;
     private ShowtimeDAO showtimeDAO;
@@ -43,11 +42,9 @@ public class ViewSeatController extends HttpServlet {
         ticketTypeDAO = new TicketTypeDAO();
         cusDAO = new CustomerDAO();
     }
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
+    
+    /** 
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -71,17 +68,16 @@ public class ViewSeatController extends HttpServlet {
     }
 
     protected void viewSeatEvent(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
 //        int showtimeId = Integer.parseInt(request.getParameter("showtimeId"));
-//        int eventId = Integer.parseInt(request.getParameter("eventId"));
-        System.out.println(2);
-        Event event = eventDAO.selectEventByID(2);
-        Showtime showtime = showtimeDAO.selectShowtimeById(2);
-        List<TicketType> ticketTypes = ticketTypeDAO.selectTicketTypeByShowtimeId(2);
-
-        Customer customer = cusDAO.selectCustomerById(2);
-        List<Seat> seats = seatDAO.selectSeatsByShowtimeId(2);
-
+        
+        Customer customer = cusDAO.selectCustomerById(1);
+        Event event = eventDAO.selectEventByID(1);
+        Showtime showtime = showtimeDAO.selectShowtimeById(1);
+        
+        List<TicketType> ticketTypes = ticketTypeDAO.selectTicketTypeByShowtimeId(1);
+        List<Seat> seats = seatDAO.selectSeatsByShowtimeId(1);
+        
         for (Seat seat : seats) {
             System.out.println(seat);
         }
@@ -92,7 +88,7 @@ public class ViewSeatController extends HttpServlet {
         session.setAttribute("showtime", showtime);
         session.setAttribute("ticketTypes", ticketTypes);
         session.setAttribute("seatsForEvent", seats);
-
+        
 //        request.setAttribute("customer", customer);
 //        request.setAttribute("event", event);
 //        request.setAttribute("showtime", showtime);

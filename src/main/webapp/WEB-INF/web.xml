@@ -2,10 +2,6 @@
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee                               http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <!-- Define Servlet Mappings -->
     <servlet>
-        <servlet-name>ViewPaymentController</servlet-name>
-        <servlet-class>controllers.ViewPaymentController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>AuthController</servlet-name>
         <servlet-class>controllers.AuthController</servlet-class>
     </servlet>
@@ -66,10 +62,6 @@
         <servlet-class>controllers.CategoryController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>EventSummaryController</servlet-name>
-        <servlet-class>controllers.EventSummaryController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>AdminController</servlet-name>
         <servlet-class>controllers.AdminController</servlet-class>
     </servlet>
@@ -80,10 +72,6 @@
     <servlet>
         <servlet-name>TicketDetailController</servlet-name>
         <servlet-class>controllers.TicketDetailController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>LoginController</servlet-name>
-        <servlet-class>controllers.LoginController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewCreatedEventsController</servlet-name>
@@ -177,8 +165,39 @@
         <servlet-name>ViewApprovedDetailController</servlet-name>
         <servlet-class>controllers.ViewApprovedDetailController</servlet-class>
     </servlet>
-    
     <!-- Define Servlet Mappings -->
+    <servlet>
+        <servlet-name>EventOverviewController</servlet-name>
+        <servlet-class>controllers.EventOverviewController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewPaymentController</servlet-name>
+        <servlet-class>controllers.ViewPaymentController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>vnpayQueryController</servlet-name>
+        <servlet-class>vnpay.vnpayQueryController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ValidateTicketController</servlet-name>
+        <servlet-class>controllers.ValidateTicketController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewAllCustomersController</servlet-name>
+        <servlet-class>controllers.ViewAllCustomersController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewDetailAccountController</servlet-name>
+        <servlet-class>controllers.ViewDetailAccountController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeactivateAccountController</servlet-name>
+        <servlet-class>controllers.DeactivateAccountController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UpdateAccountController</servlet-name>
+        <servlet-class>controllers.UpdateAccountController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -232,10 +251,6 @@
         <url-pattern>/category</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>EventSummaryController</servlet-name>
-        <url-pattern>/eventSummary</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>AdminController</servlet-name>
         <url-pattern>/admin</url-pattern>
     </servlet-mapping>
@@ -246,10 +261,6 @@
     <servlet-mapping>
         <servlet-name>TicketDetailController</servlet-name>
         <url-pattern>/viewTicketDetail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LoginController</servlet-name>
-        <url-pattern>/LoginController</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewCreatedEventsController</servlet-name>
@@ -343,9 +354,44 @@
         <servlet-name>ProfileController</servlet-name>
         <url-pattern>/profile</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewAllCustomersController</servlet-name>
+        <url-pattern>/ViewAllCustomersController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewDetailAccountController</servlet-name>
+        <url-pattern>/ViewDetailAccountController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeactivateAccountController</servlet-name>
+        <url-pattern>/DeactivateAccountController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateAccountController</servlet-name>
+        <url-pattern>/admin/updateAccount</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EventOverviewController</servlet-name>
+        <url-pattern>/eventOverview</url-pattern>
+    </servlet-mapping>
+    <!-- Session Configuration -->
+    <servlet-mapping>
+        <servlet-name>ViewPaymentController</servlet-name>
+        <url-pattern>/viewPayment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>vnpayQueryController</servlet-name>
+        <url-pattern>/vnpayQuery</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ValidateTicketController</servlet-name>
+        <url-pattern>/validateTicket</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
+
+    <!-- Welcome File List -->
     <welcome-file-list>
         <welcome-file>event</welcome-file>
     </welcome-file-list>

@@ -18,12 +18,17 @@
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vi.js"></script>
         <style>
+
+            body {
+                background-color: black;
+                color: white;
+            }
             /* All Events */
             .title-all_events {
                 text-align: center;
                 font-size: 24px;
                 font-weight: bold;
-                color: #2c3e50;
+                color: white;
                 margin-bottom: 20px;
             }
 
@@ -34,7 +39,6 @@
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
                 text-align: center;
-                width: 320px;
                 transition: transform 0.3s, box-shadow 0.3s;
             }
 
@@ -46,7 +50,7 @@
             .event-card-all_events img {
                 width: 100%;
                 height: 150px;
-                object-fit: cover; /* Sử dụng cover thay vì fill để hình ảnh đẹp hơn */
+                object-fit: fill;
                 background-color: #f0f0f0;
                 display: block;
                 transition: filter 0.3s;
@@ -285,13 +289,14 @@
                 left: 0;
                 right: 0;
                 max-height: 0;
-                overflow: hidden;
+                overflow: auto;
                 transition: max-height 0.3s ease;
                 background: #fff;
                 border-radius: 8px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                 z-index: 1000;
                 margin-top: 2px;
+                color: black;
             }
 
             .category-list.active {
@@ -369,30 +374,39 @@
                 <div class="filter-group category-group">
                     <label for="categoryDropdown">Category:</label>
                     <div class="category-toggle">
-                        <label>Category</label>
+                        <label>
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.selectedCategories}">
+                                    <c:set var="categoryCount" value="${fn:length(sessionScope.selectedCategories)}" />
+                                    <c:if test="${categoryCount > 0}">
+                                        <c:set var="firstCategory" value="true" />
+                                        <c:forEach var="selected" items="${sessionScope.selectedCategories}">
+                                            <c:if test="${firstCategory}">
+                                                <c:forEach var="category" items="${listCategories}">
+                                                    <c:if test="${category.categoryId == selected}">
+                                                        ${category.categoryName}<c:if test="${categoryCount > 1}">...</c:if>
+                                                        <c:set var="firstCategory" value="false" />
+                                                    </c:if>
+                                                </c:forEach>
+                                            </c:if>
+                                        </c:forEach>
+                                    </c:if>
+                                </c:when>
+                                <c:otherwise>
+                                    Category
+                                </c:otherwise>
+                            </c:choose>
+                        </label>
                     </div>
                     <div class="category-list">
                         <c:set var="selectedCategoryList" value="${sessionScope.selectedCategories}" />
-                        <input type="checkbox" name="category" value="1"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 1}">checked</c:if>
-                               </c:forEach>> Concert <br>
-                        <input type="checkbox" name="category" value="2"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 2}">checked</c:if>
-                               </c:forEach>> Technology <br>
-                        <input type="checkbox" name="category" value="3"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 3}">checked</c:if>
-                               </c:forEach>> Sports <br>
-                        <input type="checkbox" name="category" value="4"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 4}">checked</c:if>
-                               </c:forEach>> Festival <br>
-                        <input type="checkbox" name="category" value="5"
-                               <c:forEach var="category" items="${selectedCategoryList}">
-                                   <c:if test="${category == 5}">checked</c:if>
-                               </c:forEach>> Exhibition <br>
+                        <c:forEach var="category" items="${listCategories}">
+                            <input type="checkbox" name="category" value="${category.categoryId}"
+                                   <c:forEach var="selected" items="${selectedCategoryList}">
+                                       <c:if test="${selected == category.categoryId}">checked</c:if>
+                                   </c:forEach>>
+                            ${category.categoryName} <br>
+                        </c:forEach>
                     </div>
                 </div>
 
@@ -400,7 +414,19 @@
                 <div class="filter-group price-group">
                     <label for="priceDropdown">Price:</label>
                     <div class="category-toggle" data-type="price">
-                        <label>Price</label>
+                        <label>
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.selectedPrice}">
+                                    <c:if test="${sessionScope.selectedPrice == 'below_150'}">Below 150</c:if>
+                                    <c:if test="${sessionScope.selectedPrice == 'between_150_300'}">150 - 300</c:if>
+                                    <c:if test="${sessionScope.selectedPrice == 'greater_300'}">Above 300</c:if>
+                                    <c:if test="${empty sessionScope.selectedPrice}">All Prices</c:if>
+                                </c:when>
+                                <c:otherwise>
+                                    Price
+                                </c:otherwise>
+                            </c:choose>
+                        </label>
                     </div>
                     <div class="category-list" data-type="price">
                         <input type="radio" name="price" value="below_150" ${selectedPrice == 'below_150' ? 'checked' : ''}> Below 150 <br>
@@ -414,10 +440,19 @@
                 <div class="filter-group location-group">
                     <label for="locationDropdown">Location:</label>
                     <div class="category-toggle" data-type="location">
-                        <label>Location</label>
+                        <label>
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.selectedLocation}">
+                                    ${sessionScope.selectedLocation}
+                                </c:when>
+                                <c:otherwise>
+                                    Location
+                                </c:otherwise>
+                            </c:choose>
+                        </label>
                     </div>
                     <div class="category-list" data-type="location">
-                        <input type="radio" name="location" value="Open Arena" ${selectedLocation == 'Open Arena' ? 'checked' : ''}> Open Arena <br>
+                        <input type="radio" name="location" value="Ben Thanh Theater" ${selectedLocation == 'Ben Thanh Theater' ? 'checked' : ''}> Ben Thanh <br>
                         <input type="radio" name="location" value="Tech Hub" ${selectedLocation == 'Tech Hub' ? 'checked' : ''}> Tech Hub <br>
                         <input type="radio" name="location" value="Sports Arena" ${selectedLocation == 'Sports Arena' ? 'checked' : ''}> Sports Arena <br>
                         <input type="radio" name="location" value="Downtown Plaza" ${selectedLocation == 'Downtown Plaza' ? 'checked' : ''}> Downtown Plaza <br>
@@ -433,160 +468,37 @@
             </div>
         </form>
 
-        <script>
-            // Khởi tạo Flatpickr cho Start Date
-            flatpickr("#startDate", {
-                dateFormat: "Y-m-d",
-                defaultDate: "${selectedStartDate}",
-                locale: "vi",
-                maxDate: new Date().fp_incr(365), // Giới hạn tối đa là 1 năm từ hôm nay
-                minDate: "today", // Giới hạn tối thiểu là ngày hôm nay
-                onChange: function (selectedDates, dateStr, instance) {
-                    // Khi chọn ngày bắt đầu, cập nhật giá trị và giới hạn tối thiểu cho endDate
-                    document.getElementById('startDate').value = dateStr;
-                    const endDatePicker = document.getElementById('endDate')._flatpickr;
-                    const endDateValue = document.getElementById('endDate').value;
-
-                    if (selectedDates[0]) {
-                        // Đặt minDate của endDate là ngày lớn hơn startDate ít nhất 1 ngày
-                        const minEndDate = new Date(selectedDates[0]);
-                        minEndDate.setDate(minEndDate.getDate() + 1); // Tăng 1 ngày
-                        endDatePicker.set("minDate", minEndDate);
-
-                        // Nếu endDate hiện tại nhỏ hơn hoặc bằng startDate, xóa endDate
-                        if (endDateValue && new Date(endDateValue) <= selectedDates[0]) {
-                            endDatePicker.clear(); // Xóa giá trị endDate
-                            document.getElementById('endDate').value = "";
-                        }
-                    }
-                },
-                onReady: function (selectedDates, dateStr, instance) {
-                    // Thêm các nút preset
-                    const ranges = document.createElement('div');
-                    ranges.className = 'flatpickr-ranges';
-                    ranges.innerHTML = `
-            <button data-range="today">Hôm nay</button>
-            <button data-range="tomorrow">Ngày mai</button>
-            <button data-range="weekend">Cuối tuần này</button>
-            <button data-range="month">Tháng này</button>
-        `;
-                    instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
-
-                    ranges.querySelectorAll('button').forEach(button => {
-                        button.addEventListener('click', function () {
-                            const range = this.getAttribute('data-range');
-                            let date;
-                            const now = new Date();
-                            switch (range) {
-                                case 'today':
-                                    date = now;
-                                    break;
-                                case 'tomorrow':
-                                    date = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-                                    break;
-                                case 'weekend':
-                                    date = new Date(now);
-                                    date.setDate(date.getDate() + (6 - date.getDay() + 1) % 7);
-                                    break;
-                                case 'month':
-                                    date = new Date(now.getFullYear(), now.getMonth(), 1);
-                                    break;
-                            }
-                            instance.setDate(date);
-                            document.getElementById('startDate').value = instance.formatDate(date, "Y-m-d");
-                            const endDatePicker = document.getElementById('endDate')._flatpickr;
-                            const minEndDate = new Date(date);
-                            minEndDate.setDate(minEndDate.getDate() + 1);
-                            endDatePicker.set("minDate", minEndDate);
-                            if (document.getElementById('endDate').value && new Date(document.getElementById('endDate').value) <= date) {
-                                endDatePicker.clear();
-                                document.getElementById('endDate').value = "";
-                            }
-                        });
-                    });
-                }
-            });
-
-            // Khởi tạo Flatpickr cho End Date
-            flatpickr("#endDate", {
-                dateFormat: "Y-m-d",
-                defaultDate: "${selectedEndDate}",
-                locale: "vi",
-                maxDate: new Date().fp_incr(365), // Giới hạn tối đa là 1 năm từ hôm nay
-                minDate: "${selectedStartDate}" ? new Date("${selectedStartDate}").fp_incr(1) : "tomorrow", // Nếu có startDate thì min là ngày sau startDate, không thì là ngày mai
-                onChange: function (selectedDates, dateStr, instance) {
-                    // Khi chọn ngày kết thúc, cập nhật giá trị
-                    document.getElementById('endDate').value = dateStr;
-                    const startDateValue = document.getElementById('startDate').value;
-                    const startDate = startDateValue ? new Date(startDateValue) : null;
-
-                    // Nếu startDate đã chọn và endDate nhỏ hơn hoặc bằng startDate, thông báo và xóa
-                    if (startDate && selectedDates[0] <= startDate) {
-                        alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
-                        instance.clear();
-                        document.getElementById('endDate').value = "";
-                    }
-                },
-                onReady: function (selectedDates, dateStr, instance) {
-                    // Thêm các nút preset
-                    const ranges = document.createElement('div');
-                    ranges.className = 'flatpickr-ranges';
-                    ranges.innerHTML = `
-            <button data-range="today">Hôm nay</button>
-            <button data-range="tomorrow">Ngày mai</button>
-            <button data-range="weekend">Cuối tuần này</button>
-            <button data-range="month">Tháng này</button>
-        `;
-                    instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
-
-                    ranges.querySelectorAll('button').forEach(button => {
-                        button.addEventListener('click', function () {
-                            const range = this.getAttribute('data-range');
-                            let date;
-                            const now = new Date();
-                            switch (range) {
-                                case 'today':
-                                    date = now;
-                                    break;
-                                case 'tomorrow':
-                                    date = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-                                    break;
-                                case 'weekend':
-                                    date = new Date(now);
-                                    date.setDate(date.getDate() + (6 - date.getDay() + 1) % 7);
-                                    break;
-                                case 'month':
-                                    date = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Ngày cuối tháng
-                                    break;
-                            }
-                            const startDateValue = document.getElementById('startDate').value;
-                            const startDate = startDateValue ? new Date(startDateValue) : null;
-
-                            if (startDate && date <= startDate) {
-                                alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
-                                return;
-                            }
-                            instance.setDate(date);
-                            document.getElementById('endDate').value = instance.formatDate(date, "Y-m-d");
-                        });
-                    });
-                }
-            });
-
-            // Hàm toggle cho Category, Price, và Location (giữ nguyên)
-            document.querySelectorAll('.category-toggle').forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    const categoryList = this.nextElementSibling;
-                    this.classList.toggle('active');
-                    categoryList.classList.toggle('active');
-                });
-            });
-        </script>
-
         <!-- Check if there are no filtered events -->
         <c:choose>
             <c:when test="${empty filteredEvents}">
-                <p>No events found.</p>
+                <p class="text-center">Not Event Found From Your Filter And Search</p>
+                <!--All Event--> 
+                <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+                    <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+                </h2>
+                <div class="container py-4">
+                    <div class="row gy-4" id="event-container">
+                        <!-- Event Cards -->
+                        <c:forEach var="event" items="${paginatedEventsAll}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                <div class="event-card-all_events">
+                                    <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageUrl}" alt="${event.imageTitle}" />
+                                    </a>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </div>
+                    <!-- Pagination -->
+                    <jsp:include page="pagination.jsp">
+                        <jsp:param name="baseUrl" value="/allEvents" />
+                        <jsp:param name="page" value="${pageAll}" />
+                        <jsp:param name="totalPages" value="${totalPagesAll}" />
+                        <jsp:param name="selectedStatus" value="${selectedStatusAll}" />
+                    </jsp:include>
+                </div>
+                <!-- Bootstrap JS for All Events-->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
             </c:when>
             <c:otherwise>
                 <div class="container py-4">
@@ -596,8 +508,7 @@
                             <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
                                 <div class="event-card-all_events">
                                     <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageURL}" alt="${event.eventName}" />
-                                        <h4>${event.eventName}</h4>
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </div>
                             </div>
@@ -606,37 +517,245 @@
                 </div>
 
                 <!-- Pagination -->
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center" id="pagination-container">
-                        <c:if test="${currentPage > 1}">
-                            <li class="page-item">
-                                <a class="page-link" href="allEvents?page=${currentPage - 1}&query=${searchQuery}&location=${selectedLocation}&startDate=${selectedStartDate}&endDate=${selectedEndDate}&price=${selectedPrice}">
-                                    « Previous
-                                </a>
-                            </li>
-                        </c:if>
-
-                        <c:forEach var="i" begin="1" end="${totalPages}">
-                            <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                <a class="page-link" href="allEvents?page=${i}&query=${searchQuery}&location=${selectedLocation}&startDate=${selectedStartDate}&endDate=${selectedEndDate}&price=${selectedPrice}">
-                                    ${i}
-                                </a>
-                            </li>
-                        </c:forEach>
-
-                        <c:if test="${currentPage < totalPages}">
-                            <li class="page-item">
-                                <a class="page-link" href="allEvents?page=${currentPage + 1}&query=${searchQuery}&location=${selectedLocation}&startDate=${selectedStartDate}&endDate=${selectedEndDate}&price=${selectedPrice}">
-                                    Next »
-                                </a>
-                            </li>
-                        </c:if>
-                    </ul>
-                </nav>
+                <jsp:include page="pagination.jsp">
+                    <jsp:param name="baseUrl" value="/allEvents" />
+                    <jsp:param name="page" value="${currentPage}" />
+                    <jsp:param name="totalPages" value="${totalPages}" />
+                    <jsp:param name="selectedStatus" value="${selectedStatus}" />
+                </jsp:include>
             </c:otherwise>
         </c:choose>
 
         <!--Footer-->
         <jsp:include page="../../components/footer.jsp"></jsp:include>
+
+            <script>
+                // Khởi tạo Flatpickr cho Start Date
+                flatpickr("#startDate", {
+                    dateFormat: "Y-m-d",
+                    defaultDate: "${selectedStartDate}",
+                    locale: "vi",
+                    maxDate: new Date().fp_incr(365), // Giới hạn tối đa là 1 năm từ hôm nay
+                    minDate: "today", // Giới hạn tối thiểu là ngày hôm nay
+                    onChange: function (selectedDates, dateStr, instance) {
+                        // Khi chọn ngày bắt đầu, cập nhật giá trị và giới hạn tối thiểu cho endDate
+                        document.getElementById('startDate').value = dateStr;
+                        const endDatePicker = document.getElementById('endDate')._flatpickr;
+                        const endDateValue = document.getElementById('endDate').value;
+
+                        if (selectedDates[0]) {
+                            // Đặt minDate của endDate là ngày lớn hơn startDate ít nhất 1 ngày
+                            const minEndDate = new Date(selectedDates[0]);
+                            minEndDate.setDate(minEndDate.getDate() + 1); // Tăng 1 ngày
+                            endDatePicker.set("minDate", minEndDate);
+
+                            // Nếu endDate hiện tại nhỏ hơn hoặc bằng startDate, xóa endDate
+                            if (endDateValue && new Date(endDateValue) <= selectedDates[0]) {
+                                endDatePicker.clear(); // Xóa giá trị endDate
+                                document.getElementById('endDate').value = "";
+                            }
+                        }
+                    },
+                    onReady: function (selectedDates, dateStr, instance) {
+                        // Thêm các nút preset
+                        const ranges = document.createElement('div');
+                        ranges.className = 'flatpickr-ranges';
+                        ranges.innerHTML = `
+                        <button data-range="today">Hôm nay</button>
+                        <button data-range="tomorrow">Ngày mai</button>
+                        <button data-range="weekend">Cuối tuần này</button>
+                        <button data-range="month">Tháng này</button>
+                    `;
+                        instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
+
+                        ranges.querySelectorAll('button').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const range = this.getAttribute('data-range');
+                                let date;
+                                const now = new Date();
+                                switch (range) {
+                                    case 'today':
+                                        date = now;
+                                        break;
+                                    case 'tomorrow':
+                                        date = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                                        break;
+                                    case 'weekend':
+                                        date = new Date(now);
+                                        date.setDate(date.getDate() + (6 - date.getDay() + 1) % 7);
+                                        break;
+                                    case 'month':
+                                        date = new Date(now.getFullYear(), now.getMonth(), 1);
+                                        break;
+                                }
+                                instance.setDate(date);
+                                document.getElementById('startDate').value = instance.formatDate(date, "Y-m-d");
+                                const endDatePicker = document.getElementById('endDate')._flatpickr;
+                                const minEndDate = new Date(date);
+                                minEndDate.setDate(minEndDate.getDate() + 1);
+                                endDatePicker.set("minDate", minEndDate);
+                                if (document.getElementById('endDate').value && new Date(document.getElementById('endDate').value) <= date) {
+                                    endDatePicker.clear();
+                                    document.getElementById('endDate').value = "";
+                                }
+                            });
+                        });
+                    }
+                });
+
+                // Khởi tạo Flatpickr cho End Date
+                flatpickr("#endDate", {
+                    dateFormat: "Y-m-d",
+                    defaultDate: "${selectedEndDate}",
+                    locale: "vi",
+                    maxDate: new Date().fp_incr(365), // Giới hạn tối đa là 1 năm từ hôm nay
+                    minDate: "${selectedStartDate}" ? new Date("${selectedStartDate}").fp_incr(1) : "tomorrow", // Nếu có startDate thì min là ngày sau startDate, không thì là ngày mai
+                    onChange: function (selectedDates, dateStr, instance) {
+                        // Khi chọn ngày kết thúc, cập nhật giá trị
+                        document.getElementById('endDate').value = dateStr;
+                        const startDateValue = document.getElementById('startDate').value;
+                        const startDate = startDateValue ? new Date(startDateValue) : null;
+
+                        // Nếu startDate đã chọn và endDate nhỏ hơn hoặc bằng startDate, thông báo và xóa
+                        if (startDate && selectedDates[0] <= startDate) {
+                            alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
+                            instance.clear();
+                            document.getElementById('endDate').value = "";
+                        }
+                    },
+                    onReady: function (selectedDates, dateStr, instance) {
+                        // Thêm các nút preset
+                        const ranges = document.createElement('div');
+                        ranges.className = 'flatpickr-ranges';
+                        ranges.innerHTML = `
+                            <button data-range="today">Hôm nay</button>
+                            <button data-range="tomorrow">Ngày mai</button>
+                            <button data-range="weekend">Cuối tuần này</button>
+                            <button data-range="month">Tháng này</button>
+                        `;
+                        instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
+
+                        ranges.querySelectorAll('button').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const range = this.getAttribute('data-range');
+                                let date;
+                                const now = new Date();
+                                switch (range) {
+                                    case 'today':
+                                        date = now;
+                                        break;
+                                    case 'tomorrow':
+                                        date = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                                        break;
+                                    case 'weekend':
+                                        date = new Date(now);
+                                        date.setDate(date.getDate() + (6 - date.getDay() + 1) % 7);
+                                        break;
+                                    case 'month':
+                                        date = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Ngày cuối tháng
+                                        break;
+                                }
+                                const startDateValue = document.getElementById('startDate').value;
+                                const startDate = startDateValue ? new Date(startDateValue) : null;
+
+                                if (startDate && date <= startDate) {
+                                    alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
+                                    return;
+                                }
+                                instance.setDate(date);
+                                document.getElementById('endDate').value = instance.formatDate(date, "Y-m-d");
+                            });
+                        });
+                    }
+                });
+
+                // Hàm toggle cho Category, Price, và Location (giữ nguyên)
+                document.querySelectorAll('.category-toggle').forEach(toggle => {
+                    toggle.addEventListener('click', function () {
+                        const categoryList = this.nextElementSibling;
+                        this.classList.toggle('active');
+                        categoryList.classList.toggle('active');
+                    });
+                });
+
+                // Cập nhật dropdown khi người dùng chọn category
+                document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.addEventListener('change', function () {
+                        const selectedCategories = Array.from(
+                                document.querySelectorAll('.category-list input[type="checkbox"]:checked')
+                                ).map(cb => cb.nextSibling.textContent.trim());
+
+                        const categoryToggle = document.querySelector('.category-toggle label');
+
+                        if (selectedCategories.length > 0) {
+                            if (selectedCategories.length > 1) {
+                                // Hiển thị category mới được chọn gần đây nhất kèm "..."
+                                const latestCategory = this.nextSibling.textContent.trim(); // Lấy category từ checkbox vừa thay đổi
+                                categoryToggle.textContent = `${latestCategory}...`;
+                            } else {
+                                // Nếu chỉ có 1 category, hiển thị category đó
+                                categoryToggle.textContent = selectedCategories[0];
+                            }
+                        } else {
+                            // Nếu không có category nào được chọn, hiển thị placeholder "Category"
+                            categoryToggle.textContent = 'Category';
+                        }
+                    });
+                });
+
+                // Cập nhật dropdown ngay khi trang tải (dựa trên sessionScope)
+                window.addEventListener('load', function () {
+                    const selectedCategoryList = "${sessionScope.selectedCategories}"
+                            ? "${sessionScope.selectedCategories}".replace(/[\[\]"]/g, '').split(',')
+                            : [];
+                    const categoryToggle = document.querySelector('.category-toggle label');
+                    const checkboxes = document.querySelectorAll('.category-list input[type="checkbox"]');
+
+                    if (selectedCategoryList.length > 0) {
+                        let latestCategoryName = '';
+                        checkboxes.forEach(checkbox => {
+                            const categoryId = checkbox.value;
+                            if (selectedCategoryList.includes(categoryId)) {
+                                latestCategoryName = checkbox.nextSibling.textContent.trim();
+                            }
+                        });
+                        if (selectedCategoryList.length > 1) {
+                            categoryToggle.textContent = `${latestCategoryName}...`;
+                        } else {
+                            categoryToggle.textContent = latestCategoryName || 'Category';
+                        }
+                    } else {
+                        categoryToggle.textContent = 'Category';
+                    }
+
+                    // Kích hoạt sự kiện change để đảm bảo giao diện đồng bộ
+                    document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.dispatchEvent(new Event('change'));
+                    });
+                });
+
+                // Cập nhật dropdown cho Price
+                document.querySelectorAll('.price-group .category-list input[type="radio"]').forEach(radio => {
+                    radio.addEventListener('change', function () {
+                        const selectedPrice = this.nextSibling.textContent.trim();
+                        const priceToggle = document.querySelector('.price-group .category-toggle label');
+                        priceToggle.textContent = selectedPrice;
+                    });
+                });
+
+                // Cập nhật dropdown cho Location
+                document.querySelectorAll('.location-group .category-list input[type="radio"]').forEach(radio => {
+                    radio.addEventListener('change', function () {
+                        const selectedLocation = this.nextSibling.textContent.trim();
+                        const locationToggle = document.querySelector('.location-group .category-toggle label');
+                        locationToggle.textContent = selectedLocation;
+                    });
+                });
+
+                // Cập nhật dropdown ngay khi trang tải
+                document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.dispatchEvent(new Event('change'));
+                });
+        </script>
     </body>
 </html>

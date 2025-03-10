@@ -212,7 +212,7 @@ Notes and VAT Terms</textarea>
                                 <div id="showTimeList" class="space-y-4">
                                     <div class="show-time bg-gray-800 p-4 rounded">
                                         <div class="flex justify-between items-center mb-3">
-                                            <h6 class="text-white"><span class="show-time-label">Show Time #${showTimeCount}</span></h6>
+                                            <h6 class="text-white"><span class="show-time-label">Show Time #1</span></h6>
                                             <div class="flex gap-2">
                                                 <button class="toggle-btn" onclick="toggleShowTime(this)">
                                                     <i class="fas fa-chevron-down"></i>
@@ -224,17 +224,17 @@ Notes and VAT Terms</textarea>
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="text-gray-300">Start Date</label>
-                                                    <input type="datetime-local" name="showStartDate" id="showStartDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)" required>
-                                                    <span class="error-message" id="showStartDate_${showTimeCount}_error"></span>
+                                                    <input type="datetime-local" name="showStartDate" id="showStartDate_1" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)" required>
+                                                    <span class="error-message" id="showStartDate_1_error"></span>
                                                 </div>
                                                 <div>
                                                     <label class="text-gray-300">End Date</label>
-                                                    <input type="datetime-local" name="showEndDate" id="showEndDate_${showTimeCount}" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)" required>
-                                                    <span class="error-message" id="showEndDate_${showTimeCount}_error"></span>
+                                                    <input type="datetime-local" name="showEndDate" id="showEndDate_1" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" onchange="updateShowTimeLabel(this)" required>
+                                                    <span class="error-message" id="showEndDate_1_error"></span>
                                                 </div>
                                             </div>
-                                            <div id="ticketList_${showTimeCount}" class="mt-3 space-y-2"></div>
-                                            <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" data-show-time="${showTimeCount}" onclick="openModal(this)">+ Add Ticket Type</button>
+                                            <div id="ticketList_1" class="mt-3 space-y-2"></div>
+                                            <button class="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200" data-show-time="1" onclick="openModal(this)">+ Add Ticket Type</button>
                                         </div>
                                     </div>
                                 </div>

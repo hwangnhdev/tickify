@@ -21,6 +21,7 @@ public class Showtime {
     private String status;
     private Timestamp createdAt; // Changed from Date to Timestamp
     private Timestamp updatedAt; // Changed from Date to Timestamp
+    
     private List<TicketType> ticketTypes;
 
     public List<TicketType> getTicketTypes() {

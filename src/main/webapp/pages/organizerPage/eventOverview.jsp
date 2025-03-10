@@ -18,7 +18,7 @@
                 </div>
                 <nav class="space-y-4">
 
-                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="eventOverview.jsp">
+                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/eventOverview?eventId=${1}}&organizerId=${1}">
                         <i class="fas fa-chart-pie mr-2"></i>Overview
                     </a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventStatistic.jsp">
@@ -60,7 +60,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div class="bg-gray-800 rounded-lg shadow-lg p-6">
                                 <h3 class="text-lg font-bold text-green-400">Total Revenue</h3>
-                                <p class="text-3xl font-bold text-white mt-2">$12,345</p>
+                                <p class="text-3xl font-bold text-white mt-2">${totalRevenue}</p>
                             </div>
                             <div class="bg-gray-800 rounded-lg shadow-lg p-6">
                                 <h3 class="text-lg font-bold text-green-400">Tickets Sold</h3>

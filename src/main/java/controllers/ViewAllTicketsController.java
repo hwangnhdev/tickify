@@ -1,6 +1,7 @@
 package controllers;
 
 import dals.OrderDAO;
+import dals.TicketDAO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,9 +35,9 @@ public class ViewAllTicketsController extends HttpServlet {
             statusFilter = "all";
         }
 
-        OrderDAO orderDAO = new OrderDAO();
+        TicketDAO ticketDAO = new TicketDAO();
         // Gọi phương thức lấy vé đã mua của customer theo customerId và status filter
-        List<CustomerTicketDTO> tickets = orderDAO.getTicketsByCustomer(customerId, statusFilter);
+        List<CustomerTicketDTO> tickets = ticketDAO.getTicketsByCustomer(customerId, statusFilter);
 
         // Đặt dữ liệu vào request attribute để hiển thị trên JSP
         request.setAttribute("tickets", tickets);

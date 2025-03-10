@@ -56,7 +56,7 @@ public class AdminController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 //        processRequest(request, response);
-        request.getRequestDispatcher("pages/adminPage/sidebar.jsp").forward(request, response);
+        request.getRequestDispatcher("pages/adminPage/admin.jsp").forward(request, response);
     }
 
     /**

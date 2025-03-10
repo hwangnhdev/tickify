@@ -18,7 +18,7 @@
         </a>
       </li>
       <li class="mb-4">
-        <a class="sidebar-item flex items-center p-2 rounded" href="${pageContext.request.contextPath}/admin/manageUsers">
+        <a class="sidebar-item flex items-center p-2 rounded" href="${pageContext.request.contextPath}/ViewAllCustomersController">
           <i class="sidebar-icon fas fa-users mr-3"></i> Manage Users
         </a>
       </li>

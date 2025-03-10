@@ -4,6 +4,7 @@
  */
 package utils;
 
+import configs.DBConfig;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,12 +19,9 @@ public class DBContext {
 
     public DBContext() {
         try {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=Tickify_version_2;trustServerCertificate=true";
-            String username = "sa";
-            String password = "123456";
-
+            DBConfig db = new DBConfig();
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(db.DB_URL, db.DB_NAME, db.DB_PASSWORD);
         } catch (SQLException | ClassNotFoundException e) {
             System.out.println(e);
         }
@@ -46,4 +44,5 @@ public class DBContext {
             System.out.println("Connected Not Successfully!");
         }
     }
+    
 }

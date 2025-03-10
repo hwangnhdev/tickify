@@ -60,16 +60,18 @@
                     <tr>
                         <th class="py-2 text-left">Hình ảnh</th>
                         <td class="py-2">
-                            <c:choose>
-                                <c:when test="${not empty imageUrls}">
-                                    <c:forEach var="url" items="${imageUrls}">
-                                        <img src="${pageContext.request.contextPath}/${url}" alt="Event Image" class="w-64 h-auto mb-2" />
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <img src="${pageContext.request.contextPath}/images/default_banner.png" alt="Default Banner" class="w-64 h-auto" />
-                                </c:otherwise>
-                            </c:choose>
+                            <div>
+                                <p><strong>Banner:</strong></p>
+                                <img src="${logoBannerImage}" alt="Logo Banner" class="w-64 h-auto mb-2" />
+                            </div>
+                            <div>
+                                <p><strong>Event:</strong></p>
+                                <img src="${logoEventImage}" alt="Logo Event" class="w-64 h-auto mb-2" />
+                            </div>
+                            <div>
+                                <p><strong>Organizer:</strong></p>
+                                <img src="${logoOrganizerImage}" alt="Logo Organizer" class="w-64 h-auto mb-2" />
+                            </div>
                         </td>
                     </tr>
                 </table>

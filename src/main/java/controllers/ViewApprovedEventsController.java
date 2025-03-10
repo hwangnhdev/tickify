@@ -1,13 +1,13 @@
 package controllers;
 
-import dals.EventAdminDAO;
+import dals.AdminDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import models.EventAdmin;
+import models.Event;
 
 public class ViewApprovedEventsController extends HttpServlet {
 
@@ -26,12 +26,12 @@ public class ViewApprovedEventsController extends HttpServlet {
                 page = 1;
             }
         }
-        
+
         String searchKeyword = request.getParameter("search");
-        EventAdminDAO dao = new EventAdminDAO();
-        List<EventAdmin> approvedEvents;
+        AdminDAO dao = new AdminDAO();
+        List<Event> approvedEvents;
         int totalRecords = 0;
-        
+
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
             // Tìm kiếm sự kiện đã duyệt theo tên
             approvedEvents = dao.searchApprovedEventsByName(searchKeyword, page, PAGE_SIZE);
@@ -41,9 +41,9 @@ public class ViewApprovedEventsController extends HttpServlet {
             approvedEvents = dao.getApprovedEvents(page, PAGE_SIZE);
             totalRecords = dao.getTotalApprovedEvents();
         }
-        
+
         int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
-        
+
         request.setAttribute("events", approvedEvents);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("page", page);

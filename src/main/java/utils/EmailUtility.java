@@ -4,27 +4,31 @@
  */
 package utils;
 
-import jakarta.mail.MessagingException;
-import java.util.Properties;
+import configs.EmailConfig;
+import com.google.zxing.WriterException;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
 import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Authenticator;
-import jakarta.mail.Session;
+import jakarta.mail.internet.*;
+import java.util.Properties;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.util.ByteArrayDataSource;
+import java.io.IOException;
+import static utils.QRCodeGenerator.generateQRCodeAsBytes;
 
 /**
  *
  * @author Nguyen Huy Hoang - CE182102
  */
 public class EmailUtility {
+    
+    static String host = "smtp.gmail.com";
+    static String port = "587";
+    static String user = EmailConfig.EMAIL_USER;
+    static String password = EmailConfig.EMAIL_PASS;
 
     public static void sendEmail(String recipient, String subject, String content) throws MessagingException {
-        String host = "smtp.gmail.com";
-        String port = "587";
-        final String user = "huyhoang23112004ct@gmail.com";  // email của bạn
-        final String password = "kank gxqh qqib lbjd";  // mật khẩu ứng dụng của Gmail
-
         Properties props = new Properties();
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", port);
@@ -46,11 +50,65 @@ public class EmailUtility {
         Transport.send(message);
     }
 
-    public static void main(String[] args) throws MessagingException {
-        String recipient = "hwang.huyhoang@gmail.com";
-        String subject = "Haloo";
-        String content = "welcome!";
+    public static void sendEmailWithQRCode(String recipient, String subject, String content, String qrData) throws MessagingException, IOException, WriterException {
+        // Configure email properties
+        Properties props = new Properties();
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
 
-        sendEmail(recipient, subject, content);
+        // Create a session with authentication
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(user, password);
+            }
+        });
+
+        // Create a new email message
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(user));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
+        message.setSubject(subject);
+
+        // Create the email body
+        MimeBodyPart textPart = new MimeBodyPart();
+        textPart.setText(content);
+
+        // Generate QR code as byte array
+        byte[] qrCodeBytes = generateQRCodeAsBytes(qrData);
+
+        // Attach QR code image
+        MimeBodyPart imagePart = new MimeBodyPart();
+        DataSource dataSource = new ByteArrayDataSource(qrCodeBytes, "image/png");
+        imagePart.setDataHandler(new DataHandler(dataSource));
+        imagePart.setFileName("qrcode.png");
+
+        // Combine the email parts
+        Multipart multipart = new MimeMultipart();
+        multipart.addBodyPart(textPart);
+        multipart.addBodyPart(imagePart);
+
+        message.setContent(multipart);
+
+        // Send the email
+        Transport.send(message);
+    }
+
+    public static void main(String[] args) throws MessagingException {
+        try {
+            // Create QR data
+            String qrData = "ticketId=12345;eventId=E001;userName=Nguyen Van C";
+
+            // Send email with QR code
+            String recipient = "hwang.huyhoang@gmail.com";
+            String subject = "Your Ticket!";
+            String content = "Here is the QR code for your ticket. Please bring it with you to the event.";
+            
+            EmailUtility.sendEmailWithQRCode(recipient, subject, content, qrData);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

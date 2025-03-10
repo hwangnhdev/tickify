@@ -98,6 +98,7 @@ public class VnPayAjaxController extends HttpServlet {
         System.out.println(bankCode);
 
         String vnp_TxnRef = VnPayUtils.getRandomNumber(8);
+        System.out.println(vnp_TxnRef);
         String vnp_IpAddr = VnPayUtils.getIpAddress(request);
 
         String vnp_TmnCode = VnPayConfig.vnp_TmnCode;
@@ -128,6 +129,7 @@ public class VnPayAjaxController extends HttpServlet {
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnp_CreateDate = formatter.format(cld.getTime());
+        System.out.println(vnp_CreateDate);
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
         cld.add(Calendar.MINUTE, 15);

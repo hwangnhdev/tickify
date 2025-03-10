@@ -127,11 +127,12 @@
                             <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-4">
                                 <!-- Phần trên: 2 cột (ảnh và thông tin) -->
                                 <div class="flex">
-                                    <c:if test="${not empty event.image}">
+                                    <c:if test="${not empty event.imageUrl}">
                                         <div class="w-1/3 flex items-center justify-center bg-gray-800">
-                                            <img src="${event.image}" alt="Event image" class="max-h-full max-w-full object-contain"/>
+                                            <img src="${event.imageUrl}" alt="Event image" class="max-h-full max-w-full object-contain"/>
                                         </div>
                                     </c:if>
+
                                     <div class="w-2/3 p-4 bg-gray-800 flex flex-col justify-center">
                                         <h2 class="text-xl font-bold text-white cursor-pointer hover:text-gray-400 mb-4" 
                                             onclick="window.open('${pageContext.request.contextPath}/OrganizerEventDetailController?eventId=${event.eventId}', '_blank')">
