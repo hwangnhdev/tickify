@@ -106,6 +106,10 @@
         <servlet-name>vnpayQueryController</servlet-name>
         <servlet-class>vnpay.vnpayQueryController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ValidateTicketController</servlet-name>
+        <servlet-class>controllers.ValidateTicketController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -206,6 +210,10 @@
     <servlet-mapping>
         <servlet-name>vnpayQueryController</servlet-name>
         <url-pattern>/vnpayQuery</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ValidateTicketController</servlet-name>
+        <url-pattern>/validateTicket</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

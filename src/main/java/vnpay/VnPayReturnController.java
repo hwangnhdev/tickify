@@ -4,11 +4,13 @@
  */
 package vnpay;
 
+import com.google.zxing.WriterException;
 import dals.OrderDAO;
 import dals.OrderDetailDAO;
 import dals.SeatDAO;
 import dals.TicketDAO;
 import dals.TicketTypeDAO;
+import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -23,11 +25,14 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import models.Customer;
 import models.Order;
 import models.OrderDetail;
 import models.Ticket;
 import models.TicketType;
+import utils.EmailUtility;
 import utils.VnPayUtils;
 
 /**
@@ -62,28 +67,6 @@ public class VnPayReturnController extends HttpServlet {
         }
     }
 
-//    protected void generateQR(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String ticketId = request.getParameter("ticketId");  // ID vé từ request
-//        String eventId = request.getParameter("eventId");    // ID sự kiện từ request
-//        String userName = request.getParameter("userName");  // Tên người đặt
-//
-//        if (ticketId == null || eventId == null || userName == null) {
-//            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu thông tin vé.");
-//            return;
-//        }
-//
-//        // Tạo nội dung QR Code
-//        String qrContent = String.format("ticketId=%s;eventId=%s;userName=%s", ticketId, eventId, userName);
-//        
-//        response.setContentType("image/png");
-//        try (OutputStream outputStream = response.getOutputStream()) {
-//            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-//            BitMatrix bitMatrix = qrCodeWriter.encode(qrContent, BarcodeFormat.QR_CODE, 200, 200);
-//            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
-//        } catch (WriterException e) {
-//            throw new ServletException("Lỗi khi tạo mã QR", e);
-//        }
-//    }
     public boolean updateSeatStatusBatch(String seat, int seatId, String newStatus) {
         SeatDAO seatDao = new SeatDAO();
         boolean allUpdated = true; // Kiểm tra tất cả ghế có cập nhật thành công không
@@ -101,7 +84,7 @@ public class VnPayReturnController extends HttpServlet {
         return allUpdated;
     }
 
-    protected void vnPayReturn(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void vnPayReturn(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, MessagingException, WriterException {
         SeatDAO seatDao = new SeatDAO();
         TicketTypeDAO ticketTypeDao = new TicketTypeDAO();
         TicketDAO ticketDao = new TicketDAO();
@@ -111,7 +94,10 @@ public class VnPayReturnController extends HttpServlet {
         HttpSession session = request.getSession();
         Customer customer = (Customer) session.getAttribute("customer");
         String selectedSeats = (String) session.getAttribute("selectedSeats");
-        double subtotal = Double.parseDouble((String) session.getAttribute("subtotal"));
+        String subtotalStr = (String) session.getAttribute("subtotal");
+        System.out.println(subtotalStr);
+        double subtotal = (subtotalStr != null && !subtotalStr.isEmpty()) ? Double.parseDouble(subtotalStr) : 0.0;
+        System.out.println(subtotal);
         double total = subtotal;
         List<Map<String, Object>> seatDataList = (List<Map<String, Object>>) session.getAttribute("seatDataList");
 
@@ -142,6 +128,7 @@ public class VnPayReturnController extends HttpServlet {
 
         // Xử lý sau khi thanh toán thành công
         if ("00".equals(request.getParameter("vnp_ResponseCode"))) {
+            List<String> ticketCodes = new ArrayList<>();
             
             // Insert order
             Order newOrder = new Order(0, customer.getCustomerId(), 0, total, null, transactionStatus, transactionId, null, null);
@@ -196,9 +183,23 @@ public class VnPayReturnController extends HttpServlet {
                             System.out.println("Failed to create ticket for seat: " + seatId);
                             // Có thể rollback hoặc log để xử lý sau
                         }
+                        
+                        ticketCodes.add(ticketCode);
                     }
                 }
             }
+            
+            // Send QR to Email 
+            String ticketCodesString = String.join(";", ticketCodes);
+            
+            String qrData = "ticketCode=" + ticketCodesString;
+//            String recipient = customer.getEmail();
+            String recipient = "hwang.huyhoang@gmail.com";
+            String subject = "Your Ticket!";
+            String content = "Here is the QR code for your ticket. Please bring it with you to the event.";
+            
+            EmailUtility.sendEmailWithQRCode(recipient, subject, content, qrData);
+            
         }
 
         // Chuyển các giá trị sang request để dùng trong JSP
@@ -229,8 +230,14 @@ public class VnPayReturnController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        processRequest(request, response);
-        vnPayReturn(request, response);
+        try {
+            //        processRequest(request, response);
+            vnPayReturn(request, response);
+        } catch (MessagingException ex) {
+            Logger.getLogger(VnPayReturnController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (WriterException ex) {
+            Logger.getLogger(VnPayReturnController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
