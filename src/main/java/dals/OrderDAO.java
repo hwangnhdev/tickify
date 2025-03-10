@@ -10,9 +10,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import models.Order;
-import models.OrganizerOrderDetail;
-import models.OrganizerOrderDetailDTO;
-import models.OrganizerOrderHeader;
 import models.TicketDetailDTO;
 import utils.DBContext;
 

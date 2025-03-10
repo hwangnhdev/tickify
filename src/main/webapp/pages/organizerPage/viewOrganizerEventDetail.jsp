@@ -9,44 +9,44 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Organizer Event Detail</title>
         <jsp:include page="../../components/header.jsp"></jsp:include>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-            <style>
-                .ticket {
-                    position: relative;
-                    border: 2px dashed #4a5568;
-                    border-radius: 10px;
-                    padding: 20px;
-                    background-color: #2d3748;
-                    color: white;
-                }
-                .ticket::before, .ticket::after {
-                    content: '';
-                    position: absolute;
-                    width: 20px;
-                    height: 20px;
-                    background-color: #2d3748;
-                    border: 2px dashed #4a5568;
-                    border-radius: 50%;
-                }
-                .ticket::before {
-                    top: -11px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                }
-                .ticket::after {
-                    bottom: -11px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                }
-            </style>
-        </head>
-        <body class="bg-gray-100">
-            <!-- Main Content -->
-            <main class="max-w-6xl mx-auto p-4">
-                <div class="flex flex-col lg:flex-row items-stretch">
-                    <!-- Ticket-like container for event info -->
-                    <section class="ticket lg:w-1/3 flex flex-col justify-between bg-gray-700 text-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+        <style>
+            .ticket {
+                position: relative;
+                border: 2px dashed #4a5568;
+                border-radius: 10px;
+                padding: 20px;
+                background-color: #2d3748;
+                color: white;
+            }
+            .ticket::before, .ticket::after {
+                content: '';
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                background-color: #2d3748;
+                border: 2px dashed #4a5568;
+                border-radius: 50%;
+            }
+            .ticket::before {
+                top: -11px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .ticket::after {
+                bottom: -11px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        </style>
+    </head>
+    <body class="bg-gray-100">
+        <!-- Main Content -->
+        <main class="max-w-6xl mx-auto p-4">
+            <div class="flex flex-col lg:flex-row items-stretch">
+                <!-- Ticket-like container for event info -->
+                <section class="ticket lg:w-1/3 flex flex-col justify-between bg-gray-700 text-white p-6 rounded-lg shadow-lg w-full max-w-md">
                     <c:if test="${not empty organizerEventDetail}">
                         <div>
                             <h2 class="text-2xl font-bold mb-2">${organizerEventDetail.eventName}</h2>
@@ -72,7 +72,6 @@
                             </p>
                         </div>
                         <!-- Payment Status badge -->
-
                         <div class="mt-auto pt-5 border-t border-gray-600 flex">
                             <c:choose>
                                 <c:when test="${organizerEventDetail.paymentStatus == 'Pending'}">
@@ -95,24 +94,21 @@
                                 </c:otherwise>
                             </c:choose>
                         </div>
-
                         <hr class="border-gray-600 mt-1 mb-2">
                     </c:if>
                     <c:if test="${empty organizerEventDetail}">
                         <p class="text-sm text-center">No event details available.</p>
                     </c:if>
                 </section>
-
                 <!-- Image container -->
                 <section class="lg:w-2/3 mt-4 lg:mt-0 lg:ml-4">
-                    <c:if test="${not empty organizerEventDetail.imageURL}">
+                    <c:if test="${not empty organizerEventDetail.imageUrl}">
                         <img alt="${organizerEventDetail.eventName} image" 
                              class="rounded-lg w-full h-full object-cover" 
-                             src="${organizerEventDetail.imageURL}"/>
+                             src="${organizerEventDetail.imageUrl}"/>
                     </c:if>
                 </section>
             </div>
-
             <!-- About Section -->
             <section class="mt-8">
                 <div class="bg-white p-6 rounded-lg shadow-md">
@@ -128,7 +124,6 @@
                     </c:choose>
                 </div>
             </section>
-
             <!-- Organizer Section -->
             <section class="mt-8">
                 <div class="bg-white p-6 rounded-lg shadow-md">

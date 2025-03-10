@@ -1,13 +1,15 @@
 package controllers;
 
-import dals.EventAdminDAO;
-import models.EventAdmin;
+import dals.AdminDAO;
+import dals.EventDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import models.Event;
+import models.EventDetailDTO;
 
 @WebServlet(name = "ApproveEventController", urlPatterns = {"/admin/approveEvent"})
 public class ApproveEventController extends HttpServlet {
@@ -27,8 +29,8 @@ public class ApproveEventController extends HttpServlet {
                     response.getWriter().write("invalid");
                     return;
                 }
-                EventAdminDAO dao = new EventAdminDAO();
-                EventAdmin updatedEvent = dao.updateEventStatus(eventId, newStatus);
+                AdminDAO dao = new AdminDAO();
+                EventDetailDTO updatedEvent = dao.updateEventStatus(eventId, newStatus);
                 if (updatedEvent != null) {
                     response.getWriter().write("success");
                 } else {

@@ -1,25 +1,26 @@
-package controllers;
-
-import dals.OrderDAO;
-import models.Order;
-import java.io.IOException;
-import java.util.List;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-@WebServlet(name = "SearchOrderController", urlPatterns = {"/SearchOrderController"})
-public class SearchOrderController extends HttpServlet {
-
+//package controllers;
+//
+//import dals.OrderDAO;
+//import dals.OrganizerDAO;
+//import models.Order;
+//import java.io.IOException;
+//import java.util.List;
+//import jakarta.servlet.RequestDispatcher;
+//import jakarta.servlet.ServletException;
+//import jakarta.servlet.annotation.WebServlet;
+//import jakarta.servlet.http.HttpServlet;
+//import jakarta.servlet.http.HttpServletRequest;
+//import jakarta.servlet.http.HttpServletResponse;
+//
+//@WebServlet(name = "SearchOrderController", urlPatterns = {"/SearchOrderController"})
+//public class SearchOrderController extends HttpServlet {
+//
 //    private static final long serialVersionUID = 1L;
-//    private OrderDAO orderDAO;
+//    private OrganizerDAO OrganizerDAO;
 //
 //    @Override
 //    public void init() throws ServletException {
-//        orderDAO = new OrderDAO();
+//        OrganizerDAO = new OrganizerDAO();
 //    }
 //
 //    @Override
@@ -37,7 +38,7 @@ public class SearchOrderController extends HttpServlet {
 //            keyword = "";
 //        }
 //        // Gọi DAO để tìm kiếm đơn hàng theo organizer và từ khóa, sử dụng đối tượng Order của package models
-//        List<Order> orders = orderDAO.searchOrders(organizerId, keyword);
+//        List<Order> orders = OrganizerDAO.searchOrders(organizerId, keyword);
 //        // Đưa kết quả tìm kiếm vào request attribute
 //        request.setAttribute("orders", orders);
 //        // Chuyển tiếp đến trang hiển thị kết quả (organizerOrders.jsp)
@@ -50,4 +51,4 @@ public class SearchOrderController extends HttpServlet {
 //            throws ServletException, IOException {
 //        doGet(request, response);
 //    }
-}
+//}
