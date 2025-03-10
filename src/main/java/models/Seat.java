@@ -26,13 +26,14 @@ public class Seat extends TicketType {
         this.ticketTypeId = ticketTypeId;
         this.seatRow = seatRow;
         this.seatCol = seatCol;
+        this.seatCol = seatCol;
         this.status = status;
     }
 
-    public Seat(int seatId, String seatRow, String seatCol, String status, int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+    public Seat(int seatId, int ticketTypeId, String seatRow, String seatCol, String status, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Timestamp createdAt, Timestamp updatedAt) {
         super(ticketTypeId, showtimeId, name, description, price, color, totalQuantity, soldQuantity, createdAt, updatedAt);
         this.seatId = seatId;
-        this.eventId = eventId;
+        this.ticketTypeId = ticketTypeId;
         this.seatRow = seatRow;
         this.seatCol = seatCol;
         this.status = status;
@@ -51,8 +52,9 @@ public class Seat extends TicketType {
         return ticketTypeId;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    @Override
+    public void setTicketTypeId(int ticketTypeId) {
+        this.ticketTypeId = ticketTypeId;
     }
 
     public String getSeatRow() {

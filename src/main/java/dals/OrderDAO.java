@@ -5,8 +5,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import models.Order;
+import models.OrganizerOrderDetail;
+import models.OrganizerOrderDetailDTO;
+import models.OrganizerOrderHeader;
+import models.TicketDetailDTO;
+import utils.DBContext;
 
 public class OrderDAO extends DBContext {
 
@@ -193,75 +201,75 @@ public class OrderDAO extends DBContext {
         return dto;
     }
 
-    /**
-     * Lấy danh sách đơn hàng theo organizer và trạng thái thanh toán với phân
-     * trang.
-     *
-     * @param organizerId ID của organizer.
-     * @param paymentStatus Trạng thái thanh toán ("all", "paid", "pending").
-     * @param offset Vị trí bắt đầu lấy dữ liệu.
-     * @param pageSize Số đơn hàng mỗi trang.
-     * @return Danh sách đơn hàng.
-     */
-    public List<Order> getOrdersByOrganizerAndPaymentStatus(int organizerId, String paymentStatus, int offset, int pageSize) {
-        List<Order> orders = new ArrayList<>();
-        String query = "SELECT order_id, customer_id, voucherId, totalPrice, order_date, paymentStatus, transactionId, createdAt, updatedAt "
-                + "FROM Orders WHERE customer_id = ?";
-        try ( Connection conn = new DBContext().connection;  PreparedStatement ps = conn.prepareStatement(query)) {
+//    /**
+//     * Lấy danh sách đơn hàng theo organizer và trạng thái thanh toán với phân
+//     * trang.
+//     *
+//     * @param organizerId ID của organizer.
+//     * @param paymentStatus Trạng thái thanh toán ("all", "paid", "pending").
+//     * @param offset Vị trí bắt đầu lấy dữ liệu.
+//     * @param pageSize Số đơn hàng mỗi trang.
+//     * @return Danh sách đơn hàng.
+//     */
+//    public List<Order> getOrdersByOrganizerAndPaymentStatus(int organizerId, String paymentStatus, int offset, int pageSize) {
+//        List<Order> orders = new ArrayList<>();
+//        String query = "SELECT order_id, customer_id, voucherId, totalPrice, order_date, paymentStatus, transactionId, createdAt, updatedAt "
+//                + "FROM Orders WHERE customer_id = ?";
+//        try ( Connection conn = new DBContext().connection;  PreparedStatement ps = conn.prepareStatement(query)) {
+//
+//            ps.setInt(1, customerId);
+//            ResultSet rs = ps.executeQuery();
+//            while (rs.next()) {
+//                Order order = new Order();
+//                order.setOrderId(rs.getInt("order_id"));
+//                order.setCustomerId(rs.getInt("customer_id"));
+//                order.setVoucherId(rs.getInt("voucherId"));
+//                order.setTotalPrice(rs.getDouble("totalPrice"));
+//                order.setOrderDate(rs.getTimestamp("order_date"));
+//                order.setPaymentStatus(rs.getString("paymentStatus"));
+//                order.setTransactionId(rs.getString("transactionId"));
+//                order.setCreatedAt(rs.getTimestamp("createdAt"));
+//                order.setUpdatedAt(rs.getTimestamp("updatedAt"));
+//                orders.add(order);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return orders;
+//    }
 
-            ps.setInt(1, customerId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Order order = new Order();
-                order.setOrderId(rs.getInt("order_id"));
-                order.setCustomerId(rs.getInt("customer_id"));
-                order.setVoucherId(rs.getInt("voucherId"));
-                order.setTotalPrice(rs.getDouble("totalPrice"));
-                order.setOrderDate(rs.getTimestamp("order_date"));
-                order.setPaymentStatus(rs.getString("paymentStatus"));
-                order.setTransactionId(rs.getString("transactionId"));
-                order.setCreatedAt(rs.getTimestamp("createdAt"));
-                order.setUpdatedAt(rs.getTimestamp("updatedAt"));
-                orders.add(order);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return orders;
-    }
-
-    /**
-     * Đếm tổng số đơn hàng theo organizer và trạng thái thanh toán.
-     *
-     * @param organizerId ID của organizer.
-     * @param paymentStatus Trạng thái thanh toán ("all", "paid", "pending").
-     * @return Số đơn hàng.
-     */
-    public Order getOrderById(int orderId) {
-        Order order = null;
-        String query = "SELECT order_id, customer_id, voucherId, totalPrice, order_date, paymentStatus, transactionId, createdAt, updatedAt "
-                + "FROM Orders WHERE order_id = ?";
-        try ( Connection conn = new DBContext().connection;  PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                order = new Order();
-                order.setOrderId(rs.getInt("order_id"));
-                order.setCustomerId(rs.getInt("customer_id"));
-                order.setVoucherId(rs.getInt("voucherId"));
-                order.setTotalPrice(rs.getDouble("totalPrice"));
-                order.setOrderDate(rs.getTimestamp("order_date"));
-                order.setPaymentStatus(rs.getString("paymentStatus"));
-                order.setTransactionId(rs.getString("transactionId"));
-                order.setCreatedAt(rs.getTimestamp("createdAt"));
-                order.setUpdatedAt(rs.getTimestamp("updatedAt"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return tickets;
-    }
+//    /**
+//     * Đếm tổng số đơn hàng theo organizer và trạng thái thanh toán.
+//     *
+//     * @param organizerId ID của organizer.
+//     * @param paymentStatus Trạng thái thanh toán ("all", "paid", "pending").
+//     * @return Số đơn hàng.
+//     */
+//    public Order getOrderById(int orderId) {
+//        Order order = null;
+//        String query = "SELECT order_id, customer_id, voucherId, totalPrice, order_date, paymentStatus, transactionId, createdAt, updatedAt "
+//                + "FROM Orders WHERE order_id = ?";
+//        try ( Connection conn = new DBContext().connection;  PreparedStatement ps = conn.prepareStatement(query)) {
+//
+//            ps.setInt(1, orderId);
+//            ResultSet rs = ps.executeQuery();
+//            if (rs.next()) {
+//                order = new Order();
+//                order.setOrderId(rs.getInt("order_id"));
+//                order.setCustomerId(rs.getInt("customer_id"));
+//                order.setVoucherId(rs.getInt("voucherId"));
+//                order.setTotalPrice(rs.getDouble("totalPrice"));
+//                order.setOrderDate(rs.getTimestamp("order_date"));
+//                order.setPaymentStatus(rs.getString("paymentStatus"));
+//                order.setTransactionId(rs.getString("transactionId"));
+//                order.setCreatedAt(rs.getTimestamp("createdAt"));
+//                order.setUpdatedAt(rs.getTimestamp("updatedAt"));
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return tickets;
+//    }
 
     /**
      * Lấy chi tiết vé cho khách hàng dựa trên ticketCode và customerId.

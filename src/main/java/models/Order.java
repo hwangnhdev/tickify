@@ -1,11 +1,20 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package models;
 
 import java.sql.Timestamp;
 
+/**
+ *
+ * @author Nguyen Huy Hoang - CE182102
+ */
 public class Order {
 
     private int orderId;
-    private Timestamp orderDate;
+    private int customerId;
+    private int voucherId;
     private double totalPrice;
     private Timestamp orderDate;
     private String paymentStatus;
@@ -28,19 +37,6 @@ public class Order {
         this.updatedAt = updatedAt;
     }
 
-    // Kiet add attributes
-    public Order(int orderId, Timestamp orderDate, double totalPrice, String paymentStatus,
-            String customerName, String eventName, String location, String ticketCode) {
-        this.orderId = orderId;
-        this.orderDate = orderDate;
-        this.totalPrice = totalPrice;
-        this.paymentStatus = paymentStatus;
-        this.customerName = customerName;
-        this.eventName = eventName;
-        this.location = location;
-        this.ticketCode = ticketCode;
-    }
-
     public int getOrderId() {
         return orderId;
     }
@@ -49,12 +45,20 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public Timestamp getOrderDate() {
-        return orderDate;
+    public int getCustomerId() {
+        return customerId;
     }
 
-    public void setOrderDate(Timestamp orderDate) {
-        this.orderDate = orderDate;
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(int voucherId) {
+        this.voucherId = voucherId;
     }
 
     public double getTotalPrice() {
@@ -79,30 +83,6 @@ public class Order {
 
     public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public String getTransactionId() {
