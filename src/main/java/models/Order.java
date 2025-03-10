@@ -1,7 +1,5 @@
 package models;
 
-import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Order {
@@ -9,17 +7,11 @@ public class Order {
     private int orderId;
     private Timestamp orderDate;
     private double totalPrice;
+    private Timestamp orderDate;
     private String paymentStatus;
     private String transactionId;
     private Timestamp createdAt;
     private Timestamp updatedAt;
-    private int customerId;
-    private int voucherId;
-    private String customerName;
-
-    private String eventName;
-    private String location;
-    private String ticketCode;
 
     public Order() {
     }
@@ -73,6 +65,14 @@ public class Order {
         this.totalPrice = totalPrice;
     }
 
+    public Timestamp getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Timestamp orderDate) {
+        this.orderDate = orderDate;
+    }
+
     public String getPaymentStatus() {
         return paymentStatus;
     }
@@ -113,44 +113,34 @@ public class Order {
         this.transactionId = transactionId;
     }
 
-    public int getCustomerId() {
-        return customerId;
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public int getVoucherId() {
-        return voucherId;
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setVoucherId(int voucherId) {
-        this.voucherId = voucherId;
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public String getEventName() {
-        return eventName;
+    @Override
+    public String toString() {
+        return "Order{"
+                + "orderId=" + orderId
+                + ", customerId=" + customerId
+                + ", voucherId=" + voucherId
+                + ", totalPrice=" + totalPrice
+                + ", orderDate=" + orderDate
+                + ", paymentStatus='" + paymentStatus + '\''
+                + ", transactionId='" + transactionId + '\''
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + '}';
     }
-
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getTicketCode() {
-        return ticketCode;
-    }
-
-    public void setTicketCode(String ticketCode) {
-        this.ticketCode = ticketCode;
-    }
-
 }

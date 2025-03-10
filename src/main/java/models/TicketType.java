@@ -26,9 +26,8 @@ public class TicketType extends Showtime {
     public TicketType() {
     }
 
-    public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Timestamp createdAt, Timestamp updatedAt) {
+    public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
         this.ticketTypeId = ticketTypeId;
-        this.showtimeId = showtimeId;
         this.showtimeId = showtimeId;
         this.name = name;
         this.description = description;
@@ -39,6 +38,21 @@ public class TicketType extends Showtime {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Date createdAt, Date updatedAt) {
+        this.ticketTypeId = ticketTypeId;
+        this.showtimeId = showtimeId;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.color = color;
+        this.totalQuantity = totalQuantity;
+        this.soldQuantity = soldQuantity;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+    
+    
 
     public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Timestamp createdAt, Timestamp updatedAt, int eventId, Timestamp startDate, Timestamp endDate, String status) {
         super(showtimeId, eventId, startDate, endDate, status, createdAt, updatedAt);

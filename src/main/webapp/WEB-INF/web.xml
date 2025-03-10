@@ -2,10 +2,6 @@
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee                               http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <!-- Define Servlet Mappings -->
     <servlet>
-        <servlet-name>ViewPaymentController</servlet-name>
-        <servlet-class>controllers.ViewPaymentController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>AuthController</servlet-name>
         <servlet-class>controllers.AuthController</servlet-class>
     </servlet>
@@ -178,6 +174,18 @@
         <servlet-name>EventOverviewController</servlet-name>
         <servlet-class>controllers.EventOverviewController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ViewPaymentController</servlet-name>
+        <servlet-class>controllers.ViewPaymentController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>vnpayQueryController</servlet-name>
+        <servlet-class>vnpay.vnpayQueryController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ValidateTicketController</servlet-name>
+        <servlet-class>controllers.ValidateTicketController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -342,9 +350,24 @@
         <servlet-name>EventOverviewController</servlet-name>
         <url-pattern>/eventOverview</url-pattern>
     </servlet-mapping>
+    <!-- Session Configuration -->
+    <servlet-mapping>
+        <servlet-name>ViewPaymentController</servlet-name>
+        <url-pattern>/viewPayment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>vnpayQueryController</servlet-name>
+        <url-pattern>/vnpayQuery</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ValidateTicketController</servlet-name>
+        <url-pattern>/validateTicket</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
+
+    <!-- Welcome File List -->
     <welcome-file-list>
         <welcome-file>event</welcome-file>
     </welcome-file-list>

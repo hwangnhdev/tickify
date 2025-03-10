@@ -126,7 +126,11 @@
                                     <c:set var="seatCursor" value="not-allowed" />
                                 </c:if>
                                 <div class="${seatClass}" 
-                                     data-seat="${seat.seatRow}${seat.seatCol}" data-price="${seat.price * 1000}" data-type="${seat.name}"
+                                     data-ticket_type_id="${seat.ticketTypeId}" 
+                                     data-seat_id="${seat.seatId}" 
+                                     data-seat="${seat.seatRow}${seat.seatCol}" 
+                                     data-price="${seat.price * 1000}" 
+                                     data-type="${seat.name}"
                                      style="background-color: ${seatColor}; color: #FFF; cursor: ${seatCursor}">
                                     ${seat.seatRow}${seat.seatCol}
                                 </div>
@@ -192,21 +196,23 @@
                 const subtotalInput = document.getElementById("subtotal");
 
                 let selectedSeats = [];
-                let seatDataMap = new Map(); // Key: "color-price-name", Value: { count, seats[] }
+                let seatDataMap = new Map(); // Key: "ticketTypeId-color-price-name", Value: { count, seats[] }
 
                 seats.forEach(seat => {
                     seat.addEventListener("click", function () {
+                        const ticketTypeId = this.dataset.ticket_type_id; // Lấy Ticket Type ID
+                        const seatId = this.dataset.seat_id; // Lấy Seat ID
                         const seatName = this.dataset.seat;
                         const seatPrice = parseFloat(this.dataset.price);
                         const seatColor = this.style.backgroundColor;
-                        const ticketType = this.dataset.type; // Lấy tên loại vé từ data-type
+                        const ticketType = this.dataset.type;
 
                         if (this.classList.contains("selected")) {
                             this.classList.remove("selected");
-                            removeSeat(seatName, seatPrice, seatColor, ticketType);
+                            removeSeat(ticketTypeId, seatId, seatName, seatPrice, seatColor, ticketType);
                         } else {
                             this.classList.add("selected");
-                            addSeat(seatName, seatPrice, seatColor, ticketType);
+                            addSeat(ticketTypeId, seatId, seatName, seatPrice, seatColor, ticketType);
                         }
 
                         updateTotalPrice();
@@ -214,7 +220,7 @@
                     });
                 });
 
-                function addSeat(seat, price, color, ticketType) {
+                function addSeat(ticketTypeId, seatId, seat, price, color, ticketType) {
                     selectedSeats.push(seat);
 
                     const li = document.createElement("li");
@@ -226,33 +232,40 @@
                     li.textContent = seat;
                     selectedSeatsList.appendChild(li);
 
-                    const key = color + "-" + price + "-" + ticketType;
+                    const key = ticketTypeId + "-" + color + "-" + price + "-" + ticketType;
                     if (seatDataMap.has(key)) {
                         let seatInfo = seatDataMap.get(key);
                         seatInfo.count++;
-                        seatInfo.seats.push(seat);
+                        seatInfo.seats.push({id: seatId, name: seat});
                     } else {
-                        seatDataMap.set(key, {price, color, name: ticketType, count: 1, seats: [seat]});
+                        seatDataMap.set(key, {
+                            ticketTypeId, // Lưu Ticket Type ID
+                            price,
+                            color,
+                            name: ticketType,
+                            count: 1,
+                            seats: [{id: seatId, name: seat}]
+                        });
                     }
                 }
 
-                function removeSeat(seat, price, color, ticketType) {
+                function removeSeat(ticketTypeId, seatId, seat, price, color, ticketType) {
                     const index = selectedSeats.indexOf(seat);
                     if (index > -1) {
                         selectedSeats.splice(index, 1);
                     }
 
-                    const key = color + "-" + price + "-" + ticketType;
+                    const key = ticketTypeId + "-" + color + "-" + price + "-" + ticketType;
                     if (seatDataMap.has(key)) {
                         let seatInfo = seatDataMap.get(key);
                         if (seatInfo.count > 1) {
                             seatInfo.count--;
-                            seatInfo.seats.splice(seatInfo.seats.indexOf(seat), 1);
+                            seatInfo.seats = seatInfo.seats.filter(s => s.id !== seatId);
                         } else {
                             seatDataMap.delete(key);
                         }
                     }
-                    
+
                     const items = selectedSeatsList.querySelectorAll("li");
                     items.forEach(item => {
                         if (item.dataset.seat === seat) {
@@ -266,6 +279,7 @@
                     seatDataMap.forEach(value => {
                         total += value.price * value.count;
                     });
+
                     totalPriceElement.textContent = "Total Price: " + total.toLocaleString("vi-VN") + " VND";
                     subtotalInput.value = total;
                 }
@@ -276,7 +290,8 @@
                     let seatDataArray = [];
                     seatDataMap.forEach((value, key) => {
                         seatDataArray.push({
-                            name: value.name, // Thêm tên loại vé
+                            ticketTypeId: value.ticketTypeId, // Gửi Ticket Type ID
+                            name: value.name,
                             color: value.color,
                             price: value.price,
                             count: value.count,
@@ -297,7 +312,6 @@
                     }
                 });
             });
-
         </script>
     </body>
 </html>

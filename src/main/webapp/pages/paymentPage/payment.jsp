@@ -161,15 +161,17 @@
                                     </p>
                                     <!--style="background-color: ${seatData.color}"-->
                                     <p >
-                                        ${seatData.seats}
+                                        <c:forEach var="seat" items="${seatData.seats}">
+                                            ${seat.name}
+                                        </c:forEach>
                                     </p>
                                 </div>
                                 <div class="flex flex-col items-end">
                                     <p>
-                                        x<fmt:formatNumber value="${seatData.count}" currencyCode="VND" minFractionDigits="0" />
+                                        <fmt:formatNumber value="${seatData.price}" currencyCode="VND" minFractionDigits="0" /> VND
                                     </p>
                                     <p>
-                                        <fmt:formatNumber value="${seatData.price}" currencyCode="VND" minFractionDigits="0" /> VND
+                                        x<fmt:formatNumber value="${seatData.count}" currencyCode="VND" minFractionDigits="0" />
                                     </p>
                                 </div>
                             </div>
@@ -218,7 +220,7 @@
                         <div class="mt-4" style="width: 100%">
                             <button id="btnSubmit" class="bg-green-500 text-white w-full p-2 rounded-md" style="display: block; text-align: center">
                                 Payment
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
