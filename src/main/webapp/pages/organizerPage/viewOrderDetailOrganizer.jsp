@@ -131,19 +131,6 @@
                 </c:if>
             </div>
             
-            <!-- Ticket Information Section -->
-            <div class="bg-white border rounded-lg shadow p-6">
-                <h2 class="text-2xl font-semibold mb-4">Ticket Information</h2>
-                <table class="w-full">
-                    <tbody class="divide-y divide-gray-200">
-                        <tr>
-                            <th class="py-2 text-left w-1/3">Seat List</th>
-                            <td class="py-2">${orderDetail.seatList}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
             <!-- Action Buttons Section -->
             <div class="flex justify-between mt-8">
                 <a href="ordersList.jsp" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">

@@ -16,26 +16,17 @@ public class OrderDetailDTO {
     private double discount_value;
     private double discountAmount;
     private double totalAfterDiscount;
-    private String seatList;
     private String image_url;
-    // New field for Payment Status
+    // Trường mới cho trạng thái thanh toán
     private String paymentStatus;
 
     public OrderDetailDTO() {
     }
 
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
-
     public OrderDetailDTO(int orderId, Timestamp orderDate, String customerName, String customerEmail,
             String eventName, String location, double grandTotal, String voucherCode,
             String discount_type, double discount_value, double discountAmount,
-            double totalAfterDiscount, String seatList, String image_url) {
+            double totalAfterDiscount, String image_url, String paymentStatus) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.customerName = customerName;
@@ -48,11 +39,11 @@ public class OrderDetailDTO {
         this.discount_value = discount_value;
         this.discountAmount = discountAmount;
         this.totalAfterDiscount = totalAfterDiscount;
-        this.seatList = seatList;
         this.image_url = image_url;
+        this.paymentStatus = paymentStatus;
     }
 
-    // Generate getters and setters
+    // Getters & Setters
     public int getOrderId() {
         return orderId;
     }
@@ -149,19 +140,19 @@ public class OrderDetailDTO {
         this.totalAfterDiscount = totalAfterDiscount;
     }
 
-    public String getSeatList() {
-        return seatList;
-    }
-
-    public void setSeatList(String seatList) {
-        this.seatList = seatList;
-    }
-
     public String getImage_url() {
         return image_url;
     }
 
     public void setImage_url(String image_url) {
         this.image_url = image_url;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 import models.EventDetailDTO;
 import models.EventImage;
 
-@WebServlet("/admin/eventDetail")
+
 public class ViewEventDetailAdminController extends HttpServlet {
 
     @Override
