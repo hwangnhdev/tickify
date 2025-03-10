@@ -1,13 +1,13 @@
 package controllers;
 
-import dals.EventAdminDAO;
+import dals.AdminDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import models.EventAdmin;
+import models.Event;
 
 public class ViewHistoryApprovedEventsController extends HttpServlet {
 
@@ -26,28 +26,40 @@ public class ViewHistoryApprovedEventsController extends HttpServlet {
                 page = 1;
             }
         }
-        
+
         String searchKeyword = request.getParameter("search");
-        EventAdminDAO dao = new EventAdminDAO();
-        List<EventAdmin> historyEvents;
+        String statusFilter = request.getParameter("status"); // Lấy giá trị trạng thái từ form (active hoặc rejected)
+        AdminDAO dao = new AdminDAO();
+        List<Event> historyEvents;
         int totalRecords = 0;
-        
+
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            // Tìm kiếm lịch sử sự kiện đã duyệt theo tên
-            historyEvents = dao.searchHistoryEventsByName(searchKeyword, page, PAGE_SIZE);
-            totalRecords = dao.getTotalSearchHistoryApprovedEventsByName(searchKeyword);
+            if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+                // Nếu có từ khóa và trạng thái lọc, gọi phương thức tìm kiếm kết hợp
+                historyEvents = dao.searchHistoryEventsByNameAndStatus(searchKeyword, statusFilter, page, PAGE_SIZE);
+                totalRecords = dao.getTotalSearchHistoryEventsByNameAndStatus(searchKeyword, statusFilter);
+            } else {
+                historyEvents = dao.searchHistoryEventsByName(searchKeyword, page, PAGE_SIZE);
+                totalRecords = dao.getTotalSearchHistoryApprovedEventsByName(searchKeyword);
+            }
         } else {
-            // Lấy danh sách lịch sử sự kiện đã duyệt mặc định (ví dụ: status = 'completed')
-            historyEvents = dao.getHistoryApprovedEvents(page, PAGE_SIZE);
-            totalRecords = dao.getTotalHistoryApprovedEvents();
+            if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+                // Nếu không có từ khóa nhưng có lọc trạng thái, sử dụng phương thức mới
+                historyEvents = dao.getHistoryEventsByStatus(statusFilter, page, PAGE_SIZE);
+                totalRecords = dao.getTotalHistoryEventsByStatus(statusFilter);
+            } else {
+                // Mặc định: lấy danh sách sự kiện đã duyệt (status = 'active')
+                historyEvents = dao.getHistoryApprovedEvents(page, PAGE_SIZE);
+                totalRecords = dao.getTotalHistoryApprovedEvents();
+            }
         }
-        
+
         int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
-        
         request.setAttribute("events", historyEvents);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("page", page);
         request.setAttribute("searchKeyword", searchKeyword);
+        request.setAttribute("statusFilter", statusFilter);
         request.getRequestDispatcher("/pages/adminPage/viewHistoryApprovedEvents.jsp").forward(request, response);
     }
 }

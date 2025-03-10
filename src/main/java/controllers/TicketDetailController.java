@@ -1,6 +1,7 @@
 package controllers;
 
 import dals.OrderDAO;
+import dals.TicketDAO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,11 +21,11 @@ public class TicketDetailController extends HttpServlet {
         String ticketCode = request.getParameter("ticketCode");
         // Giả sử customerId được lấy từ session (hoặc request parameter) - ví dụ: 2
         int customerId = 2; // Thay thế bằng logic lấy customerId từ session nếu cần
-        
-        OrderDAO orderDAO = new OrderDAO();
-        TicketDetailDTO ticketDetail = orderDAO.getTicketDetail(ticketCode, customerId);
-        
-        if(ticketDetail == null) {
+
+        TicketDAO ticketDAO = new TicketDAO();
+        TicketDetailDTO ticketDetail = ticketDAO.getTicketDetail(ticketCode, customerId);
+
+        if (ticketDetail == null) {
             request.setAttribute("errorMessage", "Không tìm thấy chi tiết vé!");
         } else {
             request.setAttribute("ticketDetail", ticketDetail);

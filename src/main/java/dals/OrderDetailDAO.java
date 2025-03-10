@@ -1,101 +1,99 @@
 package dals;
 
+import models.OrderDetailDTO;
+import utils.DBContext;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import models.OrderDetail;
-import utils.DBContext;
 
 public class OrderDetailDAO extends DBContext {
 
-    /**
-     * Lấy chi tiết đơn hàng theo orderId với thông tin ghế.
-     *
-     * @param orderId Mã đơn hàng
-     * @return OrderDetail chứa dữ liệu hoặc null nếu không tìm thấy.
-     * @throws SQLException Lỗi truy xuất dữ liệu
-     */
-    public OrderDetail getOrderDetail(int orderId) throws SQLException {
-        OrderDetail orderDetail = null;
-        
-        String sql = "SELECT " +
-                "    o.order_id, " +
-                "    o.order_date, " +
-                "    o.total_price, " +
-                "    o.payment_status, " +
-                "    o.transaction_id, " +
-                "    o.created_at AS order_created_at, " +
-                "    c.full_name AS customer_name, " +
-                "    c.email AS customer_email, " +
-                "    e.event_name, " +
-                "    e.location, " +
-                "    org.organization_name, " +
-                "    org.account_holder, " +
-                "    org.account_number, " +
-                "    org.bank_name, " +
-                "    org.created_at AS organizer_created_at, " +
-                "    od.quantity, " +
-                "    MAX(od_total.total_quantity) AS total_quantity, " +
-                "    v.code AS voucher_code, " +
-                "    v.discount_type, " +
-                "    v.discount_value, " +
-                "    (o.total_price - COALESCE(v.discount_value, 0)) AS total_price_after_discount, " +
-                "    SUM(o.total_price) OVER (PARTITION BY org.organization_name) AS total_bill_for_organization, " +
-                "    STRING_AGG(CONCAT(s.seat_row, s.seat_col), ', ') AS seat_list " +
-                "FROM Orders o " +
-                "INNER JOIN Customers c ON o.customer_id = c.customer_id " +
-                "INNER JOIN OrderDetails od ON o.order_id = od.order_id " +
-                "INNER JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id " +
-                "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id " +
-                "INNER JOIN Events e ON st.event_id = e.event_id " +
-                "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id " +
-                "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id " +
-                "LEFT JOIN Ticket t ON od.order_detail_id = t.order_detail_id " +
-                "LEFT JOIN Seats s ON t.seat_id = s.seat_id " +
-                "CROSS APPLY ( " +
-                "    SELECT SUM(od2.quantity) AS total_quantity " +
-                "    FROM OrderDetails od2 " +
-                "    WHERE od2.order_id = o.order_id " +
-                ") AS od_total " +
-                "WHERE o.order_id = ? " +
-                "GROUP BY " +
-                "    o.order_id, o.order_date, o.total_price, o.payment_status, o.transaction_id, " +
-                "    o.created_at, c.full_name, c.email, e.event_name, e.location, " +
-                "    org.organization_name, org.account_holder, org.account_number, org.bank_name, org.created_at, " +
-                "    od.quantity, v.code, v.discount_type, v.discount_value " +
-                "ORDER BY o.order_date DESC;";
-        
+    public OrderDetailDTO getOrderDetailForOrganizer(int organizerId, int orderId) {
+        OrderDetailDTO detail = null;
+     String sql = "SELECT \n"
+        + "    o.order_id,\n"
+        + "    o.order_date,\n"
+        + "    c.full_name AS customerName,\n"
+        + "    c.email AS customerEmail,\n"
+        + "    e.event_name,\n"
+        + "    e.location,\n"
+        + "    CAST(ROUND(o.total_price, 2) AS DECIMAL(10,2)) AS grandTotal,\n"
+        + "    v.code AS voucherCode,\n"
+        + "    v.discount_type,\n"
+        + "    CAST(ISNULL(v.discount_value, 0) AS DECIMAL(10,2)) AS discount_value,\n"
+        + "    CAST(ROUND(\n"
+        + "      CASE \n"
+        + "        WHEN LOWER(v.discount_type) = 'percentage' THEN o.total_price * (v.discount_value / 100.0)\n"
+        + "        ELSE ISNULL(v.discount_value, 0)\n"
+        + "      END, 2) AS DECIMAL(10,2)) AS discountAmount,\n"
+        + "    CAST(ROUND(\n"
+        + "      o.total_price - CASE \n"
+        + "        WHEN LOWER(v.discount_type) = 'percentage' THEN o.total_price * (v.discount_value / 100.0)\n"
+        + "        ELSE ISNULL(v.discount_value, 0)\n"
+        + "      END, 2) AS DECIMAL(10,2)) AS totalAfterDiscount,\n"
+        + "    STRING_AGG(t.ticket_code, ', ') AS seatList,\n"
+        + "    ei.image_url,\n"
+        + "    o.payment_status\n"
+        + "FROM Orders o\n"
+        + "JOIN Customers c ON o.customer_id = c.customer_id\n"
+        + "JOIN OrderDetails od ON o.order_id = od.order_id\n"
+        + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
+        + "JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
+        + "JOIN Events e ON st.event_id = e.event_id\n"
+        + "JOIN Organizers org ON e.organizer_id = org.organizer_id\n"
+        + "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id\n"
+        + "LEFT JOIN Ticket t ON od.order_detail_id = t.order_detail_id\n"
+        + "LEFT JOIN (\n"
+        + "    SELECT event_id, MIN(image_url) AS image_url\n"
+        + "    FROM EventImages\n"
+        + "    GROUP BY event_id\n"
+        + ") ei ON e.event_id = ei.event_id\n"
+        + "WHERE org.organizer_id = ? \n"
+        + "  AND o.order_id = ?\n"
+        + "GROUP BY \n"
+        + "    o.order_id,\n"
+        + "    o.order_date,\n"
+        + "    c.full_name,\n"
+        + "    c.email,\n"
+        + "    e.event_name,\n"
+        + "    e.location,\n"
+        + "    o.total_price,\n"
+        + "    v.code,\n"
+        + "    v.discount_type,\n"
+        + "    v.discount_value,\n"
+        + "    ei.image_url,\n"
+        + "    o.payment_status;";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, orderId);
+            ps.setInt(1, organizerId);
+            ps.setInt(2, orderId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    orderDetail = new OrderDetail();
-                    orderDetail.setOrderId(rs.getInt("order_id"));
-                    orderDetail.setOrderDate(rs.getTimestamp("order_date"));
-                    orderDetail.setTotalPrice(rs.getDouble("total_price"));
-                    orderDetail.setPaymentStatus(rs.getString("payment_status"));
-                    orderDetail.setTransactionId(rs.getString("transaction_id"));
-                    orderDetail.setOrderCreatedAt(rs.getTimestamp("order_created_at"));
-                    orderDetail.setCustomerName(rs.getString("customer_name"));
-                    orderDetail.setCustomerEmail(rs.getString("customer_email"));
-                    orderDetail.setEventName(rs.getString("event_name"));
-                    orderDetail.setLocation(rs.getString("location"));
-                    orderDetail.setOrganizationName(rs.getString("organization_name"));
-                    orderDetail.setAccountHolder(rs.getString("account_holder"));
-                    orderDetail.setAccountNumber(rs.getString("account_number"));
-                    orderDetail.setBankName(rs.getString("bank_name"));
-                    orderDetail.setOrganizerCreatedAt(rs.getTimestamp("organizer_created_at"));
-                    orderDetail.setQuantity(rs.getInt("quantity"));
-                    orderDetail.setTotalQuantity(rs.getInt("total_quantity"));
-                    orderDetail.setVoucherCode(rs.getString("voucher_code"));
-                    orderDetail.setDiscountType(rs.getString("discount_type"));
-                    orderDetail.setDiscountValue(rs.getDouble("discount_value"));
-                    orderDetail.setTotalPriceAfterDiscount(rs.getDouble("total_price_after_discount"));
-                    orderDetail.setTotalBillForOrganization(rs.getDouble("total_bill_for_organization"));
-                    orderDetail.setSeatList(rs.getString("seat_list"));
+                    detail = new OrderDetailDTO();
+                    detail.setOrderId(rs.getInt("order_id"));
+                    detail.setOrderDate(rs.getTimestamp("order_date"));
+                    detail.setCustomerName(rs.getString("customerName"));
+                    detail.setCustomerEmail(rs.getString("customerEmail"));
+                    detail.setEventName(rs.getString("event_name"));
+                    detail.setLocation(rs.getString("location"));
+                    detail.setGrandTotal(rs.getDouble("grandTotal"));
+                    detail.setVoucherCode(rs.getString("voucherCode"));
+                    detail.setDiscount_type(rs.getString("discount_type"));
+                    detail.setDiscount_value(rs.getDouble("discount_value"));
+                    detail.setDiscountAmount(rs.getDouble("discountAmount"));
+                    detail.setTotalAfterDiscount(rs.getDouble("totalAfterDiscount"));
+                    detail.setSeatList(rs.getString("seatList"));
+                    detail.setImage_url(rs.getString("image_url"));
+                    // Set the new payment status field
+                    detail.setPaymentStatus(rs.getString("payment_status"));
                 }
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        return orderDetail;
+        return detail;
     }
+
 }

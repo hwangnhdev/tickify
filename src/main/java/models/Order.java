@@ -16,7 +16,6 @@ public class Order {
     private int customerId;
     private int voucherId;
     private String customerName;
-
     private String eventName;
     private String location;
     private String ticketCode;

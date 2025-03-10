@@ -82,10 +82,6 @@
         <servlet-class>controllers.TicketDetailController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>LoginController</servlet-name>
-        <servlet-class>controllers.LoginController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>ViewCreatedEventsController</servlet-name>
         <servlet-class>controllers.ViewCreatedEventsController</servlet-class>
     </servlet>
@@ -177,8 +173,23 @@
         <servlet-name>ViewApprovedDetailController</servlet-name>
         <servlet-class>controllers.ViewApprovedDetailController</servlet-class>
     </servlet>
-    
     <!-- Define Servlet Mappings -->
+    <servlet>
+        <servlet-name>ViewAllCustomersController</servlet-name>
+        <servlet-class>controllers.ViewAllCustomersController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewDetailAccountController</servlet-name>
+        <servlet-class>controllers.ViewDetailAccountController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeactivateAccountController</servlet-name>
+        <servlet-class>controllers.DeactivateAccountController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UpdateAccountController</servlet-name>
+        <servlet-class>controllers.UpdateAccountController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -246,10 +257,6 @@
     <servlet-mapping>
         <servlet-name>TicketDetailController</servlet-name>
         <url-pattern>/viewTicketDetail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LoginController</servlet-name>
-        <url-pattern>/LoginController</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewCreatedEventsController</servlet-name>
@@ -342,6 +349,22 @@
     <servlet-mapping>
         <servlet-name>ProfileController</servlet-name>
         <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewAllCustomersController</servlet-name>
+        <url-pattern>/ViewAllCustomersController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewDetailAccountController</servlet-name>
+        <url-pattern>/ViewDetailAccountController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeactivateAccountController</servlet-name>
+        <url-pattern>/DeactivateAccountController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateAccountController</servlet-name>
+        <url-pattern>/admin/updateAccount</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

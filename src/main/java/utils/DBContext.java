@@ -18,9 +18,9 @@ public class DBContext {
 
     public DBContext() {
         try {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=Tickify_version_2;trustServerCertificate=true";
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=Tickify_version_3;trustServerCertificate=true";
             String username = "sa";
-            String password = "123456";
+            String password = "admin";
 
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, username, password);
@@ -46,4 +46,5 @@ public class DBContext {
             System.out.println("Connected Not Successfully!");
         }
     }
+    
 }

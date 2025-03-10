@@ -1,103 +1,62 @@
-//package controllers;
-//
-//import dals.OrderDetailDAO;
-//import jakarta.servlet.ServletException;
-//import jakarta.servlet.annotation.WebServlet;
-//import jakarta.servlet.http.HttpServlet;
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.servlet.http.HttpServletResponse;
-//import models.OrderDetail;
-//import java.io.IOException;
-//
-//
-//public class ViewOrderDetailOrganizer extends HttpServlet {
-//
-//    /**
-//     * Xử lý yêu cầu GET: lấy thông tin chi tiết đơn hàng theo orderId.
-//     * Nếu không truyền tham số orderId, mặc định là 1 để test.
-//     */
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        String orderIdStr = request.getParameter("orderId");
-//        int orderId = 1; // Mặc định là 1 để test
-//
-//        if (orderIdStr != null && !orderIdStr.isEmpty()) {
-//            try {
-//                orderId = Integer.parseInt(orderIdStr);
-//            } catch (NumberFormatException e) {
-//                request.setAttribute("errorMessage", "Mã đơn hàng không hợp lệ.");
-//                request.getRequestDispatcher("error.jsp").forward(request, response);
-//                return;
-//            }
-//        }
-//
-//        // Gọi DAO để lấy thông tin đơn hàng
-//        OrderDetailDAO dao = new OrderDetailDAO();
-//        OrderDetail orderDetail = null;
-//        try {
-//            orderDetail = dao.getOrderDetail(orderId);
-//        } catch (Exception e) {
-//            throw new ServletException("Lỗi truy xuất dữ liệu đơn hàng", e);
-//        }
-//
-//        if (orderDetail == null) {
-//            request.setAttribute("errorMessage", "Không tìm thấy đơn hàng có mã: " + orderId);
-//            request.getRequestDispatcher("error.jsp").forward(request, response);
-//        } else {
-//            request.setAttribute("orderDetail", orderDetail);
-//            request.getRequestDispatcher("/pages/organizerPage/viewOrderDetailOrganizer.jsp").forward(request, response);
-//        }
-//    }
-//}
 package controllers;
 
 import dals.OrderDetailDAO;
+import models.OrderDetailDTO;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import models.OrderDetail;
 import java.io.IOException;
 
+@WebServlet(name = "ViewOrderDetailOrganizer", urlPatterns = {"/orderDetail"})
 public class ViewOrderDetailOrganizer extends HttpServlet {
-
-    /**
-     * Xử lý yêu cầu GET: lấy thông tin chi tiết đơn hàng theo orderId. Nếu
-     * không truyền tham số orderId, mặc định là 1 để test.
-     */
+    private static final long serialVersionUID = 1L;
+    
+    public ViewOrderDetailOrganizer() {
+        super();
+    }
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Retrieve orderId from the request
         String orderIdStr = request.getParameter("orderId");
-        int orderId = 1; // Mặc định là 1 để test
-
-        if (orderIdStr != null && !orderIdStr.isEmpty()) {
-            try {
-                orderId = Integer.parseInt(orderIdStr);
-            } catch (NumberFormatException e) {
-                request.setAttribute("errorMessage", "Mã đơn hàng không hợp lệ.");
-                request.getRequestDispatcher("error.jsp").forward(request, response);
-                return;
-            }
+        if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing orderId parameter.");
+            return;
         }
-
-        // Gọi DAO để lấy thông tin đơn hàng
-        OrderDetailDAO dao = new OrderDetailDAO();
-        OrderDetail orderDetail = null;
+        
+        int orderId;
         try {
-            orderDetail = dao.getOrderDetail(orderId);
-        } catch (Exception e) {
-            throw new ServletException("Lỗi truy xuất dữ liệu đơn hàng", e);
+            orderId = Integer.parseInt(orderIdStr);
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid orderId parameter.");
+            return;
         }
-
+        
+        // Set organizerId (defaulted to 1; adjust as needed for your logic)
+        int organizerId = 1;
+        
+        // Call DAO to retrieve the order details
+        OrderDetailDAO dao = new OrderDetailDAO();
+        OrderDetailDTO orderDetail = dao.getOrderDetailForOrganizer(organizerId, orderId);
+        
         if (orderDetail == null) {
-            request.setAttribute("errorMessage", "Không tìm thấy đơn hàng có mã: " + orderId);
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-        } else {
-            request.setAttribute("orderDetail", orderDetail);
-            request.getRequestDispatcher("/pages/organizerPage/viewOrderDetailOrganizer.jsp").forward(request, response);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Order not found.");
+            return;
         }
+        
+        // Set orderDetail as a request attribute and forward to JSP view
+        request.setAttribute("orderDetail", orderDetail);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/viewOrderDetailOrganizer.jsp");
+        dispatcher.forward(request, response);
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
     }
 }

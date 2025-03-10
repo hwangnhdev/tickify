@@ -7,17 +7,20 @@ package dals;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.sql.CallableStatement;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import models.Category;
 import models.Event;
-import models.EventDTO;
+import models.EventDetailDTO;
 import models.EventImage;
+import models.EventSummaryDTO;
 import models.Organizer;
 import models.Seat;
 import models.Showtime;
@@ -38,90 +41,7 @@ public class EventDAO extends DBContext {
      * @param filter one of "all", "pending", "paid", "upcoming", "past".
      * @return List of EventDTO objects.
      */
-    public List<EventDTO> getEventsByOrganizer(int organizerId, String filter) {
-        List<EventDTO> events = new ArrayList<>();
-
-        // Base SQL query, đã thêm eventId
-        String baseSql = "SELECT \n"
-                + "    e.event_id AS eventId,\n"
-                + "    e.event_name AS eventName,\n"
-                + "    MIN(s.start_date) AS startDate,\n"
-                + "    MAX(s.end_date) AS endDate,\n"
-                + "    e.location AS location,\n"
-                + "    (\n"
-                + "        SELECT TOP 1 o.payment_status\n"
-                + "        FROM Orders o\n"
-                + "        JOIN OrderDetails od ON o.order_id = od.order_id\n"
-                + "        JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
-                + "        JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
-                + "        WHERE s2.event_id = e.event_id\n"
-                + "        ORDER BY o.created_at DESC\n"
-                + "    ) AS paymentStatus,\n"
-                + "    (\n"
-                + "        SELECT TOP 1 image_url\n"
-                + "        FROM EventImages\n"
-                + "        WHERE event_id = e.event_id\n"
-                + "        ORDER BY image_id\n"
-                + "    ) AS image\n"
-                + "FROM Events e\n"
-                + "JOIN Showtimes s ON e.event_id = s.event_id\n"
-                + "WHERE e.organizer_id = ? ";
-
-        // Các điều kiện bổ sung theo bộ lọc
-        String extraWhere = "";
-        String groupBy = " GROUP BY e.event_id, e.event_name, e.location ";
-        String havingClause = "";
-
-        if (filter != null && !filter.equalsIgnoreCase("all")) {
-            // Lọc theo payment status: pending hoặc paid
-            if (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid")) {
-                extraWhere += " AND (\n"
-                        + "     SELECT TOP 1 o.payment_status\n"
-                        + "     FROM Orders o\n"
-                        + "     JOIN OrderDetails od ON o.order_id = od.order_id\n"
-                        + "     JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
-                        + "     JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
-                        + "     WHERE s2.event_id = e.event_id\n"
-                        + "     ORDER BY o.created_at DESC\n"
-                        + " ) = ? ";
-            } // Lọc các sự kiện sắp diễn ra (upcoming)
-            else if (filter.equalsIgnoreCase("upcoming")) {
-                havingClause = " HAVING MIN(s.start_date) > GETDATE() ";
-            } // Lọc các sự kiện đã qua (past)
-            else if (filter.equalsIgnoreCase("past")) {
-                havingClause = " HAVING MAX(s.end_date) < GETDATE() ";
-            }
-        }
-
-        String finalSql = baseSql + extraWhere + groupBy + havingClause;
-
-        try ( PreparedStatement ps = connection.prepareStatement(finalSql)) {
-            int paramIndex = 1;
-            ps.setInt(paramIndex++, organizerId);
-            if (filter != null && (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid"))) {
-                ps.setString(paramIndex++, filter);
-            }
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                EventDTO event = new EventDTO();
-                // Ánh xạ trường eventId
-                event.setEventId(rs.getInt("eventId"));
-                event.setEventName(rs.getString("eventName"));
-                event.setStartDate(rs.getDate("startDate"));
-                event.setEndDate(rs.getDate("endDate"));
-                event.setLocation(rs.getString("location"));
-                event.setPaymentStatus(rs.getString("paymentStatus"));
-                event.setImage(rs.getString("image"));
-                events.add(event);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Có thể xử lý lỗi chi tiết hơn tại đây nếu cần
-        }
-        return events;
-    }
-
+    
     // Phương thức để cập nhật sự kiện bằng stored procedure [dbo].[UpdateEventByID]
     public boolean updateEventByID(
             int eventId,
@@ -155,7 +75,7 @@ public class EventDAO extends DBContext {
 
         String sql = "{CALL [dbo].[UpdateEventByID](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
-        try ( CallableStatement stmt = connection.prepareCall(sql)) {
+        try (CallableStatement stmt = connection.prepareCall(sql)) {
             // Thiết lập các tham số đầu vào khớp với stored procedure
             stmt.setInt(1, eventId);
             stmt.setInt(2, customerId);
@@ -226,7 +146,7 @@ public class EventDAO extends DBContext {
         String sql = "{CALL [dbo].[CreateEvent](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
         EventCreationResult result = new EventCreationResult();
 
-        try ( CallableStatement stmt = connection.prepareCall(sql)) {
+        try (CallableStatement stmt = connection.prepareCall(sql)) {
             // Set input parameters (match stored procedure parameters)
             stmt.setInt(1, customerId);
             stmt.setString(2, organizationName);
@@ -428,7 +348,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
                 + "FROM Events "
                 + "WHERE event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -463,7 +383,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT image_id, event_id, image_url, image_title "
                 + "FROM EventImages "
                 + "WHERE event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -493,7 +413,7 @@ public class EventDAO extends DBContext {
                 + "FROM Events e "
                 + "INNER JOIN Organizers o ON e.organizer_id = o.organizer_id "
                 + "WHERE e.event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -526,7 +446,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT showtime_id, event_id, start_date, end_date, status, created_at, updated_at "
                 + "FROM Showtimes "
                 + "WHERE event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -560,7 +480,7 @@ public class EventDAO extends DBContext {
                 + "FROM Showtimes st "
                 + "INNER JOIN TicketTypes tt ON st.showtime_id = tt.showtime_id "
                 + "WHERE st.event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -615,7 +535,7 @@ public class EventDAO extends DBContext {
                 + "INNER JOIN MaxSeats ms ON s.seat_row = ms.seat_row AND CAST(s.seat_col AS INT) = ms.max_seat_col\n"
                 + "WHERE st.event_id = ?\n"
                 + "ORDER BY s.seat_row;";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setInt(2, eventId);
             ResultSet rs = stmt.executeQuery();
@@ -679,7 +599,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
                 + "FROM Events "
                 + "WHERE event_name LIKE ? AND organizer_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             // Thêm ký tự % để tìm kiếm gần đúng
             stmt.setString(1, "%" + eventName + "%");
             stmt.setInt(2, organizerId);
@@ -722,7 +642,7 @@ public class EventDAO extends DBContext {
                 + "                FROM EventImages\n"
                 + "                WHERE image_title = 'logo_banner') ei ON e.event_id = ei.event_id\n"
                 + "                WHERE e.event_name LIKE ? AND e.organizer_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + eventName + "%");
             stmt.setInt(2, organizerId);
             ResultSet rs = stmt.executeQuery();
@@ -795,7 +715,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT ticket_type_id, showtime_id, name, description, price, color, total_quantity, sold_quantity, created_at, updated_at\n"
                 + "FROM     TicketTypes\n"
                 + "WHERE showtime_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, showtimeId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -1333,4 +1253,7 @@ public class EventDAO extends DBContext {
             e.printStackTrace();
         }
     }
+
+
+   
 }

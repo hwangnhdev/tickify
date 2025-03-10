@@ -33,6 +33,15 @@ public class Event {
     private Timestamp createdAt;
     @Expose
     private Timestamp updatedAt;
+    private Timestamp approvedAt; // Thêm thuộc tính này
+
+    public Timestamp getApprovedAt() {
+        return approvedAt;
+    }
+
+    public void setApprovedAt(Timestamp approvedAt) {
+        this.approvedAt = approvedAt;
+    }
 
     public Event() {
     }

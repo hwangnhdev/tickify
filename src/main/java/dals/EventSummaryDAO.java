@@ -8,9 +8,7 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import models.EventSalesSummary;
 import models.SalesHistory;
@@ -35,7 +33,7 @@ public class EventSummaryDAO extends DBContext {
                 + "WHERE o.customer_id = ? AND e.event_id = ? "
                 + "ORDER BY tt.name";
 
-        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, organizerId);
             ps.setInt(2, eventId);
             ResultSet rs = ps.executeQuery();
@@ -72,7 +70,7 @@ public class EventSummaryDAO extends DBContext {
                 + "WHERE o.customer_id = ? AND e.event_id = ? AND t.status = 'Sold' "
                 + "GROUP BY e.event_id, e.event_name";
 
-        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, organizerId);
             ps.setInt(2, eventId);
             ResultSet rs = ps.executeQuery();
@@ -109,7 +107,7 @@ public class EventSummaryDAO extends DBContext {
                 + "GROUP BY CONVERT(DATE, o.order_date) "
                 + "ORDER BY sale_date";
 
-        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, organizerId);
             ps.setInt(2, eventId);
             ps.setDate(3, new java.sql.Date(startDate.getTime()));
@@ -136,7 +134,7 @@ public class EventSummaryDAO extends DBContext {
         List<EventSalesSummary> summaries = new ArrayList<>();
         String sql = "{CALL GetEventRevenueBy24Hours(?, ?, NULL)}"; // NULL to use default end_date
 
-        try ( CallableStatement cs = connection.prepareCall(sql)) {
+        try (CallableStatement cs = connection.prepareCall(sql)) {
             cs.setInt(1, eventId);
             cs.setInt(2, organizerId);
             ResultSet rs = cs.executeQuery();
@@ -164,7 +162,7 @@ public class EventSummaryDAO extends DBContext {
         List<EventSalesSummary> summaries = new ArrayList<>();
         String sql = "{CALL GetEventRevenueBy7Days(?, ?, NULL)}";
 
-        try ( CallableStatement cs = connection.prepareCall(sql)) {
+        try (CallableStatement cs = connection.prepareCall(sql)) {
             cs.setInt(1, eventId);
             cs.setInt(2, organizerId);
             ResultSet rs = cs.executeQuery();
@@ -191,7 +189,7 @@ public class EventSummaryDAO extends DBContext {
         List<EventSalesSummary> summaries = new ArrayList<>();
         String sql = "{CALL GetEventRevenueBy30Days(?, ?, NULL)}";
 
-        try ( CallableStatement cs = connection.prepareCall(sql)) {
+        try (CallableStatement cs = connection.prepareCall(sql)) {
             cs.setInt(1, eventId);
             cs.setInt(2, organizerId);
             ResultSet rs = cs.executeQuery();
@@ -218,7 +216,7 @@ public class EventSummaryDAO extends DBContext {
         List<EventSalesSummary> summaries = new ArrayList<>();
         String sql = "{CALL GetEventRevenueByYearFull(?, ?, ?)}";
 
-        try ( CallableStatement cs = connection.prepareCall(sql)) {
+        try (CallableStatement cs = connection.prepareCall(sql)) {
             cs.setInt(1, eventId);
             cs.setInt(2, organizerId);
             cs.setInt(3, year);
@@ -244,105 +242,105 @@ public class EventSummaryDAO extends DBContext {
         return summaries.isEmpty() ? null : summaries;
     }
 
-    public static void main(String[] args) {
-//        // Tạo đối tượng DAO
+//    public static void main(String[] args) {
+////        // Tạo đối tượng DAO
+////        EventSummaryDAO dao = new EventSummaryDAO();
+////
+////        // 1. Test getSoldTicketsSummary
+////        int organizerId = 2; // ID của Organizer (ví dụ)
+////        int eventId = 2;     // ID của sự kiện "Birthday" (ví dụ)
+////
+////        System.out.println("Testing getSoldTicketsSummary...");
+////        List<TicketSummary> ticketSummaries = dao.getSoldTicketsSummary(organizerId, eventId);
+////        if (ticketSummaries != null && !ticketSummaries.isEmpty()) {
+////            System.out.println("Ticket Summaries for Event ID " + eventId + ":");
+////            for (TicketSummary summary : ticketSummaries) {
+////                System.out.printf("Event: %s, Ticket Type: %s, Total: %d, Sold: %d, Remaining: %d, Percentage: %.2f%%\n",
+////                        summary.getEventName(), summary.getTicketTypeName(), summary.getTotalTickets(),
+////                        summary.getTicketsSold(), summary.getTicketsRemaining(), summary.getSoldPercentage());
+////            }
+////        } else {
+////            System.out.println("No ticket summaries found for Organizer ID " + organizerId + " and Event ID " + eventId);
+////        }
+////        System.out.println("-----------------------------------");
+////
+////        // 2. Test getGrossSalesSummary
+////        System.out.println("Testing getGrossSalesSummary...");
+////        EventSalesSummary salesSummary = dao.getGrossSalesSummary(organizerId, eventId);
+////        if (salesSummary != null) {
+////            System.out.printf("Event: %s, Total Tickets Sold: %d, Gross Sales: %.2f VND\n",
+////                    salesSummary.getEventName(), salesSummary.getTotalTicketsSold(), salesSummary.getGrossSales());
+////        } else {
+////            System.out.println("No sales summary found for Organizer ID " + organizerId + " and Event ID " + eventId);
+////        }
+////        System.out.println("-----------------------------------");
+////
+////        // 3. Test getSalesHistory
+////        System.out.println("Testing getSalesHistory...");
+////        Date startDate = new Date(System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000); // 30 ngày trước
+////        Date endDate = new Date(); // Hôm nay
+////
+////        List<SalesHistory> salesHistory = dao.getSalesHistory(organizerId, eventId, startDate, endDate);
+////        if (salesHistory != null && !salesHistory.isEmpty()) {
+////            System.out.println("Sales History for Event ID " + eventId + " (Last 30 days):");
+////            for (SalesHistory entry : salesHistory) {
+////                System.out.printf("Date: %s, Tickets Sold: %d, Daily Sales: %.2f VND\n",
+////                        entry.getSaleDate(), entry.getTicketsSold(), entry.getDailySales());
+////            }
+////        } else {
+////            System.out.println("No sales history found for Organizer ID " + organizerId + " and Event ID " + eventId);
+////        }
+//
 //        EventSummaryDAO dao = new EventSummaryDAO();
+//        int organizerId = 2;
+//        int eventId = 2;
 //
-//        // 1. Test getSoldTicketsSummary
-//        int organizerId = 2; // ID của Organizer (ví dụ)
-//        int eventId = 2;     // ID của sự kiện "Birthday" (ví dụ)
-//
-//        System.out.println("Testing getSoldTicketsSummary...");
-//        List<TicketSummary> ticketSummaries = dao.getSoldTicketsSummary(organizerId, eventId);
-//        if (ticketSummaries != null && !ticketSummaries.isEmpty()) {
-//            System.out.println("Ticket Summaries for Event ID " + eventId + ":");
-//            for (TicketSummary summary : ticketSummaries) {
-//                System.out.printf("Event: %s, Ticket Type: %s, Total: %d, Sold: %d, Remaining: %d, Percentage: %.2f%%\n",
-//                        summary.getEventName(), summary.getTicketTypeName(), summary.getTotalTickets(),
-//                        summary.getTicketsSold(), summary.getTicketsRemaining(), summary.getSoldPercentage());
+//        // Test getRevenueByYearFull
+//        System.out.println("Testing getRevenueByYearFull...");
+//        List<EventSalesSummary> yearSummary = dao.getRevenueByYearFull(organizerId, eventId, 2025);
+//        if (yearSummary.isEmpty()) {
+//            System.out.println("No data found for getRevenueByYearFull.");
+//        } else {
+//            for (EventSalesSummary summary : yearSummary) {
+//                System.out.printf("Month: %d, Revenue: %.2f, Tickets Sold: %d\n",
+//                        summary.getPeriodDate().getMonth() + 1, summary.getRevenue(), summary.getTotalTicketsSold());
 //            }
-//        } else {
-//            System.out.println("No ticket summaries found for Organizer ID " + organizerId + " and Event ID " + eventId);
 //        }
-//        System.out.println("-----------------------------------");
 //
-//        // 2. Test getGrossSalesSummary
-//        System.out.println("Testing getGrossSalesSummary...");
-//        EventSalesSummary salesSummary = dao.getGrossSalesSummary(organizerId, eventId);
-//        if (salesSummary != null) {
-//            System.out.printf("Event: %s, Total Tickets Sold: %d, Gross Sales: %.2f VND\n",
-//                    salesSummary.getEventName(), salesSummary.getTotalTicketsSold(), salesSummary.getGrossSales());
+//        // Test getRevenueBy30Days
+//        System.out.println("Testing getRevenueBy30Days...");
+//        List<EventSalesSummary> thirtyDaysSummary = dao.getRevenueBy30Days(organizerId, eventId);
+//        if (thirtyDaysSummary.isEmpty()) {
+//            System.out.println("No data found for getRevenueBy30Days.");
 //        } else {
-//            System.out.println("No sales summary found for Organizer ID " + organizerId + " and Event ID " + eventId);
-//        }
-//        System.out.println("-----------------------------------");
-//
-//        // 3. Test getSalesHistory
-//        System.out.println("Testing getSalesHistory...");
-//        Date startDate = new Date(System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000); // 30 ngày trước
-//        Date endDate = new Date(); // Hôm nay
-//
-//        List<SalesHistory> salesHistory = dao.getSalesHistory(organizerId, eventId, startDate, endDate);
-//        if (salesHistory != null && !salesHistory.isEmpty()) {
-//            System.out.println("Sales History for Event ID " + eventId + " (Last 30 days):");
-//            for (SalesHistory entry : salesHistory) {
-//                System.out.printf("Date: %s, Tickets Sold: %d, Daily Sales: %.2f VND\n",
-//                        entry.getSaleDate(), entry.getTicketsSold(), entry.getDailySales());
+//            for (EventSalesSummary summary : thirtyDaysSummary) {
+//                System.out.printf("Date: %s, Revenue: %.2f, Tickets Sold: %d\n",
+//                        summary.getPeriodDate(), summary.getRevenue(), summary.getTotalTicketsSold());
 //            }
-//        } else {
-//            System.out.println("No sales history found for Organizer ID " + organizerId + " and Event ID " + eventId);
 //        }
-
-        EventSummaryDAO dao = new EventSummaryDAO();
-        int organizerId = 2;
-        int eventId = 2;
-
-        // Test getRevenueByYearFull
-        System.out.println("Testing getRevenueByYearFull...");
-        List<EventSalesSummary> yearSummary = dao.getRevenueByYearFull(organizerId, eventId, 2025);
-        if (yearSummary.isEmpty()) {
-            System.out.println("No data found for getRevenueByYearFull.");
-        } else {
-            for (EventSalesSummary summary : yearSummary) {
-                System.out.printf("Month: %d, Revenue: %.2f, Tickets Sold: %d\n",
-                        summary.getPeriodDate().getMonth() + 1, summary.getRevenue(), summary.getTotalTicketsSold());
-            }
-        }
-
-        // Test getRevenueBy30Days
-        System.out.println("Testing getRevenueBy30Days...");
-        List<EventSalesSummary> thirtyDaysSummary = dao.getRevenueBy30Days(organizerId, eventId);
-        if (thirtyDaysSummary.isEmpty()) {
-            System.out.println("No data found for getRevenueBy30Days.");
-        } else {
-            for (EventSalesSummary summary : thirtyDaysSummary) {
-                System.out.printf("Date: %s, Revenue: %.2f, Tickets Sold: %d\n",
-                        summary.getPeriodDate(), summary.getRevenue(), summary.getTotalTicketsSold());
-            }
-        }
-
-        // Test getRevenueBy7Days
-        System.out.println("Testing getRevenueBy7Days...");
-        List<EventSalesSummary> sevenDaysSummary = dao.getRevenueBy7Days(organizerId, eventId);
-        if (sevenDaysSummary.isEmpty()) {
-            System.out.println("No data found for getRevenueBy7Days.");
-        } else {
-            for (EventSalesSummary summary : sevenDaysSummary) {
-                System.out.printf("Date: %s, Revenue: %.2f, Tickets Sold: %d\n",
-                        summary.getPeriodDate(), summary.getRevenue(), summary.getTotalTicketsSold());
-            }
-        }
-
-        // Test getRevenueBy24Hours
-        System.out.println("Testing getRevenueBy24Hours...");
-        List<EventSalesSummary> twentyFourHoursSummary = dao.getRevenueBy24Hours(organizerId, eventId);
-        if (twentyFourHoursSummary.isEmpty()) {
-            System.out.println("No data found for getRevenueBy24Hours.");
-        } else {
-            for (EventSalesSummary summary : twentyFourHoursSummary) {
-                System.out.printf("DateTime: %s, Revenue: %.2f, Tickets Sold: %d\n",
-                        summary.getPeriod(), summary.getRevenue(), summary.getTotalTicketsSold());
-            }
-        }
-    }
+//
+//        // Test getRevenueBy7Days
+//        System.out.println("Testing getRevenueBy7Days...");
+//        List<EventSalesSummary> sevenDaysSummary = dao.getRevenueBy7Days(organizerId, eventId);
+//        if (sevenDaysSummary.isEmpty()) {
+//            System.out.println("No data found for getRevenueBy7Days.");
+//        } else {
+//            for (EventSalesSummary summary : sevenDaysSummary) {
+//                System.out.printf("Date: %s, Revenue: %.2f, Tickets Sold: %d\n",
+//                        summary.getPeriodDate(), summary.getRevenue(), summary.getTotalTicketsSold());
+//            }
+//        }
+//
+//        // Test getRevenueBy24Hours
+//        System.out.println("Testing getRevenueBy24Hours...");
+//        List<EventSalesSummary> twentyFourHoursSummary = dao.getRevenueBy24Hours(organizerId, eventId);
+//        if (twentyFourHoursSummary.isEmpty()) {
+//            System.out.println("No data found for getRevenueBy24Hours.");
+//        } else {
+//            for (EventSalesSummary summary : twentyFourHoursSummary) {
+//                System.out.printf("DateTime: %s, Revenue: %.2f, Tickets Sold: %d\n",
+//                        summary.getPeriod(), summary.getRevenue(), summary.getTotalTicketsSold());
+//            }
+//        }
+//    }
 }

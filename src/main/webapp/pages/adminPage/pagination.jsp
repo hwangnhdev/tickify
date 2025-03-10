@@ -1,4 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:if test="${totalPages gt 1}">
     <div class="mt-6 flex justify-center items-center space-x-4">
         <c:set var="displayPages" value="5" />
@@ -12,12 +13,15 @@
             <c:set var="endPage" value="${totalPages}" />
         </c:if>
 
-        <!-- Nút First và Prev -->
+        <!-- NÃºt First vÃ  Prev -->
         <c:if test="${page gt 1}">
             <c:url var="urlFirst" value="${baseUrl}">
                 <c:param name="page" value="1" />
                 <c:if test="${not empty selectedStatus}">
                     <c:param name="status" value="${selectedStatus}" />
+                </c:if>
+                <c:if test="${not empty param.search}">
+                    <c:param name="search" value="${param.search}" />
                 </c:if>
             </c:url>
             <a class="bg-blue-600 text-white py-2 px-4 rounded" href="${urlFirst}">First</a>
@@ -27,11 +31,14 @@
                 <c:if test="${not empty selectedStatus}">
                     <c:param name="status" value="${selectedStatus}" />
                 </c:if>
+                <c:if test="${not empty param.search}">
+                    <c:param name="search" value="${param.search}" />
+                </c:if>
             </c:url>
             <a class="bg-blue-600 text-white py-2 px-4 rounded" href="${urlPrev}">Prev</a>
         </c:if>
 
-        <!-- S? trang -->
+        <!-- Hiá»ƒn thá»‹ sá»‘ trang -->
         <c:forEach begin="${startPage}" end="${endPage}" var="i">
             <c:choose>
                 <c:when test="${i eq page}">
@@ -43,18 +50,24 @@
                         <c:if test="${not empty selectedStatus}">
                             <c:param name="status" value="${selectedStatus}" />
                         </c:if>
+                        <c:if test="${not empty param.search}">
+                            <c:param name="search" value="${param.search}" />
+                        </c:if>
                     </c:url>
                     <a class="bg-blue-600 text-white py-2 px-4 rounded" href="${urlPage}">${i}</a>
                 </c:otherwise>
             </c:choose>
         </c:forEach>
 
-        <!-- Nút Next và Last -->
+        <!-- NÃºt Next vÃ  Last -->
         <c:if test="${page lt totalPages}">
             <c:url var="urlNext" value="${baseUrl}">
                 <c:param name="page" value="${page + 1}" />
                 <c:if test="${not empty selectedStatus}">
                     <c:param name="status" value="${selectedStatus}" />
+                </c:if>
+                <c:if test="${not empty param.search}">
+                    <c:param name="search" value="${param.search}" />
                 </c:if>
             </c:url>
             <a class="bg-blue-600 text-white py-2 px-4 rounded" href="${urlNext}">Next</a>
@@ -63,6 +76,9 @@
                 <c:param name="page" value="${totalPages}" />
                 <c:if test="${not empty selectedStatus}">
                     <c:param name="status" value="${selectedStatus}" />
+                </c:if>
+                <c:if test="${not empty param.search}">
+                    <c:param name="search" value="${param.search}" />
                 </c:if>
             </c:url>
             <a class="bg-blue-600 text-white py-2 px-4 rounded" href="${urlLast}">Last</a>

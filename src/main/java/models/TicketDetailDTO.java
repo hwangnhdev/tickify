@@ -3,30 +3,39 @@ package models;
 import java.util.Date;
 
 /**
- * @author Duong Minh Kiet - CE180166
- *
- * DTO hiển thị chi tiết vé (View Ticket Detail) cho khách hàng.
+ * DTO hiển thị chi tiết vé (View Ticket Detail) cho khách hàng. Lớp này được
+ * xây dựng từ các entity Ticket, Event, OrderDetail, User,... Chỉ chứa những
+ * thông tin cần thiết cho hiển thị.
  */
 public class TicketDetailDTO {
 
-    private String orderCode;          // Mã đơn hàng (ticket_code)
-    private String ticketStatus;       // Trạng thái của vé
-    private String paymentStatus;      // Trạng thái thanh toán
+    // Thông tin cơ bản của vé & đơn hàng
+    private String orderCode;          // Mã đơn hàng (có thể trùng hoặc khác với ticketCode tùy nghiệp vụ)
+    private String ticketStatus;       // Trạng thái của vé (lấy từ Ticket.status)
+    private String paymentStatus;      // Trạng thái thanh toán (lấy từ hệ thống thanh toán)
+
+    // Thông tin sự kiện
     private Date startDate;            // Ngày bắt đầu sự kiện
     private Date endDate;              // Ngày kết thúc sự kiện
     private String location;           // Địa điểm sự kiện
-    private String seat;               // Ghế (sẽ là kết hợp của seat_row và seat_col)
     private String eventName;          // Tên sự kiện
-    private double ticketPrice;        // Giá vé
+    private double ticketPrice;        // Giá vé (tương ứng với Ticket.price)
     private String eventImage;         // URL hình ảnh của sự kiện
+
+    // Thông tin ghế (nếu áp dụng)
+    private String seat;               // Ghế (kết hợp của seat_row và seat_col)
+
+    // Thông tin người mua (nếu cần hiển thị)
     private String buyerName;          // Tên người mua
     private String buyerEmail;         // Email người mua
     private String buyerPhone;         // Số điện thoại người mua
     private String buyerAddress;       // Địa chỉ người mua
-    private String ticketType;         // Loại vé
-    private int quantity;              // Số lượng vé trong chi tiết đơn hàng
-    private double amount;             // Số tiền của chi tiết vé (có thể bằng ticketPrice)
-    private double originalTotalAmount;// Tổng tiền ban đầu của đơn hàng
+
+    // Thông tin giao dịch / voucher (nếu cần)
+    private String ticketType;         // Loại vé (ví dụ: Regular, VIP,...)
+    private int quantity;              // Số lượng vé
+    private double amount;             // Tổng tiền của chi tiết vé (có thể bằng ticketPrice * quantity)
+    private double originalTotalAmount;// Tổng tiền ban đầu của đơn hàng (trước giảm giá)
     private String voucherApplied;     // Có áp dụng voucher hay không (Yes/No)
     private String voucherCode;        // Mã voucher (nếu có)
     private double discount;           // Số tiền giảm giá
@@ -81,14 +90,6 @@ public class TicketDetailDTO {
         this.location = location;
     }
 
-    public String getSeat() {
-        return seat;
-    }
-
-    public void setSeat(String seat) {
-        this.seat = seat;
-    }
-
     public String getEventName() {
         return eventName;
     }
@@ -111,6 +112,14 @@ public class TicketDetailDTO {
 
     public void setEventImage(String eventImage) {
         this.eventImage = eventImage;
+    }
+
+    public String getSeat() {
+        return seat;
+    }
+
+    public void setSeat(String seat) {
+        this.seat = seat;
     }
 
     public String getBuyerName() {
