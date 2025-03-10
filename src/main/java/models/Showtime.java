@@ -10,19 +10,27 @@ import java.util.List;
 
 /**
  *
- * @author Nguyen Huy Hoang - CE182102
+ * @author Tang Thanh Vui - CE180901
  */
 public class Showtime {
 
     private int showtimeId;
     private int eventId;
-    private Timestamp startDate;
-    private Timestamp endDate;
+    private Timestamp startDate; // Changed from Date to Timestamp
+    private Timestamp endDate;   // Changed from Date to Timestamp
     private String status;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private Timestamp createdAt; // Changed from Date to Timestamp
+    private Timestamp updatedAt; // Changed from Date to Timestamp
+    
+    private List<TicketType> ticketTypes;
 
-    private List<TicketType> ticketTypes; // Vui add to store Json
+    public List<TicketType> getTicketTypes() {
+        return ticketTypes;
+    }
+
+    public void setTicketTypes(List<TicketType> ticketTypes) {
+        this.ticketTypes = ticketTypes;
+    }
 
     public Showtime() {
     }
@@ -35,17 +43,6 @@ public class Showtime {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt, List<TicketType> ticketTypes) {
-        this.showtimeId = showtimeId;
-        this.eventId = eventId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.ticketTypes = ticketTypes;
     }
 
     public int getShowtimeId() {
@@ -104,24 +101,4 @@ public class Showtime {
         this.updatedAt = updatedAt;
     }
 
-    public List<TicketType> getTicketTypes() {
-        return ticketTypes;
-    }
-
-    public void setTicketTypes(List<TicketType> ticketTypes) {
-        this.ticketTypes = ticketTypes;
-    }
-    
-    @Override
-    public String toString() {
-        return "Showtime{"
-                + "showtimeId=" + showtimeId
-                + ", eventId=" + eventId
-                + ", startDate=" + startDate
-                + ", endDate=" + endDate
-                + ", status='" + status + '\''
-                + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt
-                + '}';
-    }
 }
