@@ -66,14 +66,16 @@ public class EventOverviewController extends HttpServlet {
         EventDAO eventDAO = new EventDAO();
 
         // Lấy dữ liệu tổng quan
-        List<Double> totals = eventDAO.getTotalRevenueOfEventById(1, 1); // Cho eventId, organizerId là 1 to test
+        List<Double> totals = eventDAO.getTotalRevenueOfEventById(111); // Cho eventId, organizerId là 1 to test
         double totalRevenue = totals.get(0);
         int ticketsSold = totals.get(1).intValue();
-        int ticketsRemaining = totals.get(2).intValue();
-        double fillRate = totals.get(3);
+        int totalTickets = totals.get(2).intValue();
+        int ticketsRemaining = totals.get(3).intValue();
+        double fillRate = totals.get(4);
 
         request.setAttribute("totalRevenue", totalRevenue);
         request.setAttribute("ticketsSold", ticketsSold);
+        request.setAttribute("totalTickets", totalTickets);
         request.setAttribute("ticketsRemaining", ticketsRemaining);
         request.setAttribute("fillRate", fillRate);
 
@@ -98,7 +100,7 @@ public class EventOverviewController extends HttpServlet {
 //        int organizerId = Integer.parseInt(request.getParameter("organizerId"));
 //        int year = Integer.parseInt(request.getParameter("year"));
 
-        List<Double> monthlyRevenue = eventDAO.getTotalRevenueChartOfEventById(1, 1, 2025); // Set value of eventid, organizer, year are 1, 1, 2025
+        List<Double> monthlyRevenue = eventDAO.getTotalRevenueChartOfEventById(111, 2025); // Set value of eventid, organizer, year are 1, 1, 2025
         if (monthlyRevenue == null || monthlyRevenue.isEmpty()) {
             monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
         }

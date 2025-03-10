@@ -7,6 +7,7 @@
         <title>Event Overview Statistic</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     </head>
     <body class="bg-gray-900 text-white">
@@ -23,6 +24,10 @@
                         <p id="ticketsSold" class="text-3xl font-bold text-white mt-2">${ticketsSold}</p>
                     </div>
                     <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-green-400">Total Tickets</h3>
+                        <p id="ticketsSold" class="text-3xl font-bold text-white mt-2">${totalTickets}</p>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
                         <h3 class="text-lg font-bold text-green-400">Tickets Remaining</h3>
                         <p id="ticketsRemaining" class="text-3xl font-bold text-white mt-2">${ticketsRemaining}</p>
                     </div>
@@ -30,8 +35,10 @@
                         <h3 class="text-lg font-bold text-green-400">Fill Rate</h3>
                         <p id="fillRate" class="text-3xl font-bold text-white mt-2">${fillRate}%</p>
                     </div>
+                    <div>
+                        <canvas id="fillRateChart" class="h-48"></canvas>
+                    </div>
                 </div>
-
 
                 <!-- Biểu đồ doanh thu -->
                 <div class="bg-gray-800 rounded-lg shadow-lg p-6 mt-6">
@@ -57,6 +64,49 @@
         </section>
 
         <script>
+            function initFillRateChart(fillRate) {
+                const ctx = document.getElementById('fillRateChart').getContext('2d');
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Filled', 'Remaining'],
+                        datasets: [{
+                            data: [fillRate, 100 - fillRate], // Phần trăm đã bán và còn lại
+                            backgroundColor: ['#22c55e', '#374151'], // Xanh lá và xám đậm
+                            borderWidth: 2,
+                            hoverOffset: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#fff' }
+                            },
+                            datalabels: {
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold',
+                                    size: 16
+                                },
+                                formatter: (value, context) => {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels] // Kích hoạt plugin
+                });
+            }
+
+            const fillRateText = document.getElementById('fillRate').innerText;
+            const fillRateValue = parseFloat(fillRateText.replace('%', '')) || 0;
+
+            initFillRateChart(fillRateValue);
+
             let revenueChart;
 
             function initChart() {

@@ -1558,7 +1558,7 @@ async function submitEventForm() {
     // Get eventId from URL or session
     const urlParams = new URLSearchParams(window.location.search);
     const eventId = urlParams.get('eventId') || 577; // ID sự kiện cần cập nhật
-    const customerId = 9; // Thay bằng cách lấy customerId thực tế từ session hoặc context
+    const customerId = document.querySelector('#event-info .organizer-row input[name="customerId"]')?.value || '';
 
     // Thu thập dữ liệu từ form
     const eventName = document.querySelector('#event-info input[placeholder="Event Name"]')?.value.trim() || '';

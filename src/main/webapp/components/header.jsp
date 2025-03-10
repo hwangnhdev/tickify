@@ -128,7 +128,7 @@
             <div class="user-actions-header flex items-center space-x-4">
                 <c:choose>
                     <c:when test="${not empty sessionScope.customerId}">
-                        <a class="border border-white text-white rounded-full px-4 py-2" type="button" href="createNewEvent">Create Event</a>
+                        <a class="border border-white text-white rounded-full px-4 py-2" type="button" href="createNewEvent?customerId=${sessionScope.customerId}">Create Event</a>
                         <button class="text-white flex items-center"
                                 onclick="window.location.href = '<%= request.getContextPath()%>/viewAllTickets'">
                             <i class="fas fa-ticket-alt"></i>

@@ -81,6 +81,10 @@ public class CreateNewEventController extends HttpServlet {
         // Set attribute for DAO
         session.setAttribute("listCategories", listCategories);
 
+        // Get customerID
+        String customerIdParam = request.getParameter("customerId");
+        session.setAttribute("customerId", customerIdParam);
+
         // Forward to JSP
         request.getRequestDispatcher("pages/organizerPage/createEvent.jsp").forward(request, response);
     }

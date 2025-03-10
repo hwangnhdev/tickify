@@ -689,6 +689,7 @@
                                                <label class="block text-gray-300 mb-2">Organizer Name</label>
                                                <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" 
                                                       value="${organizer.organizationName}" placeholder="Organizer Name" required>
+                                    <input value="${organizer.customerId}" hidden name="customerId">
                                     <span class="error-message" id="organizerName_error"></span>
                                 </div>
                             </div>
@@ -708,12 +709,12 @@
                                 <option value="seatedevent" <c:if test="${event.eventType == 'seatedevent'}">selected</c:if>>Seated Event</option>
                                 </select>
                                 <span class="error-message" id="eventType_error"></span>
-                        </div>
+                            </div>
 
-                        <!-- Seat Management (if seated event) -->
-                        <div id="seatSection" class="">
-                            <h5 class="text-white mb-3">Seat Management (Seated Event)</h5>
-                            <div id="seatsContainer" class="space-y-4">
+                            <!-- Seat Management (if seated event) -->
+                            <div id="seatSection" class="">
+                                <h5 class="text-white mb-3">Seat Management (Seated Event)</h5>
+                                <div id="seatsContainer" class="space-y-4">
                                 <c:forEach var="seat" items="${seats}" varStatus="loop">
                                     <div class="seat-input flex flex-col md:flex-row gap-4">
                                         <div class="flex-1">

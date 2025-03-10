@@ -513,7 +513,7 @@ function updateShowTimeLabel(input) {
     }
 }
 
-// Toggle Individual Show Time
+ // Toggle Individual Show Time
 function toggleShowTime(button) {
     const showTime = button.closest('.show-time');
     const details = showTime.querySelector('.show-time-details');
@@ -575,7 +575,7 @@ function toggleShowTime(button) {
         if (labelSpan) {
             labelSpan.textContent = `Show Time #${showTimeIndex}`;
         }
-        details.style.height = `${contentHeight}px`; // Mở rộng
+        details.style.height = `auto`; // Mở rộng
     }
 }
 
@@ -1572,12 +1572,13 @@ async function submitEventForm() {
     const isPaymentInfoValidResult = isPaymentInfoValid();
 
     if (!isEventInfoValidResult || !isTimeLogisticsValidResult || !isPaymentInfoValidResult) {
-        alert('Please complete all required fields in all tabs before submitting.');
+        showErrorPopup('Please complete all required fields in all tabs before submitting.');
         return;
     }
 
     // ... (giữ nguyên phần thu thập dữ liệu và gửi request)
     const eventName = document.querySelector('#event-info input[placeholder="Event Name"]')?.value.trim() || '';
+    const customerId = document.querySelector('#event-info .organizer-row input[name="customerId"]')?.value || '';
     const eventCategory = document.querySelector('#event-info select')?.value || '';
     const province = document.getElementById('province')?.value || '';
     const district = document.getElementById('district')?.value || '';
@@ -1684,7 +1685,7 @@ async function submitEventForm() {
     }
 
     const eventData = {
-        customerId: 8,
+        customerId: customerId,
         organizationName: organizerName,
         accountHolder: accountHolder,
         accountNumber: bankAccount,
@@ -1700,7 +1701,7 @@ async function submitEventForm() {
         organizerImageUrl: organizerLogo,
         showTimes: showTimes,
         ticketTypes: ticketTypes,
-        seats: seats.length > 0 ? seats : null // Gửi tất cả ghế với ticketTypeName từ ticketTypes cho tất cả showtimes
+        seats: seats.length > 0 ? seats : null
     };
 
     console.log("Final event data being sent:", JSON.stringify(eventData, null, 2));
@@ -1715,14 +1716,14 @@ async function submitEventForm() {
         const result = await response.json();
         console.log("Server response:", result);
         if (result.success) {
-            alert('Event created successfully!');
-            window.location.href = result.redirectUrl || 'OrganizerEventController?success=true';
+            console.log("Success detected, showing popup"); // Kiểm tra điều kiện
+            showSuccessPopup();
         } else {
-            alert('Failed to create event: ' + (result.message || 'Unknown error.'));
+            showErrorPopup('Failed to create event: ' + (result.message || 'Unknown error.'));
         }
     } catch (error) {
         console.error('Error submitting event:', error);
-        alert('An error occurred while submitting the form: ' + error.message);
+        showErrorPopup('An error occurred while submitting the form: ' + error.message);
     }
 }
 
@@ -1753,7 +1754,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSaveButtonState();
     });
 });
-
 // Validation tab event information
 document.addEventListener('DOMContentLoaded', () => {
     // Event Name
@@ -1864,7 +1864,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
 // Time & Logistics
 document.addEventListener('DOMContentLoaded', () => {
     // Event Type
@@ -1894,3 +1893,48 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('change', () => updateShowTimeLabel(input));
     });
 });
+  // pop -up
+// Hiển thị popup thành công
+function showSuccessPopup() {
+    const popup = document.getElementById('successPopup');
+    popup.classList.add('show');
+}
+// Đóng popup thành công
+function closeSuccessPopup() {
+    const popup = document.getElementById('successPopup');
+    popup.classList.remove('show');
+    // Chuyển hướng sau khi đóng popup
+    window.location.href = 'OrganizerEventController?success=true';
+}
+
+// Hàm hiển thị popup lỗi (tùy chọn, nếu muốn thống nhất giao diện)
+function showErrorPopup(message) {
+    const popup = document.createElement('div');
+    popup.id = 'errorPopup';
+    popup.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    popup.innerHTML = `
+<div class="bg-gray-800 rounded-lg p-6 max-w-sm w-full text-center">
+    <div class="flex justify-center mb-4">
+        <i class="fas fa-exclamation-circle text-red-500 text-4xl"></i>
+    </div>
+    <h3 class="text-xl font-bold text-white mb-2">Error</h3>
+    <p class="text-gray-300 mb-4">${message}</p>
+    <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200" onclick="this.closest('#errorPopup').remove()">OK</button>
+</div>
+`;
+    document.body.appendChild(popup);
+}
+// Hiển thị popup lỗi với thông điệp tùy chỉnh
+function showErrorPopup(message) {
+    const popup = document.getElementById('errorPopup');
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message; // Cập nhật nội dung thông điệp lỗi
+    popup.classList.add('show');
+    console.log("Showing error popup with message:", message); // Log để kiểm tra
+}
+// Đóng popup lỗi
+function closeErrorPopup() {
+    const popup = document.getElementById('errorPopup');
+    popup.classList.remove('show');
+    console.log("Error popup closed"); // Log để kiểm tra
+}
