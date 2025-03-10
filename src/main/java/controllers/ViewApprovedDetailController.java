@@ -12,7 +12,7 @@ import java.util.List;
 import models.Event;
 import models.EventImage;
 
-@WebServlet(name = "ViewApprovedDetailController", urlPatterns = {"/admin/viewApprovedDetail"})
+
 public class ViewApprovedDetailController extends HttpServlet {
 
     @Override

@@ -12,15 +12,12 @@
   <!-- JavaScript validation script cho form search -->
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // Chỉ lấy form search dựa theo ID
       const searchForm = document.getElementById("searchForm");
       if(searchForm) {
         searchForm.addEventListener("submit", function(event) {
           const searchInput = searchForm.querySelector('input[name="searchOrder"]');
           const trimmedValue = searchInput.value.trim();
           const regex = /^[a-zA-Z\s]+$/;
-          
-          // Nếu muốn cho phép submit khi không nhập gì (để hiển thị tất cả) thì bỏ đoạn kiểm tra rỗng
           if(trimmedValue !== "" && !regex.test(trimmedValue)) {
             event.preventDefault();
             alert("Tên khách hàng chỉ được chứa chữ cái và khoảng trắng.");
@@ -45,7 +42,7 @@
         <span class="text-lg font-bold text-green-500">Organizer Center</span>
       </div>
       <nav class="space-y-4">
-        <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="/Tickify/pages/eventOverview.jsp"><i class="fas fa-chart-pie mr-2"></i>Overview</a>
+        <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/pages/eventOverview.jsp"><i class="fas fa-chart-pie mr-2"></i>Overview</a>
         <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventAnalyst.jsp"><i class="fas fa-chart-line mr-2"></i>Analyst</a>
         <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="updateEvent"><i class="fas fa-edit mr-2"></i>Edit Event</a>
         <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="seatingChart.jsp"><i class="fas fa-chair mr-2"></i>Seat Map</a>
@@ -71,7 +68,7 @@
       <section class="flex-1 p-4 overflow-y-auto">
         <!-- Filter and Search Section -->
         <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-800 p-4 rounded-lg shadow-md">
-          <!-- Filter Form (không liên quan đến search) -->
+          <!-- Filter Form -->
           <form id="filterForm" action="${pageContext.request.contextPath}/organizerOrders" method="get" class="flex items-center space-x-4">
             <label for="paymentStatus" class="mr-2 text-white font-medium">Payment Status:</label>
             <select id="paymentStatus" name="paymentStatus" class="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-green-500">
@@ -116,9 +113,6 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                   <i class="fas fa-map-marker-alt mr-2"></i>Location
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                  <i class="fas fa-barcode mr-2"></i>Ticket Code
-                </th>
               </tr>
             </thead>
             <tbody class="bg-gray-800 divide-y divide-gray-700">
@@ -129,18 +123,17 @@
                     <fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
                   </td>
                   <td class="px-6 py-4 text-sm">
-                    <fmt:formatNumber value="${order.totalPrice}" type="number" pattern="#,##0 đ"/>
+                    <fmt:formatNumber value="${order.grandTotal}" type="number" pattern="#,##0 đ"/>
                   </td>
                   <td class="px-6 py-4 text-sm">${order.paymentStatus}</td>
                   <td class="px-6 py-4 text-sm">${order.customerName}</td>
                   <td class="px-6 py-4 text-sm">${order.eventName}</td>
                   <td class="px-6 py-4 text-sm">${order.location}</td>
-                  <td class="px-6 py-4 text-sm">${order.ticketCode}</td>
                 </tr>
               </c:forEach>
               <c:if test="${empty orders}">
                 <tr>
-                  <td colspan="8" class="px-6 py-4 text-center text-gray-400">No orders found.</td>
+                  <td colspan="7" class="px-6 py-4 text-center text-gray-400">No orders found.</td>
                 </tr>
               </c:if>
             </tbody>
