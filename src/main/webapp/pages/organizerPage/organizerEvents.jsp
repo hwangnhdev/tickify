@@ -174,7 +174,7 @@
                                 <!-- Phần dưới: Các nút hành động, căn giữa -->
                                 <div class="p-4 border-t border-gray-700 flex justify-center">
                                     <button type="button" 
-                                            onclick="window.open('${pageContext.request.contextPath}/pages/eventOverview.jsp', '_blank')" 
+                                            onclick="window.open('${pageContext.request.contextPath}/eventOverview?eventId=${event.eventId}', '_blank')" 
                                             class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
                                         <i class="fas fa-chart-pie text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Overview</span>

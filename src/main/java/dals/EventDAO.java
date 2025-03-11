@@ -1141,16 +1141,17 @@ public class EventDAO extends DBContext {
         List<Double> listTotals = new ArrayList<>();
 
         String sql = "SELECT \n"
+                + "    s.event_id,\n"
                 + "    COALESCE(SUM(od.quantity * od.price), 0) AS total_revenue,\n"
                 + "    COALESCE(SUM(od.quantity), 0) AS tickets_sold,\n"
-                + "    COALESCE(SUM(tt.total_quantity), 0) AS total_tickets,\n"
-                + "    COALESCE(SUM(tt.total_quantity) - SUM(od.quantity), 0) AS tickets_remaining,\n"
-                + "    COALESCE(CAST((SUM(od.quantity) * 100.0 / NULLIF(SUM(tt.total_quantity), 0)) AS DECIMAL(5,2)), 0) AS fill_rate\n"
-                + "FROM Orders o\n"
-                + "JOIN OrderDetails od ON o.order_id = od.order_id\n"
-                + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
-                + "JOIN Showtimes s ON tt.showtime_id = s.showtime_id\n"
-                + "WHERE o.payment_status = 'paid' AND s.event_id = ?\n"
+                + "    SUM(tt.total_quantity) AS total_tickets,\n"
+                + "    SUM(tt.total_quantity) - COALESCE(SUM(od.quantity), 0) AS tickets_remaining,\n"
+                + "    (COALESCE(SUM(od.quantity), 0) * 100.0 / NULLIF(SUM(tt.total_quantity), 0)) AS fill_rate\n"
+                + "FROM Showtimes s\n"
+                + "JOIN TicketTypes tt ON tt.showtime_id = s.showtime_id \n"
+                + "LEFT JOIN OrderDetails od ON od.ticket_type_id = tt.ticket_type_id \n"
+                + "LEFT JOIN Orders o ON o.order_id = od.order_id\n"
+                + "WHERE s.event_id = ?\n"
                 + "GROUP BY s.event_id;";
 
         try {
@@ -1175,7 +1176,33 @@ public class EventDAO extends DBContext {
     public List<Double> getTotalRevenueChartOfEventById(int eventId, int year) {
         List<Double> monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
-        String sql = "{call GetEventRevenueByYear(?, ?)}";
+        String sql = "WITH RevenueByMonth AS (\n"
+                + "    SELECT \n"
+                + "        MONTH(o.order_date) AS Month,\n"
+                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity) AS TicketQuantity\n"
+                + "    FROM [dbo].[Orders] o\n"
+                + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
+                + "    INNER JOIN [dbo].[TicketTypes] tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "    INNER JOIN [dbo].[Showtimes] st ON tt.showtime_id = st.showtime_id\n"
+                + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
+                + "    WHERE \n"
+                + "        e.event_id = ? -- Thay bằng ID của sự kiện cần tìm\n"
+                + "        AND YEAR(o.order_date) = ? -- Thay bằng năm cần tìm\n"
+                + "    GROUP BY MONTH(o.order_date)\n"
+                + ")\n"
+                + "\n"
+                + "SELECT \n"
+                + "    m.Month,\n"
+                + "    ISNULL(rm.Revenue, 0) AS Revenue,\n"
+                + "    ISNULL(rm.TicketQuantity, 0) AS TicketQuantity\n"
+                + "FROM (\n"
+                + "    SELECT 1 AS Month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION \n"
+                + "    SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION \n"
+                + "    SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12\n"
+                + ") m\n"
+                + "LEFT JOIN RevenueByMonth rm ON m.Month = rm.Month\n"
+                + "ORDER BY m.Month;";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -1184,7 +1211,7 @@ public class EventDAO extends DBContext {
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
-                int month = rs.getInt("Month") - 1; // MONTH trả về 1-12, List index là 0-11
+                int month = rs.getInt("Month") - 1;
                 double revenue = rs.getDouble("Revenue");
                 monthlyRevenue.set(month, revenue);
             }

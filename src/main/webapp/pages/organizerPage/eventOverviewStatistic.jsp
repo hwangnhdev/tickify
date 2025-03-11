@@ -11,6 +11,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     </head>
     <body class="bg-gray-900 text-white">
+        <input type="hidden" id="eventId" value="${eventId}">
         <section class="flex-1 p-4 overflow-y-auto">
             <div class="w-full p-4 space-y-6">
                 <!-- Thống kê tổng quan -->
@@ -24,12 +25,12 @@
                         <p id="ticketsSold" class="text-3xl font-bold text-white mt-2">${ticketsSold}</p>
                     </div>
                     <div class="bg-gray-800 rounded-lg shadow-lg p-6">
-                        <h3 class="text-lg font-bold text-green-400">Total Tickets</h3>
-                        <p id="ticketsSold" class="text-3xl font-bold text-white mt-2">${totalTickets}</p>
-                    </div>
-                    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
                         <h3 class="text-lg font-bold text-green-400">Tickets Remaining</h3>
                         <p id="ticketsRemaining" class="text-3xl font-bold text-white mt-2">${ticketsRemaining}</p>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-green-400">Total Tickets</h3>
+                        <p id="ticketsSold" class="text-3xl font-bold text-white mt-2">${totalTickets}</p>
                     </div>
                     <div class="bg-gray-800 rounded-lg shadow-lg p-6">
                         <h3 class="text-lg font-bold text-green-400">Fill Rate</h3>
@@ -46,12 +47,12 @@
                     <div class="bg-gray-800 rounded-lg shadow-lg p-6">
                         <h3 class="text-lg font-bold text-green-400 mb-4">Select Year</h3>
                         <select id="yearSelect" class="bg-gray-700 text-white p-2 rounded">
-                            <option value="2023">2020</option>
-                            <option value="2023">2021</option>
-                            <option value="2023">2022</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
                             <option value="2023">2023</option>
                             <option value="2024">2024</option>
-                            <option value="2025" selected>2025</option>
+                            <option value="2025">2025</option>
                             <option value="2026">2026</option>
                         </select>
                     </div>
@@ -64,19 +65,28 @@
         </section>
 
         <script>
+            // Lấy eventId từ input hidden
+            const eventId = document.getElementById('eventId').value;
+
+            // Lấy năm hiện tại
+            const currentYear = new Date().getFullYear();
+
+            // Đặt năm mặc định cho dropdown
+            const yearSelect = document.getElementById('yearSelect');
+            yearSelect.value = currentYear;
+
             function initFillRateChart(fillRate) {
                 const ctx = document.getElementById('fillRateChart').getContext('2d');
-
                 new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Filled', 'Remaining'],
                         datasets: [{
-                            data: [fillRate, 100 - fillRate], // Phần trăm đã bán và còn lại
-                            backgroundColor: ['#22c55e', '#374151'], // Xanh lá và xám đậm
-                            borderWidth: 2,
-                            hoverOffset: 5
-                        }]
+                                data: [fillRate, 100 - fillRate],
+                                backgroundColor: ['#22c55e', '#374151'],
+                                borderWidth: 2,
+                                hoverOffset: 5
+                            }]
                     },
                     options: {
                         responsive: true,
@@ -84,7 +94,7 @@
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { color: '#fff' }
+                                labels: {color: '#fff'}
                             },
                             datalabels: {
                                 color: '#fff',
@@ -98,13 +108,12 @@
                             }
                         }
                     },
-                    plugins: [ChartDataLabels] // Kích hoạt plugin
+                    plugins: [ChartDataLabels]
                 });
             }
 
             const fillRateText = document.getElementById('fillRate').innerText;
             const fillRateValue = parseFloat(fillRateText.replace('%', '')) || 0;
-
             initFillRateChart(fillRateValue);
 
             let revenueChart;
@@ -159,27 +168,29 @@
                 revenueChart.update();
             }
 
-            function fetchRevenueData(year) {
+            function fetchRevenueData(eventId, year) {
                 fetch(`${pageContext.request.contextPath}/eventOverview`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({eventId: 1, organizerId: 1, year: year})
+                    body: JSON.stringify({eventId: eventId, year: year})
                 })
                         .then(response => response.json())
                         .then(data => updateChart(data))
                         .catch(error => console.error('Error fetching data:', error));
             }
 
-            document.getElementById('yearSelect').addEventListener('change', function () {
-                const selectedYear = this.value;
-                fetchRevenueData(selectedYear);
-            });
-
+            // Khởi tạo biểu đồ và load dữ liệu ban đầu
             initChart();
-            fetchRevenueData(2025);
+            fetchRevenueData(eventId, currentYear);
+
+            // Xử lý sự kiện thay đổi năm
+            yearSelect.addEventListener('change', function () {
+                const selectedYear = this.value;
+                fetchRevenueData(eventId, selectedYear);
+            });
         </script>
     </body>
 </html>
