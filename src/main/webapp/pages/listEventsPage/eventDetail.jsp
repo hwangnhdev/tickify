@@ -33,6 +33,7 @@
                 align-items: center;
                 padding: 20px;
                 background-color: black;
+                margin-top: 1%;
             }
 
             .event-card-event_detail {
@@ -43,15 +44,65 @@
                 box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
                 overflow: hidden;
                 max-width: 1300px;
-                max-height: 700px;
+                max-height: 1000px;
                 height: 100%;
                 width: 100%;
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
 
             .event-details {
                 padding: 25px;
                 flex: 1;
                 color: #fff;
+            }
+
+            /* Hiệu ứng chữ (text) */
+            .event-details h1 {
+                font-size: 2rem;
+                font-weight: bold;
+                transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            }
+
+            .event-details h1:hover {
+                color: #ffcc00;
+                transform: translateY(-2px);
+            }
+
+            .event-details p {
+                font-size: 1rem;
+                transition: color 0.3s ease-in-out, transform 0.2s;
+            }
+
+            .event-details p:hover {
+                color: #ddd;
+                transform: translateX(5px);
+            }
+
+            /* Hiệu ứng khi hover vào card */
+            .event-card-event_detail:hover {
+                transform: scale(1.02); /* Phóng to nhẹ */
+                box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.3); /* Bóng đổ mạnh hơn */
+                transition: all 0.3s ease-in-out; /* Hiệu ứng mượt */
+            }
+
+            /* Hiệu ứng khi hover vào ảnh */
+            .event-image-event_detail img {
+                transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+            }
+
+            .event-image-event_detail img:hover {
+                transform: scale(1.05); /* Phóng to ảnh */
+                filter: brightness(1.1); /* Làm sáng ảnh */
+            }
+
+            /* Hiệu ứng khi hover vào nút */
+            .btn {
+                transition: background-color 0.3s ease-in-out, transform 0.2s;
+            }
+
+            .btn:hover {
+                background-color: #e63946; /* Màu đỏ sáng */
+                transform: scale(1.05); /* Phóng to nhẹ */
             }
 
             .event-details h1 {
@@ -167,6 +218,59 @@
                 transition: all 0.3s ease;
             }
 
+            /* Hiệu ứng cho từng mục Showtime */
+            .event-info-event_detail .text-gray-400 {
+                font-size: 1rem;
+                transition: color 0.3s ease-in-out, transform 0.2s;
+                cursor: pointer;
+            }
+
+            .event-info-event_detail .text-gray-400:hover {
+                color: #ffffff;
+                transform: translateX(5px);
+            }
+
+            /* Hiệu ứng cho từng loại vé */
+            .event-info-event_detail .bg-gray-700 {
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+                cursor: pointer;
+            }
+
+            .event-info-event_detail .bg-gray-700:hover {
+                transform: scale(1.02);
+                box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+            }
+
+            /* Hiệu ứng cho giá vé */
+            .text-green-400 {
+                font-weight: bold;
+                font-size: 1.1rem;
+            }
+
+            /* Hiệu ứng cho trạng thái vé */
+            .bg-green-500, .bg-gray-500 {
+                font-weight: bold;
+                transition: background-color 0.3s ease-in-out;
+            }
+
+            .bg-green-500:hover {
+                background-color: #32a852;
+            }
+
+            .bg-gray-500:hover {
+                background-color: #6b7280;
+            }
+
+            /* Hiệu ứng nút đặt vé */
+            .bg-red-500 {
+                transition: background-color 0.3s ease-in-out, transform 0.2s;
+            }
+
+            .bg-red-500:hover {
+                background-color: #e63946;
+                transform: scale(1.05);
+            }
+
             /* Textarea Styling */
             .event-info-textarea {
                 width: 100%;
@@ -192,6 +296,20 @@
                 color: #FFFFFF;
             }
 
+
+            /*toggle*/
+            .show-time-details {
+                height: auto;
+                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+                overflow: hidden;
+            }
+            .show-time-details.collapsed {
+                height: 0;
+                opacity: 0;
+                padding: 0;
+            }
+
+            /*responsive*/
             @media (max-width: 768px) {
                 .event-card-event_detail {
                     flex-direction: column;
@@ -227,7 +345,7 @@
                         <a class="btn" href="#ShowtimesInformation">Order Ticket Now</a>
                     </div>
                     <div class="event-image-event_detail">
-                        <img src="${logoBannerImage}" alt="${titleEventImage}" />
+                        <img src="${logoBannerImage}" alt="${titleEventImage}"/>
                 </div>
             </div>
         </div>
@@ -241,41 +359,43 @@
                     </div>
                     <!-- Loop through listShowtimes -->
                     <c:forEach var="showtime" items="${listShowtimes}" varStatus="loop">
-                        <div class="text-gray-400 mb-4 text-light">
-                            <i class="fas fa-chevron-down"></i>
-                            <span>Showtime ${loop.count}: </span>
-                            <span>Start Date: ${showtime.startDate} - End Date: ${showtime.endDate}</span>
-                        </div>
-                        <div class="space-y-2">
-                            <!-- Loop through ticketTypes for this showtime -->
-                            <c:forEach var="ticket" items="${showtime.ticketTypes}">
-                                <div class="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
-                                    <span class="text-light">${ticket.name}</span>
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-green-400">${ticket.price} đ</span>
-                                        <span class="bg-green-500 text-white px-2 py-1 rounded-lg">
+                        <div class="show-time mb-4">
+                            <div class="text-gray-400 show-time-header text-light" onclick="toggleShowTime(this)">
+                                <i class="fas fa-chevron-down"></i>
+                                <span class="show-time-label">Showtime ${loop.count}: </span>
+                                <span>Start Date: ${showtime.startDate} - End Date: ${showtime.endDate}</span>
+                            </div>
+                            <div class="show-time-details collapsed space-y-2">
+                                <!-- Loop through ticketTypes for this showtime -->
+                                <c:forEach var="ticket" items="${showtime.ticketTypes}">
+                                    <div class="flex justify-between items-center bg-gray-700 p-3 rounded-lg saved-ticket">
+                                        <span class="text-light">${ticket.name}</span>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-green-400">${ticket.price} đ</span>
+                                            <span class="bg-green-500 text-white px-2 py-1 rounded-lg">
+                                                <c:choose>
+                                                    <c:when test="${ticket.totalQuantity - ticket.soldQuantity > 0}">Available</c:when>
+                                                    <c:otherwise>Sold Out</c:otherwise>
+                                                </c:choose>
+                                            </span>
                                             <c:choose>
-                                                <c:when test="${ticket.totalQuantity - ticket.soldQuantity > 0}">Available</c:when>
-                                                <c:otherwise>Sold Out</c:otherwise>
+                                                <c:when test="${not empty sessionScope.customerId}">
+                                                    <a href="viewSeat?showtimeId=${showtime.showtimeId}&ticketTypeId=${ticket.ticketTypeId}" 
+                                                       class="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600">
+                                                        Order Now
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a href="${pageContext.request.contextPath}/pages/signUpPage/signUp.jsp" 
+                                                       class="bg-gray-500 text-white px-2 py-1 rounded-lg hover:bg-gray-600">
+                                                        Order Now
+                                                    </a>
+                                                </c:otherwise>
                                             </c:choose>
-                                        </span>
-                                        <c:choose>
-                                            <c:when test="${not empty sessionScope.customerId}">
-                                                <a href="viewSeat?showtimeId=${showtime.showtimeId}&ticketTypeId=${ticket.ticketTypeId}" 
-                                                   class="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600">
-                                                    Order Now
-                                                </a>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <a href="${pageContext.request.contextPath}/pages/signUpPage/signUp.jsp" 
-                                                   class="bg-gray-500 text-white px-2 py-1 rounded-lg hover:bg-gray-600">
-                                                    Order Now
-                                                </a>
-                                            </c:otherwise>
-                                        </c:choose>
+                                        </div>
                                     </div>
-                                </div>
-                            </c:forEach>
+                                </c:forEach>
+                            </div>
                         </div>
                     </c:forEach>
                 </div>
@@ -350,5 +470,44 @@
 
         <!-- Footer -->
         <jsp:include page="../../components/footer.jsp"></jsp:include>
+            <script>
+                function toggleShowTime(button) {
+                    const showTime = button.closest('.show-time');
+                    const details = showTime.querySelector('.show-time-details');
+                    const labelSpan = showTime.querySelector('.show-time-label');
+                    const icon = button.querySelector('i');
+
+                    // Toggle the collapsed state
+                    details.classList.toggle('collapsed');
+                    icon.classList.toggle('fa-chevron-down');
+                    icon.classList.toggle('fa-chevron-up');
+
+                    // Get showtime index from label
+                    let showTimeIndex = '1';
+                    if (labelSpan && labelSpan.textContent) {
+                        const match = labelSpan.textContent.match(/\d+/);
+                        showTimeIndex = match ? match[0] : '1';
+                    }
+
+                    // Get start and end dates from the header
+                    const dateSpan = button.querySelector('span:last-child');
+                    const dateText = dateSpan ? dateSpan.textContent : '';
+
+                    if (details.classList.contains('collapsed')) {
+                        // Collapsed state: show dates in label
+                        labelSpan.textContent = `Showtime ${showTimeIndex}: ${dateText}`;
+                        details.style.height = '0';
+                    } else {
+                        // Expanded state: reset label and expand details
+                        labelSpan.textContent = `Showtime ${showTimeIndex}: `;
+                        details.style.height = `${details.scrollHeight}px`;
+
+                        // Reset height to auto after transition for dynamic content
+                        setTimeout(() => {
+                            details.style.height = 'auto';
+                        }, 0); // Match transition duration
+                    }
+                }
+        </script>
     </body>
 </html>

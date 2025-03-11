@@ -40,6 +40,13 @@
                 height: 30px;
                 cursor: pointer;
                 border-radius: 10px;
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            }
+
+            /* Khi hover vào logo */
+            .logo-header img:hover {
+                transform: scale(1.1);
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             }
 
             .search-bar-header {
@@ -48,6 +55,8 @@
                 background: white;
                 padding: 5px 10px;
                 border-radius: 20px;
+                transition: box-shadow 0.3s ease-in-out;
+                position: relative;
             }
 
             .search-bar-header input {
@@ -58,12 +67,60 @@
                 font-size: 14px;
             }
 
+            /* Khi focus vào input */
+            .search-bar-header input:focus {
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Hiệu ứng hover cho nút search */
             .search-bar-header button {
                 cursor: pointer;
                 color: black;
                 background-color: white;
                 border: none;
                 font-size: 14px;
+                transition: color 0.3s ease-in-out;
+            }
+
+            .search-bar-header button:hover {
+                color: #e63946;
+                font-weight: bold;
+            }
+
+            /* Khi hover vào thanh tìm kiếm */
+            .search-bar-header:hover::before {
+                opacity: 1;
+                animation: glowing 2s linear infinite;
+            }
+
+            /* Tạo hiệu ứng viền nhiều màu */
+            .search-bar-header::before {
+                content: "";
+                position: absolute;
+                top: -3px;
+                left: -3px;
+                right: -3px;
+                bottom: -3px;
+                border-radius: 23px; /* Lớn hơn 20px của search-bar-header */
+                background: linear-gradient(45deg, #ff0000, #ff7300, #ffeb00, #47ff00, #00ffee, #002bff, #7a00ff, #ff00a6, #ff0000);
+                background-size: 400%;
+                z-index: -1;
+                filter: blur(6px);
+                opacity: 0;
+                transition: opacity 0.3s ease-in-out;
+            }
+
+            /* Animation đổi màu */
+            @keyframes glowing {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
             }
 
             .user-actions-header {
@@ -102,6 +159,36 @@
 
             .categories-header a:hover {
                 color: #3498db;
+            }
+
+            .categories-header {
+                display: flex;
+                justify-content: center;
+                gap: 15px; /* Khoảng cách giữa các link */
+                background-color: #222; /* Màu nền */
+                padding: 10px 0;
+                border-radius: 0;
+            }
+
+            .categories-header a {
+                text-decoration: none;
+                color: white;
+                font-weight: bold;
+                padding: 8px 15px;
+                border-radius: 5px;
+                transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            }
+
+            /* Hiệu ứng hover */
+            .categories-header a:hover {
+                background-color: #17a045;
+                transform: scale(1.1);
+            }
+
+            /* Hiệu ứng khi active (click) */
+            .categories-header a:active {
+                background-color: #17a045;
+                transform: scale(0.95);
             }
         </style>
     </head>
@@ -168,7 +255,6 @@
                         <a href="<%= request.getContextPath()%>/pages/signUpPage/signUp.jsp" class="text-white">Sign In | Register</a>
                     </c:otherwise>
                 </c:choose>
-
             </div>
         </header>
 
