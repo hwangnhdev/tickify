@@ -773,7 +773,7 @@
 
         <!--All Event--> 
         <div style="text-align: center;">
-            <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+            <h2 id="all-events-title" class="text-xl font-bold  text-center" style="margin-left: 4%;">
                 <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
             </h2>
         </div>

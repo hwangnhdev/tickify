@@ -120,7 +120,9 @@ public class EventController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         System.out.println(totalPages);
-
+        System.out.println(paginatedEvents);
+        System.out.println(page);
+        
         // Create session to store parameter when filter and search
         HttpSession session = request.getSession();
         // Call all DAO to get methods in it

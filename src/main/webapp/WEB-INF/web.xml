@@ -196,7 +196,6 @@
         <servlet-name>UpdateAccountController</servlet-name>
         <servlet-class>controllers.UpdateAccountController</servlet-class>
     </servlet>
-    
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -345,11 +344,9 @@
         <servlet-name>EventOverviewController</servlet-name>
         <url-pattern>/eventOverview</url-pattern>
     </servlet-mapping>
-    
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
     <welcome-file-list>
         <welcome-file>event</welcome-file>
     </welcome-file-list>

@@ -560,29 +560,12 @@
                         </div>
 
                         <!-- Location (Province/City, District, Ward, Full Address) -->
-                        <!-- Giả sử bạn cần lấy thông tin địa chỉ từ location và phân tích (có thể cần logic thêm để tách Province, District, Ward) -->
-                        <!-- Province/City -->
                         <div>
                             <label class="block text-gray-300 mb-2">Province/City</label>
                             <select id="province" name="province" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateDistricts(); updateFullAddress();" required>
                                 <option value="">-- Select Province/City --</option>
-                                <c:if test="${not empty event.location}">
-                                    <c:set var="locationParts" value="${fn:split(event.location, ',')}" />
-                                    <c:if test="${not empty locationParts and fn:length(locationParts) > 0}">
-                                        <c:set var="province" value="${fn:trim(locationParts[fn:length(locationParts) - 1])}" />
-                                        <c:set var="normalizedProvince" value="${fn:replace(province, 'Thành phố ', '')}" />
-                                        <c:forEach var="prov" items="${provinces}">
-                                            <c:set var="provName" value="${fn:trim(prov.name)}" />
-                                            <c:if test="${fn:contains(provName, normalizedProvince) || fn:contains(provName, province)}">
-                                                <option value="${prov.name}" selected>${prov.name}</option>
-                                            </c:if>
-                                        </c:forEach>
-                                    </c:if>
-                                </c:if>
                                 <c:forEach var="prov" items="${provinces}">
-                                    <c:if test="${empty provinceMatch}">
-                                        <option value="${prov.name}">${prov.name}</option>
-                                    </c:if>
+                                    <option value="${prov.name}" ${prov.name == province ? 'selected' : ''}>${prov.name}</option>
                                 </c:forEach>
                             </select>
                             <span class="error-message" id="province_error"></span>
@@ -594,11 +577,7 @@
                             <select id="district" name="district" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateWards(); updateFullAddress();" required>
                                 <option value="">-- Select District --</option>
                                 <c:if test="${not empty event.location}">
-                                    <c:set var="locationParts" value="${fn:split(event.location, ',')}" />
-                                    <c:if test="${not empty locationParts and fn:length(locationParts) > 1}">
-                                        <c:set var="district" value="${fn:trim(locationParts[fn:length(locationParts) - 2])}" />
-                                        <option value="${district}" selected>${district}</option>
-                                    </c:if>
+                                    <option value="${district}" selected>${district}</option>
                                 </c:if>
                             </select>
                             <span class="error-message" id="district_error"></span>
@@ -610,11 +589,7 @@
                             <select id="ward" name="ward" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateFullAddress();" required>
                                 <option value="">-- Select Ward --</option>
                                 <c:if test="${not empty event.location}">
-                                    <c:set var="locationParts" value="${fn:split(event.location, ',')}" />
-                                    <c:if test="${not empty locationParts and fn:length(locationParts) > 0}">
-                                        <c:set var="ward" value="${fn:trim(locationParts[0])}" />
-                                        <option value="${ward}" selected>${ward}</option>
-                                    </c:if>
+                                    <option value="${ward}" selected>${ward}</option>
                                 </c:if>
                             </select>
                             <span class="error-message" id="ward_error"></span>
