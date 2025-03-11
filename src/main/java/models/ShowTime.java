@@ -4,7 +4,6 @@
  */
 package models;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -21,8 +20,8 @@ public class Showtime {
     private String status;
     private Timestamp createdAt; // Changed from Date to Timestamp
     private Timestamp updatedAt; // Changed from Date to Timestamp
-    
-    private List<TicketType> ticketTypes;
+
+    private List<TicketType> ticketTypes; // Vui add this field to store json
 
     public List<TicketType> getTicketTypes() {
         return ticketTypes;
@@ -43,6 +42,17 @@ public class Showtime {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt, List<TicketType> ticketTypes) {
+        this.showtimeId = showtimeId;
+        this.eventId = eventId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.ticketTypes = ticketTypes;
     }
 
     public int getShowtimeId() {

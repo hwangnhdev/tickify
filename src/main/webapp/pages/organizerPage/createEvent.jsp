@@ -16,6 +16,68 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
         <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/pages/organizerPage/createEvent.css"/>
+        <style>
+
+            /*// pop up*/
+            #successPopup {
+                display: none; /* Ẩn mặc định */
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 50;
+                justify-content: center;
+                align-items: center;
+            }
+            #successPopup.show {
+                display: flex; /* Hiển thị khi có class 'show' */
+            }
+            /* Error Popup */
+            #errorPopup {
+                display: none; /* Ẩn mặc định */
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 50;
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+                transition: opacity 0.3s ease-in-out;
+            }
+            #errorPopup.show {
+                display: flex; /* Hiển thị khi có class 'show' */
+                opacity: 1;
+            }
+            /* Toggle Buttons Styling */
+            .toggle-btn {
+                background-color: #4B5563; /* Medium gray background */
+                color: #FFFFFF; /* White text */
+                border: none; /* No border */
+                padding: 6px 12px; /* Padding */
+                border-radius: 6px; /* Rounded corners */
+                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+                margin-right: 10px; /* Space to the right */
+            }
+            .toggle-btn:hover {
+                background-color: #6B7280; /* Lighter gray on hover */
+                transform: translateY(-2px); /* Slight lift */
+            }
+            .collapsible-content {
+                height: auto; /* Auto height when expanded */
+                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out; /* Smooth collapse/expand */
+                overflow: hidden; /* Hide overflow */
+            }
+            .collapsible-content.collapsed {
+                height: 0; /* Collapsed height */
+                opacity: 0; /* Fully transparent */
+                padding: 0; /* No padding when collapsed */
+            }
+        </style>
     </head>
     <body class="bg-gray-900 text-white">
         <div class="flex h-screen">
@@ -158,6 +220,7 @@ Notes and VAT Terms</textarea>
                                 <div class="input-container">
                                     <label class="block text-gray-300 mb-2">Organizer Name</label>
                                     <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Organizer Name" required>
+                                    <input value="${sessionScope.customerId}" hidden name="customerId">
                                     <span class="error-message" id="organizerName_error"></span>
                                 </div>
 
@@ -274,8 +337,8 @@ Notes and VAT Terms</textarea>
         </div>
 
         <!-- Modal -->
-        <div id="newTicketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-            <div class="bg-gray-800 rounded-lg w-full max-w-4xl p-6">
+        <div id="newTicketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center" style="overflow: auto;">
+            <div class="bg-gray-800 rounded-lg w-full max-w-4xl p-6" style="margin-top: 10%;">
                 <div class="flex justify-between items-center mb-4">
                     <h5 class="text-xl font-bold">Create New Ticket Type</h5>
                     <button class="text-gray-400 hover:text-white text-2xl" onclick="closeModal()">×</button>
@@ -331,6 +394,28 @@ Notes and VAT Terms</textarea>
             </div>
         </div>
 
+        <!-- Success Popup -->
+        <div id="successPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-lg p-6 max-w-sm w-full text-center">
+                <div class="flex justify-center mb-4">
+                    <i class="fas fa-check-circle text-green-500 text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Success</h3>
+                <p class="text-gray-300 mb-4">Create New Event Successfully!</p>
+                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200" onclick="closeSuccessPopup()">OK</button>
+            </div>
+        </div>
+        <!-- Error Popup -->
+        <div id="errorPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-lg p-6 max-w-sm w-full text-center">
+                <div class="flex justify-center mb-4">
+                    <i class="fas fa-exclamation-circle text-red-500 text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Error</h3>
+                <p class="text-gray-300 mb-4" id="errorMessage">Please complete all required fields.</p>
+                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200" onclick="closeErrorPopup()">OK</button>
+            </div>
+        </div>
         <script src="${pageContext.request.contextPath}/pages/organizerPage/createEvent.js"></script>
     </body>
 </html>

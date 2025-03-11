@@ -259,10 +259,20 @@
                                                 <c:otherwise>Sold Out</c:otherwise>
                                             </c:choose>
                                         </span>
-                                        <a href="bookTicket?showtimeId=${showtime.showtimeId}&ticketTypeId=${ticket.ticketTypeId}" 
-                                           class="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600">
-                                            Order Now
-                                        </a>
+                                        <c:choose>
+                                            <c:when test="${not empty sessionScope.customerId}">
+                                                <a href="viewSeat?showtimeId=${showtime.showtimeId}&ticketTypeId=${ticket.ticketTypeId}" 
+                                                   class="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600">
+                                                    Order Now
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${pageContext.request.contextPath}/pages/signUpPage/signUp.jsp" 
+                                                   class="bg-gray-500 text-white px-2 py-1 rounded-lg hover:bg-gray-600">
+                                                    Order Now
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </div>
                                 </div>
                             </c:forEach>

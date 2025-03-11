@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,22 +61,36 @@ public class EventOverviewController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        int eventId = Integer.parseInt(request.getParameter("eventId"));
-//        int organizerId = Integer.parseInt(request.getParameter("organizerId"));
-
+        int eventId = Integer.parseInt(request.getParameter("eventId"));
         EventDAO eventDAO = new EventDAO();
 
-        // Lấy dữ liệu tổng quan
-        List<Double> totals = eventDAO.getTotalRevenueOfEventById(1, 1); // Cho eventId, organizerId là 1 to test
-        double totalRevenue = totals.get(0);
-        int ticketsSold = totals.get(1).intValue();
-        int ticketsRemaining = totals.get(2).intValue();
-        double fillRate = totals.get(3);
+        List<Double> totals = eventDAO.getTotalRevenueOfEventById(eventId);
+
+        // Kiểm tra totals có rỗng hoặc không đủ phần tử
+        double totalRevenue = 0.0;
+        int ticketsSold = 0;
+        int totalTickets = 0;
+        int ticketsRemaining = 0;
+        double fillRate = 0.0;
+
+        if (totals != null && totals.size() >= 5) {
+            totalRevenue = totals.get(0);
+            ticketsSold = totals.get(1).intValue();
+            totalTickets = totals.get(2).intValue();
+            ticketsRemaining = totals.get(3).intValue();
+            fillRate = totals.get(4);
+        } else {
+            // Log lỗi nếu cần
+            System.out.println("No data found for eventId: " + eventId);
+            // Có thể thêm thông báo lỗi cho người dùng nếu cần
+        }
 
         request.setAttribute("totalRevenue", totalRevenue);
         request.setAttribute("ticketsSold", ticketsSold);
+        request.setAttribute("totalTickets", totalTickets);
         request.setAttribute("ticketsRemaining", ticketsRemaining);
-        request.setAttribute("fillRate", fillRate);
+        request.setAttribute("fillRate", String.format("%.2f", fillRate));
+        request.setAttribute("eventId", eventId);
 
         request.getRequestDispatcher("pages/organizerPage/eventOverviewStatistic.jsp").forward(request, response);
     }
@@ -93,26 +108,32 @@ public class EventOverviewController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        EventDAO eventDAO = new EventDAO();
-//        int eventId = Integer.parseInt(request.getParameter("eventId"));
-//        int organizerId = Integer.parseInt(request.getParameter("organizerId"));
-//        int year = Integer.parseInt(request.getParameter("year"));
 
-        List<Double> monthlyRevenue = eventDAO.getTotalRevenueChartOfEventById(1, 1, 2025); // Set value of eventid, organizer, year are 1, 1, 2025
+        // Đọc dữ liệu từ request body
+        StringBuilder jb = new StringBuilder();
+        String line;
+        try {
+            BufferedReader reader = request.getReader();
+            while ((line = reader.readLine()) != null) {
+                jb.append(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Parse JSON từ request
+        JSONObject jsonRequest = new JSONObject(jb.toString());
+        int eventId = jsonRequest.getInt("eventId");
+        int year = jsonRequest.getInt("year");
+
+        EventDAO eventDAO = new EventDAO();
+
+        List<Double> monthlyRevenue = eventDAO.getTotalRevenueChartOfEventById(eventId, year);
         if (monthlyRevenue == null || monthlyRevenue.isEmpty()) {
             monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
         }
 
         JSONObject jsonResponse = new JSONObject();
-        StringBuilder monthlyRevenueArray = new StringBuilder("[");
-        for (int i = 0; i < monthlyRevenue.size(); i++) {
-            monthlyRevenueArray.append(monthlyRevenue.get(i));
-            if (i < monthlyRevenue.size() - 1) {
-                monthlyRevenueArray.append(",");
-                System.out.println(monthlyRevenue.get(i));
-            }
-        }
-        monthlyRevenueArray.append("]");
         jsonResponse.put("monthlyRevenue", new org.json.JSONArray(monthlyRevenue));
 
         try ( PrintWriter out = response.getWriter()) {

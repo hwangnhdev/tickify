@@ -14,6 +14,7 @@ import java.util.List;
 import models.EventDetailDTO;
 import models.EventSummaryDTO;
 import models.Order;
+import models.OrderDetailDTO;
 
 import utils.DBContext;
 
@@ -54,7 +55,7 @@ public class OrganizerDAO extends DBContext {
                 + "JOIN Showtimes s ON e.event_id = s.event_id "
                 + "WHERE org.organizer_id = ? AND e.event_id = ? "
                 + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
-        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, organizerId);
             ps.setInt(2, eventId);
             ResultSet rs = ps.executeQuery();
@@ -134,7 +135,7 @@ public class OrganizerDAO extends DBContext {
 
         String finalSql = baseSql + extraWhere + groupBy + havingClause;
 
-        try ( PreparedStatement ps = connection.prepareStatement(finalSql)) {
+        try (PreparedStatement ps = connection.prepareStatement(finalSql)) {
             int paramIndex = 1;
             ps.setInt(paramIndex++, organizerId);
             if (filter != null && (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid"))) {
@@ -162,60 +163,64 @@ public class OrganizerDAO extends DBContext {
         return events;
     }
 
-    // Lấy danh sách order theo organizer, trạng thái thanh toán và tìm kiếm theo tên khách hàng
-//    public List<Order> getOrdersByOrganizerAndPaymentStatus(int organizerId, String paymentStatus, String searchOrder, int offset, int pageSize) {
-//        List<Order> orders = new ArrayList<>();
-//        String sql = "SELECT o.order_id, o.order_date, o.total_price, o.payment_status, "
-//                + "       c.full_name AS customer_name, e.event_name, e.location, t.ticket_code "
-//                + "FROM Orders o "
-//                + "INNER JOIN Customers c ON o.customer_id = c.customer_id "
-//                + "INNER JOIN OrderDetails od ON o.order_id = od.order_id "
-//                + "INNER JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-//                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
-//                + "INNER JOIN Events e ON st.event_id = e.event_id "
-//                + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
-//                + "INNER JOIN Ticket t ON t.order_detail_id = od.order_detail_id "
-//                + "WHERE org.organizer_id = ? "
-//                + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? ) "
-//                + "  AND ( ? IS NULL OR LOWER(c.full_name) LIKE '%' + ? + '%' ) "
-//                + "ORDER BY o.order_date DESC "
-//                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-//        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
-//            stmt.setInt(1, organizerId);
-//            // Payment status: nếu là 'all' thì không lọc, nếu không thì so sánh
-//            stmt.setString(2, paymentStatus.toLowerCase());
-//            stmt.setString(3, paymentStatus.toLowerCase());
-//            // Search theo tên khách hàng: nếu searchOrder null thì không lọc
-//            if (searchOrder == null) {
-//                stmt.setNull(4, Types.NVARCHAR);
-//                stmt.setNull(5, Types.NVARCHAR);
-//            } else {
-//                stmt.setNString(4, searchOrder.toLowerCase());
-//                stmt.setNString(5, "%" + searchOrder.toLowerCase() + "%");
-//            }
-//            stmt.setInt(6, offset);
-//            stmt.setInt(7, pageSize);
-//            try ( ResultSet rs = stmt.executeQuery()) {
-//                while (rs.next()) {
-//                    Order order = new Order();
-//                    order.setOrderId(rs.getInt("order_id"));
-//                    order.setOrderDate(rs.getTimestamp("order_date"));
-//                    order.setTotalPrice(rs.getDouble("total_price"));
-//                    order.setPaymentStatus(rs.getString("payment_status"));
-//                    order.setCustomerName(rs.getString("customer_name"));
-//                    order.setEventName(rs.getString("event_name"));
-//                    order.setLocation(rs.getString("location"));
-//                    order.setTicketCode(rs.getString("ticket_code"));
-//                    orders.add(order);
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return orders;
-//    }
+    public List<OrderDetailDTO> getOrderDetailsByOrganizerAndPaymentStatus(int organizerId, String paymentStatus, String searchOrder, int offset, int pageSize) {
+        List<OrderDetailDTO> orders = new ArrayList<>();
 
-    // Đếm tổng số order theo organizer, trạng thái thanh toán và tìm kiếm theo tên khách hàng
+        // Kiểm tra connection, nếu null thì ghi log hoặc ném exception để dễ debug
+        if (connection == null) {
+            throw new IllegalStateException("Database connection is null. Please check DBConnection.getConnection() configuration.");
+        }
+
+        String sql = "SELECT o.order_id, o.order_date, o.total_price, o.payment_status, "
+                + "       c.full_name AS customer_name, e.event_name, e.location "
+                + "FROM Orders o "
+                + "INNER JOIN Customers c ON o.customer_id = c.customer_id "
+                + "INNER JOIN OrderDetails od ON o.order_id = od.order_id "
+                + "INNER JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
+                + "INNER JOIN Events e ON st.event_id = e.event_id "
+                + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
+                + "WHERE org.organizer_id = ? "
+                + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? ) "
+                + "  AND ( ? IS NULL OR LOWER(c.full_name) LIKE ? ) "
+                + "ORDER BY o.order_date DESC "
+                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, organizerId);
+            stmt.setString(2, paymentStatus.toLowerCase());
+            stmt.setString(3, paymentStatus.toLowerCase());
+            if (searchOrder == null) {
+                stmt.setNull(4, java.sql.Types.VARCHAR);
+                stmt.setNull(5, java.sql.Types.VARCHAR);
+            } else {
+                stmt.setString(4, searchOrder.toLowerCase());
+                stmt.setString(5, "%" + searchOrder.toLowerCase() + "%");
+            }
+            stmt.setInt(6, offset);
+            stmt.setInt(7, pageSize);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    OrderDetailDTO order = new OrderDetailDTO();
+                    order.setOrderId(rs.getInt("order_id"));
+                    order.setOrderDate(rs.getTimestamp("order_date"));
+                    // Map cột total_price sang grandTotal
+                    order.setGrandTotal(rs.getDouble("total_price"));
+                    order.setPaymentStatus(rs.getString("payment_status"));
+                    order.setCustomerName(rs.getString("customer_name"));
+                    order.setEventName(rs.getString("event_name"));
+                    order.setLocation(rs.getString("location"));
+                    orders.add(order);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return orders;
+    }
+
+    // Đếm số bản ghi order theo điều kiện lọc
     public int countOrdersByOrganizerAndPaymentStatus(int organizerId, String paymentStatus, String searchOrder) {
         int count = 0;
         String sql = "SELECT COUNT(*) AS total "
@@ -226,11 +231,10 @@ public class OrganizerDAO extends DBContext {
                 + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
                 + "INNER JOIN Events e ON st.event_id = e.event_id "
                 + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
-                + "INNER JOIN Ticket t ON t.order_detail_id = od.order_detail_id "
                 + "WHERE org.organizer_id = ? "
                 + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? ) "
-                + "  AND ( ? IS NULL OR LOWER(c.full_name) LIKE '%' + ? + '%' )";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+                + "  AND ( ? IS NULL OR LOWER(c.full_name) LIKE ? )";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             stmt.setString(2, paymentStatus.toLowerCase());
             stmt.setString(3, paymentStatus.toLowerCase());
@@ -238,10 +242,11 @@ public class OrganizerDAO extends DBContext {
                 stmt.setNull(4, Types.NVARCHAR);
                 stmt.setNull(5, Types.NVARCHAR);
             } else {
-                stmt.setNString(4, searchOrder.toLowerCase());
-                stmt.setNString(5, "%" + searchOrder.toLowerCase() + "%");
+                stmt.setString(4, searchOrder.toLowerCase());
+                stmt.setString(5, "%" + searchOrder.toLowerCase() + "%");
             }
-            try ( ResultSet rs = stmt.executeQuery()) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt("total");
                 }
@@ -270,11 +275,11 @@ public class OrganizerDAO extends DBContext {
                 + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
                 + "WHERE org.organizer_id = ? "
                 + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? )";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             stmt.setString(2, paymentStatus.toLowerCase());
             stmt.setString(3, paymentStatus.toLowerCase());
-            try ( ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt("total");
                 }
@@ -337,5 +342,4 @@ public class OrganizerDAO extends DBContext {
 //        }
 //        return orders;
 //    }
-
 }

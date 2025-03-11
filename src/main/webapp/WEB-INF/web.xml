@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee                               http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-    <!-- Define Servlet Mappings -->
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3.1.xsd">
+
+    <!-- Servlet Definitions -->
     <servlet>
         <servlet-name>AuthController</servlet-name>
         <servlet-class>controllers.AuthController</servlet-class>
@@ -165,7 +166,6 @@
         <servlet-name>ViewApprovedDetailController</servlet-name>
         <servlet-class>controllers.ViewApprovedDetailController</servlet-class>
     </servlet>
-    <!-- Define Servlet Mappings -->
     <servlet>
         <servlet-name>EventOverviewController</servlet-name>
         <servlet-class>controllers.EventOverviewController</servlet-class>
@@ -198,6 +198,8 @@
         <servlet-name>UpdateAccountController</servlet-name>
         <servlet-class>controllers.UpdateAccountController</servlet-class>
     </servlet>
+    
+    <!-- Servlet Mappings -->
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -319,40 +321,12 @@
         <url-pattern>/viewPayment</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>VnPayAjaxController</servlet-name>
-        <url-pattern>/vnPayAjax</url-pattern>
+        <servlet-name>vnpayQueryController</servlet-name>
+        <url-pattern>/vnpayQuery</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>VoucherController</servlet-name>
-        <url-pattern>/VoucherController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ViewAllVouchersController</servlet-name>
-        <url-pattern>/ViewAllVouchersController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UpdateVoucherStatusController</servlet-name>
-        <url-pattern>/UpdateVoucherStatusController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateVoucherController</servlet-name>
-        <url-pattern>/CreateVoucherController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ViewHistoryApprovedEventsController</servlet-name>
-        <url-pattern>/admin/viewHistoryApprovedEvents</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SearchOrderController</servlet-name>
-        <url-pattern>/SearchOrderController</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ViewApprovedDetailController</servlet-name>
-        <url-pattern>/admin/viewApprovedDetail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProfileController</servlet-name>
-        <url-pattern>/profile</url-pattern>
+        <servlet-name>ValidateTicketController</servlet-name>
+        <url-pattern>/validateTicket</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewAllCustomersController</servlet-name>
@@ -374,19 +348,8 @@
         <servlet-name>EventOverviewController</servlet-name>
         <url-pattern>/eventOverview</url-pattern>
     </servlet-mapping>
+    
     <!-- Session Configuration -->
-    <servlet-mapping>
-        <servlet-name>ViewPaymentController</servlet-name>
-        <url-pattern>/viewPayment</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>vnpayQueryController</servlet-name>
-        <url-pattern>/vnpayQuery</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ValidateTicketController</servlet-name>
-        <url-pattern>/validateTicket</url-pattern>
-    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
