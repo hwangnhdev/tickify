@@ -110,6 +110,7 @@ public class UpdateEventController extends HttpServlet {
         List<Province> provinces = loadProvincesFromAPI();
         request.setAttribute("provinces", provinces);
 
+        String provinceLocal = "";
         System.out.println(event.getLocation());
         String[] locationPart = event.getLocation().split(",");
         int index = 0;
@@ -120,13 +121,23 @@ public class UpdateEventController extends HttpServlet {
             } else if (index == 1) {
                 request.setAttribute("district", string.trim());
             } else if (index == 2) {
-                String province = string.trim().replace("Tỉnh ", "").replace("Thành phố ", "");
-                request.setAttribute("province", province);
+//                String province = string.trim().replace("Tỉnh ", "").replace("Thành phố ", "");
+                provinceLocal = string.trim();
+                request.setAttribute("province", string.trim());
             }
             index++;
         }
 
         System.out.println("Provinces list: " + provinces);
+        for (Province province : provinces) {
+            System.out.println(province.getCodename());
+            System.out.println(province.getCode());
+            System.out.println(province.getName());
+            if (province.getName().equalsIgnoreCase(provinceLocal)) {
+                System.out.println("Successfully");
+            }
+        }
+        System.out.println(provinceLocal);
         System.out.println("Set ward: " + request.getAttribute("ward"));
         System.out.println("Set district: " + request.getAttribute("district"));
         System.out.println("Set province: " + request.getAttribute("province"));
@@ -343,21 +354,38 @@ public class UpdateEventController extends HttpServlet {
             return name;
         }
 
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public String getCodename() {
+            return codename;
+        }
+
+        public void setCodename(String codename) {
+            this.codename = codename;
+        }
+
     }
 
-    // Method to fetch provinces from API
+    // Cập nhật phương thức loadProvincesFromAPI để xử lý UTF-8
     private List<Province> loadProvincesFromAPI() throws IOException {
         String apiUrl = "https://provinces.open-api.vn/api/p/";
         URL url = new URL(apiUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestProperty("Accept-Charset", "UTF-8"); // Đảm bảo UTF-8
 
         if (conn.getResponseCode() != 200) {
             throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
         StringBuilder jsonResponse = new StringBuilder();
         String output;
         while ((output = br.readLine()) != null) {

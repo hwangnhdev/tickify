@@ -565,7 +565,7 @@
                             <select id="province" name="province" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateDistricts(); updateFullAddress();" required>
                                 <option value="">-- Select Province/City --</option>
                                 <c:forEach var="prov" items="${provinces}">
-                                    <option value="${prov.name}" ${prov.name == province ? 'selected' : ''}>${prov.name}</option>
+                                    <option value="${prov.name}" data-code="${prov.code}" ${prov.name eq province ? 'selected' : ''}>${prov.name}</option>
                                 </c:forEach>
                             </select>
                             <span class="error-message" id="province_error"></span>
