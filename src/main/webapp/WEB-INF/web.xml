@@ -348,7 +348,14 @@
         <servlet-name>EventOverviewController</servlet-name>
         <url-pattern>/eventOverview</url-pattern>
     </servlet-mapping>
-    
+    <servlet-mapping>
+        <servlet-name>ViewApprovedDetailController</servlet-name>
+        <url-pattern>/admin/viewApprovedDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewHistoryApprovedEventsController</servlet-name>
+        <url-pattern>/admin/viewHistoryApprovedEvents</url-pattern>
+    </servlet-mapping>
     <!-- Session Configuration -->
     <session-config>
         <session-timeout>30</session-timeout>

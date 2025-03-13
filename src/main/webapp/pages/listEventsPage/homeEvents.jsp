@@ -23,17 +23,17 @@
             .content-grid-large_events {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                grid-gap: 10px;
+                grid-gap: 5px;
                 padding: 30px;
                 margin: 0 0;
-                margin-left: 2.5%;
+                margin-left: 8%;
             }
 
             .carousel-large_events {
                 position: relative;
                 overflow: hidden;
-                width: 95%;
-                height: 350px;
+                width: 85%;
+                height: 300px;
                 display: flex;
                 justify-content: center;
                 border-radius: 8px;
@@ -82,10 +82,11 @@
                 color: white;
                 border: none;
                 border-radius: 50%;
-                width: 40px;
-                height: 40px;
+                width: 30px;
+                height: 30px;
                 cursor: pointer;
                 z-index: 10;
+                opacity: 0.3;
             }
 
             .prev-large_events {
@@ -113,7 +114,7 @@
                 max-width: 300px;
                 margin-bottom: 20px;
             }
-            
+
             /*Top-Picks-For-You*/
             .title-top_events {
                 text-align: center;

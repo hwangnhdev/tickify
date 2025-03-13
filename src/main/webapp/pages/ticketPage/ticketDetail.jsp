@@ -8,25 +8,24 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Ticket Detail</title>
         <jsp:include page="../../components/header.jsp"></jsp:include>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-        <style>
-            body {
-                font-family: 'Roboto', sans-serif;
-            }
-            /* Xử lý text tràn */
-            .truncate-text {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-        </style>
-    </head>
-    <body class="bg-gray-100 text-gray-900">
-        <div class="max-w-4xl mx-auto p-6">
-            <div class="bg-white shadow rounded-lg p-6 space-y-8">
-                <!-- Header: Event Name -->
+            <script src="https://cdn.tailwindcss.com"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+            <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+            <style>
+                body {
+                    font-family: 'Roboto', sans-serif;
+                }
+                .truncate-text {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            </style>
+        </head>
+        <body class="bg-gray-100 text-gray-900">
+            <div class="max-w-4xl mx-auto p-6">
+                <div class="bg-white shadow rounded-lg p-6 space-y-8">
+                    <!-- Header: Event Name -->
                 <c:if test="${not empty ticketDetail.eventName}">
                     <div class="space-y-2">
                         <h1 class="text-3xl font-bold truncate-text">
@@ -34,7 +33,6 @@
                         </h1>
                     </div>
                 </c:if>
-
                 <!-- Event Image -->
                 <c:if test="${not empty ticketDetail.eventImage}">
                     <div>
@@ -45,7 +43,6 @@
                              class="w-full h-auto rounded" />
                     </div>
                 </c:if>
-
                 <!-- Order Code -->
                 <c:if test="${not empty ticketDetail.orderCode}">
                     <div>
@@ -55,7 +52,6 @@
                         </p>
                     </div>
                 </c:if>
-
                 <!-- Ticket Overview -->
                 <c:if test="${not empty ticketDetail.ticketStatus or not empty ticketDetail.paymentStatus or not empty ticketDetail.location}">
                     <div class="border-t border-gray-200 pt-4">
@@ -84,7 +80,6 @@
                         </div>
                     </div>
                 </c:if>
-
                 <!-- Ticket Detail -->
                 <c:if test="${not empty ticketDetail.ticketType or not empty ticketDetail.seat or not empty ticketDetail.startDate or not empty ticketDetail.endDate}">
                     <div class="border-t border-gray-200 pt-4">
@@ -123,7 +118,6 @@
                         </div>
                     </div>
                 </c:if>
-
                 <!-- Buyer Information -->
                 <c:if test="${not empty ticketDetail.buyerName or not empty ticketDetail.buyerEmail or not empty ticketDetail.buyerPhone or not empty ticketDetail.buyerAddress}">
                     <div class="border-t border-gray-200 pt-4">
@@ -158,7 +152,6 @@
                         </div>
                     </div>
                 </c:if>
-
                 <!-- Order Summary -->
                 <c:if test="${not empty ticketDetail.ticketType or not empty ticketDetail.quantity or not empty ticketDetail.amount or (ticketDetail.voucherApplied eq 'Yes') or not empty ticketDetail.originalTotalAmount or not empty ticketDetail.finalTotalAmount}">
                     <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
@@ -170,13 +163,13 @@
                                 <tr class="bg-gray-100">
                                     <c:if test="${not empty ticketDetail.ticketType}">
                                         <th class="p-2 border border-gray-200">Ticket type</th>
-                                    </c:if>
-                                    <c:if test="${not empty ticketDetail.quantity}">
+                                        </c:if>
+                                        <c:if test="${not empty ticketDetail.quantity}">
                                         <th class="p-2 border border-gray-200">Quantity</th>
-                                    </c:if>
-                                    <c:if test="${not empty ticketDetail.amount}">
+                                        </c:if>
+                                        <c:if test="${not empty ticketDetail.amount}">
                                         <th class="p-2 border border-gray-200">Amount</th>
-                                    </c:if>
+                                        </c:if>
                                 </tr>
                             </thead>
                             <tbody>
@@ -184,7 +177,7 @@
                                     <c:if test="${not empty ticketDetail.ticketType}">
                                         <td class="p-2 border border-gray-200">
                                             ${ticketDetail.ticketType}<br />
-                                            <fmt:formatNumber value="${ticketDetail.ticketPrice}" type="currency" currencySymbol="đ" />
+                                            <fmt:formatNumber value="${ticketDetail.ticketPrice}" pattern="#,##0.00'đ'" />
                                         </td>
                                     </c:if>
                                     <c:if test="${not empty ticketDetail.quantity}">
@@ -194,25 +187,10 @@
                                     </c:if>
                                     <c:if test="${not empty ticketDetail.amount}">
                                         <td class="p-2 border border-gray-200">
-                                            <fmt:formatNumber value="${ticketDetail.amount}" type="currency" currencySymbol="đ" />
+                                            <fmt:formatNumber value="${ticketDetail.amount}" pattern="#,##0.00'đ'" />
                                         </td>
                                     </c:if>
                                 </tr>
-                                <!-- Voucher Row (nếu có) -->
-                                <c:if test="${ticketDetail.voucherApplied eq 'Yes'}">
-                                    <tr class="bg-white hover:bg-gray-50">
-                                        <c:if test="${not empty ticketDetail.voucherCode}">
-                                            <td class="p-2 border border-gray-200 font-semibold" colspan="2">
-                                                Voucher: <span class="font-normal">${ticketDetail.voucherCode}</span>
-                                            </td>
-                                        </c:if>
-                                        <c:if test="${not empty ticketDetail.discount}">
-                                            <td class="p-2 border border-gray-200 text-left font-semibold">
-                                                Savings: <fmt:formatNumber value="${ticketDetail.discount}" type="currency" currencySymbol="đ" />
-                                            </td>
-                                        </c:if>
-                                    </tr>
-                                </c:if>
                                 <!-- Subtotal Row -->
                                 <c:if test="${not empty ticketDetail.originalTotalAmount}">
                                     <tr class="bg-gray-50">
@@ -220,7 +198,30 @@
                                             Subtotal
                                         </td>
                                         <td class="p-2 border border-gray-200">
-                                            <fmt:formatNumber value="${ticketDetail.originalTotalAmount}" type="currency" currencySymbol="đ" />
+                                            <fmt:formatNumber value="${ticketDetail.originalTotalAmount}" pattern="#,##0.00'đ'" />
+                                        </td>
+                                    </tr>
+                                </c:if>
+                                <!-- Voucher Discount Row: Kiểu phần trăm -->
+                                <c:if test="${ticketDetail.voucherApplied eq 'Yes' and not empty ticketDetail.voucherPercentageCode}">
+                                    <tr class="bg-white hover:bg-gray-50">
+                                        <td class="p-2 border border-gray-200 font-semibold" colspan="2">
+                                            Voucher (%): <span class="font-normal">${ticketDetail.voucherPercentageCode}</span>
+                                        </td>
+                                        <td class="p-2 border border-gray-200 text-left font-semibold">
+                                            Savings: <fmt:formatNumber value="${ticketDetail.discountPercentage}" pattern="#,##0.00'đ'" />
+                                        </td>
+                                    </tr>
+                                </c:if>
+
+                                <!-- Voucher Discount Row: Kiểu tiền cố định -->
+                                <c:if test="${ticketDetail.voucherApplied eq 'Yes' and not empty ticketDetail.voucherFixedCode}">
+                                    <tr class="bg-white hover:bg-gray-50">
+                                        <td class="p-2 border border-gray-200 font-semibold" colspan="2">
+                                            Voucher (Fixed): <span class="font-normal">${ticketDetail.voucherFixedCode}</span>
+                                        </td>
+                                        <td class="p-2 border border-gray-200 text-left font-semibold">
+                                            Savings: <fmt:formatNumber value="${ticketDetail.discountFixed}" pattern="#,##0.00'đ'" />
                                         </td>
                                     </tr>
                                 </c:if>
@@ -231,7 +232,7 @@
                                             Total Amount
                                         </td>
                                         <td class="p-2 border border-gray-200 text-green-500">
-                                            <fmt:formatNumber value="${ticketDetail.finalTotalAmount}" type="currency" currencySymbol="đ" />
+                                            <fmt:formatNumber value="${ticketDetail.finalTotalAmount}" pattern="#,##0.00'đ'" />
                                         </td>
                                     </tr>
                                 </c:if>
@@ -240,7 +241,6 @@
                     </div>
                 </c:if>
             </div>
-
             <!-- Thông báo nếu ticketDetail rỗng -->
             <c:if test="${empty ticketDetail}">
                 <div class="mt-6 p-4 bg-red-100 text-red-700 rounded">

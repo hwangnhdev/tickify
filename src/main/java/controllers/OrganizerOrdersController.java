@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import models.OrderDetailDTO;
 
-@WebServlet(name = "OrganizerOrdersController", urlPatterns = {"/organizer/viewOrders"})
+
 public class OrganizerOrdersController extends HttpServlet {
 
     private static final int PAGE_SIZE = 10;

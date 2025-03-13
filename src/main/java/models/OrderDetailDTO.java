@@ -17,8 +17,9 @@ public class OrderDetailDTO {
     private double discountAmount;
     private double totalAfterDiscount;
     private String image_url;
-    // Trường mới cho trạng thái thanh toán
     private String paymentStatus;
+    // Trường mới cho thông tin Seat
+    private String seat;
 
     public OrderDetailDTO() {
     }
@@ -26,7 +27,7 @@ public class OrderDetailDTO {
     public OrderDetailDTO(int orderId, Timestamp orderDate, String customerName, String customerEmail,
             String eventName, String location, double grandTotal, String voucherCode,
             String discount_type, double discount_value, double discountAmount,
-            double totalAfterDiscount, String image_url, String paymentStatus) {
+            double totalAfterDiscount, String image_url, String paymentStatus, String seat) {
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.customerName = customerName;
@@ -41,9 +42,10 @@ public class OrderDetailDTO {
         this.totalAfterDiscount = totalAfterDiscount;
         this.image_url = image_url;
         this.paymentStatus = paymentStatus;
+        this.seat = seat;
     }
 
-    // Getters & Setters
+    // Getters and Setters
     public int getOrderId() {
         return orderId;
     }
@@ -154,5 +156,13 @@ public class OrderDetailDTO {
 
     public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public String getSeat() {
+        return seat;
+    }
+
+    public void setSeat(String seat) {
+        this.seat = seat;
     }
 }
