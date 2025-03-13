@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
+@WebServlet("/viewOrderDetailOrganizer")
 public class ViewOrderDetailOrganizer extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -36,7 +36,7 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
             return;
         }
         
-        // Set organizerId (defaulted to 1; adjust as needed for your logic)
+        // Set organizerId (defaulted to 1; adjust as needed)
         int organizerId = 1;
         
         // Call DAO to retrieve the order details

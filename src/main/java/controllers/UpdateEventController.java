@@ -25,12 +25,10 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import models.Bank;
 import models.Category;
 import models.Event;
 import models.EventImage;
 import models.Organizer;
-import models.Province;
 import models.Seat;
 import models.Showtime;
 import models.TicketType;
@@ -84,7 +82,6 @@ public class UpdateEventController extends HttpServlet {
         EventDAO eventDAO = new EventDAO();
         CategoryDAO categoryDAO = new CategoryDAO();
 
-        // Get event id from URL parameter (default to 577 if not provided)
         String eventIdParam = request.getParameter("eventId");
         int eventId = 0;
         try {
@@ -95,7 +92,6 @@ public class UpdateEventController extends HttpServlet {
             System.err.println("Invalid eventId parameter: " + e.getMessage());
         }
 
-        // Lấy thông tin sự kiện dựa trên eventId
         Event event = eventDAO.getEventById(eventId);
         if (event == null) {
             response.sendRedirect("pages/organizerPage/createEvent.jsp");
@@ -110,54 +106,43 @@ public class UpdateEventController extends HttpServlet {
         List<Seat> seats = eventDAO.getSeatsByEventId(eventId);
         List<Category> listCategories = categoryDAO.getAllCategories();
 
-        // Load provinces from API and save to session
-        try {
-            URL apiUrl = new URL("https://provinces.open-api.vn/api/p/");
-            HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
-            conn.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuilder responseBuffer = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                responseBuffer.append(inputLine);
-            }
-            in.close();
-            conn.disconnect();
+        // Fetch provinces from API
+        List<Province> provinces = loadProvincesFromAPI();
+        request.setAttribute("provinces", provinces);
 
-            Gson gson = new Gson();
-            List<Province> provinces = gson.fromJson(responseBuffer.toString(), new TypeToken<List<Province>>() {
-            }.getType());
-            session.setAttribute("provinces", provinces);
-        } catch (Exception e) {
-            System.err.println("Error loading provinces: " + e.getMessage());
-            e.printStackTrace();
+        String provinceLocal = "";
+        System.out.println(event.getLocation());
+        String[] locationPart = event.getLocation().split(",");
+        int index = 0;
+        for (String string : locationPart) {
+            System.out.println("Part " + index + ": " + string.trim());
+            if (index == 0) {
+                request.setAttribute("ward", string.trim());
+            } else if (index == 1) {
+                request.setAttribute("district", string.trim());
+            } else if (index == 2) {
+//                String province = string.trim().replace("Tỉnh ", "").replace("Thành phố ", "");
+                provinceLocal = string.trim();
+                request.setAttribute("province", string.trim());
+            }
+            index++;
         }
 
-        // Load banks from API and save to session
-        try {
-            URL bankApiUrl = new URL("https://api.vietqr.io/v2/banks");
-            HttpURLConnection bankConn = (HttpURLConnection) bankApiUrl.openConnection();
-            bankConn.setRequestMethod("GET");
-            BufferedReader bankIn = new BufferedReader(new InputStreamReader(bankConn.getInputStream()));
-            String bankInputLine;
-            StringBuilder bankResponseBuffer = new StringBuilder();
-            while ((bankInputLine = bankIn.readLine()) != null) {
-                bankResponseBuffer.append(bankInputLine);
+        System.out.println("Provinces list: " + provinces);
+        for (Province province : provinces) {
+            System.out.println(province.getCodename());
+            System.out.println(province.getCode());
+            System.out.println(province.getName());
+            if (province.getName().equalsIgnoreCase(provinceLocal)) {
+                System.out.println("Successfully");
             }
-            bankIn.close();
-            bankConn.disconnect();
-
-            Gson gson = new Gson();
-            JsonObject bankJson = gson.fromJson(bankResponseBuffer.toString(), JsonObject.class);
-            List<Bank> banks = gson.fromJson(bankJson.get("data"), new TypeToken<List<Bank>>() {
-            }.getType());
-            session.setAttribute("banks", banks);
-        } catch (Exception e) {
-            System.err.println("Error loading banks: " + e.getMessage());
-            e.printStackTrace();
         }
+        System.out.println(provinceLocal);
+        System.out.println("Set ward: " + request.getAttribute("ward"));
+        System.out.println("Set district: " + request.getAttribute("district"));
+        System.out.println("Set province: " + request.getAttribute("province"));
 
-        // Đặt các thuộc tính vào request
+        // Set attributes
         request.setAttribute("event", event);
         request.setAttribute("eventImages", eventImages);
         request.setAttribute("category", category);
@@ -166,6 +151,7 @@ public class UpdateEventController extends HttpServlet {
         request.setAttribute("ticketTypes", ticketTypes);
         request.setAttribute("seats", seats);
         session.setAttribute("listCategories", listCategories);
+        request.setAttribute("bankName", organizer.getBankName());
 
         request.getRequestDispatcher("pages/organizerPage/updateEvent.jsp").forward(request, response);
     }
@@ -353,6 +339,74 @@ public class UpdateEventController extends HttpServlet {
         errorJson.addProperty("success", false);
         errorJson.addProperty("message", message);
         response.getWriter().write(new Gson().toJson(errorJson));
+    }
+
+    public static class Province {
+
+        private String name;
+        private int code;
+        private String division_type;
+        private String codename;
+        private int phone_code;
+        private List<Object> districts;
+
+        public String getName() {
+            return name;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public String getCodename() {
+            return codename;
+        }
+
+        public void setCodename(String codename) {
+            this.codename = codename;
+        }
+
+    }
+
+    // Cập nhật phương thức loadProvincesFromAPI để xử lý UTF-8
+    private List<Province> loadProvincesFromAPI() throws IOException {
+        String apiUrl = "https://provinces.open-api.vn/api/p/";
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestProperty("Accept-Charset", "UTF-8"); // Đảm bảo UTF-8
+
+        if (conn.getResponseCode() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+        }
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+        StringBuilder jsonResponse = new StringBuilder();
+        String output;
+        while ((output = br.readLine()) != null) {
+            jsonResponse.append(output);
+        }
+        conn.disconnect();
+
+        Gson gson = new Gson();
+        List<Province> provinces = gson.fromJson(jsonResponse.toString(), new TypeToken<List<Province>>() {
+        }.getType());
+        return provinces;
+    }
+
+    @Override
+    public void init() throws ServletException {
+        try {
+            List<Province> provinces = loadProvincesFromAPI();
+            getServletContext().setAttribute("provinces", provinces);
+        } catch (IOException e) {
+            throw new ServletException("Failed to load provinces", e);
+        }
     }
 
     /**

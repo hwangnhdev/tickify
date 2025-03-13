@@ -24,6 +24,7 @@
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
                 grid-gap: 5px;
+                grid-gap: 5px;
                 padding: 30px;
                 margin: 0 0;
                 margin-left: 7%;
@@ -32,6 +33,8 @@
             .carousel-large_events {
                 position: relative;
                 overflow: hidden;
+                width: 85%;
+                height: 300px;
                 width: 85%;
                 height: 300px;
                 display: flex;
@@ -127,6 +130,7 @@
                 max-width: 300px;
                 margin-bottom: 20px;
             }
+
 
             /*Top-Picks-For-You*/
             .title-top_events {
@@ -773,7 +777,7 @@
 
         <!--All Event--> 
         <div style="text-align: center;">
-            <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+            <h2 id="all-events-title" class="text-xl font-bold  text-center" style="margin-left: 4%;">
                 <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
             </h2>
         </div>
