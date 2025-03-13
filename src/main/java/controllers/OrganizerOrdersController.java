@@ -37,7 +37,7 @@ public class OrganizerOrdersController extends HttpServlet {
         }
         
         // Lấy organizerId từ session (giả sử đã được lưu khi đăng nhập)
-        int organizerId = 1; // Giá trị mặc định cho test
+        int organizerId = 2; // Giá trị mặc định cho test
         Object orgIdObj = request.getSession().getAttribute("organizerId");
         if (orgIdObj != null) {
             organizerId = Integer.parseInt(orgIdObj.toString());
