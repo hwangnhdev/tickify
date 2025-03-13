@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3.1.xsd">
-
-    <!-- Servlet Definitions -->
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <servlet>
         <servlet-name>AuthController</servlet-name>
         <servlet-class>controllers.AuthController</servlet-class>
@@ -198,8 +196,6 @@
         <servlet-name>UpdateAccountController</servlet-name>
         <servlet-class>controllers.UpdateAccountController</servlet-class>
     </servlet>
-    
-    <!-- Servlet Mappings -->
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -356,12 +352,26 @@
         <servlet-name>ViewHistoryApprovedEventsController</servlet-name>
         <url-pattern>/admin/viewHistoryApprovedEvents</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VoucherController</servlet-name>
+        <url-pattern>/VoucherController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewAllVouchersController</servlet-name>
+        <url-pattern>/ViewAllVouchersController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateVoucherController</servlet-name>
+        <url-pattern>/CreateVoucherController</url-pattern>
+    </servlet-mapping>
     <!-- Session Configuration -->
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
-    <!-- Welcome File List -->
     <welcome-file-list>
         <welcome-file>event</welcome-file>
     </welcome-file-list>

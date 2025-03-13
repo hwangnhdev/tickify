@@ -15,7 +15,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"/>
         <style>
             body {
-                background-color: black;
+                background-color: #121212;
                 color: white;
             }
 
@@ -24,14 +24,17 @@
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
                 grid-gap: 5px;
+                grid-gap: 5px;
                 padding: 30px;
                 margin: 0 0;
-                margin-left: 8%;
+                margin-left: 7%;
             }
 
             .carousel-large_events {
                 position: relative;
                 overflow: hidden;
+                width: 85%;
+                height: 300px;
                 width: 85%;
                 height: 300px;
                 display: flex;
@@ -58,6 +61,11 @@
                 width: 100%;
                 height: 100%;
                 object-fit: fill;
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .event-card-large_events img:hover {
+                transform: scale(1.1);
             }
 
             .view-btn-large_events {
@@ -82,19 +90,27 @@
                 color: white;
                 border: none;
                 border-radius: 50%;
-                width: 30px;
-                height: 30px;
+                width: 35px;
+                height: 35px;
                 cursor: pointer;
                 z-index: 10;
                 opacity: 0.3;
+                transition: opacity 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            .prev-large_events:hover,
+            .next-large_events:hover {
+                opacity: 1;
+                background-color: rgba(0, 0, 0, 0.8);
+                transform: translateY(-50%) scale(1.1);
             }
 
             .prev-large_events {
-                left: 20px;
+                left: 10px;
             }
 
             .next-large_events {
-                right: 20px;
+                right: 10px;
             }
 
             .sidebar-large_events {
@@ -114,6 +130,7 @@
                 max-width: 300px;
                 margin-bottom: 20px;
             }
+
 
             /*Top-Picks-For-You*/
             .title-top_events {
@@ -192,7 +209,7 @@
                 overflow-x: hidden;
                 position: relative;
                 padding: 20px;
-                margin: 0 40px;
+                margin: 0 9.9%;
             }
 
             .event-cards-spec_event {
@@ -216,7 +233,15 @@
             .event-card-spec_event img {
                 width: 100%;
                 height: 100%;
-                object-fit: fill;
+                object-fit: cover;
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, filter 0.3s ease-in-out;
+            }
+
+            /* Hiệu ứng hover */
+            .event-card-spec_event:hover img {
+                transform: scale(1.1);
+                box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
+                filter: brightness(1.2);
             }
 
             .prev-btn-spec_event,
@@ -233,14 +258,15 @@
                 font-size: 20px;
                 cursor: pointer;
                 z-index: 10;
+                opacity: 0.3;
             }
 
             .prev-btn-spec_event {
-                left: 10px;
+                left: 20px;
             }
 
             .next-btn-spec_event {
-                right: 10px;
+                right: 20px;
             }
 
             /*Trending-Events*/
@@ -254,7 +280,7 @@
                 overflow-x: hidden;
                 position: relative;
                 padding: 20px;
-                margin: 0 40px;
+                margin: 0 9.9%;
             }
 
             .event-cards-trend_events {
@@ -278,7 +304,15 @@
             .event-card-trend_events img {
                 width: 100%;
                 height: 100%;
-                object-fit: fill;
+                object-fit: cover;
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, filter 0.3s ease-in-out;
+            }
+
+            /* Hiệu ứng khi hover */
+            .event-card-trend_events:hover img {
+                transform: scale(1.1);
+                box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.5);
+                filter: brightness(1.2);
             }
 
             .prev-btn-trend_events,
@@ -295,17 +329,16 @@
                 font-size: 20px;
                 cursor: pointer;
                 z-index: 10;
+                opacity: 0.3;
             }
 
             .prev-btn-trend_events {
-                left: 10px;
+                left: 20px;
             }
 
             .next-btn-trend_events {
-                right: 10px;
+                right: 20px;
             }
-
-
 
             /*Recommendation Events*/
             .title-rec_events {
@@ -318,7 +351,7 @@
                 overflow-x: hidden;
                 position: relative;
                 padding: 20px;
-                margin: 0 40px;
+                margin: 0 9.9%;
             }
 
             .event-cards-rec_events {
@@ -342,7 +375,14 @@
             .event-card-rec_events img {
                 width: 100%;
                 height: 100%;
-                object-fit: fill;
+                object-fit: cover;
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            }
+
+            /* Hiệu ứng khi hover */
+            .event-card-rec_events:hover img {
+                transform: scale(1.1);
+                box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
             }
 
             .prev-btn-rec_events,
@@ -359,14 +399,15 @@
                 font-size: 20px;
                 cursor: pointer;
                 z-index: 10;
+                opacity: 0.3;
             }
 
             .prev-btn-rec_events {
-                left: 10px;
+                left: 20px;
             }
 
             .next-btn-rec_events {
-                right: 10px;
+                right: 20px;
             }
 
             /*All Events*/
@@ -382,8 +423,8 @@
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
                 text-align: center;
-                /* width: 320px; */
                 transition: transform 0.3s, box-shadow 0.3s;
+                margin-top: 1%;
             }
 
             .event-card-all_events:hover {
@@ -393,15 +434,19 @@
 
             .event-card-all_events img {
                 width: 100%;
-                height: 150px;
+                height: 180px;
                 object-fit: fill;
                 background-color: #f0f0f0;
                 display: block;
                 transition: filter 0.3s;
+                object-fit: cover;
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
 
             .event-card-all_events:hover img {
                 filter: brightness(1.1);
+                transform: scale(1.1);
+                box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
             }
             .event-card-all_events h4 {
                 font-size: 16px;
@@ -416,13 +461,62 @@
             .pagination a {
                 text-decoration: none;
             }
+            h2.text-xl.font-bold.text-center {
+                margin-top: 2%;
+                margin-bottom: -1.5rem !important;
+                position: relative;
+                display: inline-block;
+                padding: 10px 20px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+            }
+            /* Hiệu ứng hover */
+            h2.text-xl.font-bold.text-center:hover {
+                transform: scale(1.1);
+                color: #e63946; /* Màu đỏ đậm hơn */
+            }
+            /* Hiệu ứng underline khi xuất hiện */
+            h2.text-xl.font-bold.text-center::after {
+                content: "";
+                position: absolute;
+                left: 50%;
+                bottom: -5px;
+                width: 50%;
+                height: 3px;
+                background-color: #e63946;
+                transform: translateX(-50%) scaleX(0);
+                transition: transform 0.3s ease-in-out;
+            }
+            /* Khi hover, underline hiện ra */
+            h2.text-xl.font-bold.text-center:hover::after {
+                transform: translateX(-50%) scaleX(1);
+            }
+
+            h2.text-xl.font-bold {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                padding: 0 0;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+            }
+
+            /* Khi hover, tiêu đề sẽ phóng to nhẹ và đổi màu */
+            h2.text-xl.font-bold:hover {
+                transform: scale(1.1);
+                color: #00ffee; /* Màu đỏ đậm hơn */
+            }
         </style>
     </head>
     <body>        
         <!--Large-Events-->
-        <h2 class="text-xl font-bold text-center" style="margin-top: 2%; margin-bottom: -1.5rem !important;">
-            <i class="fas fa-fire text-red-500 mr-2"></i> Most Popular
-        </h2>
+        <div style="text-align: center;">
+            <h2 class="text-xl font-bold text-center">
+                <i class="fas fa-fire text-red-500 mr-2"></i> Most Popular
+            </h2>
+        </div>
         <div class="content-grid-large_events">
             <!-- Carousel 1 -->
             <div class="carousel-large_events">
@@ -476,7 +570,7 @@
         <script src="${pageContext.request.contextPath}/pages/listEventsPage/homeEvents.js"></script>
 
         <!--New Events-->
-        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 11%; margin-bottom: -0.5rem!important;">
             <i class="fas fa-star text-yellow-500 mr-2"></i> Special Events
         </h2>
         <div class="content-grid-spec_event" id="eventContainer-spec_event">
@@ -546,7 +640,7 @@
         </script>
 
         <!--Upcoming-Events--> 
-        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 11%; margin-bottom: -0.5rem!important;">
             <i class="fas fa-fire text-red-500 mr-2"></i> Upcoming events
         </h2>
         <div class="content-grid-trend_events" id="eventContainer-trend_events">
@@ -608,7 +702,7 @@
         </script>
 
         <!--Recommendation Events--> 
-        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 4%;">
+        <h2 class="text-xl font-bold mb-4 flex items-center" style="margin-left: 11%; margin-bottom: -0.5rem!important;">
             <i class="fas fa-thumbs-up text-blue-500 mr-2"></i> Recommendation For You
         </h2>
         <div class="content-grid-rec_events" id="eventContainer-rec_events">
@@ -682,9 +776,11 @@
         </script>
 
         <!--All Event--> 
-        <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
-            <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
-        </h2>
+        <div style="text-align: center;">
+            <h2 id="all-events-title" class="text-xl font-bold  text-center" style="margin-left: 4%;">
+                <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+            </h2>
+        </div>
         <div class="container py-4">
             <div class="row gy-4" id="event-container">
                 <!-- Event Cards -->

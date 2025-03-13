@@ -1259,13 +1259,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Load Provinces
 async function loadProvinces() {
+    const provinceSelect = document.getElementById("province");
+    const requestedProvince = "${province}"; // Lấy giá trị từ JSP (Thành phố Hà Nội)
+
     // Kiểm tra xem provinces đã có trong session chưa
     const provinces = sessionStorage.getItem('provinces');
     if (provinces) {
         const provinceData = JSON.parse(provinces);
-        const provinceSelect = document.getElementById("province");
         provinceSelect.innerHTML = '<option value="">-- Select Province/City --</option>' +
             provinceData.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
+        selectDefaultProvince(provinceSelect, requestedProvince); // Chọn giá trị mặc định
         return;
     }
 
@@ -1273,9 +1276,23 @@ async function loadProvinces() {
     const response = await fetch("https://provinces.open-api.vn/api/p/");
     const provincesData = await response.json();
     sessionStorage.setItem('provinces', JSON.stringify(provincesData));
-    const provinceSelect = document.getElementById("province");
     provinceSelect.innerHTML = '<option value="">-- Select Province/City --</option>' +
         provincesData.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
+    selectDefaultProvince(provinceSelect, requestedProvince); // Chọn giá trị mặc định
+}
+
+// Hàm chọn giá trị mặc định cho Province
+function selectDefaultProvince(provinceSelect, requestedProvince) {
+    if (requestedProvince) {
+        const options = provinceSelect.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === requestedProvince) {
+                provinceSelect.selectedIndex = i;
+                console.log(`Selected province: ${options[i].value}`); // Debug
+                break;
+            }
+        }
+    }
 }
 // Load Districts based on selected Province
 async function updateDistricts() {
