@@ -33,6 +33,11 @@
         </a>
       </li>
       <li class="mb-4">
+        <a class="sidebar-item flex items-center p-2 rounded" href="${pageContext.request.contextPath}/category">
+          <i class="sidebar-icon fas fa-chart-line mr-3"></i> Manage Category
+        </a>
+      </li>
+      <li class="mb-4">
         <a class="sidebar-item flex items-center p-2 rounded" href="${pageContext.request.contextPath}/admin/settings">
           <i class="sidebar-icon fas fa-cog mr-3"></i> Settings
         </a>
