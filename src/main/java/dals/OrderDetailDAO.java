@@ -1,6 +1,6 @@
 package dals;
 
-import models.OrderDetailDTO;
+import viewModels.OrderDetailDTO;
 import utils.DBContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

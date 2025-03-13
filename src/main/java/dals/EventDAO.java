@@ -1220,11 +1220,60 @@ public class EventDAO extends DBContext {
         }
         return monthlyRevenue;
     }
+    
+    /*getTotalRevenueOfEventById*/
+    public List<Double> getTotalTicketsChartOfEventById(int eventId, int year) {
+        List<Double> monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+        String sql = "WITH RevenueByMonth AS (\n"
+                + "    SELECT \n"
+                + "        MONTH(o.order_date) AS Month,\n"
+                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity) AS TicketQuantity\n"
+                + "    FROM [dbo].[Orders] o\n"
+                + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
+                + "    INNER JOIN [dbo].[TicketTypes] tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "    INNER JOIN [dbo].[Showtimes] st ON tt.showtime_id = st.showtime_id\n"
+                + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
+                + "    WHERE \n"
+                + "        e.event_id = ? -- Thay bằng ID của sự kiện cần tìm\n"
+                + "        AND YEAR(o.order_date) = ? -- Thay bằng năm cần tìm\n"
+                + "    GROUP BY MONTH(o.order_date)\n"
+                + ")\n"
+                + "\n"
+                + "SELECT \n"
+                + "    m.Month,\n"
+                + "    ISNULL(rm.Revenue, 0) AS Revenue,\n"
+                + "    ISNULL(rm.TicketQuantity, 0) AS TicketQuantity\n"
+                + "FROM (\n"
+                + "    SELECT 1 AS Month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION \n"
+                + "    SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION \n"
+                + "    SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12\n"
+                + ") m\n"
+                + "LEFT JOIN RevenueByMonth rm ON m.Month = rm.Month\n"
+                + "ORDER BY m.Month;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, eventId);
+            st.setInt(2, year);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                int month = rs.getInt("Month") - 1;
+                double revenue = rs.getDouble("TicketQuantity");
+                monthlyRevenue.set(month, revenue);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error searching events: " + e.getMessage());
+        }
+        return monthlyRevenue;
+    }
 
     public static void main(String[] args) {
         EventDAO d = new EventDAO();
-        List<Double> monthlyRevenue = d.getTotalRevenueChartOfEventById(1, 2025);
-        for (Double double1 : monthlyRevenue) {
+        List<Showtime> monthlyRevenue = d.getShowTimesByEventId(1);
+        for (Showtime double1 : monthlyRevenue) {
             System.out.println(double1);
         }
     }

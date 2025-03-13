@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import models.Event;
-import models.EventDetailDTO;
+import viewModels.EventDetailDTO;
 
 @WebServlet(name = "ApproveEventController", urlPatterns = {"/admin/approveEvent"})
 public class ApproveEventController extends HttpServlet {

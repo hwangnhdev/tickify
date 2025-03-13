@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import models.OrderDetailDTO;
+import viewModels.OrderDetailDTO;
 
 
 public class OrganizerOrdersController extends HttpServlet {

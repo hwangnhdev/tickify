@@ -7,10 +7,11 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.EventDetailDTO;
-import models.EventSummaryDTO;
+import viewModels.EventDetailDTO;
+import viewModels.EventSummaryDTO;
 import models.Order;
-import models.OrderDetailDTO;
+import viewModels.OrderDetailDTO;
+
 import utils.DBContext;
 
 /**

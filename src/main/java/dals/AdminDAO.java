@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import models.Event;
-import models.EventDetailDTO;
+import viewModels.EventDetailDTO;
 import models.EventImage;
 import utils.DBContext;
 
