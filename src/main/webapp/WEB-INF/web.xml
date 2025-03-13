@@ -352,6 +352,22 @@
         <servlet-name>ViewHistoryApprovedEventsController</servlet-name>
         <url-pattern>/admin/viewHistoryApprovedEvents</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VoucherController</servlet-name>
+        <url-pattern>/VoucherController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewAllVouchersController</servlet-name>
+        <url-pattern>/ViewAllVouchersController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateVoucherController</servlet-name>
+        <url-pattern>/CreateVoucherController</url-pattern>
+    </servlet-mapping>
     <!-- Session Configuration -->
     <session-config>
         <session-timeout>30</session-timeout>
