@@ -1,6 +1,5 @@
 package controllers;
 
-import dals.OrderDAO;
 import dals.TicketDAO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -11,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import models.TicketDetailDTO;
 import java.io.IOException;
 
-@WebServlet(name = "TicketDetailController", urlPatterns = {"/viewTicketDetail"})
+
 public class TicketDetailController extends HttpServlet {
 
     @Override

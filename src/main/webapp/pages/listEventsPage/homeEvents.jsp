@@ -24,6 +24,7 @@
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
                 grid-gap: 5px;
+                grid-gap: 5px;
                 padding: 30px;
                 margin: 0 0;
                 margin-left: 7%;
@@ -32,6 +33,8 @@
             .carousel-large_events {
                 position: relative;
                 overflow: hidden;
+                width: 85%;
+                height: 300px;
                 width: 85%;
                 height: 300px;
                 display: flex;
@@ -127,6 +130,7 @@
                 max-width: 300px;
                 margin-bottom: 20px;
             }
+
 
             /*Top-Picks-For-You*/
             .title-top_events {

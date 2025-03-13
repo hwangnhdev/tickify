@@ -43,7 +43,8 @@ public class OrderDetailDAO extends DBContext {
                 + "        ELSE ISNULL(v.discount_value, 0)\n"
                 + "      END, 2) AS DECIMAL(10,2)) AS totalAfterDiscount,\n"
                 + "    ei.image_url,\n"
-                + "    o.payment_status\n"
+                + "    o.payment_status,\n"
+                + "    MIN(CONCAT(s.seat_row, '-', s.seat_col)) AS seat\n"
                 + "FROM Orders o\n"
                 + "JOIN Customers c ON o.customer_id = c.customer_id\n"
                 + "JOIN OrderDetails od ON o.order_id = od.order_id\n"
@@ -51,6 +52,8 @@ public class OrderDetailDAO extends DBContext {
                 + "JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
                 + "JOIN Events e ON st.event_id = e.event_id\n"
                 + "JOIN Organizers org ON e.organizer_id = org.organizer_id\n"
+                + "JOIN Ticket t ON od.order_detail_id = t.order_detail_id\n"
+                + "JOIN Seats s ON t.seat_id = s.seat_id\n"
                 + "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id\n"
                 + "LEFT JOIN (\n"
                 + "    SELECT event_id, MIN(image_url) AS image_url\n"
@@ -71,7 +74,7 @@ public class OrderDetailDAO extends DBContext {
                 + "    v.discount_type,\n"
                 + "    v.discount_value,\n"
                 + "    ei.image_url,\n"
-                + "    o.payment_status;";
+                + "    o.payment_status";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, organizerId);
@@ -93,8 +96,8 @@ public class OrderDetailDAO extends DBContext {
                     detail.setDiscountAmount(rs.getDouble("discountAmount"));
                     detail.setTotalAfterDiscount(rs.getDouble("totalAfterDiscount"));
                     detail.setImage_url(rs.getString("image_url"));
-                    // Set trường paymentStatus mới
                     detail.setPaymentStatus(rs.getString("payment_status"));
+                    detail.setSeat(rs.getString("seat")); // Lấy thông tin seat từ kết quả MIN(...)
                 }
             }
         } catch (SQLException ex) {
