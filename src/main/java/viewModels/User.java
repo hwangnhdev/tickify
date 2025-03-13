@@ -1,4 +1,4 @@
-package models;
+package viewModels;
 
 public class User {
     private int userId;

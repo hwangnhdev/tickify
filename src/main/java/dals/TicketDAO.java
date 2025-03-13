@@ -5,8 +5,8 @@ import utils.DBContext;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import models.CustomerTicketDTO;
-import models.TicketDetailDTO;
+import viewModels.CustomerTicketDTO;
+import viewModels.TicketDetailDTO;
 
 public class TicketDAO extends DBContext {
 

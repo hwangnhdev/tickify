@@ -21,7 +21,7 @@ public class Showtime {
     private Timestamp createdAt; // Changed from Date to Timestamp
     private Timestamp updatedAt; // Changed from Date to Timestamp
 
-    private List<TicketType> ticketTypes; // Vui add this field to store json
+    private List<TicketType> ticketTypes; // Vui add this field to store json // Vui Fix
 
     public List<TicketType> getTicketTypes() {
         return ticketTypes;

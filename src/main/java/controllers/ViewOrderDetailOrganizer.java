@@ -1,7 +1,7 @@
 package controllers;
 
 import dals.OrderDetailDAO;
-import models.OrderDetailDTO;
+import viewModels.OrderDetailDTO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

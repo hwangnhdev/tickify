@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Event;
 import models.EventImage;
-import models.FilterEvent;
+import viewModels.FilterEvent;
 import utils.DBContext;
 
 /**

@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import models.Customer;
 import models.CustomerAuth;
-import models.UserFacebookDTO;
+import viewModels.UserFacebookDTO;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Form;
