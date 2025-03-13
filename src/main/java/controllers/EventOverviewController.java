@@ -129,12 +129,19 @@ public class EventOverviewController extends HttpServlet {
         EventDAO eventDAO = new EventDAO();
 
         List<Double> monthlyRevenue = eventDAO.getTotalRevenueChartOfEventById(eventId, year);
+        List<Double> monthlyTickets = eventDAO.getTotalTicketsChartOfEventById(eventId, year);
+
         if (monthlyRevenue == null || monthlyRevenue.isEmpty()) {
             monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
         }
 
+        if (monthlyTickets == null || monthlyTickets.isEmpty()) {
+            monthlyTickets = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+        }
+
         JSONObject jsonResponse = new JSONObject();
         jsonResponse.put("monthlyRevenue", new org.json.JSONArray(monthlyRevenue));
+        jsonResponse.put("monthlyTickets", new org.json.JSONArray(monthlyTickets));
 
         try ( PrintWriter out = response.getWriter()) {
             out.print(jsonResponse.toString());

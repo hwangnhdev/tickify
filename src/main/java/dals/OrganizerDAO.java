@@ -11,10 +11,10 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.EventDetailDTO;
-import models.EventSummaryDTO;
+import viewModels.EventDetailDTO;
+import viewModels.EventSummaryDTO;
 import models.Order;
-import models.OrderDetailDTO;
+import viewModels.OrderDetailDTO;
 
 import utils.DBContext;
 
@@ -24,7 +24,7 @@ import utils.DBContext;
  */
 public class OrganizerDAO extends DBContext {
 
-    public EventDetailDTO getOrganizerEventDetail(int organizerId, int eventId) {
+    public EventDetailDTO getCustomerEventDetail(int customerId, int eventId) {
         EventDetailDTO detail = null;
         String sql = "SELECT "
                 + "    e.event_id AS eventId, "
@@ -39,6 +39,7 @@ public class OrganizerDAO extends DBContext {
                 + "        JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
                 + "        JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id "
                 + "        WHERE s2.event_id = e.event_id "
+                + "          AND o.customer_id = ? "
                 + "        ORDER BY o.created_at DESC "
                 + "    ) AS paymentStatus, "
                 + "    e.status AS status, "
@@ -53,11 +54,22 @@ public class OrganizerDAO extends DBContext {
                 + "FROM Events e "
                 + "JOIN Organizers org ON e.organizer_id = org.organizer_id "
                 + "JOIN Showtimes s ON e.event_id = s.event_id "
-                + "WHERE org.organizer_id = ? AND e.event_id = ? "
+                + "WHERE e.event_id = ? "
+                + "  AND EXISTS ( "
+                + "      SELECT 1 "
+                + "      FROM Orders o "
+                + "      JOIN OrderDetails od ON o.order_id = od.order_id "
+                + "      JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+                + "      JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id "
+                + "      WHERE s2.event_id = e.event_id "
+                + "        AND o.customer_id = ? "
+                + "  ) "
                 + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, organizerId);
+            // Gán customerId cho subquery lấy paymentStatus và điều kiện EXISTS
+            ps.setInt(1, customerId);
             ps.setInt(2, eventId);
+            ps.setInt(3, customerId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 detail = new EventDetailDTO();
@@ -69,7 +81,7 @@ public class OrganizerDAO extends DBContext {
                 detail.setPaymentStatus(rs.getString("paymentStatus"));
                 detail.setStatus(rs.getString("status"));
                 detail.setDescription(rs.getString("description"));
-                detail.setImageUrl(rs.getString("imageURL")); // Cần có thuộc tính imageUrl trong model
+                detail.setImageUrl(rs.getString("imageURL")); // Thuộc tính imageUrl của model
                 detail.setOrganizationName(rs.getString("organizationName"));
             }
         } catch (SQLException e) {
@@ -78,26 +90,29 @@ public class OrganizerDAO extends DBContext {
         return detail;
     }
 
-    public List<EventSummaryDTO> getEventsByOrganizer(int organizerId, String filter) {
+    public List<EventSummaryDTO> getEventsByCustomer(int customerId, String filter) {
         List<EventSummaryDTO> events = new ArrayList<>();
 
-        // Base SQL query, đã thêm eventId
+        // Truy vấn cơ bản lấy thông tin sự kiện từ bảng Events và Showtimes,
+        // đồng thời dùng subquery để lấy payment_status và image của sự kiện,
+        // chỉ lấy các sự kiện mà khách hàng đã có đơn hàng
         String baseSql = "SELECT \n"
                 + "    e.event_id AS eventId,\n"
                 + "    e.event_name AS eventName,\n"
                 + "    MIN(s.start_date) AS startDate,\n"
                 + "    MAX(s.end_date) AS endDate,\n"
                 + "    e.location AS location,\n"
-                + "    (\n"
+                + "    ( \n"
                 + "        SELECT TOP 1 o.payment_status\n"
                 + "        FROM Orders o\n"
                 + "        JOIN OrderDetails od ON o.order_id = od.order_id\n"
                 + "        JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
                 + "        JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
                 + "        WHERE s2.event_id = e.event_id\n"
+                + "          AND o.customer_id = ?\n"
                 + "        ORDER BY o.created_at DESC\n"
                 + "    ) AS paymentStatus,\n"
-                + "    (\n"
+                + "    ( \n"
                 + "        SELECT TOP 1 image_url\n"
                 + "        FROM EventImages\n"
                 + "        WHERE event_id = e.event_id\n"
@@ -105,17 +120,22 @@ public class OrganizerDAO extends DBContext {
                 + "    ) AS image\n"
                 + "FROM Events e\n"
                 + "JOIN Showtimes s ON e.event_id = s.event_id\n"
-                + "WHERE e.organizer_id = ? ";
+                + "WHERE EXISTS (\n"
+                + "    SELECT 1\n"
+                + "    FROM Orders o\n"
+                + "    JOIN OrderDetails od ON o.order_id = od.order_id\n"
+                + "    JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "    JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
+                + "    WHERE s2.event_id = e.event_id\n"
+                + "      AND o.customer_id = ?\n"
+                + ")\n";
 
-        // Các điều kiện bổ sung theo bộ lọc
-        String extraWhere = "";
+        // Xử lý bộ lọc (nếu có)
         String groupBy = " GROUP BY e.event_id, e.event_name, e.location ";
         String havingClause = "";
-
         if (filter != null && !filter.equalsIgnoreCase("all")) {
-            // Lọc theo payment status: pending hoặc paid
             if (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid")) {
-                extraWhere += " AND (\n"
+                baseSql += " AND (\n"
                         + "     SELECT TOP 1 o.payment_status\n"
                         + "     FROM Orders o\n"
                         + "     JOIN OrderDetails od ON o.order_id = od.order_id\n"
@@ -124,20 +144,22 @@ public class OrganizerDAO extends DBContext {
                         + "     WHERE s2.event_id = e.event_id\n"
                         + "     ORDER BY o.created_at DESC\n"
                         + " ) = ? ";
-            } // Lọc các sự kiện sắp diễn ra (upcoming)
-            else if (filter.equalsIgnoreCase("upcoming")) {
+            } else if (filter.equalsIgnoreCase("upcoming")) {
                 havingClause = " HAVING MIN(s.start_date) > GETDATE() ";
-            } // Lọc các sự kiện đã qua (past)
-            else if (filter.equalsIgnoreCase("past")) {
+            } else if (filter.equalsIgnoreCase("past")) {
                 havingClause = " HAVING MAX(s.end_date) < GETDATE() ";
             }
         }
 
-        String finalSql = baseSql + extraWhere + groupBy + havingClause;
+        String finalSql = baseSql + groupBy + havingClause;
 
         try (PreparedStatement ps = connection.prepareStatement(finalSql)) {
             int paramIndex = 1;
-            ps.setInt(paramIndex++, organizerId);
+            // Gán customerId cho subquery trong SELECT paymentStatus
+            ps.setInt(paramIndex++, customerId);
+            // Gán customerId cho subquery trong WHERE EXISTS
+            ps.setInt(paramIndex++, customerId);
+            // Nếu filter theo payment status thì gán tham số cho điều kiện đó
             if (filter != null && (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid"))) {
                 ps.setString(paramIndex++, filter);
             }
@@ -158,7 +180,7 @@ public class OrganizerDAO extends DBContext {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Có thể xử lý lỗi chi tiết hơn tại đây nếu cần
+            // Xử lý lỗi nếu cần thiết
         }
         return events;
     }

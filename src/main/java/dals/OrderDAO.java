@@ -10,7 +10,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import models.Order;
-import models.TicketDetailDTO;
+import viewModels.TicketDetailDTO;
 import utils.DBContext;
 
 public class OrderDAO extends DBContext {

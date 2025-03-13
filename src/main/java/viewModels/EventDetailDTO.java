@@ -1,7 +1,8 @@
-package models;
+package viewModels;
 
 import java.sql.Timestamp;
 import java.util.List;
+import models.Event;
 
 public class EventDetailDTO extends Event {
 
