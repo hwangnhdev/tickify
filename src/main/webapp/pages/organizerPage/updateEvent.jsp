@@ -543,7 +543,6 @@
                                    value="${event.eventName}" placeholder="Event Name" required>
                             <span class="error-message" id="eventName_error"></span>
                         </div>
-
                         <!-- Event Category -->
                         <div>
                             <label class="block text-gray-300 mb-2">Event Category</label>
@@ -558,11 +557,11 @@
                             </select>
                             <span class="error-message" id="eventCategory_error"></span>
                         </div>
-
                         <!-- Location (Province/City, District, Ward, Full Address) -->
                         <div>
                             <label class="block text-gray-300 mb-2">Province/City</label>
-                            <select id="province" name="province" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateDistricts(); updateFullAddress();" required>
+                            <input type="hidden" id="original_province" value="${province != null ? province : ''}">
+                            <select id="province" name="province" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="handleProvinceChange(this); updateDistricts(); updateFullAddress();" required>
                                 <option value="">-- Select Province/City --</option>
                                 <c:forEach var="prov" items="${provinces}">
                                     <option value="${prov.name}" data-code="${prov.code}" ${prov.name eq province ? 'selected' : ''}>${prov.name}</option>
@@ -574,11 +573,9 @@
                         <!-- District -->
                         <div>
                             <label class="block text-gray-300 mb-2">District</label>
+                            <input type="hidden" id="original_district" value="${district != null ? district : ''}">
                             <select id="district" name="district" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateWards(); updateFullAddress();" required>
                                 <option value="">-- Select District --</option>
-                                <c:if test="${not empty event.location}">
-                                    <option value="${district}" selected>${district}</option>
-                                </c:if>
                             </select>
                             <span class="error-message" id="district_error"></span>
                         </div>
@@ -586,28 +583,26 @@
                         <!-- Ward -->
                         <div>
                             <label class="block text-gray-300 mb-2">Ward</label>
+                            <input type="hidden" id="original_ward" value="${ward != null ? ward : ''}">
                             <select id="ward" name="ward" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="updateFullAddress();" required>
                                 <option value="">-- Select Ward --</option>
-                                <c:if test="${not empty event.location}">
-                                    <option value="${ward}" selected>${ward}</option>
-                                </c:if>
                             </select>
                             <span class="error-message" id="ward_error"></span>
                         </div>
+
+                        <!-- Full Address -->
                         <div class="md:col-span-2">
                             <label class="block text-gray-300 mb-2">Full Address</label>
                             <input type="text" id="fullAddress" name="fullAddress" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" 
-                                   value="${event.location}" placeholder="Building number, Ward, District, Province/City" required>
+                                   value="${event.location}" placeholder="Ward, District, Province/City" required>
                             <span class="error-message" id="fullAddress_error"></span>
                         </div>
-
                         <!-- Event Information (Description) -->
                         <div class="md:col-span-2">
                             <label class="block text-gray-300 mb-2">Event Information</label>
                             <textarea class="event-info-textarea" placeholder="Description" required>${event.description}</textarea>
                             <span class="error-message" id="eventInfo_error"></span>
                         </div>
-
                         <!-- Event Logo, Background Image, Organizer Logo -->
                         <div class="md:col-span-2 p-4 rounded bg-gray-800 text-center">
                             <div class="image-group">
