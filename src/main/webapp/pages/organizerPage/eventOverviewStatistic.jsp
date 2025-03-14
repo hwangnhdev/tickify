@@ -76,25 +76,27 @@
                                     <option value="30days">30 Days</option>
                                     <option value="24hours">24 Hours</option>
                                 </select>
-                                <select id="yearSelect" class="bg-gray-700 text-white p-2 rounded">
-                                    <option value="2020">2020</option>
-                                    <option value="2021">2021</option>
-                                    <option value="2022">2022</option>
-                                    <option value="2023">2023</option>
-                                    <option value="2024">2024</option>
-                                    <option value="2025" selected>2025</option>
-                                    <option value="2026">2026</option>
-                                </select>
+                                <span id="yearSelectContainer">
+                                    <select id="yearSelect" class="bg-gray-700 text-white p-2 rounded">
+                                        <option value="2020">2020</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2022">2022</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2026">2026</option>
+                                    </select>
+                                </span>
                             </div>
                         </div>
-                        <h3 class="text-lg font-bold text-green-400">Revenue Over Time</h3>
-                        <div class="h-64 mt-4">
-                            <canvas id="revenueChart"></canvas>
-                        </div>
-                        <h3 class="text-lg font-bold text-green-400">Ticket Over Time</h3>
-                        <div class="h-64 mt-4">
-                            <canvas id="ticketChart"></canvas>
-                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-green-400">Revenue Over Time</h3>
+                    <div class="h-64 mt-4">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <h3 class="text-lg font-bold text-green-400">Ticket Over Time</h3>
+                    <div class="h-64 mt-4">
+                        <canvas id="ticketChart"></canvas>
                     </div>
                 </div>
                 <div class="container mx-auto p-4">
@@ -202,239 +204,263 @@
                         </c:forEach>
                     </div>
                 </div>
-            </section>
-
-            <script>
-                // Lấy eventId từ input hidden
-                const eventId = document.getElementById('eventId').value;
-
-                // Lấy năm hiện tại
-                const currentYear = new Date().getFullYear();
-
-                // Đặt năm mặc định cho dropdown
-                const yearSelect = document.getElementById('yearSelect');
-                yearSelect.value = currentYear;
-
-                // Khai báo biến biểu đồ
-                let revenueChart;
-                let ticketChart;
-
-                function initFillRateChart(fillRate) {
-                    const ctx = document.getElementById('fillRateChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Filled', 'Remaining'],
-                            datasets: [{
-                                data: [fillRate, 100 - fillRate],
-                                backgroundColor: ['#22c55e', '#374151'],
-                                borderWidth: 2,
-                                hoverOffset: 5
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                    labels: { color: '#fff' }
-                                },
-                                datalabels: {
-                                    color: '#fff',
-                                    font: {
-                                        weight: 'bold',
-                                        size: 16
-                                    },
-                                    formatter: (value, context) => {
-                                        return value + '%';
-                                    }
-                                }
-                            }
-                        },
-                        plugins: [ChartDataLabels]
-                    });
-                }
-
-                const fillRateText = document.getElementById('fillRate').innerText;
-                const fillRateValue = parseFloat(fillRateText.replace('%', '')) || 0;
-                initFillRateChart(fillRateValue);
-
-                // Hàm khởi tạo biểu đồ doanh thu
-                function initChart() {
-                    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-                    revenueChart = new Chart(revenueCtx, {
-                        type: 'line',
-                        data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                            datasets: [{
-                                label: 'Doanh thu',
-                                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                                backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                                borderColor: 'rgba(34, 197, 94, 1)',
-                                borderWidth: 2,
-                                fill: true,
-                                pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgba(34, 197, 94, 1)',
-                                tension: 0.4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    min: 0,
-                                    ticks: { color: '#fff' },
-                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                },
-                                x: {
-                                    ticks: { color: '#fff' },
-                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    labels: { color: 'rgba(34, 197, 94, 1)' }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                // Hàm khởi tạo biểu đồ vé
-                function initTicketChart() {
-                    const ticketCtx = document.getElementById('ticketChart').getContext('2d');
-                    ticketChart = new Chart(ticketCtx, {
-                        type: 'line',
-                        data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                            datasets: [{
-                                label: 'Số vé bán được',
-                                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                                borderColor: 'rgba(59, 130, 246, 1)',
-                                borderWidth: 2,
-                                fill: true,
-                                pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
-                                tension: 0.4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    min: 0,
-                                    ticks: { color: '#fff' },
-                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                },
-                                x: {
-                                    ticks: { color: '#fff' },
-                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    labels: { color: 'rgba(59, 130, 246, 1)' }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                // Cập nhật nhãn và dữ liệu biểu đồ dựa trên timeRange
-                function updateCharts(data, timeRange) {
-                    let labels;
-
-                    if (timeRange === 'year') {
-                        labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        revenueChart.data.datasets[0].data = data.monthlyRevenue;
-                        ticketChart.data.datasets[0].data = data.monthlyTickets;
-                    } else if (timeRange === '30days') {
-                        labels = Array.from({ length: 30 }, (_, i) => {
-                            const date = new Date();
-                            date.setDate(date.getDate() - (29 - i));
-                            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                        });
-                        revenueChart.data.datasets[0].data = data.revenueLast30Days;
-                        ticketChart.data.datasets[0].data = data.ticketsLast30Days;
-                    } else if (timeRange === '24hours') {
-                        labels = Array.from({ length: 24 }, (_, i) => {
-                            const date = new Date();
-                            date.setHours(date.getHours() - (23 - i));
-                            return date.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false });
-                        });
-                        revenueChart.data.datasets[0].data = data.revenueLast24Hours;
-                        ticketChart.data.datasets[0].data = data.ticketsLast24Hours;
-                    }
-
-                    // Cập nhật nhãn cho cả hai biểu đồ
-                    revenueChart.data.labels = labels;
-                    ticketChart.data.labels = labels;
-
-                    // Cập nhật biểu đồ
-                    revenueChart.update();
-                    ticketChart.update();
-                }
-
-                // Hàm gửi yêu cầu lấy dữ liệu
-                function fetchRevenueData(eventId, year, timeRange) {
-                    fetch(`${pageContext.request.contextPath}/eventOverview`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ eventId: eventId, year: year, timeRange: timeRange })
-                    })
-                        .then(response => response.json())
-                        .then(data => updateCharts(data, timeRange))
-                        .catch(error => console.error('Error fetching data:', error));
-                }
-
-                // Khởi tạo biểu đồ
-                initChart();
-                initTicketChart();
-                fetchRevenueData(eventId, currentYear, 'year');
-
-                // Xử lý sự kiện thay đổi bộ lọc
-                yearSelect.addEventListener('change', function () {
-                    const selectedYear = this.value;
-                    const timeRange = document.getElementById('timeRangeSelect').value;
-                    fetchRevenueData(eventId, selectedYear, timeRange);
-                });
-
-                document.getElementById('timeRangeSelect').addEventListener('change', function () {
-                    const selectedYear = yearSelect.value;
-                    const timeRange = this.value;
-                    fetchRevenueData(eventId, selectedYear, timeRange);
-                });
-
-                // Toggle for ticket details
-                function toggleShowtime(id, iconId) {
-                    var element = document.getElementById(id);
-                    var icon = document.getElementById(iconId);
-                    if (element.style.display === "none") {
-                        element.style.display = "table";
-                        icon.classList.remove("fa-chevron-down");
-                        icon.classList.add("fa-chevron-up");
-                    } else {
-                        element.style.display = "none";
-                        icon.classList.remove("fa-chevron-up");
-                        icon.classList.add("fa-chevron-down");
-                    }
-                }
-            </script>
         </div>
-    </body>
+    </section>
+
+    <script>
+        // Lấy eventId từ input hidden
+        const eventId = document.getElementById('eventId').value;
+
+        // Lấy năm hiện tại
+        const currentYear = new Date().getFullYear();
+
+        // Đặt năm mặc định cho dropdown
+        const yearSelect = document.getElementById('yearSelect');
+        yearSelect.value = currentYear;
+
+        // Khai báo biến biểu đồ
+        let revenueChart;
+        let ticketChart;
+
+        // Hàm kiểm tra và hiển thị/ẩn yearSelectContainer
+        function toggleYearSelect() {
+            const timeRange = document.getElementById('timeRangeSelect').value;
+            const yearSelectContainer = document.getElementById('yearSelectContainer');
+
+            if (timeRange === 'year') {
+                yearSelectContainer.style.display = 'inline-block'; // Hiển thị khi chọn "Year"
+            } else {
+                yearSelectContainer.style.display = 'none'; // Ẩn khi chọn "30 Days" hoặc "24 Hours"
+            }
+        }
+
+        // Gọi hàm toggleYearSelect khi tải trang để thiết lập trạng thái ban đầu for selec time and day and year
+        toggleYearSelect();
+
+        // Thêm sự kiện change cho timeRangeSelect
+        document.getElementById('timeRangeSelect').addEventListener('change', function () {
+            toggleYearSelect(); // Cập nhật trạng thái hiển thị của yearSelectContainer
+            const selectedYear = yearSelect.value;
+            const timeRange = this.value;
+            fetchRevenueData(eventId, selectedYear, timeRange);
+        });
+
+        function initFillRateChart(fillRate) {
+            const ctx = document.getElementById('fillRateChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Filled', 'Remaining'],
+                    datasets: [{
+                            data: [fillRate, 100 - fillRate],
+                            backgroundColor: ['#22c55e', '#374151'],
+                            borderWidth: 2,
+                            hoverOffset: 5
+                        }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {color: '#fff'}
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            },
+                            formatter: (value, context) => {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        const fillRateText = document.getElementById('fillRate').innerText;
+        const fillRateValue = parseFloat(fillRateText.replace('%', '')) || 0;
+        initFillRateChart(fillRateValue);
+
+        // Hàm khởi tạo biểu đồ doanh thu
+        function initChart() {
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                            label: 'Doanh thu',
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 2,
+                            fill: true,
+                            pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(34, 197, 94, 1)',
+                            tension: 0.4
+                        }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            ticks: {color: '#fff'},
+                            grid: {color: 'rgba(255, 255, 255, 0.1)'}
+                        },
+                        x: {
+                            ticks: {color: '#fff'},
+                            grid: {color: 'rgba(255, 255, 255, 0.1)'}
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {color: 'rgba(34, 197, 94, 1)'}
+                        }
+                    }
+                }
+            });
+        }
+
+        // Hàm khởi tạo biểu đồ vé
+        function initTicketChart() {
+            const ticketCtx = document.getElementById('ticketChart').getContext('2d');
+            ticketChart = new Chart(ticketCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                            label: 'Số vé bán được',
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2,
+                            fill: true,
+                            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
+                            tension: 0.4
+                        }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            ticks: {color: '#fff'},
+                            grid: {color: 'rgba(255, 255, 255, 0.1)'}
+                        },
+                        x: {
+                            ticks: {color: '#fff'},
+                            grid: {color: 'rgba(255, 255, 255, 0.1)'}
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {color: 'rgba(59, 130, 246, 1)'}
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cập nhật nhãn và dữ liệu biểu đồ dựa trên timeRange
+        function updateCharts(data, timeRange) {
+            let labels;
+
+            if (timeRange === 'year') {
+                labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                revenueChart.data.datasets[0].data = data.monthlyRevenue;
+                ticketChart.data.datasets[0].data = data.monthlyTickets;
+            } else if (timeRange === '30days') {
+                labels = Array.from({length: 30}, (_, i) => {
+                    const date = new Date();
+                    date.setDate(date.getDate() - (29 - i));
+                    return date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+                });
+                revenueChart.data.datasets[0].data = data.revenueLast30Days;
+                ticketChart.data.datasets[0].data = data.ticketsLast30Days;
+            } else if (timeRange === '24hours') {
+                labels = Array.from({length: 24}, (_, i) => {
+                    const date = new Date();
+                    date.setHours(date.getHours() - (23 - i));
+                    return date.toLocaleTimeString('en-US', {hour: '2-digit', hour12: false});
+                });
+                revenueChart.data.datasets[0].data = data.revenueLast24Hours;
+                ticketChart.data.datasets[0].data = data.ticketsLast24Hours;
+            }
+
+            // Cập nhật nhãn cho cả hai biểu đồ
+            revenueChart.data.labels = labels;
+            ticketChart.data.labels = labels;
+
+            // Cập nhật biểu đồ
+            revenueChart.update();
+            ticketChart.update();
+        }
+
+        // Hàm gửi yêu cầu lấy dữ liệu
+        function fetchRevenueData(eventId, year, timeRange) {
+            fetch(`${pageContext.request.contextPath}/eventOverview`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({eventId: eventId, year: year, timeRange: timeRange})
+            })
+                    .then(response => response.json())
+                    .then(data => updateCharts(data, timeRange))
+                    .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Khởi tạo biểu đồ
+        initChart();
+        initTicketChart();
+        fetchRevenueData(eventId, currentYear, 'year');
+
+        // Xử lý sự kiện thay đổi bộ lọc
+        yearSelect.addEventListener('change', function () {
+            const selectedYear = this.value;
+            const timeRange = document.getElementById('timeRangeSelect').value;
+            fetchRevenueData(eventId, selectedYear, timeRange);
+        });
+
+        document.getElementById('timeRangeSelect').addEventListener('change', function () {
+            const selectedYear = yearSelect.value;
+            const timeRange = this.value;
+            fetchRevenueData(eventId, selectedYear, timeRange);
+        });
+
+        // Toggle for ticket details
+        function toggleShowtime(id, iconId) {
+            var element = document.getElementById(id);
+            var icon = document.getElementById(iconId);
+            if (element.style.display === "none") {
+                element.style.display = "table";
+                icon.classList.remove("fa-chevron-down");
+                icon.classList.add("fa-chevron-up");
+            } else {
+                element.style.display = "none";
+                icon.classList.remove("fa-chevron-up");
+                icon.classList.add("fa-chevron-down");
+            }
+        }
+    </script>
+</div>
+</body>
 </html>

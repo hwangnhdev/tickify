@@ -1277,8 +1277,8 @@ async function loadProvinces() {
     const provincesData = await response.json();
     sessionStorage.setItem('provinces', JSON.stringify(provincesData));
     provinceSelect.innerHTML = '<option value="">-- Select Province/City --</option>' +
-        provincesData.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
-    selectDefaultProvince(provinceSelect, requestedProvince); // Chọn giá trị mặc định
+    provincesData.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
+//    selectDefaultProvince(provinceSelect, requestedProvince); // Chọn giá trị mặc định
 }
 
 // Hàm chọn giá trị mặc định cho Province

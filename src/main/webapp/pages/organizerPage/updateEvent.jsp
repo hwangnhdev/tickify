@@ -359,7 +359,7 @@
             #logoImage {
                 width: 100%; /* Full width */
                 height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
+                object-fit: fill; /* Cover entire area */
                 border-radius: 8px; /* Rounded corners */
             }
 
@@ -394,7 +394,7 @@
             #backgroundImage {
                 width: 100%; /* Full width */
                 height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
+                object-fit: fill; /* Cover entire area */
                 border-radius: 8px; /* Rounded corners */
             }
 
@@ -430,7 +430,7 @@
             #organizerLogoImage {
                 width: 100%; /* Full width */
                 height: 100%; /* Full height */
-                object-fit: cover; /* Cover entire area */
+                object-fit: fill; /* Cover entire area */
                 border-radius: 8px; /* Rounded corners */
             }
 
