@@ -31,7 +31,7 @@ public class FilterEventDAO extends DBContext {
                 + "LEFT JOIN Showtimes s ON e.event_id = s.event_id \n"
                 + "LEFT JOIN TicketTypes t ON s.showtime_id = t.ticket_type_id\n"
                 + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%'\n"
-                + "WHERE 1 = 1 AND s.status = 'Active'"
+                + "WHERE 1 = 1 AND s.status = 'Approved'"
         );
 
         // List to store query parameters
