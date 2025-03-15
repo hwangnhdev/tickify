@@ -236,8 +236,8 @@ Notes and VAT Terms</textarea>
                             <label class="block text-gray-300 mb-2">Type Of Event</label>
                             <select id="eventType" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="toggleEventType()" required>
                                 <option value="">-- Please Select Type --</option>
-                                <option value="standingevent">Standing Event</option>
-                                <option value="seatedevent">Seated Event</option>
+                                <option value="Standing Event">Standing Event</option>
+                                <option value="Seating Event">Seating Event</option>
                             </select>
                             <span class="error-message" id="eventType_error"></span>
                         </div>
@@ -357,14 +357,12 @@ Notes and VAT Terms</textarea>
                         <span class="error-message" id="modalTicketDescription_error"></span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Price -->
-                        <div>
+                        <div style="display: block !important;">
                             <label class="block text-gray-300 mb-2">Price (VND)</label>
                             <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 150000" step="1000">
                             <span class="error-message" id="modalTicketPrice_error"></span>
                         </div>
-                        <!-- Quantity -->
-                        <div>
+                        <div style="display: block !important;">
                             <label class="block text-gray-300 mb-2">Quantity</label>
                             <input type="number" id="modalTicketQuantity" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 50">
                             <span class="error-message" id="modalTicketQuantity_error"></span>

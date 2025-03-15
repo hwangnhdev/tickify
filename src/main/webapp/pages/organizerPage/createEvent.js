@@ -205,7 +205,7 @@ function isTimeLogisticsValid() {
     }
 
     // Nếu là Seated Event, kiểm tra ít nhất một hàng ghế và tổng số ghế
-    if (eventType === 'seatedevent') {
+    if (eventType === 'Seating Event') {
         const seatRows = document.querySelectorAll('input[name="seatRow[]"]');
         const seatNumbers = document.querySelectorAll('input[name="seatNumber[]"]');
         let hasValidSeat = false;
@@ -353,8 +353,8 @@ function isPaymentInfoValid() {
 function toggleEventType() {
     const eventType = document.getElementById('eventType').value;
     const seatSection = document.getElementById('seatSection');
-    seatSection.classList.toggle('hidden', eventType !== 'seatedevent');
-    if (eventType === 'seatedevent') {
+    seatSection.classList.toggle('hidden', eventType !== 'Seating Event');
+    if (eventType === 'Seating Event') {
         calculateSeatSummary();
     }
 }
@@ -782,7 +782,7 @@ function openModal(button) {
     const eventType = document.getElementById('eventType').value;
     const seatSelectionDiv = document.getElementById('seatSelection');
 
-    if (eventType === 'seatedevent') {
+    if (eventType === 'Seating Event') {
         const seatsByRow = calculateSeatSummary();
         let seatOptions = '<label class="block text-gray-300 mb-2">Select Seat Rows (VIP: A, B; Normal: C):</label>';
         const ticketNameInput = document.getElementById('modalTicketName');
@@ -1002,7 +1002,7 @@ async function saveNewTicket() {
     let selectedSeatsText = '';
     let totalSeats = 0;
 
-    if (eventType === 'seatedevent') {
+    if (eventType === 'Seating Event') {
         const selectedSeats = document.querySelectorAll('#seatSelection input[name="selectedSeats"]:checked');
         const seatsArray = Array.from(selectedSeats).map(checkbox => {
             const seatRow = checkbox.value;
@@ -1078,64 +1078,101 @@ function editTicket(button, showTimeId) {
     const ticket = button.closest('.saved-ticket');
     const ticketDetails = ticket.querySelector('.ticket-details');
     const modal = document.getElementById('newTicketModal');
-    document.getElementById('modalTicketName').value = ticket.querySelector('.ticket-label').getAttribute('data-ticket-name');
-    document.getElementById('modalTicketDescription').value = ticketDetails.querySelector('div:nth-child(1) span').textContent;
-    document.getElementById('modalTicketPrice').value = ticketDetails.querySelector('div:nth-child(2) span').textContent;
-    document.getElementById('modalTicketQuantity').value = ticketDetails.querySelector('div:nth-child(3) span').textContent;
-    document.getElementById('modalTicketColor').value = ticketDetails.querySelector('div:nth-child(4) span').textContent;
-    document.getElementById('colorValue').textContent = ticketDetails.querySelector('div:nth-child(4) span').textContent;
+    console.log(ticketDetails.innerHTML);
+
+    // Thiết lập giá trị và kiểm tra lỗi
+    try {
+        // Lấy tên vé từ thuộc tính data-ticket-name
+        document.getElementById('modalTicketName').value = ticket.querySelector('.ticket-label').getAttribute('data-ticket-name');
+
+        // Tìm các div dựa trên nội dung của label
+        const allDivs = ticketDetails.querySelectorAll('div');
+
+        // Description
+        const descriptionDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Description:');
+        if (descriptionDiv) {
+            document.getElementById('modalTicketDescription').value = descriptionDiv.querySelector('span').textContent;
+        }
+
+        // Price (VND)
+        const priceDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Price (VND):');
+        if (priceDiv) {
+            console.log('Price:', priceDiv.querySelector('span').textContent);
+            document.getElementById('modalTicketPrice').value = priceDiv.querySelector('span').textContent;
+        }
+
+        // Quantity
+        const quantityDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Quantity:');
+        if (quantityDiv) {
+            console.log('Quantity:', quantityDiv.querySelector('span').textContent);
+            document.getElementById('modalTicketQuantity').value = quantityDiv.querySelector('span').textContent;
+        }
+
+        // Color
+        const colorDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Color:');
+        if (colorDiv) {
+            const colorValue = colorDiv.querySelector('span').textContent;
+            document.getElementById('modalTicketColor').value = colorValue;
+            document.getElementById('colorValue').textContent = colorValue;
+        }
+    } catch (e) {
+        console.error('Lỗi khi điền dữ liệu vào modal:', e);
+    }
+
+    // Xử lý phần chọn ghế
     const eventType = document.getElementById('eventType').value;
     const seatSelectionDiv = document.getElementById('seatSelection');
 
-    if (eventType === 'seatedevent') {
-        const seatsByRow = calculateSeatSummary();
-        const selectedRowsText = ticketDetails.querySelector('div:nth-child(5) span')?.textContent || '';
-        const selectedRows = selectedRowsText.split(', ').map(row => row.split(' ')[0]); // Extract row (e.g., "A" from "A 16")
-        let seatOptions = '<label class="block text-gray-300 mb-2">Select Seat Rows (VIP: A, B; Normal: C):</label>';
-        const ticketName = document.getElementById('modalTicketName').value.toLowerCase();
-        const ticketList = document.getElementById(`ticketList_${showTimeId}`);
+    if (eventType === 'Seating Event') {
+        try {
+            const seatsByRow = calculateSeatSummary();
+            // Tìm div chứa label "Seats:"
+            const seatsDiv = Array.from(ticketDetails.querySelectorAll('div')).find(div => div.querySelector('label')?.textContent === 'Seats:');
+            const selectedRowsText = seatsDiv ? seatsDiv.querySelector('span').textContent : '';
+            const selectedRows = selectedRowsText.split(', ').map(row => row.split(' ')[0]);
+            let seatOptions = '<label class="block text-gray-300 mb-2">Select Seat Rows (VIP: A, B; Normal: C):</label>';
 
-        // Lấy danh sách ghế đã được dùng bởi các vé khác
-        const usedRows = new Set();
-        ticketList.querySelectorAll('.saved-ticket').forEach(otherTicket => {
-            const otherTicketName = otherTicket.querySelector('.ticket-label').getAttribute('data-ticket-name');
-            if (otherTicketName !== ticket.querySelector('.ticket-label').getAttribute('data-ticket-name')) { // Bỏ qua vé đang chỉnh sửa
-                const rowsText = otherTicket.querySelector('.ticket-details div:nth-child(5) span')?.textContent || '';
-                rowsText.split(', ').forEach(row => {
-                    const rowName = row.split(' ')[0];
-                    usedRows.add(rowName);
-                });
-            }
-        });
+            const ticketName = document.getElementById('modalTicketName').value.toLowerCase();
+            const ticketList = document.getElementById(`ticketList_${showTimeId}`);
+            const usedRows = new Set();
+            ticketList.querySelectorAll('.saved-ticket').forEach(otherTicket => {
+                const otherTicketName = otherTicket.querySelector('.ticket-label').getAttribute('data-ticket-name');
+                if (otherTicketName !== ticket.querySelector('.ticket-label').getAttribute('data-ticket-name')) {
+                    const otherSeatsDiv = Array.from(otherTicket.querySelector('.ticket-details').querySelectorAll('div')).find(div => div.querySelector('label')?.textContent === 'Seats:');
+                    const rowsText = otherSeatsDiv ? otherSeatsDiv.querySelector('span').textContent : '';
+                    rowsText.split(', ').forEach(row => usedRows.add(row.split(' ')[0]));
+                }
+            });
 
-        for (let row in seatsByRow) {
-            const isDisabled = usedRows.has(row) ? 'disabled' : ''; // Vô hiệu hóa ghế đã được chọn bởi vé khác
-            let isVisible = !usedRows.has(row); // Chỉ hiển thị ghế chưa được chọn
-            if (isVisible) {
-                let isAllowed = true;
-                if (ticketName.includes('vip') && (row !== 'A' && row !== 'B')) {
-                    isAllowed = false; // Chỉ hiển thị A, B cho VIP
-                } else if (ticketName.includes('normal') && row !== 'C') {
-                    isAllowed = false; // Chỉ hiển thị C cho Normal
-                }
-                if (isAllowed) {
-                    // Đảm bảo data-seats là chuỗi số
-                    const seatNum = seatsByRow[row].seatNum.toString();
-                    const isChecked = selectedRows.includes(row) ? 'checked' : '';
-                    seatOptions += `
-                        <div>
-                            <input type="checkbox" name="selectedSeats" value="${row}" data-seats="${seatNum}" ${isDisabled} ${isChecked}>
-                            <label class="text-gray-300 ml-2">Row ${row} (${seatNum} seats)</label>
-                        </div>`;
+            for (let row in seatsByRow) {
+                const isDisabled = usedRows.has(row) ? 'disabled' : '';
+                let isVisible = !usedRows.has(row);
+                if (isVisible) {
+                    let isAllowed = true;
+                    if (ticketName.includes('vip') && (row !== 'A' && row !== 'B')) {
+                        isAllowed = false;
+                    } else if (ticketName.includes('normal') && row !== 'C') {
+                        isAllowed = false;
+                    }
+                    if (isAllowed) {
+                        const seatNum = seatsByRow[row].seatNum.toString();
+                        const isChecked = selectedRows.includes(row) ? 'checked' : '';
+                        seatOptions += `
+                            <div>
+                                <input type="checkbox" name="selectedSeats" value="${row}" data-seats="${seatNum}" ${isDisabled} ${isChecked}>
+                                <label class="text-gray-300 ml-2">Row ${row} (${seatNum} seats)</label>
+                            </div>`;
+                    }
                 }
             }
+            seatSelectionDiv.innerHTML = seatOptions;
+
+            seatSelectionDiv.querySelectorAll('input[name="selectedSeats"]').forEach(checkbox => {
+                checkbox.addEventListener('change', validateSeatSelection);
+            });
+        } catch (e) {
+            console.error('Lỗi khi tạo seatSelection:', e);
         }
-        seatSelectionDiv.innerHTML = seatOptions;
-
-        // Listener để kiểm tra số lượng ghế và ghế trùng lặp khi chọn
-        seatSelectionDiv.querySelectorAll('input[name="selectedSeats"]').forEach(checkbox => {
-            checkbox.addEventListener('change', validateSeatSelection);
-        });
     } else {
         seatSelectionDiv.innerHTML = '';
     }
@@ -1144,7 +1181,7 @@ function editTicket(button, showTimeId) {
     modal.setAttribute('data-editing-ticket', ticket.querySelector('.ticket-label').getAttribute('data-ticket-name'));
     modal.querySelector('h5').textContent = 'Edit Ticket Type';
     modal.classList.remove('hidden');
-    clearAllErrors(); // Xóa tất cả lỗi khi mở modal để chỉnh sửa
+    clearAllErrors();
 }
 
 // Hàm lấy tên màu từ API Color Pizza
@@ -1657,7 +1694,7 @@ async function submitEventForm() {
     // Trong hàm submitEventForm, sửa phần tạo seats như sau:
     // Trong submitEventForm, sửa phần tạo seats:
     let seats = [];
-    if (eventType === 'seatedevent') {
+    if (eventType === 'Seating Event') {
         const seatsByRow = calculateSeatSummary(); // Lấy thông tin ghế từ calculateSeatSummary
         // Lặp qua từng showtime và ticket type để tạo danh sách ghế đầy đủ
         showTimeElements.forEach((showTime, showTimeIndex) => {
@@ -1695,7 +1732,7 @@ async function submitEventForm() {
         location: fullAddress,
         eventType: eventType,
         description: eventInfo,
-        status: "Pending",
+        status: "Processing",
         eventLogoUrl: eventLogo,
         backgroundImageUrl: backgroundImage,
         organizerImageUrl: organizerLogo,
@@ -1893,7 +1930,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('change', () => updateShowTimeLabel(input));
     });
 });
-  // pop -up
+// pop -up
 // Hiển thị popup thành công
 function showSuccessPopup() {
     const popup = document.getElementById('successPopup');
