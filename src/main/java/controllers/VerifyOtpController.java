@@ -83,19 +83,28 @@ public class VerifyOtpController extends HttpServlet {
         String action = (String) session.getAttribute("action");
         
         // Nếu không sử dụng Redis
-//        String verificationCode = String.valueOf(session.getAttribute("verificationCode"));
-
-        // So sánh mã OTP từ Redis và mã OTP từ người dùng input
+        String verificationCode = String.valueOf(session.getAttribute("verificationCode"));
         boolean isOtpValid;
-        OTPService otpService = new OTPService();
-        if (otpService.isValidOTP(email, inputOtp)) {
-            otpService.deleteOTP(email); // Xóa OTP sau khi xác thực thành công
+        if (inputOtp.equalsIgnoreCase(verificationCode)) {
+            session.removeAttribute("verificationCode"); // Xóa OTP sau khi xác thực thành công
             isOtpValid = true;
         } else {
             isOtpValid = false;
             request.setAttribute("errorMessage", "Mã OTP không hợp lệ hoặc đã hết hạn!");
             request.getRequestDispatcher("pages/submitOTPPage/submitOTP.jsp").forward(request, response);
         }
+
+        // So sánh mã OTP từ Redis và mã OTP từ người dùng input
+//        boolean isOtpValid;
+//        OTPService otpService = new OTPService();
+//        if (otpService.isValidOTP(email, inputOtp)) {
+//            otpService.deleteOTP(email); // Xóa OTP sau khi xác thực thành công
+//            isOtpValid = true;
+//        } else {
+//            isOtpValid = false;
+//            request.setAttribute("errorMessage", "Mã OTP không hợp lệ hoặc đã hết hạn!");
+//            request.getRequestDispatcher("pages/submitOTPPage/submitOTP.jsp").forward(request, response);
+//        }
         
         System.out.println("OTP: " + action);
         System.out.println("OTP valid: " + isOtpValid);

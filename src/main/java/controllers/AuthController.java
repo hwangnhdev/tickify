@@ -92,7 +92,7 @@ public class AuthController extends HttpServlet {
 
             int insertedCustomerId = customerDao.selectCustomerByEmail(email).getCustomerId();
 
-            CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, hashedPassword, provider, null);
+            CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, provider, hashedPassword, null);
             customerAuthDao.insertCustomerAuth(customerAuth);
 
             session.setAttribute("customerId", customer.getCustomerId());

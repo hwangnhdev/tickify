@@ -67,8 +67,9 @@ public class VerifyEmailController extends HttpServlet {
         String content = "Your verification code is: " + verificationCode;
         EmailUtility.sendEmail(recipient, subject, content);
         
-//        HttpSession session = request.getSession();
-//        session.setAttribute("verificationCode", verificationCode); // Lưu OTP vào session
+        // Nếu không xài Redis
+        HttpSession session = request.getSession();
+        session.setAttribute("verificationCode", verificationCode); // Lưu OTP vào session
     }
     
     private void moveToOtp(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, MessagingException {

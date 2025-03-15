@@ -288,6 +288,12 @@
                 color: #fff;
                 transition: all 0.3s ease-in;
             }
+            .error {
+                color: red;
+                font-size: 0.875rem;
+                margin-top: 4px;
+                display: none;
+            }
 
         </style>
     </head>
@@ -308,12 +314,14 @@
                     <input type="hidden" name="action" value="signup"/>
                     <input type="text" placeholder="Name (8-50 chars)" name="name" required/>
                     <input type="email" placeholder="Email" name="email" required/>
+                    <p id="emailError" class="error">Email không hợp lệ!</p>
                     <div class="password-container">
                         <input type="password" placeholder="Password (8-50 chars)" name="password" required>
                         <span class="toggle-password">
                             <i class="fa-regular fa-eye"></i>
                         </span>
                     </div>
+                    <p id="passwordError" class="error">Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
                     <button style="margin-top: 20px;">Sign Up</button>
                 </form>
             </div>
@@ -331,12 +339,14 @@
                     <!--Input-->
                     <input type="hidden" name="action" value="login"/>
                     <input type="email" placeholder="Email" name="email" required/>
+                    <p id="emailError" class="error">Email không hợp lệ!</p>
                     <div class="password-container">
                         <input type="password" placeholder="Password" name="password" required>
                         <span class="toggle-password">
                             <i class="fa-regular fa-eye"></i>
                         </span>
                     </div>
+                    <p id="passwordError" class="error">Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
                     <a href="<%= request.getContextPath()%>/pages/forgetPasswordPage/forgetPassword.jsp" class="forgetLink">Forgot your password?</a>
                     <button>Log In</button>
                 </form>
@@ -389,6 +399,62 @@
             signInButton.addEventListener('click', () => {
                 container.classList.remove("right-panel-active");
             });
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById("adminLoginForm");
+                const emailInput = document.getElementById("email");
+                const passwordInput = document.getElementById("password");
+                const emailError = document.getElementById("emailError");
+                const passwordError = document.getElementById("passwordError");
+
+                function validateEmail(email) {
+                    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    return emailRegex.test(email);
+                }
+
+                function validatePassword(password) {
+                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                    return passwordRegex.test(password);
+                }
+
+                form.addEventListener("submit", function (event) {
+                    let isValid = true;
+
+                    // Kiểm tra email
+                    if (!validateEmail(emailInput.value.trim())) {
+                        emailError.style.display = "block";
+                        isValid = false;
+                    } else {
+                        emailError.style.display = "none";
+                    }
+
+                    // Kiểm tra mật khẩu
+                    if (!validatePassword(passwordInput.value.trim())) {
+                        passwordError.style.display = "block";
+                        isValid = false;
+                    } else {
+                        passwordError.style.display = "none";
+                    }
+
+                    if (!isValid) {
+                        event.preventDefault();
+                    }
+                });
+
+                // Ẩn lỗi khi người dùng nhập đúng
+                emailInput.addEventListener("input", () => {
+                    if (validateEmail(emailInput.value.trim())) {
+                        emailError.style.display = "none";
+                    }
+                });
+
+                passwordInput.addEventListener("input", () => {
+                    if (validatePassword(passwordInput.value.trim())) {
+                        passwordError.style.display = "none";
+                    }
+                });
+            });
+
         </script>
     </body>
 </html>

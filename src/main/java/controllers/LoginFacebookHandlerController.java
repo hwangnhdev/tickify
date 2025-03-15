@@ -110,7 +110,7 @@ public class LoginFacebookHandlerController extends HttpServlet {
             //TH2: Có customer nhưng chưa có customer_auth trong DB 
             if (existingCustomer != null && existingCustomerAuth == null) {
                 // Lấy customer_id đã có trong Customers thêm 1 thằng Customer_auths 
-                CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), null, provider, user.getId());
+                CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), provider, null, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
             }
 
@@ -121,7 +121,7 @@ public class LoginFacebookHandlerController extends HttpServlet {
 
                 int insertedCustomerId = customerDao.selectCustomerByEmail(user.getEmail()).getCustomerId();
 
-                CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, null, provider, user.getId());
+                CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, provider, null, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
 
                 customerSendRedirect.setCustomerId(insertedCustomerId);
