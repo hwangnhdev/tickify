@@ -341,7 +341,7 @@
                     <p><strong>Type Of Event:</strong> ${event.eventType}</p>
                     <p><strong>Organizer:</strong> ${organizer.organizationName}</p>
                     <p><strong>Venue:</strong> ${event.location}</p>
-                    <p><strong>Status:</strong> <c:if test="${event.status == 'Active'}">Available</c:if></p>
+                    <p><strong>Status:</strong> <c:if test="${event.status == 'Approved'}">Available</c:if></p>
                         <a class="btn" href="#ShowtimesInformation">Order Ticket Now</a>
                     </div>
                     <div class="event-image-event_detail">
