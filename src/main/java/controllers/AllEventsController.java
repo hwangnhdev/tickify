@@ -20,7 +20,7 @@ import java.util.List;
 import models.Category;
 import models.Event;
 import models.EventImage;
-import models.FilterEvent;
+import viewModels.FilterEvent;
 
 /**
  * import dals.FilterEventDAO; import java.io.IOException; import

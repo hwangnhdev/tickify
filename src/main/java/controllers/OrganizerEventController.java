@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import models.EventSummaryDTO;
+import viewModels.EventSummaryDTO;
 
 public class OrganizerEventController extends HttpServlet {
 
@@ -17,14 +17,14 @@ public class OrganizerEventController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Lấy organizerId từ session hoặc dùng mặc định (ở đây mặc định là 2)
-        int organizerId = 2;
+        int customerId = 2;
         String filter = request.getParameter("filter");
         if (filter == null || filter.trim().isEmpty()) {
             filter = "all";
         }
 
         OrganizerDAO OrganizerDAO = new OrganizerDAO();
-        List<EventSummaryDTO> events = OrganizerDAO.getEventsByOrganizer(organizerId, filter);
+        List<EventSummaryDTO> events = OrganizerDAO.getEventsByCustomer(customerId, filter);
 
         // Đặt danh sách sự kiện và bộ lọc hiện tại vào request để JSP hiển thị
         request.setAttribute("events", events);

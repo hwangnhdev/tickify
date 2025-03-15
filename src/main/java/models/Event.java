@@ -37,7 +37,7 @@ public class Event {
     private Timestamp createdAt;
     @Expose
     private Timestamp updatedAt;
-    private Timestamp approvedAt; // Thêm thuộc tính này
+    private Timestamp approvedAt;
 
     public Timestamp getApprovedAt() {
         return approvedAt;

@@ -10,8 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import models.EventDetailDTO;
-
+import viewModels.EventDetailDTO;
 
 public class OrganizerEventDetailController extends HttpServlet {
 
@@ -19,8 +18,8 @@ public class OrganizerEventDetailController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Organizer ID lấy từ session hoặc mặc định (ở đây sử dụng 2)
-        int organizerId = 2;
-        
+        int customerId = 2;
+
         // Lấy eventId từ request parameter, mặc định là 2 nếu không có
         String eventIdParam = request.getParameter("eventId");
         int eventId = 2;
@@ -32,16 +31,16 @@ public class OrganizerEventDetailController extends HttpServlet {
                 return;
             }
         }
-        
+
         // Sử dụng DAO để lấy chi tiết sự kiện của organizer
         OrganizerDAO OrganizerDAO = new OrganizerDAO();
-        EventDetailDTO detail = OrganizerDAO.getOrganizerEventDetail(organizerId, eventId);
-        
+        EventDetailDTO detail = OrganizerDAO.getCustomerEventDetail(customerId, eventId);
+
         if (detail == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Event detail not found.");
             return;
         }
-        
+
         // Set attribute để JSP hiển thị
         request.setAttribute("organizerEventDetail", detail);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/viewOrganizerEventDetail.jsp");
@@ -53,7 +52,7 @@ public class OrganizerEventDetailController extends HttpServlet {
             throws ServletException, IOException {
         doGet(request, response);
     }
-    
+
     @Override
     public String getServletInfo() {
         return "OrganizerEventDetailController retrieves event detail for an organizer";

@@ -86,19 +86,21 @@ public class EventController extends HttpServlet {
         List<EventImage> listEvents = eventDAO.getTop10LatestEvents();
         request.setAttribute("listEvents", listEvents);
 
+        List<EventImage> listAllEvents = eventDAO.getAllEvents();
+        request.setAttribute("listAllEvents", listAllEvents);
+
         // <!--Upcoming-Events--> 
         List<EventImage> upcomingEvents = eventDAO.getUpcomingEvents();
-        request.setAttribute("upcomingEvents", upcomingEvents);
+        if (upcomingEvents.isEmpty()) {
+            request.setAttribute("upcomingEvents", listAllEvents);
+        } else {
+            request.setAttribute("upcomingEvents", upcomingEvents);
+        }
 
         // <!--Recommendation Events--> 
         List<EventImage> listRecommendedEvents = eventDAO.getRecommendedEvents(1);
         request.setAttribute("listRecommendedEvents", listRecommendedEvents);
 
-//        // Get All Event
-//        List<Event> listAllEvents = eventDAO.getAllEvents();
-//        // Store the list of events in the request scope so it can be accessed in the JSP
-//        request.setAttribute("listAllEvents", listAllEvents);
-//
         // Get the requested page number, default to 1 if not provided <!--All Event--> 
         int page = 1;
         int pageSize = 20;
@@ -120,6 +122,8 @@ public class EventController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         System.out.println(totalPages);
+        System.out.println(paginatedEvents);
+        System.out.println(page);
 
         // Create session to store parameter when filter and search
         HttpSession session = request.getSession();

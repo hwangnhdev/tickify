@@ -18,77 +18,17 @@
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vi.js"></script>
         <style>
-
             body {
                 background-color: black;
                 color: white;
-            }
-            /* All Events */
-            .title-all_events {
-                text-align: center;
-                font-size: 24px;
-                font-weight: bold;
-                color: white;
-                margin-bottom: 20px;
-            }
-
-            .event-card-all_events {
-                background-color: #ffffff;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                overflow: hidden;
-                text-align: center;
-                transition: transform 0.3s, box-shadow 0.3s;
-            }
-
-            .event-card-all_events:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            }
-
-            .event-card-all_events img {
-                width: 100%;
-                height: 150px;
-                object-fit: fill;
-                background-color: #f0f0f0;
-                display: block;
-                transition: filter 0.3s;
-            }
-
-            .event-card-all_events:hover img {
-                filter: brightness(1.1);
-            }
-
-            .event-card-all_events h4 {
-                font-size: 16px;
-                margin: 10px 0 5px;
-                color: #000000;
-                font-weight: 600;
-            }
-
-            .event-card-all_events p {
-                font-size: 14px;
-                margin: 5px 0;
-                color: #666666;
-            }
-
-            .pagination a {
-                text-decoration: none;
-                color: #2c3e50;
-                transition: color 0.3s ease;
-            }
-
-            .pagination a:hover {
-                color: #3498db;
             }
 
             /* Filter Container */
             .filter-container {
                 width: 100%;
                 max-width: 1200px;
-                margin: 20px auto;
-                padding: 20px;
+                margin: 35px auto;
+                padding: 10px;
                 background: #ffffff;
                 border-radius: 12px;
                 box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
@@ -105,8 +45,8 @@
                 display: flex;
                 justify-content: flex-start;
                 flex-wrap: wrap;
-                gap: 15px;
-                padding: 10px 0;
+                gap: 8px;
+                padding: 0 0;
                 align-items: center;
             }
 
@@ -346,6 +286,53 @@
                 transform: translateY(1px);
                 box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
             }
+
+            /*All Events*/
+            .title-all_events {
+                text-align: center;
+                font-size: 24px;
+                font-weight: bold;
+            }
+            .event-card-all_events {
+                background-color: #ffffff;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                text-align: center;
+                transition: transform 0.3s, box-shadow 0.3s;
+                margin-top: 1%;
+            }
+
+            .event-card-all_events:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            }
+
+            .event-card-all_events img {
+                width: 100%;
+                height: 180px;
+                object-fit: fill;
+                background-color: #f0f0f0;
+                display: block;
+                transition: filter 0.3s;
+                object-fit: cover;
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            }
+
+            .event-card-all_events:hover img {
+                filter: brightness(1.1);
+                transform: scale(1.1);
+                box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
+            }
+            .g-4, .gy-4 {
+                --bs-gutter-y: 1.5rem;
+                margin: 0 7%;
+            }
+            .py-4 {
+                padding-top: 0.5rem !important;
+                padding-bottom: 1.5rem !important;
+            }
         </style>
     </head>
     <body>
@@ -478,24 +465,17 @@
                 </h2>
                 <div class="container py-4">
                     <div class="row gy-4" id="event-container">
-                        <!-- Event Cards -->
+                        <!-- Loop through paginated events -->
                         <c:forEach var="event" items="${paginatedEventsAll}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
                                 <div class="event-card-all_events">
-                                    <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.imageTitle}" />
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </div>
                             </div>
                         </c:forEach>
                     </div>
-                    <!-- Pagination -->
-                    <jsp:include page="pagination.jsp">
-                        <jsp:param name="baseUrl" value="/allEvents" />
-                        <jsp:param name="page" value="${pageAll}" />
-                        <jsp:param name="totalPages" value="${totalPagesAll}" />
-                        <jsp:param name="selectedStatus" value="${selectedStatusAll}" />
-                    </jsp:include>
                 </div>
                 <!-- Bootstrap JS for All Events-->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
@@ -515,14 +495,6 @@
                         </c:forEach>
                     </div>
                 </div>
-
-                <!-- Pagination -->
-                <jsp:include page="pagination.jsp">
-                    <jsp:param name="baseUrl" value="/allEvents" />
-                    <jsp:param name="page" value="${currentPage}" />
-                    <jsp:param name="totalPages" value="${totalPages}" />
-                    <jsp:param name="selectedStatus" value="${selectedStatus}" />
-                </jsp:include>
             </c:otherwise>
         </c:choose>
 

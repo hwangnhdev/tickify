@@ -14,8 +14,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONObject;
+import viewModels.TicketRevenueDTO;
 
 /**
  *
@@ -92,6 +95,10 @@ public class EventOverviewController extends HttpServlet {
         request.setAttribute("fillRate", String.format("%.2f", fillRate));
         request.setAttribute("eventId", eventId);
 
+        Map<Integer, List<TicketRevenueDTO>> showtimeTicketMap = eventDAO.getTicketRevenueByEventId(eventId);
+        request.setAttribute("showtimeTicketMap", showtimeTicketMap);
+        System.out.println(showtimeTicketMap);
+
         request.getRequestDispatcher("pages/organizerPage/eventOverviewStatistic.jsp").forward(request, response);
     }
 
@@ -125,16 +132,51 @@ public class EventOverviewController extends HttpServlet {
         JSONObject jsonRequest = new JSONObject(jb.toString());
         int eventId = jsonRequest.getInt("eventId");
         int year = jsonRequest.getInt("year");
+        String timeRange = jsonRequest.getString("timeRange");
 
         EventDAO eventDAO = new EventDAO();
-
-        List<Double> monthlyRevenue = eventDAO.getTotalRevenueChartOfEventById(eventId, year);
-        if (monthlyRevenue == null || monthlyRevenue.isEmpty()) {
-            monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
-        }
-
         JSONObject jsonResponse = new JSONObject();
-        jsonResponse.put("monthlyRevenue", new org.json.JSONArray(monthlyRevenue));
+
+        if ("year".equals(timeRange)) {
+            List<Double> monthlyRevenue = eventDAO.getTotalRevenueChartOfEventById(eventId, year);
+            List<Double> monthlyTickets = eventDAO.getTotalTicketsChartOfEventById(eventId, year);
+
+            if (monthlyRevenue == null || monthlyRevenue.isEmpty()) {
+                monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+            }
+            if (monthlyTickets == null || monthlyTickets.isEmpty()) {
+                monthlyTickets = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+            }
+
+            jsonResponse.put("monthlyRevenue", new org.json.JSONArray(monthlyRevenue));
+            jsonResponse.put("monthlyTickets", new org.json.JSONArray(monthlyTickets));
+        } else if ("30days".equals(timeRange)) {
+            List<Double> revenueLast30Days = eventDAO.getTotalRevenueLast30DaysOfEvent(eventId);
+            List<Double> ticketsLast30Days = eventDAO.getTotalTicketsLast30DaysOfEvent(eventId);
+
+            if (revenueLast30Days == null || revenueLast30Days.isEmpty()) {
+                revenueLast30Days = new ArrayList<>(Collections.nCopies(30, 0.0));
+            }
+            if (ticketsLast30Days == null || ticketsLast30Days.isEmpty()) {
+                ticketsLast30Days = new ArrayList<>(Collections.nCopies(30, 0.0));
+            }
+
+            jsonResponse.put("revenueLast30Days", new org.json.JSONArray(revenueLast30Days));
+            jsonResponse.put("ticketsLast30Days", new org.json.JSONArray(ticketsLast30Days));
+        } else if ("24hours".equals(timeRange)) {
+            List<Double> revenueLast24Hours = eventDAO.getTotalRevenueLast24HoursOfEvent(eventId);
+            List<Double> ticketsLast24Hours = eventDAO.getTotalTicketsLast24HoursOfEvent(eventId);
+
+            if (revenueLast24Hours == null || revenueLast24Hours.isEmpty()) {
+                revenueLast24Hours = new ArrayList<>(Collections.nCopies(24, 0.0));
+            }
+            if (ticketsLast24Hours == null || ticketsLast24Hours.isEmpty()) {
+                ticketsLast24Hours = new ArrayList<>(Collections.nCopies(24, 0.0));
+            }
+
+            jsonResponse.put("revenueLast24Hours", new org.json.JSONArray(revenueLast24Hours));
+            jsonResponse.put("ticketsLast24Hours", new org.json.JSONArray(ticketsLast24Hours));
+        }
 
         try ( PrintWriter out = response.getWriter()) {
             out.print(jsonResponse.toString());

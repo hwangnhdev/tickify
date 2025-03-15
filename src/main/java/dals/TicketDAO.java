@@ -5,8 +5,8 @@ import utils.DBContext;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import models.CustomerTicketDTO;
-import models.TicketDetailDTO;
+import viewModels.CustomerTicketDTO;
+import viewModels.TicketDetailDTO;
 
 public class TicketDAO extends DBContext {
 
@@ -198,86 +198,88 @@ public class TicketDAO extends DBContext {
         return tickets;
     }
 
-    public TicketDetailDTO getTicketDetail(String ticketCode, int customerId) {
-        TicketDetailDTO detail = null;
-        String sql = "SELECT "
-                + "    T.ticket_code AS orderCode, "
-                + "    T.status AS ticketStatus, "
-                + "    O.payment_status AS paymentStatus, "
-                + "    S.start_date AS startDate, "
-                + "    S.end_date AS endDate, "
-                + "    E.location AS location, "
-                + "    CONCAT(Seats.seat_row, '-', Seats.seat_col) AS seat, "
-                + "    E.event_name AS eventName, "
-                + "    T.price AS ticketPrice, "
-                + "    EI.image_url AS eventImage, "
-                + "    C.full_name AS buyerName, "
-                + "    C.email AS buyerEmail, "
-                + "    C.phone AS buyerPhone, "
-                + "    C.address AS buyerAddress, "
-                + "    TT.name AS ticketType, "
-                + "    OD.quantity AS quantity, "
-                + "    T.price AS amount, "
-                + "    O.total_price AS originalTotalAmount, "
-                + "    CASE WHEN O.voucher_id IS NOT NULL THEN 'Yes' ELSE 'No' END AS voucherApplied, "
-                + "    V.code AS voucherCode, "
-                + "    CASE "
-                + "        WHEN V.discount_type = 'percentage' THEN O.total_price * (V.discount_value / 100) "
-                + "        WHEN V.discount_type = 'fixed' THEN V.discount_value "
-                + "        ELSE 0 "
-                + "    END AS discount, "
-                + "    O.total_price - "
-                + "    CASE "
-                + "        WHEN V.discount_type = 'percentage' THEN O.total_price * (V.discount_value / 100) "
-                + "        WHEN V.discount_type = 'fixed' THEN V.discount_value "
-                + "        ELSE 0 "
-                + "    END AS finalTotalAmount "
-                + "FROM Ticket T "
-                + "JOIN OrderDetails OD ON T.order_detail_id = OD.order_detail_id "
-                + "JOIN Orders O ON OD.order_id = O.order_id "
-                + "JOIN Customers C ON O.customer_id = C.customer_id "
-                + "JOIN Seats ON T.seat_id = Seats.seat_id "
-                + "JOIN TicketTypes TT ON Seats.ticket_type_id = TT.ticket_type_id "
-                + "JOIN Showtimes S ON TT.showtime_id = S.showtime_id "
-                + "JOIN Events E ON S.event_id = E.event_id "
-                + "LEFT JOIN (SELECT event_id, MIN(image_id) AS min_image_id FROM EventImages GROUP BY event_id) EI_sub "
-                + "    ON E.event_id = EI_sub.event_id "
-                + "LEFT JOIN EventImages EI ON EI_sub.min_image_id = EI.image_id "
-                + "LEFT JOIN Vouchers V ON O.voucher_id = V.voucher_id "
-                + "WHERE C.customer_id = ? AND T.ticket_code = ?";
-        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, customerId);
-            ps.setString(2, ticketCode);
-            try ( ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    detail = new TicketDetailDTO();
-                    detail.setOrderCode(rs.getString("orderCode"));
-                    detail.setTicketStatus(rs.getString("ticketStatus"));
-                    detail.setPaymentStatus(rs.getString("paymentStatus"));
-                    detail.setStartDate(rs.getTimestamp("startDate"));
-                    detail.setEndDate(rs.getTimestamp("endDate"));
-                    detail.setLocation(rs.getString("location"));
-                    detail.setSeat(rs.getString("seat"));
-                    detail.setEventName(rs.getString("eventName"));
-                    detail.setTicketPrice(rs.getDouble("ticketPrice"));
-                    detail.setEventImage(rs.getString("eventImage"));
-                    detail.setBuyerName(rs.getString("buyerName"));
-                    detail.setBuyerEmail(rs.getString("buyerEmail"));
-                    detail.setBuyerPhone(rs.getString("buyerPhone"));
-                    detail.setBuyerAddress(rs.getString("buyerAddress"));
-                    detail.setTicketType(rs.getString("ticketType"));
-                    detail.setQuantity(rs.getInt("quantity"));
-                    detail.setAmount(rs.getDouble("amount"));
-                    detail.setOriginalTotalAmount(rs.getDouble("originalTotalAmount"));
-                    detail.setVoucherApplied(rs.getString("voucherApplied"));
-                    detail.setVoucherCode(rs.getString("voucherCode"));
-                    detail.setDiscount(rs.getDouble("discount"));
-                    detail.setFinalTotalAmount(rs.getDouble("finalTotalAmount"));
-                }
+  public TicketDetailDTO getTicketDetail(String ticketCode, int customerId) {
+    TicketDetailDTO detail = null;
+    String sql = "SELECT "
+            + "    T.ticket_code AS orderCode, "
+            + "    T.status AS ticketStatus, "
+            + "    O.payment_status AS paymentStatus, "
+            + "    S.start_date AS startDate, "
+            + "    S.end_date AS endDate, "
+            + "    E.location AS location, "
+            + "    CONCAT(Seats.seat_row, '-', Seats.seat_col) AS seat, "
+            + "    E.event_name AS eventName, "
+            + "    T.price AS ticketPrice, "
+            + "    EI.image_url AS eventImage, "
+            + "    C.full_name AS buyerName, "
+            + "    C.email AS buyerEmail, "
+            + "    C.phone AS buyerPhone, "
+            + "    C.address AS buyerAddress, "
+            + "    TT.name AS ticketType, "
+            + "    OD.quantity AS quantity, "
+            + "    T.price AS amount, "
+            + "    O.total_price AS originalTotalAmount, "
+            + "    CASE WHEN O.voucher_id IS NOT NULL THEN 'Yes' ELSE 'No' END AS voucherApplied, "
+            // Voucher kiểu phần trăm
+            + "    CASE WHEN V.discount_type = 'percentage' THEN V.code ELSE NULL END AS voucherPercentageCode, "
+            + "    CASE WHEN V.discount_type = 'percentage' THEN O.total_price * (V.discount_value / 100) ELSE 0 END AS discountPercentage, "
+            // Voucher kiểu tiền cố định
+            + "    CASE WHEN V.discount_type = 'fixed' THEN V.code ELSE NULL END AS voucherFixedCode, "
+            + "    CASE WHEN V.discount_type = 'fixed' THEN V.discount_value ELSE 0 END AS discountFixed, "
+            // Tính final total amount
+            + "    O.total_price - CASE WHEN V.discount_type = 'percentage' THEN O.total_price * (V.discount_value / 100) "
+            + "                         WHEN V.discount_type = 'fixed' THEN V.discount_value ELSE 0 END AS finalTotalAmount "
+            + "FROM Ticket T "
+            + "JOIN OrderDetails OD ON T.order_detail_id = OD.order_detail_id "
+            + "JOIN Orders O ON OD.order_id = O.order_id "
+            + "JOIN Customers C ON O.customer_id = C.customer_id "
+            + "JOIN Seats ON T.seat_id = Seats.seat_id "
+            + "JOIN TicketTypes TT ON Seats.ticket_type_id = TT.ticket_type_id "
+            + "JOIN Showtimes S ON TT.showtime_id = S.showtime_id "
+            + "JOIN Events E ON S.event_id = E.event_id "
+            + "LEFT JOIN (SELECT event_id, MIN(image_id) AS min_image_id FROM EventImages GROUP BY event_id) EI_sub "
+            + "    ON E.event_id = EI_sub.event_id "
+            + "LEFT JOIN EventImages EI ON EI_sub.min_image_id = EI.image_id "
+            + "LEFT JOIN Vouchers V ON O.voucher_id = V.voucher_id "
+            + "WHERE C.customer_id = ? AND T.ticket_code = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, customerId);
+        ps.setString(2, ticketCode);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                detail = new TicketDetailDTO();
+                detail.setOrderCode(rs.getString("orderCode"));
+                detail.setTicketStatus(rs.getString("ticketStatus"));
+                detail.setPaymentStatus(rs.getString("paymentStatus"));
+                detail.setStartDate(rs.getTimestamp("startDate"));
+                detail.setEndDate(rs.getTimestamp("endDate"));
+                detail.setLocation(rs.getString("location"));
+                detail.setSeat(rs.getString("seat"));
+                detail.setEventName(rs.getString("eventName"));
+                detail.setTicketPrice(rs.getDouble("ticketPrice"));
+                detail.setEventImage(rs.getString("eventImage"));
+                detail.setBuyerName(rs.getString("buyerName"));
+                detail.setBuyerEmail(rs.getString("buyerEmail"));
+                detail.setBuyerPhone(rs.getString("buyerPhone"));
+                detail.setBuyerAddress(rs.getString("buyerAddress"));
+                detail.setTicketType(rs.getString("ticketType"));
+                detail.setQuantity(rs.getInt("quantity"));
+                detail.setAmount(rs.getDouble("amount"));
+                detail.setOriginalTotalAmount(rs.getDouble("originalTotalAmount"));
+                detail.setVoucherApplied(rs.getString("voucherApplied"));
+                // Dữ liệu voucher kiểu phần trăm
+                detail.setVoucherPercentageCode(rs.getString("voucherPercentageCode"));
+                detail.setDiscountPercentage(rs.getDouble("discountPercentage"));
+                // Dữ liệu voucher kiểu tiền cố định
+                detail.setVoucherFixedCode(rs.getString("voucherFixedCode"));
+                detail.setDiscountFixed(rs.getDouble("discountFixed"));
+                detail.setFinalTotalAmount(rs.getDouble("finalTotalAmount"));
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
         }
-        return detail;
+    } catch (SQLException ex) {
+        ex.printStackTrace();
     }
+    return detail;
+}
+
 }

@@ -9,9 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import models.OrderDetailDTO;
+import viewModels.OrderDetailDTO;
 
-@WebServlet(name = "OrganizerOrdersController", urlPatterns = {"/organizer/viewOrders"})
+
 public class OrganizerOrdersController extends HttpServlet {
 
     private static final int PAGE_SIZE = 10;
@@ -37,7 +37,7 @@ public class OrganizerOrdersController extends HttpServlet {
         }
         
         // Lấy organizerId từ session (giả sử đã được lưu khi đăng nhập)
-        int organizerId = 1; // Giá trị mặc định cho test
+        int organizerId = 2; // Giá trị mặc định cho test
         Object orgIdObj = request.getSession().getAttribute("organizerId");
         if (orgIdObj != null) {
             organizerId = Integer.parseInt(orgIdObj.toString());

@@ -1,7 +1,7 @@
 package controllers;
 
 import dals.OrderDetailDAO;
-import models.OrderDetailDTO;
+import viewModels.OrderDetailDTO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
+@WebServlet("/viewOrderDetailOrganizer")
 public class ViewOrderDetailOrganizer extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -36,8 +36,8 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
             return;
         }
         
-        // Set organizerId (defaulted to 1; adjust as needed for your logic)
-        int organizerId = 1;
+        // Set organizerId (defaulted to 1; adjust as needed)
+        int organizerId = 2;
         
         // Call DAO to retrieve the order details
         OrderDetailDAO dao = new OrderDetailDAO();

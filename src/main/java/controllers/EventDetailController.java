@@ -18,7 +18,7 @@ import java.util.List;
 import models.Category;
 import models.EventImage;
 import models.Event;
-import models.FilterEvent;
+import viewModels.FilterEvent;
 import models.Organizer;
 import models.Showtime;
 import models.TicketType;
