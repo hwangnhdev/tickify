@@ -113,23 +113,11 @@ public class EventDetailController extends HttpServlet {
         request.setAttribute("organizer", organizer);
         request.setAttribute("listShowtimes", listShowtimes);
 
+        System.out.println(eventDetail.getCategoryId());
+        
         // Filter and pagination logic (unchanged)
-        String[] categoryIds = request.getParameterValues("categoryId");
-        String location = request.getParameter("location");
-        String startDateStr = request.getParameter("startDate");
-        String endDateStr = request.getParameter("endDate");
-        String price = request.getParameter("price");
-        String searchQuery = request.getParameter("query");
-
         List<Integer> categories = new ArrayList<>();
-        if (categoryIds != null) {
-            for (String idCat : categoryIds) {
-                categories.add(Integer.parseInt(idCat));
-            }
-        }
-
-        Date startDate = (startDateStr != null && !startDateStr.isEmpty()) ? Date.valueOf(startDateStr) : null;
-        Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? Date.valueOf(endDateStr) : null;
+        categories.add(eventDetail.getCategoryId());
 
         FilterEvent filters = new FilterEvent(categories, null, null, null, null, false, null);
         List<EventImage> filteredEvents = filterEventDAO.getFilteredEvents(filters);
@@ -157,6 +145,27 @@ public class EventDetailController extends HttpServlet {
         request.setAttribute("filteredEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        
+        // <!--All Event For You-->  Get the requested page number, default to 1 if not provided 
+        int pageAll = 1;
+        int pageSizeAll = 20;
+        if (request.getParameter("page") != null) {
+            try {
+                pageAll = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException e) {
+                pageAll = 1; // Fallback to page 1 in case of an invalid input
+            }
+        }
+
+        // Get total number of events and calculate total pages
+        int totalEventsAll = eventDAO.getTotalEvents();
+        int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSizeAll);
+
+        // Fetch paginated list of events
+        List<EventImage> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
+        request.setAttribute("paginatedEventsAll", paginatedEventsAll);
+        request.setAttribute("pageAll", pageAll);
+        request.setAttribute("totalPagesAll", totalPagesAll);
 
         request.getRequestDispatcher("pages/listEventsPage/eventDetail.jsp").forward(request, response);
     }

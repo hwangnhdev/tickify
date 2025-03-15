@@ -30,8 +30,8 @@ public class FilterEventDAO extends DBContext {
                 + "FROM Events e\n"
                 + "LEFT JOIN Showtimes s ON e.event_id = s.event_id \n"
                 + "LEFT JOIN TicketTypes t ON s.showtime_id = t.ticket_type_id\n"
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%'\n"
-                + "WHERE 1 = 1 AND s.status = 'Approved'"
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%'\n"
+                + "WHERE e.status = 'Approved'"
         );
 
         // List to store query parameters
@@ -78,10 +78,6 @@ public class FilterEventDAO extends DBContext {
             }
         }
 
-//        // Filtering by voucher availability
-//        if (filters.isVouchers()) {
-//            sql.append(" AND v.voucher_id IS NOT NULL");
-//        }
         // Filtering by search query
         if (filters.getSearchQuery() != null && !filters.getSearchQuery().isEmpty()) {
             sql.append(" AND e.event_name LIKE ?");
@@ -129,8 +125,8 @@ public class FilterEventDAO extends DBContext {
 
         // Defining filter criteria
         List<Integer> categories = new ArrayList<>();
-        categories.add(5);
-        String location = "Ben Thanh Theater";
+        categories.add(1);
+        String location = "Thành Phố Hồ Chí Minh";
         java.util.Date startDate = java.sql.Date.valueOf("2025-03-01");
         java.util.Date endDate = java.sql.Date.valueOf("2025-03-31");
         String priceRange = "below_150";
@@ -146,7 +142,7 @@ public class FilterEventDAO extends DBContext {
 
         // Printing the event names and count of filtered events
         for (EventImage filteredEvent : filteredEvents) {
-            System.out.println("Event Name: " + filteredEvent.getEventId());
+            System.out.println("Event ID: " + filteredEvent.getEventId());
             System.out.println("Event Name: " + filteredEvent.getEventName());
             System.out.println("Image Title: " + filteredEvent.getImageTitle());
             System.out.println("Image URL: " + filteredEvent.getImageUrl());
