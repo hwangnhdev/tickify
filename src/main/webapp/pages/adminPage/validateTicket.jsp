@@ -106,8 +106,7 @@
                     document.getElementById("result").innerText = "Mã QR: " + code.data;
                     scanning = false; // Dừng quét sau khi tìm thấy mã
 
-//                    let ticketCode = getTicketCode(code.data);
-                    let ticketCode = code.data;
+                    let ticketCode = getTicketCode(code.data);
                     if (ticketCode) {
                         validateTicket(ticketCode);
                     } else {

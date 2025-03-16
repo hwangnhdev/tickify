@@ -57,9 +57,10 @@ public class VerifyEmailController extends HttpServlet {
         int verificationCode = 100000 + random.nextInt(900000);
         System.out.println("Verification OTP: " + verificationCode);
 
+        // Nêú dùng Redis
         // Lưu OTP vào database hoặc Redis (nếu dùng Redis thì xóa dòng session bên dưới)
-        OTPService otpService = new OTPService();
-        otpService.saveOTP(email, String.valueOf(verificationCode));
+//        OTPService otpService = new OTPService();
+//        otpService.saveOTP(email, String.valueOf(verificationCode));
 
         // Gửi email
         String recipient = email;

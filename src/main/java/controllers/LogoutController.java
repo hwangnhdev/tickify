@@ -49,7 +49,7 @@ public class LogoutController extends HttpServlet {
         if (session != null) {
             session.invalidate(); // Xóa session
         }
-        response.sendRedirect("");
+        response.sendRedirect(request.getContextPath());
     } 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -63,7 +63,8 @@ public class LogoutController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+//        processRequest(request, response);
+        logout(request, response);
     } 
 
     /** 

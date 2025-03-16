@@ -129,7 +129,7 @@
                                      data-ticket_type_id="${seat.ticketTypeId}" 
                                      data-seat_id="${seat.seatId}" 
                                      data-seat="${seat.seatRow}${seat.seatCol}" 
-                                     data-price="${seat.price * 1000}" 
+                                     data-price="${seat.price}" 
                                      data-type="${seat.name}"
                                      style="background-color: ${seatColor}; color: #FFF; cursor: ${seatCursor}">
                                     ${seat.seatRow}${seat.seatCol}
@@ -169,7 +169,7 @@
                                     <p class="truncate-text">${ticketType.name}</p>
                                 </div>
                                 <span class="text-green-500">
-                                    <fmt:formatNumber value="${ticketType.price * 1000}" currencyCode="VND" minFractionDigits="0" /> VND
+                                    <fmt:formatNumber value="${ticketType.price}" currencyCode="VND" minFractionDigits="0" /> VND
                                 </span>
                             </div>
                         </c:forEach>

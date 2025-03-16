@@ -26,7 +26,7 @@
                 flex-direction: column;
                 font-family: 'Montserrat', sans-serif;
                 height: 100vh;
-                margin: -20px 0 50px;
+                margin: 0;
             }
 
             h1 {
@@ -39,13 +39,13 @@
                 text-align: center;
             }
 
-            p {
-                font-size: 14px;
-                font-weight: 100;
-                line-height: 20px;
-                letter-spacing: 0.5px;
-                margin: 20px 0 30px;
-            }
+            /*            p {
+                            font-size: 14px;
+                            font-weight: 100;
+                            line-height: 20px;
+                            letter-spacing: 0.5px;
+                            margin: 20px 0 30px;
+                        }*/
 
             span {
                 font-size: 12px;
@@ -290,8 +290,8 @@
             }
             .error {
                 color: red;
-                font-size: 0.875rem;
-                margin-top: 4px;
+                font-size: 0.75rem;
+                margin-top: 0px;
                 display: none;
             }
 
@@ -302,7 +302,7 @@
         <div class="container" id="container">
             <!--Sign Up-->
             <div class="form-container sign-up-container">
-                <form action="<%= request.getContextPath()%>/verifyEmail" method="post">
+                <form id="customerForm" action="<%= request.getContextPath()%>/verifyEmail" method="post">
                     <h1>Create Account</h1>
                     <div class="social-container">
                         <a href="https://www.facebook.com/v21.0/dialog/oauth?client_id=489098020910683&redirect_uri=http://localhost:8080/Tickify/loginFacebookHandler" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -313,10 +313,10 @@
                     <!--Input-->
                     <input type="hidden" name="action" value="signup"/>
                     <input type="text" placeholder="Name (8-50 chars)" name="name" required/>
-                    <input type="email" placeholder="Email" name="email" required/>
+                    <input id="email" type="email" placeholder="Email" name="email" required/>
                     <p id="emailError" class="error">Email không hợp lệ!</p>
                     <div class="password-container">
-                        <input type="password" placeholder="Password (8-50 chars)" name="password" required>
+                        <input id="password" type="password" placeholder="Password (8-50 chars)" name="password" required>
                         <span class="toggle-password">
                             <i class="fa-regular fa-eye"></i>
                         </span>
@@ -328,7 +328,7 @@
 
             <!--Log In-->
             <div class="form-container log-in-container">
-                <form action="<%= request.getContextPath()%>/auth" method="post">
+                <form id="customerForm" action="<%= request.getContextPath()%>/auth" method="post">
                     <h1>Log In</h1>
                     <div class="social-container">
                         <a href="https://www.facebook.com/v21.0/dialog/oauth?client_id=489098020910683&redirect_uri=http://localhost:8080/Tickify/loginFacebookHandler" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -338,10 +338,10 @@
 
                     <!--Input-->
                     <input type="hidden" name="action" value="login"/>
-                    <input type="email" placeholder="Email" name="email" required/>
+                    <input id="email" type="email" placeholder="Email" name="email" required/>
                     <p id="emailError" class="error">Email không hợp lệ!</p>
                     <div class="password-container">
-                        <input type="password" placeholder="Password" name="password" required>
+                        <input id="password" type="password" placeholder="Password" name="password" required>
                         <span class="toggle-password">
                             <i class="fa-regular fa-eye"></i>
                         </span>
@@ -401,57 +401,45 @@
             });
 
             document.addEventListener("DOMContentLoaded", function () {
-                const form = document.getElementById("adminLoginForm");
-                const emailInput = document.getElementById("email");
-                const passwordInput = document.getElementById("password");
-                const emailError = document.getElementById("emailError");
-                const passwordError = document.getElementById("passwordError");
+                const forms = document.querySelectorAll("form");
 
-                function validateEmail(email) {
-                    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-                    return emailRegex.test(email);
-                }
+                forms.forEach(form => {
+                    form.addEventListener("submit", function (event) {
+                        const emailInput = form.querySelector("input[name='email']");
+                        const passwordInput = form.querySelector("input[name='password']");
+                        const emailError = form.querySelector("#emailError");
+                        const passwordError = form.querySelector("#passwordError");
 
-                function validatePassword(password) {
-                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                    return passwordRegex.test(password);
-                }
+                        function validateEmail(email) {
+                            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                            return emailRegex.test(email);
+                        }
 
-                form.addEventListener("submit", function (event) {
-                    let isValid = true;
+                        function validatePassword(password) {
+                            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                            return passwordRegex.test(password);
+                        }
 
-                    // Kiểm tra email
-                    if (!validateEmail(emailInput.value.trim())) {
-                        emailError.style.display = "block";
-                        isValid = false;
-                    } else {
-                        emailError.style.display = "none";
-                    }
+                        let isValid = true;
 
-                    // Kiểm tra mật khẩu
-                    if (!validatePassword(passwordInput.value.trim())) {
-                        passwordError.style.display = "block";
-                        isValid = false;
-                    } else {
-                        passwordError.style.display = "none";
-                    }
+                        if (!validateEmail(emailInput.value.trim())) {
+                            emailError.style.display = "block";
+                            isValid = false;
+                        } else {
+                            emailError.style.display = "none";
+                        }
 
-                    if (!isValid) {
-                        event.preventDefault();
-                    }
-                });
+                        if (!validatePassword(passwordInput.value.trim())) {
+                            passwordError.style.display = "block";
+                            isValid = false;
+                        } else {
+                            passwordError.style.display = "none";
+                        }
 
-                // Ẩn lỗi khi người dùng nhập đúng
-                emailInput.addEventListener("input", () => {
-                    if (validateEmail(emailInput.value.trim())) {
-                        emailError.style.display = "none";
-                    }
-                });
-
-                passwordInput.addEventListener("input", () => {
-                    if (validatePassword(passwordInput.value.trim())) {
-                        passwordError.style.display = "none";
-                    }
+                        if (!isValid) {
+                            event.preventDefault();
+                        }
+                    });
                 });
             });
 

@@ -112,9 +112,10 @@ public class LoginGoogleHandlerController extends HttpServlet {
             // Login 
             HttpSession session = request.getSession();
             System.out.println(customerSendRedirect.getProfilePicture());
+            session.setMaxInactiveInterval(3 * 60 * 60); // 3hrs
             session.setAttribute("customerImage", customerSendRedirect.getProfilePicture());
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
-            response.sendRedirect("event");
+            response.sendRedirect(request.getContextPath());
         } catch (Exception e) {
             request.setAttribute("error", "Login fail!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);

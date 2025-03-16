@@ -72,24 +72,6 @@
                                         </td>
                                     </tr>
                                 </c:forEach>
-<!--                                <tr class="hover:bg-gray-50 transition duration-150">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">VIP</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">1,000,000 VND</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">5</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">5,000,000 VND</td>
-                                </tr>
-                                <tr class="hover:bg-gray-50 transition duration-150">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Standard</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">500,000 VND</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">10</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">5,000,000 VND</td>
-                                </tr>
-                                <tr class="hover:bg-gray-50 transition duration-150">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Economy</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">175,072 VND</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">4</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">700,288 VND</td>
-                                </tr>-->
                             </tbody>
                         </table>
                     </div>

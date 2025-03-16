@@ -95,8 +95,9 @@ public class AuthController extends HttpServlet {
             CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, provider, hashedPassword, null);
             customerAuthDao.insertCustomerAuth(customerAuth);
 
+            session.setMaxInactiveInterval(3 * 60 * 60); // 3hrs
             session.setAttribute("customerId", customer.getCustomerId());
-            response.sendRedirect("pages/homePage/home.jsp");
+            response.sendRedirect(request.getContextPath());
         } else{
             request.setAttribute("errorMessage", "Existing email");
             RequestDispatcher dispatcher = request.getRequestDispatcher("pages/signUpPage/signUp.jsp");
@@ -113,13 +114,19 @@ public class AuthController extends HttpServlet {
         CustomerAuthDAO customerAuthDao = new CustomerAuthDAO();
         
         Customer customer = customerDao.selectCustomerByEmail(email);
+        
+        if (customer == null) {
+            request.setAttribute("errorMessage", "Invalid email");
+            request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
+        }
+        
         CustomerAuth customerAuth = customerAuthDao.selectCustomerAuthById(customer.getCustomerId());
         
         if (customer != null && BCrypt.checkpw(password, customerAuth.getPassword())) {
             HttpSession session = request.getSession();
             session.setAttribute("customerImage", customer.getProfilePicture());
             session.setAttribute("customerId", customer.getCustomerId());
-            response.sendRedirect("pages/homePage/home.jsp");
+            response.sendRedirect(request.getContextPath());
         } else {
             request.setAttribute("errorMessage", "Invalid email or password");
             RequestDispatcher dispatcher = request.getRequestDispatcher("pages/signUpPage/signUp.jsp");

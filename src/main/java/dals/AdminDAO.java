@@ -35,18 +35,18 @@ public class AdminDAO extends DBContext {
             + "    e.event_id,\n"
             + "    e.event_name,\n"
             + "    SUM(od.quantity) AS total_tickets_sold,\n"
-            + "    SUM(od.price * od.quantity) AS total_revenue,\n"
-            + "    s.start_date,\n"
-            + "    s.end_date\n"
+            + "    SUM(od.price) AS total_revenue,\n"
+            + "    MIN(s.start_date) AS start_date,\n"
+            + "    MAX(s.end_date) AS end_date\n"
             + "FROM Events e\n"
             + "JOIN Showtimes s ON e.event_id = s.event_id\n"
             + "JOIN TicketTypes tt ON s.showtime_id = tt.showtime_id\n"
             + "JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id\n"
             + "JOIN Orders o ON od.order_id = o.order_id\n"
-            + "--WHERE o.payment_status = 'Completed'\n"
-            + "GROUP BY e.event_id, e.event_name, s.start_date, s.end_date\n"
+            + "GROUP BY e.event_id, e.event_name\n"
             + "ORDER BY e.event_id ASC;";
-    private static final String SELECT_REVENUE_DETAIL_BY_EVENT_ID 
+    
+    private static final String SELECT_REVENUE_DETAIL_BY_EVENT_ID
             = "SELECT \n"
             + "    e.event_id,\n"
             + "    e.event_name,\n"
@@ -129,11 +129,10 @@ public class AdminDAO extends DBContext {
         }
         return false;
     }
-    
+
     public List<Event> selectAllRevenues() {
         List<Event> revenues = new ArrayList<>();
-        try (PreparedStatement st = connection.prepareStatement(SELECT_ALL_REVENUES);
-             ResultSet rs = st.executeQuery()) {
+        try ( PreparedStatement st = connection.prepareStatement(SELECT_ALL_REVENUES);  ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
                 Event revenue = new Event();
                 revenue.setEventId(rs.getInt("event_id"));
@@ -149,21 +148,21 @@ public class AdminDAO extends DBContext {
         }
         return revenues;
     }
-    
+
     public List<TicketType> getRevenueDetailByEventId(int eventId) {
         List<TicketType> revenueDetails = new ArrayList<>();
-        try (PreparedStatement st = connection.prepareStatement(SELECT_REVENUE_DETAIL_BY_EVENT_ID)) {
+        try ( PreparedStatement st = connection.prepareStatement(SELECT_REVENUE_DETAIL_BY_EVENT_ID)) {
             st.setInt(1, eventId);
-            try (ResultSet rs = st.executeQuery()) {
+            try ( ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     TicketType revenueDetail = new TicketType();
                     revenueDetail.setEventId(rs.getInt("event_id"));
                     revenueDetail.setEventName(rs.getString("event_name"));
                     revenueDetail.setName(rs.getString("ticket_type_name"));
-                    
+
                     revenueDetail.setTotalQuantity(rs.getInt("total_quantity"));
                     revenueDetail.setPrice(rs.getInt("ticket_price"));
-                    
+
 //                    revenueDetail.setSoldQuantity(rs.getInt("total_tickets_sold"));
                     revenueDetail.setSoldQuantity(rs.getInt("sold_quantity"));
                     revenueDetail.setTotalRevenuePerTicketType(rs.getDouble("revenue_per_ticket_type"));
@@ -443,7 +442,7 @@ public class AdminDAO extends DBContext {
                 + "ORDER BY e.updated_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -480,7 +479,7 @@ public class AdminDAO extends DBContext {
                 + "ORDER BY e.updated_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -749,7 +748,7 @@ public class AdminDAO extends DBContext {
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -808,7 +807,7 @@ public class AdminDAO extends DBContext {
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -860,7 +859,7 @@ public class AdminDAO extends DBContext {
                 + "ORDER BY e.updated_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -889,182 +888,80 @@ public class AdminDAO extends DBContext {
     }
 
     public List<Event> searchHistoryEventsByNameAndStatus(String keyword, String status, int page, int pageSize) {
-    List<Event> events = new ArrayList<>();
-    if (connection == null) {
-        return events;
-    }
-    
-    String sql;
-    if ("all".equalsIgnoreCase(status)) {
-        sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, " +
-              "e.updated_at AS approvedAt, " +
-              "STRING_AGG(ei.image_url, ',') AS imageURLs, " +
-              "STRING_AGG(ei.image_title, ',') AS imageTitles " +
-              "FROM Events e " +
-              "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
-              "WHERE e.event_name LIKE ? " +
-              "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at " +
-              "ORDER BY e.updated_at DESC " +
-              "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    } else {
-        sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, " +
-              "e.updated_at AS approvedAt, " +
-              "STRING_AGG(ei.image_url, ',') AS imageURLs, " +
-              "STRING_AGG(ei.image_title, ',') AS imageTitles " +
-              "FROM Events e " +
-              "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
-              "WHERE e.event_name LIKE ? AND e.status = ? " +
-              "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at " +
-              "ORDER BY e.updated_at DESC " +
-              "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    }
-    
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ps.setString(1, "%" + keyword + "%");
-        if ("all".equalsIgnoreCase(status)) {
-            ps.setInt(2, (page - 1) * pageSize);
-            ps.setInt(3, pageSize);
-        } else {
-            ps.setString(2, status);
-            ps.setInt(3, (page - 1) * pageSize);
-            ps.setInt(4, pageSize);
-        }
-        
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            // Lưu ý: Phương thức mapResultSetToApprovedEvent cần chuyển đổi chuỗi imageURLs và imageTitles thành List<String>
-            events.add(mapResultSetToApprovedEvent(rs));
-        }
-    } catch (SQLException e) {
-        System.out.println("Lỗi khi tìm kiếm lịch sử sự kiện: " + e.getMessage());
-    }
-    return events;
-}
-
-
-    public int getTotalSearchHistoryEventsByNameAndStatus(String keyword, String status) {
-    String sql;
-    if ("all".equalsIgnoreCase(status)) {
-        sql = "SELECT COUNT(DISTINCT event_id) FROM Events WHERE event_name LIKE ?";
-    } else {
-        sql = "SELECT COUNT(DISTINCT event_id) FROM Events WHERE event_name LIKE ? AND status = ?";
-    }
-    
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ps.setString(1, "%" + keyword + "%");
-        if (!"all".equalsIgnoreCase(status)) {
-            ps.setString(2, status);
-        }
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return rs.getInt(1);
-        }
-    } catch (SQLException e) {
-        System.out.println("Lỗi đếm số lịch sử sự kiện theo tên và trạng thái: " + e.getMessage());
-    }
-    return 0;
-}
-
-
-    public List<Event> searchEventsByNameAndStatus(String keyword, String status, int page, int pageSize) {
         List<Event> events = new ArrayList<>();
         if (connection == null) {
             return events;
         }
-        String sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, "
-                + "  (SELECT STRING_AGG(image_url, ',') "
-                + "   FROM (SELECT DISTINCT image_url FROM EventImages WHERE event_id = e.event_id) AS imgUrls) AS imageURLs, "
-                + "  (SELECT STRING_AGG(image_title, ',') "
-                + "   FROM (SELECT DISTINCT image_title FROM EventImages WHERE event_id = e.event_id) AS imgTitles) AS imageTitles "
-                + "FROM Events e "
-                + "WHERE e.event_name LIKE ? AND LOWER(e.status) = LOWER(?) "
-                + "ORDER BY e.event_name "
-                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+        String sql;
+        if ("all".equalsIgnoreCase(status)) {
+            sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, "
+                    + "e.updated_at AS approvedAt, "
+                    + "STRING_AGG(ei.image_url, ',') AS imageURLs, "
+                    + "STRING_AGG(ei.image_title, ',') AS imageTitles "
+                    + "FROM Events e "
+                    + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id "
+                    + "WHERE e.event_name LIKE ? "
+                    + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at "
+                    + "ORDER BY e.updated_at DESC "
+                    + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        } else {
+            sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, "
+                    + "e.updated_at AS approvedAt, "
+                    + "STRING_AGG(ei.image_url, ',') AS imageURLs, "
+                    + "STRING_AGG(ei.image_title, ',') AS imageTitles "
+                    + "FROM Events e "
+                    + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id "
+                    + "WHERE e.event_name LIKE ? AND e.status = ? "
+                    + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at "
+                    + "ORDER BY e.updated_at DESC "
+                    + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        }
+
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
-            ps.setString(2, status);
-            ps.setInt(3, (page - 1) * pageSize);
-            ps.setInt(4, pageSize);
+            if ("all".equalsIgnoreCase(status)) {
+                ps.setInt(2, (page - 1) * pageSize);
+                ps.setInt(3, pageSize);
+            } else {
+                ps.setString(2, status);
+                ps.setInt(3, (page - 1) * pageSize);
+                ps.setInt(4, pageSize);
+            }
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                events.add(mapResultSetToEvent(rs));
+                // Lưu ý: Phương thức mapResultSetToApprovedEvent cần chuyển đổi chuỗi imageURLs và imageTitles thành List<String>
+                events.add(mapResultSetToApprovedEvent(rs));
             }
         } catch (SQLException e) {
-            System.out.println("Lỗi khi tìm kiếm sự kiện theo tên và trạng thái: " + e.getMessage());
+            System.out.println("Lỗi khi tìm kiếm lịch sử sự kiện: " + e.getMessage());
         }
         return events;
     }
 
-    /**
-     * Đếm tổng số sự kiện thỏa mãn cả từ khóa tìm kiếm và trạng thái (phép AND)
-     *
-     * @param keyword từ khóa tìm kiếm
-     * @param status trạng thái của sự kiện
-     * @return số lượng sự kiện tìm được
-     */
-    public int getTotalSearchEventsByNameAndStatus(String keyword, String status) {
-        String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND LOWER(status) = LOWER(?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+    public int getTotalSearchHistoryEventsByNameAndStatus(String keyword, String status) {
+        String sql;
+        if ("all".equalsIgnoreCase(status)) {
+            sql = "SELECT COUNT(DISTINCT event_id) FROM Events WHERE event_name LIKE ?";
+        } else {
+            sql = "SELECT COUNT(DISTINCT event_id) FROM Events WHERE event_name LIKE ? AND status = ?";
+        }
+
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
-            ps.setString(2, status);
+            if (!"all".equalsIgnoreCase(status)) {
+                ps.setString(2, status);
+            }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
-            System.out.println("Lỗi đếm số sự kiện theo tên và trạng thái: " + e.getMessage());
+            System.out.println("Lỗi đếm số lịch sử sự kiện theo tên và trạng thái: " + e.getMessage());
         }
         return 0;
     }
-public List<Event> filterHistoryEventsByStatus(String status, int page, int pageSize) {
-    List<Event> events = new ArrayList<>();
-    if (connection == null) {
-        return events;
-    }
-    
-    String sql;
-    if ("all".equalsIgnoreCase(status)) {
-        sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, " +
-              "e.updated_at AS approvedAt, " +
-              "STRING_AGG(ei.image_url, ',') AS imageURLs, " +
-              "STRING_AGG(ei.image_title, ',') AS imageTitles " +
-              "FROM Events e " +
-              "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
-              "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at " +
-              "ORDER BY e.updated_at DESC " +
-              "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    } else {
-        sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, " +
-              "e.updated_at AS approvedAt, " +
-              "STRING_AGG(ei.image_url, ',') AS imageURLs, " +
-              "STRING_AGG(ei.image_title, ',') AS imageTitles " +
-              "FROM Events e " +
-              "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
-              "WHERE e.status = ? " +
-              "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at " +
-              "ORDER BY e.updated_at DESC " +
-              "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    }
-    
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        if ("all".equalsIgnoreCase(status)) {
-            ps.setInt(1, (page - 1) * pageSize);
-            ps.setInt(2, pageSize);
-        } else {
-            ps.setString(1, status);
-            ps.setInt(2, (page - 1) * pageSize);
-            ps.setInt(3, pageSize);
-        }
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            events.add(mapResultSetToApprovedEvent(rs));
-        }
-    } catch (SQLException e) {
-        System.out.println("Lỗi khi lọc lịch sử sự kiện theo trạng thái: " + e.getMessage());
-    }
-    return events;
-}
-
 
     public List<Event> searchEventsByNameAndStatus(String keyword, String status, int page, int pageSize) {
         List<Event> events = new ArrayList<>();
@@ -1095,9 +992,16 @@ public List<Event> filterHistoryEventsByStatus(String status, int page, int page
         return events;
     }
 
-    public int getTotalSearchHistoryEventsByNameAndStatus(String keyword, String status) {
-        String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND status = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+    /**
+     * Đếm tổng số sự kiện thỏa mãn cả từ khóa tìm kiếm và trạng thái (phép AND)
+     *
+     * @param keyword từ khóa tìm kiếm
+     * @param status trạng thái của sự kiện
+     * @return số lượng sự kiện tìm được
+     */
+    public int getTotalSearchEventsByNameAndStatus(String keyword, String status) {
+        String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND LOWER(status) = LOWER(?)";
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setString(2, status);
             ResultSet rs = ps.executeQuery();
@@ -1109,53 +1013,147 @@ public List<Event> filterHistoryEventsByStatus(String status, int page, int page
         }
         return 0;
     }
-public List<Event> filterHistoryEventsByStatus(String status, int page, int pageSize) {
-    List<Event> events = new ArrayList<>();
-    if (connection == null) {
+
+    public List<Event> filterHistoryEventsByStatus(String status, int page, int pageSize) {
+        List<Event> events = new ArrayList<>();
+        if (connection == null) {
+            return events;
+        }
+
+        String sql;
+        if ("all".equalsIgnoreCase(status)) {
+            sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, "
+                    + "e.updated_at AS approvedAt, "
+                    + "STRING_AGG(ei.image_url, ',') AS imageURLs, "
+                    + "STRING_AGG(ei.image_title, ',') AS imageTitles "
+                    + "FROM Events e "
+                    + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id "
+                    + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at "
+                    + "ORDER BY e.updated_at DESC "
+                    + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        } else {
+            sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, "
+                    + "e.updated_at AS approvedAt, "
+                    + "STRING_AGG(ei.image_url, ',') AS imageURLs, "
+                    + "STRING_AGG(ei.image_title, ',') AS imageTitles "
+                    + "FROM Events e "
+                    + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id "
+                    + "WHERE e.status = ? "
+                    + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at "
+                    + "ORDER BY e.updated_at DESC "
+                    + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        }
+
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+            if ("all".equalsIgnoreCase(status)) {
+                ps.setInt(1, (page - 1) * pageSize);
+                ps.setInt(2, pageSize);
+            } else {
+                ps.setString(1, status);
+                ps.setInt(2, (page - 1) * pageSize);
+                ps.setInt(3, pageSize);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                events.add(mapResultSetToApprovedEvent(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi lọc lịch sử sự kiện theo trạng thái: " + e.getMessage());
+        }
         return events;
     }
-    
-    String sql;
-    if ("all".equalsIgnoreCase(status)) {
-        sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, " +
-              "e.updated_at AS approvedAt, " +
-              "STRING_AGG(ei.image_url, ',') AS imageURLs, " +
-              "STRING_AGG(ei.image_title, ',') AS imageTitles " +
-              "FROM Events e " +
-              "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
-              "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at " +
-              "ORDER BY e.updated_at DESC " +
-              "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    } else {
-        sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, " +
-              "e.updated_at AS approvedAt, " +
-              "STRING_AGG(ei.image_url, ',') AS imageURLs, " +
-              "STRING_AGG(ei.image_title, ',') AS imageTitles " +
-              "FROM Events e " +
-              "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
-              "WHERE e.status = ? " +
-              "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at " +
-              "ORDER BY e.updated_at DESC " +
-              "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    }
-    
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        if ("all".equalsIgnoreCase(status)) {
-            ps.setInt(1, (page - 1) * pageSize);
-            ps.setInt(2, pageSize);
-        } else {
-            ps.setString(1, status);
-            ps.setInt(2, (page - 1) * pageSize);
-            ps.setInt(3, pageSize);
-        }
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            events.add(mapResultSetToApprovedEvent(rs));
-        }
-    } catch (SQLException e) {
-        System.out.println("Lỗi khi lọc lịch sử sự kiện theo trạng thái: " + e.getMessage());
-    }
-    return events;
-}
+//
+//
+//    public List<Event> searchEventsByNameAndStatus(String keyword, String status, int page, int pageSize) {
+//        List<Event> events = new ArrayList<>();
+//        if (connection == null) {
+//            return events;
+//        }
+//        String sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, "
+//                + "  (SELECT STRING_AGG(image_url, ',') "
+//                + "   FROM (SELECT DISTINCT image_url FROM EventImages WHERE event_id = e.event_id) AS imgUrls) AS imageURLs, "
+//                + "  (SELECT STRING_AGG(image_title, ',') "
+//                + "   FROM (SELECT DISTINCT image_title FROM EventImages WHERE event_id = e.event_id) AS imgTitles) AS imageTitles "
+//                + "FROM Events e "
+//                + "WHERE e.event_name LIKE ? AND LOWER(e.status) = LOWER(?) "
+//                + "ORDER BY e.event_name "
+//                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+//        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setString(1, "%" + keyword + "%");
+//            ps.setString(2, status);
+//            ps.setInt(3, (page - 1) * pageSize);
+//            ps.setInt(4, pageSize);
+//            ResultSet rs = ps.executeQuery();
+//            while (rs.next()) {
+//                events.add(mapResultSetToEvent(rs));
+//            }
+//        } catch (SQLException e) {
+//            System.out.println("Lỗi khi tìm kiếm sự kiện theo tên và trạng thái: " + e.getMessage());
+//        }
+//        return events;
+//    }
+//
+//    public int getTotalSearchHistoryEventsByNameAndStatus(String keyword, String status) {
+//        String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND status = ?";
+//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//            ps.setString(1, "%" + keyword + "%");
+//            ps.setString(2, status);
+//            ResultSet rs = ps.executeQuery();
+//            if (rs.next()) {
+//                return rs.getInt(1);
+//            }
+//        } catch (SQLException e) {
+//            System.out.println("Lỗi đếm số sự kiện theo tên và trạng thái: " + e.getMessage());
+//        }
+//        return 0;
+//    }
+//public List<Event> filterHistoryEventsByStatus(String status, int page, int pageSize) {
+//    List<Event> events = new ArrayList<>();
+//    if (connection == null) {
+//        return events;
+//    }
+//    
+//    String sql;
+//    if ("all".equalsIgnoreCase(status)) {
+//        sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, " +
+//              "e.updated_at AS approvedAt, " +
+//              "STRING_AGG(ei.image_url, ',') AS imageURLs, " +
+//              "STRING_AGG(ei.image_title, ',') AS imageTitles " +
+//              "FROM Events e " +
+//              "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
+//              "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at " +
+//              "ORDER BY e.updated_at DESC " +
+//              "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+//    } else {
+//        sql = "SELECT e.event_id, e.event_name, e.location, e.event_type, e.status, " +
+//              "e.updated_at AS approvedAt, " +
+//              "STRING_AGG(ei.image_url, ',') AS imageURLs, " +
+//              "STRING_AGG(ei.image_title, ',') AS imageTitles " +
+//              "FROM Events e " +
+//              "LEFT JOIN EventImages ei ON e.event_id = ei.event_id " +
+//              "WHERE e.status = ? " +
+//              "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.updated_at " +
+//              "ORDER BY e.updated_at DESC " +
+//              "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+//    }
+//    
+//    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//        if ("all".equalsIgnoreCase(status)) {
+//            ps.setInt(1, (page - 1) * pageSize);
+//            ps.setInt(2, pageSize);
+//        } else {
+//            ps.setString(1, status);
+//            ps.setInt(2, (page - 1) * pageSize);
+//            ps.setInt(3, pageSize);
+//        }
+//        ResultSet rs = ps.executeQuery();
+//        while (rs.next()) {
+//            events.add(mapResultSetToApprovedEvent(rs));
+//        }
+//    } catch (SQLException e) {
+//        System.out.println("Lỗi khi lọc lịch sử sự kiện theo trạng thái: " + e.getMessage());
+//    }
+//    return events;
+//}
 
 }
