@@ -321,6 +321,53 @@
                     border-bottom-right-radius: 15px;
                 }
             }
+            
+            /*All Events*/
+            .title-all_events {
+                text-align: center;
+                font-size: 24px;
+                font-weight: bold;
+            }
+            .event-card-all_events {
+                background-color: #ffffff;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                text-align: center;
+                transition: transform 0.3s, box-shadow 0.3s;
+                margin-top: 1%;
+            }
+
+            .event-card-all_events:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            }
+
+            .event-card-all_events img {
+                width: 100%;
+                height: 180px;
+                object-fit: fill;
+                background-color: #f0f0f0;
+                display: block;
+                transition: filter 0.3s;
+                object-fit: cover;
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            }
+
+            .event-card-all_events:hover img {
+                filter: brightness(1.1);
+                transform: scale(1.1);
+                box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
+            }
+            .g-4, .gy-4 {
+                --bs-gutter-y: 1.5rem;
+                margin: 0 7%;
+            }
+            .py-4 {
+                padding-top: 0.5rem !important;
+                padding-bottom: 1.5rem !important;
+            }
         </style>
     </head>
     <body>
@@ -436,21 +483,40 @@
             </section>
         </div>
 
-        <!-- Relevant Events -->
-        <h2 class="text-xl font-bold text-center">
-            <i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events
-        </h2>
         <c:choose>
             <c:when test="${empty filteredEvents}">
-                <p class="text-center">Not Event Found From Your Filter And Search</p>
+                <!--All Event--> 
+                <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+                    <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+                </h2>
+                <div class="container py-4">
+                    <div class="row gy-4" id="event-container">
+                        <!-- Loop through paginated events -->
+                        <c:forEach var="event" items="${paginatedEventsAll}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                                <div class="event-card-all_events">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    </a>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </div>
+                </div>
+                <!-- Bootstrap JS for All Events-->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
             </c:when>
             <c:otherwise>
+                <!-- Relevant Events -->
+                <h2 class="text-xl font-bold text-center">
+                    <i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events
+                </h2>
                 <div class="container py-4">
                     <div class="row gy-4" id="event-container">
                         <c:forEach var="event" items="${filteredEvents}">
                             <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
                                 <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}&categoryId=${event.categoryId}">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
                                         <img src="${event.imageUrl}" alt="${event.eventName}" />
                                     </a>
                                 </div>
@@ -471,43 +537,43 @@
         <!-- Footer -->
         <jsp:include page="../../components/footer.jsp"></jsp:include>
             <script>
-                function toggleShowTime(button) {
-                    const showTime = button.closest('.show-time');
-                    const details = showTime.querySelector('.show-time-details');
-                    const labelSpan = showTime.querySelector('.show-time-label');
-                    const icon = button.querySelector('i');
+                                function toggleShowTime(button) {
+                                    const showTime = button.closest('.show-time');
+                                    const details = showTime.querySelector('.show-time-details');
+                                    const labelSpan = showTime.querySelector('.show-time-label');
+                                    const icon = button.querySelector('i');
 
-                    // Toggle the collapsed state
-                    details.classList.toggle('collapsed');
-                    icon.classList.toggle('fa-chevron-down');
-                    icon.classList.toggle('fa-chevron-up');
+                                    // Toggle the collapsed state
+                                    details.classList.toggle('collapsed');
+                                    icon.classList.toggle('fa-chevron-down');
+                                    icon.classList.toggle('fa-chevron-up');
 
-                    // Get showtime index from label
-                    let showTimeIndex = '1';
-                    if (labelSpan && labelSpan.textContent) {
-                        const match = labelSpan.textContent.match(/\d+/);
-                        showTimeIndex = match ? match[0] : '1';
-                    }
+                                    // Get showtime index from label
+                                    let showTimeIndex = '1';
+                                    if (labelSpan && labelSpan.textContent) {
+                                        const match = labelSpan.textContent.match(/\d+/);
+                                        showTimeIndex = match ? match[0] : '1';
+                                    }
 
-                    // Get start and end dates from the header
-                    const dateSpan = button.querySelector('span:last-child');
-                    const dateText = dateSpan ? dateSpan.textContent : '';
+                                    // Get start and end dates from the header
+                                    const dateSpan = button.querySelector('span:last-child');
+                                    const dateText = dateSpan ? dateSpan.textContent : '';
 
-                    if (details.classList.contains('collapsed')) {
-                        // Collapsed state: show dates in label
-                        labelSpan.textContent = `Showtime ${showTimeIndex}: ${dateText}`;
-                        details.style.height = '0';
-                    } else {
-                        // Expanded state: reset label and expand details
-                        labelSpan.textContent = `Showtime ${showTimeIndex}: `;
-                        details.style.height = `${details.scrollHeight}px`;
+                                    if (details.classList.contains('collapsed')) {
+                                        // Collapsed state: show dates in label
+                                        labelSpan.textContent = `Showtime ${showTimeIndex}: ${dateText}`;
+                                        details.style.height = '0';
+                                    } else {
+                                        // Expanded state: reset label and expand details
+                                        labelSpan.textContent = `Showtime ${showTimeIndex}: `;
+                                        details.style.height = `${details.scrollHeight}px`;
 
-                        // Reset height to auto after transition for dynamic content
-                        setTimeout(() => {
-                            details.style.height = 'auto';
-                        }, 0); // Match transition duration
-                    }
-                }
+                                        // Reset height to auto after transition for dynamic content
+                                        setTimeout(() => {
+                                            details.style.height = 'auto';
+                                        }, 0); // Match transition duration
+                                    }
+                                }
         </script>
     </body>
 </html>

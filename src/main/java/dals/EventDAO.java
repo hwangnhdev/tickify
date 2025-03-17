@@ -552,7 +552,7 @@ public class EventDAO extends DBContext {
                 + "    WHERE Showtimes.event_id = ?\n"
                 + "    GROUP BY Seats.seat_row\n"
                 + ")\n"
-                + "SELECT \n"
+                + "SELECT TOP 1 WITH TIES\n"
                 + "    s.seat_id,\n"
                 + "    s.ticket_type_id,\n"
                 + "    s.seat_row,\n"
@@ -563,7 +563,7 @@ public class EventDAO extends DBContext {
                 + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
                 + "INNER JOIN MaxSeats ms ON s.seat_row = ms.seat_row AND CAST(s.seat_col AS INT) = ms.max_seat_col\n"
                 + "WHERE st.event_id = ?\n"
-                + "ORDER BY s.seat_row;";
+                + "ORDER BY ROW_NUMBER() OVER (PARTITION BY s.seat_row ORDER BY s.seat_id);";
         try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setInt(2, eventId);

@@ -200,31 +200,6 @@
                 margin-bottom: 0; /* Remove excess bottom margin */
             }
 
-            /* Toggle Buttons Styling */
-            .toggle-btn {
-                background-color: #4B5563; /* Medium gray background */
-                color: #FFFFFF; /* White text */
-                border: none; /* No border */
-                padding: 6px 12px; /* Padding */
-                border-radius: 6px; /* Rounded corners */
-                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
-                margin-right: 10px; /* Space to the right */
-            }
-            .toggle-btn:hover {
-                background-color: #6B7280; /* Lighter gray on hover */
-                transform: translateY(-2px); /* Slight lift */
-            }
-            .collapsible-content {
-                height: auto; /* Auto height when expanded */
-                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out; /* Smooth collapse/expand */
-                /*                overflow: hidden;  Hide overflow */
-            }
-            .collapsible-content.collapsed {
-                height: 0; /* Collapsed height */
-                opacity: 0; /* Fully transparent */
-                padding: 0; /* No padding when collapsed */
-            }
-
             /* General Buttons Styling */
             .add-ticket-btn, .save-seat-btn {
                 background-color: #15803D; /* Green background */
@@ -492,6 +467,51 @@
                 background-color: #374151; /* Darker gray background */
                 color: #FFFFFF; /* White text */
             }
+
+            /* CSS cho cả successPopup và errorPopup */
+            #successPopup, #errorPopup {
+                display: none; /* Ẩn mặc định */
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 50;
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+                transition: opacity 0.3s ease-in-out;
+            }
+
+            #successPopup.show, #errorPopup.show {
+                display: flex; /* Hiển thị khi có class show */
+                opacity: 1;
+            }
+            /* Toggle Buttons Styling */
+            .toggle-btn {
+                background-color: #4B5563; /* Medium gray background */
+                color: #FFFFFF; /* White text */
+                border: none; /* No border */
+                padding: 6px 12px; /* Padding */
+                border-radius: 6px; /* Rounded corners */
+                transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+                margin-right: 10px; /* Space to the right */
+            }
+            .toggle-btn:hover {
+                background-color: #6B7280; /* Lighter gray on hover */
+                transform: translateY(-2px); /* Slight lift */
+            }
+            .collapsible-content {
+                height: auto; /* Auto height when expanded */
+                transition: height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out; /* Smooth collapse/expand */
+                overflow: hidden; /* Hide overflow */
+            }
+            .collapsible-content.collapsed {
+                height: 0; /* Collapsed height */
+                opacity: 0; /* Fully transparent */
+                padding: 0; /* No padding when collapsed */
+            }
         </style>
     </head>
     <body class="bg-gray-900 text-white">
@@ -675,8 +695,8 @@
                             <label class="block text-gray-300 mb-2">Type Of Event</label>
                             <select id="eventType" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" onchange="toggleEventType()" required>
                                 <option value="">-- Please Select Type --</option>
-                                <option value="standingevent" <c:if test="${event.eventType == 'standingevent'}">selected</c:if>>Standing Event</option>
-                                <option value="seatedevent" <c:if test="${event.eventType == 'seatedevent'}">selected</c:if>>Seated Event</option>
+                                <option value="Standing Event" <c:if test="${event.eventType == 'Standing Event'}">selected</c:if>>Standing Event</option>
+                                <option value="Seating Event" <c:if test="${event.eventType == 'Seating Event'}">selected</c:if>>Seated Event</option>
                                 </select>
                                 <span class="error-message" id="eventType_error"></span>
                             </div>
@@ -723,7 +743,7 @@
                                     <c:forEach var="showTime" items="${showTimes}" varStatus="loop">
                                         <div class="show-time bg-gray-800 p-4 rounded">
                                             <div class="flex justify-between items-center mb-3">
-                                                <h6 class="text-white"><span class="show-time-label">Show Time #${loop.count}</span></h6>
+                                                <h6 class="text-white"><span class="show-time-label">Show Time #1</span></h6>
                                                 <div class="flex gap-2">
                                                     <button class="toggle-btn" onclick="toggleShowTime(this)">
                                                         <i class="fas fa-chevron-down"></i>
@@ -804,14 +824,9 @@
                         <!-- Bank Name -->
                         <div>
                             <label class="block text-gray-300 mb-2">Bank Name</label>
+                            <input type="hidden" id="organizerBankName" value="${organizer.bankName}">
                             <select id="bank" name="bankName" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" required>
                                 <option value="">Bank Name</option>
-                                <c:forEach var="bank" items="${banks}">
-                                    <option value="${bank.code}"
-                                            <c:if test="${organizer.bankName eq bank.code}">selected</c:if>>
-                                        ${bank.shortName} - ${bank.name}
-                                    </option>
-                                </c:forEach>
                             </select>
                             <span class="error-message" id="bank_error"></span>
                         </div>
@@ -837,8 +852,8 @@
         </div>
 
         <!-- Modal -->
-        <div id="newTicketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-            <div class="bg-gray-800 rounded-lg w-full max-w-4xl p-6">
+        <div id="newTicketModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center" style="overflow: auto;">
+            <div class="bg-gray-800 rounded-lg w-full max-w-4xl p-6" style="margin-top: 10%;">
                 <div class="flex justify-between items-center mb-4">
                     <h5 class="text-xl font-bold">Create New Ticket Type</h5>
                     <button class="text-gray-400 hover:text-white text-2xl" onclick="closeModal()">×</button>
@@ -857,14 +872,12 @@
                         <span class="error-message" id="modalTicketDescription_error"></span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Price -->
-                        <div>
+                        <div style="display: block !important;">
                             <label class="block text-gray-300 mb-2">Price (VND)</label>
-                            <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 15" step="1000">
+                            <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 150,000">
                             <span class="error-message" id="modalTicketPrice_error"></span>
                         </div>
-                        <!-- Quantity -->
-                        <div>
+                        <div style="display: block !important;">
                             <label class="block text-gray-300 mb-2">Quantity</label>
                             <input type="number" id="modalTicketQuantity" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 50">
                             <span class="error-message" id="modalTicketQuantity_error"></span>
@@ -893,7 +906,28 @@
                 </div>
             </div>
         </div>
-
+        <!-- Success Popup -->
+        <div id="successPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-lg p-6 max-w-sm w-full text-center">
+                <div class="flex justify-center mb-4">
+                    <i class="fas fa-check-circle text-green-500 text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Success</h3>
+                <p class="text-gray-300 mb-4">Update Event Successfully!</p>
+                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200" onclick="closeSuccessPopup()">OK</button>
+            </div>
+        </div>
+        <!-- Error Popup -->
+        <div id="errorPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-lg p-6 max-w-sm w-full text-center">
+                <div class="flex justify-center mb-4">
+                    <i class="fas fa-exclamation-circle text-red-500 text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Error</h3>
+                <p class="text-gray-300 mb-4" id="errorMessage">Please complete all required fields.</p>
+                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200" onclick="closeErrorPopup()">OK</button>
+            </div>
+        </div>
         <script src="${pageContext.request.contextPath}/pages/organizerPage/updateEvent.js"></script>
     </body>
 </html>

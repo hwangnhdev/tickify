@@ -32,6 +32,8 @@ import models.Organizer;
 import models.Seat;
 import models.Showtime;
 import models.TicketType;
+import viewModels.Bank;
+import viewModels.Province;
 
 /**
  *
@@ -82,8 +84,8 @@ public class UpdateEventController extends HttpServlet {
         EventDAO eventDAO = new EventDAO();
         CategoryDAO categoryDAO = new CategoryDAO();
 
-//        String eventIdParam = request.getParameter("eventId");
-        String eventIdParam = "21";
+        String eventIdParam = request.getParameter("eventId");
+//        String eventIdParam = "21";
         int eventId = 0;
         try {
             if (eventIdParam != null && !eventIdParam.isEmpty()) {
@@ -151,7 +153,22 @@ public class UpdateEventController extends HttpServlet {
         request.setAttribute("ticketTypes", ticketTypes);
         request.setAttribute("seats", seats);
         session.setAttribute("listCategories", listCategories);
-        request.setAttribute("bankName", organizer.getBankName());
+        request.setAttribute("bankName", organizer.getBankName().trim());
+        System.out.println("Your BankName: " + organizer.getBankName());
+
+        for (Seat seat : seats) {
+            System.out.println("Seat: " + seat.getSeatRow() + ", " + seat.getSeatCol());
+        }
+
+        // Tải danh sách ngân hàng từ API
+        List<Bank> banks = loadBanksFromAPI();
+        request.setAttribute("banks", banks);
+        for (Bank bank : banks) {
+            System.out.println(bank.getCode());
+            if (bank.getCode().equalsIgnoreCase(organizer.getBankName())) {
+                System.out.println("Successfully!");
+            }
+        }
 
         request.getRequestDispatcher("pages/organizerPage/updateEvent.jsp").forward(request, response);
     }
@@ -251,7 +268,7 @@ public class UpdateEventController extends HttpServlet {
                     TicketType ticketType = new TicketType();
                     ticketType.setName(ticketTypeObj.has("name") ? ticketTypeObj.get("name").getAsString() : "");
                     ticketType.setDescription(ticketTypeObj.has("description") ? ticketTypeObj.get("description").getAsString() : "");
-                    ticketType.setPrice(ticketTypeObj.has("price") ? ticketTypeObj.get("price").getAsDouble() : 0.0);
+                    ticketType.setPrice(ticketTypeObj.has("price") ? ticketTypeObj.get("price").getAsDouble() : 0);
                     ticketType.setColor(ticketTypeObj.has("color") ? ticketTypeObj.get("color").getAsString() : "#000000");
                     ticketType.setTotalQuantity(ticketTypeObj.has("totalQuantity") ? ticketTypeObj.get("totalQuantity").getAsInt() : 0);
 
@@ -264,7 +281,7 @@ public class UpdateEventController extends HttpServlet {
 
             // Process Seats (if seated event)
             List<Seat> seats = new ArrayList<>();
-            if ("seatedevent".equals(eventType)) {
+            if ("Seating Event".equals(eventType)) {
                 JsonArray seatsArray = jsonData.has("seats") ? jsonData.getAsJsonArray("seats") : null;
                 if (seatsArray == null || seatsArray.size() == 0) {
                     throw new IllegalArgumentException("Seats are required for seated events");
@@ -319,7 +336,7 @@ public class UpdateEventController extends HttpServlet {
             if (success) {
                 responseJson.addProperty("success", true);
                 responseJson.addProperty("eventId", eventId);
-                responseJson.addProperty("redirectUrl", "pages/organizerPage/organizerCenter.jsp");
+                responseJson.addProperty("redirectUrl", "OrganizerEventController");
             } else {
                 responseJson.addProperty("success", false);
                 responseJson.addProperty("message", "Failed to update event");
@@ -339,37 +356,6 @@ public class UpdateEventController extends HttpServlet {
         errorJson.addProperty("success", false);
         errorJson.addProperty("message", message);
         response.getWriter().write(new Gson().toJson(errorJson));
-    }
-
-    public static class Province {
-
-        private String name;
-        private int code;
-        private String division_type;
-        private String codename;
-        private int phone_code;
-        private List<Object> districts;
-
-        public String getName() {
-            return name;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public void setCode(int code) {
-            this.code = code;
-        }
-
-        public String getCodename() {
-            return codename;
-        }
-
-        public void setCodename(String codename) {
-            this.codename = codename;
-        }
-
     }
 
     // Cập nhật phương thức loadProvincesFromAPI để xử lý UTF-8
@@ -397,6 +383,41 @@ public class UpdateEventController extends HttpServlet {
         List<Province> provinces = gson.fromJson(jsonResponse.toString(), new TypeToken<List<Province>>() {
         }.getType());
         return provinces;
+    }
+
+    private List<Bank> loadBanksFromAPI() throws IOException {
+        String apiUrl = "https://api.vietqr.io/v2/banks";
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Accept", "application/json");
+
+        if (conn.getResponseCode() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+        }
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+        StringBuilder jsonResponse = new StringBuilder();
+        String output;
+        while ((output = br.readLine()) != null) {
+            jsonResponse.append(output);
+        }
+        conn.disconnect();
+
+        Gson gson = new Gson();
+        JsonObject jsonData = gson.fromJson(jsonResponse.toString(), JsonObject.class);
+        JsonArray bankArray = jsonData.getAsJsonArray("data");
+        List<Bank> banks = new ArrayList<>();
+        for (JsonElement element : bankArray) {
+            JsonObject bankObj = element.getAsJsonObject();
+            Bank bank = new Bank();
+            bank.setId(bankObj.get("id").getAsInt());
+            bank.setName(bankObj.get("name").getAsString());
+            bank.setCode(bankObj.get("code").getAsString());
+            bank.setShortName(bankObj.get("shortName").getAsString());
+            banks.add(bank);
+        }
+        return banks;
     }
 
     @Override

@@ -194,7 +194,7 @@ public class CreateNewEventController extends HttpServlet {
 
             // Process Seats (if seated event)
             List<Seat> seats = new ArrayList<>();
-            if ("seatedevent".equals(eventType)) {
+            if ("Seating Event".equals(eventType)) {
                 JsonArray seatsArray = jsonData.has("seats") ? jsonData.getAsJsonArray("seats") : null;
                 if (seatsArray == null || seatsArray.size() == 0) {
                     throw new IllegalArgumentException("Seats are required for seated events");
