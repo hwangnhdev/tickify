@@ -97,7 +97,10 @@ public class AuthController extends HttpServlet {
 
             session.setMaxInactiveInterval(3 * 60 * 60); // 3hrs
             session.setAttribute("customerId", customer.getCustomerId());
-            response.sendRedirect(request.getContextPath());
+            System.out.println("Signup successful!");
+            request.setAttribute("successfulMessage", "Signup successful!");
+            response.sendRedirect("pages/signUpPage/signUp.jsp");
+//            request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
         } else{
             request.setAttribute("errorMessage", "Existing email");
             RequestDispatcher dispatcher = request.getRequestDispatcher("pages/signUpPage/signUp.jsp");
@@ -118,11 +121,14 @@ public class AuthController extends HttpServlet {
         if (customer == null) {
             request.setAttribute("errorMessage", "Invalid email");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
+            return;
         }
         
         if (!customer.getStatus()) {
             request.setAttribute("errorMessage", "This account has been banned!");
+            System.out.println("This account has been banned!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
+            return;
         }
         
         CustomerAuth customerAuth = customerAuthDao.selectCustomerAuthById(customer.getCustomerId());
