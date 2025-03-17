@@ -120,6 +120,11 @@ public class AuthController extends HttpServlet {
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
         }
         
+        if (!customer.getStatus()) {
+            request.setAttribute("errorMessage", "This account has been banned!");
+            request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
+        }
+        
         CustomerAuth customerAuth = customerAuthDao.selectCustomerAuthById(customer.getCustomerId());
         
         if (customer != null && BCrypt.checkpw(password, customerAuth.getPassword())) {

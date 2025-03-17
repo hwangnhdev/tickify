@@ -23,35 +23,35 @@ public class OrganizerDAO extends DBContext {
 
     public EventDetailDTO getCustomerEventDetail(int customerId, int eventId) {
     EventDetailDTO detail = null;
-    String sql = "SELECT " +
-                 "    e.event_id AS eventId, " +
-                 "    e.event_name AS eventName, " +
-                 "    MIN(s.start_date) AS startDate, " +
-                 "    MAX(s.end_date) AS endDate, " +
-                 "    e.location AS location, " +
-                 "    e.status AS eventStatus, " +
-                 "    e.description AS description, " +
-                 "    ( " +
-                 "        SELECT TOP 1 image_url " +
-                 "        FROM EventImages " +
-                 "        WHERE event_id = e.event_id " +
-                 "        ORDER BY image_id " +
-                 "    ) AS imageURL, " +
-                 "    org.organization_name AS organizationName " +
-                 "FROM Events e " +
-                 "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id " +
-                 "INNER JOIN Showtimes s ON e.event_id = s.event_id " +
-                 "WHERE e.event_id = ? " +
-                 "  AND EXISTS ( " +
-                 "      SELECT 1 " +
-                 "      FROM Orders o " +
-                 "      INNER JOIN OrderDetails od ON o.order_id = od.order_id " +
-                 "      INNER JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id " +
-                 "      INNER JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id " +
-                 "      WHERE s2.event_id = e.event_id " +
-                 "        AND o.customer_id = ? " +
-                 "  ) " +
-                 "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
+    String sql = "SELECT "
+            + "    e.event_id AS eventId, "
+            + "    e.event_name AS eventName, "
+            + "    MIN(s.start_date) AS startDate, "
+            + "    MAX(s.end_date) AS endDate, "
+            + "    e.location AS location, "
+            + "    e.status AS eventStatus, "  // Lấy trực tiếp status của sự kiện
+            + "    e.description AS description, "
+            + "    ( "
+            + "        SELECT TOP 1 image_url "
+            + "        FROM EventImages "
+            + "        WHERE event_id = e.event_id "
+            + "        ORDER BY image_id "
+            + "    ) AS imageURL, "
+            + "    org.organization_name AS organizationName "
+            + "FROM Events e "
+            + "JOIN Organizers org ON e.organizer_id = org.organizer_id "
+            + "JOIN Showtimes s ON e.event_id = s.event_id "
+            + "WHERE e.event_id = ? "
+            + "  AND EXISTS ( "
+            + "      SELECT 1 "
+            + "      FROM Orders o "
+            + "      JOIN OrderDetails od ON o.order_id = od.order_id "
+            + "      JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+            + "      JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id "
+            + "      WHERE s2.event_id = e.event_id "
+            + "        OR o.customer_id = ? "
+            + "  ) "
+            + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
     try (PreparedStatement ps = connection.prepareStatement(sql)) {
         ps.setInt(1, eventId);
         ps.setInt(2, customerId);
