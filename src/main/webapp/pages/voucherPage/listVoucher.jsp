@@ -14,32 +14,7 @@
         <div class="flex h-screen">
 
             <!-- Sidebar -->
-            <aside class="w-1/6 bg-gradient-to-b from-green-900 to-black p-4 text-white">
-                <div class="flex items-center mb-8">
-                    <img alt="Tickify logo" class="mr-2" height="40" src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" width="40"/>
-                    <span class="text-lg font-bold text-green-500">Organizer Center</span>
-                </div>
-                <nav class="space-y-4">
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventOverview.jsp">
-                        <i class="fas fa-chart-pie mr-2"></i>Overview
-                    </a>
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventAnalyst.jsp">
-                        <i class="fas fa-chart-line mr-2"></i>Analyst
-                    </a>
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="editEvent.jsp">
-                        <i class="fas fa-edit mr-2"></i>Edit Event
-                    </a>
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="seatingChart.jsp">
-                        <i class="fas fa-chair mr-2"></i>Seat Map
-                    </a>
-                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="listVoucher.jsp">
-                        <i class="fas fa-tags mr-2"></i>Voucher
-                    </a>
-                    <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/organizerOrders">
-                        <i class="fas fa-list mr-2"></i>Order List
-                    </a>
-                </nav>
-            </aside>
+              <jsp:include page="sideBar.jsp"></jsp:include>
 
 
             <!-- Main Content -->

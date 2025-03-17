@@ -12,7 +12,6 @@
       <jsp:param name="pageTitle" value="Customer Management" />
     </jsp:include>
     <style>
-      /* Custom styles */
       .profile-badge {
         position: absolute;
         bottom: 0;
@@ -90,7 +89,7 @@
       </section>
     </main>
 
-    <!-- Modal Popup cho Update Profile (Modern UX) -->
+    <!-- Modal Popup cho Update Profile -->
     <div id="modal" class="fixed inset-0 z-50 overflow-y-auto hidden" role="dialog" aria-modal="true">
       <div class="flex items-center justify-center min-h-screen px-4">
         <!-- Modal overlay -->
@@ -102,9 +101,10 @@
               <h3 class="text-xl font-semibold text-gray-800" id="modal-title">Update Profile</h3>
               <button id="closeModalBtn" class="text-gray-600 hover:text-gray-800 focus:outline-none" aria-label="Close modal">&times;</button>
             </div>
-            <!-- Hiển thị lỗi nếu có -->
+            <!-- Nếu có lỗi, hiển thị thông báo update không thành công -->
             <c:if test="${not empty errors}">
               <div class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                <p class="font-bold mb-2">Update not successful. Please fix the errors below:</p>
                 <ul>
                   <c:forEach var="error" items="${errors}">
                     <li>${error}</li>
@@ -167,6 +167,14 @@
       // Đóng modal khi nhấn nút "X" hoặc "Cancel"
       closeModalBtn.addEventListener('click', closeModal);
       modalCancelBtn.addEventListener('click', closeModal);
+
+      // Nếu có lỗi từ server (attribute errors có dữ liệu) thì tự động mở modal khi trang load
+      <c:if test="${not empty errors}">
+      document.addEventListener('DOMContentLoaded', function() {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+      </c:if>
     </script>
   </body>
 </html>

@@ -21,6 +21,7 @@ public class TicketType extends Showtime {
     private String color;
     private int totalQuantity;
     private int soldQuantity;
+    private double totalRevenuePerTicketType;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -29,7 +30,6 @@ public class TicketType extends Showtime {
 
     public TicketType(int ticketTypeId, int showtimeId, String name, String description, double price, String color, int totalQuantity, int soldQuantity, Timestamp createdAt, Timestamp updatedAt) {
         this.ticketTypeId = ticketTypeId;
-        this.showtimeId = showtimeId;
         this.showtimeId = showtimeId;
         this.name = name;
         this.description = description;
@@ -117,6 +117,14 @@ public class TicketType extends Showtime {
         this.soldQuantity = soldQuantity;
     }
 
+    public double getTotalRevenuePerTicketType() {
+        return totalRevenuePerTicketType;
+    }
+
+    public void setTotalRevenuePerTicketType(double totalRevenuePerTicketType) {
+        this.totalRevenuePerTicketType = totalRevenuePerTicketType;
+    }
+    
     public Timestamp getCreatedAt() {
         return createdAt;
     }

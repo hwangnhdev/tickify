@@ -29,6 +29,10 @@ public class Event {
     private String status;
     @Expose
     private String description;
+    private int totalTicketsSold;
+    private double totalRevenue;
+    private Timestamp startDate;
+    private Timestamp endDate;
     @Expose
     private Timestamp createdAt;
     @Expose
@@ -123,6 +127,38 @@ public class Event {
         this.description = description;
     }
 
+    public int getTotalTicketsSold() {
+        return totalTicketsSold;
+    }
+
+    public void setTotalTicketsSold(int totalTicketsSold) {
+        this.totalTicketsSold = totalTicketsSold;
+    }
+
+    public double getTotalRevenue() {
+        return totalRevenue;
+    }
+
+    public void setTotalRevenue(double totalRevenue) {
+        this.totalRevenue = totalRevenue;
+    }
+
+    public Timestamp getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Timestamp startDate) {
+        this.startDate = startDate;
+    }
+
+    public Timestamp getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Timestamp endDate) {
+        this.endDate = endDate;
+    }
+    
     public Timestamp getCreatedAt() {
         return createdAt;
     }

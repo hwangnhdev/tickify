@@ -1,17 +1,17 @@
 package viewModels;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * DTO hiển thị chi tiết vé (View Ticket Detail) cho khách hàng.
  */
 public class TicketDetailDTO {
-
-    // Thông tin cơ bản của vé & đơn hàng
+    // Thông tin chung của đơn hàng
     private String orderCode;
     private String ticketStatus;
     private String paymentStatus;
-
+    
     // Thông tin sự kiện
     private Date startDate;
     private Date endDate;
@@ -19,34 +19,33 @@ public class TicketDetailDTO {
     private String eventName;
     private double ticketPrice;
     private String eventImage;
-
+    
     // Thông tin ghế (nếu áp dụng)
-    private String seat;
-
+    private String seat;  // Đây là thông tin ghế tổng hợp (nếu cần)
+    
     // Thông tin người mua
     private String buyerName;
     private String buyerEmail;
     private String buyerPhone;
     private String buyerAddress;
-
+    
     // Thông tin vé & giao dịch
-    private String ticketType;
-    private int quantity;
-    private double amount;
     private double originalTotalAmount;
     private String voucherApplied;     // Yes/No
-
-    // Voucher kiểu phần trăm
     private String voucherPercentageCode;
     private double discountPercentage;
-
-    // Voucher kiểu tiền cố định
     private String voucherFixedCode;
     private double discountFixed;
-
     private double finalTotalAmount;
+    
+    // Danh sách chi tiết các loại vé trong đơn hàng (sẽ lấy thông tin chi tiết từng dòng vé)
+    private List<TicketItemDTO> ticketItems;
+    
+    // Danh sách ghế được gom theo loại vé (VIP, Regular, ...)
+    private List<TicketSeatDTO> ticketSeats;
 
     // Getters and Setters
+
     public String getOrderCode() {
         return orderCode;
     }
@@ -131,24 +130,6 @@ public class TicketDetailDTO {
     public void setBuyerAddress(String buyerAddress) {
         this.buyerAddress = buyerAddress;
     }
-    public String getTicketType() {
-        return ticketType;
-    }
-    public void setTicketType(String ticketType) {
-        this.ticketType = ticketType;
-    }
-    public int getQuantity() {
-        return quantity;
-    }
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-    public double getAmount() {
-        return amount;
-    }
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
     public double getOriginalTotalAmount() {
         return originalTotalAmount;
     }
@@ -190,5 +171,17 @@ public class TicketDetailDTO {
     }
     public void setFinalTotalAmount(double finalTotalAmount) {
         this.finalTotalAmount = finalTotalAmount;
+    }
+    public List<TicketItemDTO> getTicketItems() {
+        return ticketItems;
+    }
+    public void setTicketItems(List<TicketItemDTO> ticketItems) {
+        this.ticketItems = ticketItems;
+    }
+    public List<TicketSeatDTO> getTicketSeats() {
+        return ticketSeats;
+    }
+    public void setTicketSeats(List<TicketSeatDTO> ticketSeats) {
+        this.ticketSeats = ticketSeats;
     }
 }

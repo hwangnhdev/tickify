@@ -12,9 +12,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import models.Category;
 import models.Event;
 import models.EventImage;
@@ -23,6 +27,7 @@ import models.Seat;
 import models.Showtime;
 import models.TicketType;
 import utils.DBContext;
+import viewModels.TicketRevenueDTO;
 
 /**
  *
@@ -427,7 +432,7 @@ public class EventDAO extends DBContext {
      * Retrieves the list of show times for the specified event ID.
      *
      * @param eventId The ID of the event.
-     * @return A list of ShowTime objects.
+     * @return A list of Showtime objects.
      */
     public List<Showtime> getShowTimesByEventId(int eventId) {
         List<Showtime> showTimes = new ArrayList<>();
@@ -547,7 +552,7 @@ public class EventDAO extends DBContext {
                 + "    WHERE Showtimes.event_id = ?\n"
                 + "    GROUP BY Seats.seat_row\n"
                 + ")\n"
-                + "SELECT \n"
+                + "SELECT TOP 1 WITH TIES\n"
                 + "    s.seat_id,\n"
                 + "    s.ticket_type_id,\n"
                 + "    s.seat_row,\n"
@@ -558,7 +563,7 @@ public class EventDAO extends DBContext {
                 + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
                 + "INNER JOIN MaxSeats ms ON s.seat_row = ms.seat_row AND CAST(s.seat_col AS INT) = ms.max_seat_col\n"
                 + "WHERE st.event_id = ?\n"
-                + "ORDER BY s.seat_row;";
+                + "ORDER BY ROW_NUMBER() OVER (PARTITION BY s.seat_row ORDER BY s.seat_id);";
         try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setInt(2, eventId);
@@ -732,7 +737,7 @@ public class EventDAO extends DBContext {
      * Retrieves the list of show times for the specified event ID.
      *
      * @param eventId The ID of the event.
-     * @return A list of ShowTime objects.
+     * @return A list of Showtime objects.
      */
     public List<TicketType> getTicketTypeByShowtimeId(int showtimeId) {
         List<TicketType> ticketTypes = new ArrayList<>();
@@ -782,7 +787,7 @@ public class EventDAO extends DBContext {
                 + "FROM EventPagination ep\n"
                 + "LEFT JOIN EventImagesFiltered eif \n"
                 + "ON ep.event_id = eif.event_id\n"
-                + "WHERE ep.rownum BETWEEN ? AND ?;";
+                + "WHERE ep.rownum BETWEEN ? AND ? AND ep.status = 'Approved';";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -818,7 +823,7 @@ public class EventDAO extends DBContext {
     public int getTotalEvents() {
         String sql = "SELECT COUNT(DISTINCT e.event_id) \n"
                 + "FROM Events e\n"
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%';";
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%' WHERE e.status = 'Approved';";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -833,13 +838,50 @@ public class EventDAO extends DBContext {
     }
 
     /*getTop10LatestEvents*/
+ /* Get All Events */
+    public List<EventImage> getAllEvents() {
+        List<EventImage> listEvents = new ArrayList<>();
+        String sql = "SELECT e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, "
+                + "e.status, e.location, e.event_type, e.created_at, e.updated_at, "
+                + "ei.image_url, ei.image_title "
+                + "FROM Events e "
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%' "
+                + "WHERE e.status = 'Approved' "
+                + "ORDER BY e.created_at DESC";
+
+        try ( PreparedStatement st = connection.prepareStatement(sql);  ResultSet rs = st.executeQuery()) {
+
+            while (rs.next()) {
+                EventImage eventImage = new EventImage(
+                        rs.getString("image_url"),
+                        rs.getString("image_title"),
+                        rs.getInt("event_id"),
+                        rs.getInt("category_id"),
+                        rs.getInt("organizer_id"),
+                        rs.getString("event_name"),
+                        rs.getString("location"),
+                        rs.getString("event_type"),
+                        rs.getString("status"),
+                        rs.getString("description"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                listEvents.add(eventImage);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching all events: " + e.getMessage());
+        }
+        return listEvents;
+    }
+
+    /*getTop10LatestEvents*/
     public List<EventImage> getTop10LatestEvents() {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "SELECT TOP 20\n"
                 + "e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
                 + "FROM Events e\n"
                 + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_event%'\n"
-                + "WHERE e.status = 'Active'\n"
+                + "WHERE e.status = 'Approved'\n"
                 + "ORDER BY e.created_at DESC";
 
         try {
@@ -877,7 +919,7 @@ public class EventDAO extends DBContext {
                 + "    ei.image_url, ei.image_title, \n"
                 + "    MIN(s.start_date) AS start_date, MAX(s.end_date) AS end_date\n"
                 + "FROM Events e\n"
-                + "JOIN Showtimes s ON e.event_id = s.event_id AND s.status = 'Active'\n"
+                + "JOIN Showtimes s ON e.event_id = s.event_id AND s.status = 'Approved'\n"
                 + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%'\n"
                 + "WHERE s.start_date >= GETDATE()\n"
                 + "GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
@@ -939,7 +981,7 @@ public class EventDAO extends DBContext {
                 + "JOIN Showtimes s ON e.event_id = s.event_id\n"
                 + "JOIN TicketTypes tt ON s.showtime_id = tt.ticket_type_id \n"
                 + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%'\n"
-                + "WHERE e.category_id IN (SELECT category_id FROM CategoriesToRecommend) AND E.status = 'Active'\n"
+                + "WHERE e.category_id IN (SELECT category_id FROM CategoriesToRecommend) AND E.status = 'Approved'\n"
                 + "GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
                 + "    e.location, e.event_type, e.created_at, e.updated_at, \n"
                 + "    ei.image_url, ei.image_title\n"
@@ -984,7 +1026,7 @@ public class EventDAO extends DBContext {
                 + "LEFT JOIN TicketTypes tt ON s.showtime_id = tt.ticket_type_id\n"
                 + "LEFT JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id\n"
                 + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%'\n"
-                + "WHERE e.status = 'Active'\n"
+                + "WHERE e.status = 'Approved'\n"
                 + "GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
                 + "e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title\n"
                 + "ORDER BY total_tickets DESC;";
@@ -1220,7 +1262,7 @@ public class EventDAO extends DBContext {
         }
         return monthlyRevenue;
     }
-    
+
     /*getTotalRevenueOfEventById*/
     public List<Double> getTotalTicketsChartOfEventById(int eventId, int year) {
         List<Double> monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
@@ -1270,11 +1312,244 @@ public class EventDAO extends DBContext {
         return monthlyRevenue;
     }
 
+    /* getTotalRevenueLast30DaysOfEvent */
+    public List<Double> getTotalRevenueLast30DaysOfEvent(int eventId) {
+        List<Double> dailyRevenue = new ArrayList<>(Collections.nCopies(30, 0.0));
+
+        String sql = "WITH RevenueByDay AS (\n"
+                + "    SELECT \n"
+                + "        DATEDIFF(DAY, o.order_date, GETDATE()) AS DaysAgo,\n"
+                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity) AS TicketQuantity\n"
+                + "    FROM [dbo].[Orders] o\n"
+                + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
+                + "    INNER JOIN [dbo].[TicketTypes] tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "    INNER JOIN [dbo].[Showtimes] st ON tt.showtime_id = st.showtime_id\n"
+                + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
+                + "    WHERE \n"
+                + "        e.event_id = ?\n"
+                + "        AND o.order_date >= DATEADD(DAY, -29, GETDATE())\n"
+                + "    GROUP BY DATEDIFF(DAY, o.order_date, GETDATE())\n"
+                + ")\n"
+                + "SELECT \n"
+                + "    d.DaysAgo,\n"
+                + "    ISNULL(rd.Revenue, 0) AS Revenue,\n"
+                + "    ISNULL(rd.TicketQuantity, 0) AS TicketQuantity\n"
+                + "FROM (\n"
+                + "    SELECT TOP 30 n = ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n"
+                + "    FROM sys.all_objects\n"
+                + ") d(DaysAgo)\n"
+                + "LEFT JOIN RevenueByDay rd ON d.DaysAgo = rd.DaysAgo\n"
+                + "ORDER BY d.DaysAgo;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, eventId);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                int daysAgo = rs.getInt("DaysAgo");
+                double revenue = rs.getDouble("Revenue");
+                dailyRevenue.set(29 - daysAgo, revenue); // Đảo ngược để ngày gần nhất ở cuối
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching 30-day revenue: " + e.getMessage());
+        }
+        return dailyRevenue;
+    }
+
+    /* getTotalTicketsLast30DaysOfEvent */
+    public List<Double> getTotalTicketsLast30DaysOfEvent(int eventId) {
+        List<Double> dailyTickets = new ArrayList<>(Collections.nCopies(30, 0.0));
+
+        String sql = "WITH RevenueByDay AS (\n"
+                + "    SELECT \n"
+                + "        DATEDIFF(DAY, o.order_date, GETDATE()) AS DaysAgo,\n"
+                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity) AS TicketQuantity\n"
+                + "    FROM [dbo].[Orders] o\n"
+                + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
+                + "    INNER JOIN [dbo].[TicketTypes] tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "    INNER JOIN [dbo].[Showtimes] st ON tt.showtime_id = st.showtime_id\n"
+                + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
+                + "    WHERE \n"
+                + "        e.event_id = ?\n"
+                + "        AND o.order_date >= DATEADD(DAY, -29, GETDATE())\n"
+                + "    GROUP BY DATEDIFF(DAY, o.order_date, GETDATE())\n"
+                + ")\n"
+                + "SELECT \n"
+                + "    d.DaysAgo,\n"
+                + "    ISNULL(rd.Revenue, 0) AS Revenue,\n"
+                + "    ISNULL(rd.TicketQuantity, 0) AS TicketQuantity\n"
+                + "FROM (\n"
+                + "    SELECT TOP 30 n = ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n"
+                + "    FROM sys.all_objects\n"
+                + ") d(DaysAgo)\n"
+                + "LEFT JOIN RevenueByDay rd ON d.DaysAgo = rd.DaysAgo\n"
+                + "ORDER BY d.DaysAgo;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, eventId);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                int daysAgo = rs.getInt("DaysAgo");
+                double tickets = rs.getDouble("TicketQuantity");
+                dailyTickets.set(29 - daysAgo, tickets); // Đảo ngược để ngày gần nhất ở cuối
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching 30-day tickets: " + e.getMessage());
+        }
+        return dailyTickets;
+    }
+
+    /* getTotalRevenueLast24HoursOfEvent */
+    public List<Double> getTotalRevenueLast24HoursOfEvent(int eventId) {
+        List<Double> hourlyRevenue = new ArrayList<>(Collections.nCopies(24, 0.0));
+
+        String sql = "WITH RevenueByHour AS (\n"
+                + "    SELECT \n"
+                + "        DATEDIFF(HOUR, o.order_date, GETDATE()) AS HoursAgo,\n"
+                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity) AS TicketQuantity\n"
+                + "    FROM [dbo].[Orders] o\n"
+                + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
+                + "    INNER JOIN [dbo].[TicketTypes] tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "    INNER JOIN [dbo].[Showtimes] st ON tt.showtime_id = st.showtime_id\n"
+                + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
+                + "    WHERE \n"
+                + "        e.event_id = ?\n"
+                + "        AND o.order_date >= DATEADD(HOUR, -23, GETDATE())\n"
+                + "    GROUP BY DATEDIFF(HOUR, o.order_date, GETDATE())\n"
+                + ")\n"
+                + "SELECT \n"
+                + "    h.HoursAgo,\n"
+                + "    ISNULL(rh.Revenue, 0) AS Revenue,\n"
+                + "    ISNULL(rh.TicketQuantity, 0) AS TicketQuantity\n"
+                + "FROM (\n"
+                + "    SELECT TOP 24 n = ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n"
+                + "    FROM sys.all_objects\n"
+                + ") h(HoursAgo)\n"
+                + "LEFT JOIN RevenueByHour rh ON h.HoursAgo = rh.HoursAgo\n"
+                + "ORDER BY h.HoursAgo;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, eventId);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                int hoursAgo = rs.getInt("HoursAgo");
+                double revenue = rs.getDouble("Revenue");
+                hourlyRevenue.set(23 - hoursAgo, revenue); // Đảo ngược để giờ gần nhất ở cuối
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching 24-hour revenue: " + e.getMessage());
+        }
+        return hourlyRevenue;
+    }
+
+    /* getTotalTicketsLast24HoursOfEvent */
+    public List<Double> getTotalTicketsLast24HoursOfEvent(int eventId) {
+        List<Double> hourlyTickets = new ArrayList<>(Collections.nCopies(24, 0.0));
+
+        String sql = "WITH RevenueByHour AS (\n"
+                + "    SELECT \n"
+                + "        DATEDIFF(HOUR, o.order_date, GETDATE()) AS HoursAgo,\n"
+                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity) AS TicketQuantity\n"
+                + "    FROM [dbo].[Orders] o\n"
+                + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
+                + "    INNER JOIN [dbo].[TicketTypes] tt ON od.ticket_type_id = tt.ticket_type_id\n"
+                + "    INNER JOIN [dbo].[Showtimes] st ON tt.showtime_id = st.showtime_id\n"
+                + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
+                + "    WHERE \n"
+                + "        e.event_id = ?\n"
+                + "        AND o.order_date >= DATEADD(HOUR, -23, GETDATE())\n"
+                + "    GROUP BY DATEDIFF(HOUR, o.order_date, GETDATE())\n"
+                + ")\n"
+                + "SELECT \n"
+                + "    h.HoursAgo,\n"
+                + "    ISNULL(rh.Revenue, 0) AS Revenue,\n"
+                + "    ISNULL(rh.TicketQuantity, 0) AS TicketQuantity\n"
+                + "FROM (\n"
+                + "    SELECT TOP 24 n = ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n"
+                + "    FROM sys.all_objects\n"
+                + ") h(HoursAgo)\n"
+                + "LEFT JOIN RevenueByHour rh ON h.HoursAgo = rh.HoursAgo\n"
+                + "ORDER BY h.HoursAgo;";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, eventId);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                int hoursAgo = rs.getInt("HoursAgo");
+                double tickets = rs.getDouble("TicketQuantity");
+                hourlyTickets.set(23 - hoursAgo, tickets); // Đảo ngược để giờ gần nhất ở cuối
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching 24-hour tickets: " + e.getMessage());
+        }
+        return hourlyTickets;
+    }
+
+    /**
+     * Retrieves ticket revenue data for all show times of a given event.
+     *
+     * @param eventId The ID of the event.
+     * @return A map of showtime ID to list of ticket revenue DTOs.
+     */
+    public Map<Integer, List<TicketRevenueDTO>> getTicketRevenueByEventId(int eventId) {
+        Map<Integer, List<TicketRevenueDTO>> showtimeTicketMap = new HashMap<>();
+
+        // Lấy danh sách showtimes của sự kiện
+        List<Showtime> showtimes = getShowTimesByEventId(eventId);
+
+        // Duyệt qua từng showtime
+        for (Showtime showtime : showtimes) {
+            int showtimeId = showtime.getShowtimeId();
+            List<TicketType> ticketTypes = getTicketTypesByShowtimeId(showtimeId);
+            List<TicketRevenueDTO> ticketRevenueList = new ArrayList<>();
+
+            // Tính toán thông tin doanh thu cho từng loại vé
+            for (TicketType ticketType : ticketTypes) {
+                int totalTicket = ticketType.getTotalQuantity();
+                int sold = ticketType.getSoldQuantity();
+                double price = ticketType.getPrice();
+                int remaining = totalTicket - sold;
+                double totalRevenue = sold * price;
+                double fillRate = totalTicket > 0 ? (sold * 100.0 / totalTicket) : 0;
+
+                TicketRevenueDTO dto = new TicketRevenueDTO(
+                        showtimeId,
+                        showtime.getStartDate(),
+                        showtime.getEndDate(),
+                        ticketType.getName(),
+                        totalTicket,
+                        price,
+                        sold,
+                        remaining,
+                        totalRevenue,
+                        fillRate
+                );
+                ticketRevenueList.add(dto);
+            }
+
+            showtimeTicketMap.put(showtimeId, ticketRevenueList);
+        }
+
+        return showtimeTicketMap;
+    }
+
     public static void main(String[] args) {
-        EventDAO d = new EventDAO();
-        List<Showtime> monthlyRevenue = d.getShowTimesByEventId(1);
-        for (Showtime double1 : monthlyRevenue) {
-            System.out.println(double1);
+        EventDAO eventDAO = new EventDAO();
+        int eventId = 1;
+        List<EventImage> revenue = eventDAO.getAllEvents();
+        for (EventImage double1 : revenue) {
+            System.out.println(double1.getImageUrl());
         }
     }
 

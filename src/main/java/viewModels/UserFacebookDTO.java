@@ -9,6 +9,7 @@ package viewModels;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class UserFacebookDTO {
+
     private String id, name, email;
     private PictureData picture;
 
@@ -46,15 +47,13 @@ public class UserFacebookDTO {
         this.email = email;
     }
 
-    public PictureData getPicture() {
-        return picture;
+    public String getPicture() {
+        return picture != null && picture.getData() != null ? picture.getData().getUrl() : null;
     }
 
     public void setPicture(PictureData picture) {
         this.picture = picture;
     }
-    
-    
 
     @Override
     public String toString() {
@@ -63,6 +62,7 @@ public class UserFacebookDTO {
 }
 
 class PictureData {
+
     private PictureUrl data;
 
     public PictureUrl getData() {
@@ -75,6 +75,7 @@ class PictureData {
 }
 
 class PictureUrl {
+
     private String url;
 
     public String getUrl() {

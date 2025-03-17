@@ -28,29 +28,38 @@ public class ViewHistoryApprovedEventsController extends HttpServlet {
         }
 
         String searchKeyword = request.getParameter("search");
-        String statusFilter = request.getParameter("status"); // Lấy giá trị trạng thái từ form (active hoặc rejected)
+        String statusFilter = request.getParameter("status"); // Trạng thái lọc: active, rejected, all
         AdminDAO dao = new AdminDAO();
         List<Event> historyEvents;
         int totalRecords = 0;
 
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            if (statusFilter != null && !statusFilter.trim().isEmpty()) {
-                // Nếu có từ khóa và trạng thái lọc, gọi phương thức tìm kiếm kết hợp
+            // Nếu có từ khóa tìm kiếm
+            if (statusFilter != null && !statusFilter.trim().isEmpty() && !statusFilter.equalsIgnoreCase("all")) {
+                // Tìm kiếm theo từ khóa + trạng thái cụ thể
                 historyEvents = dao.searchHistoryEventsByNameAndStatus(searchKeyword, statusFilter, page, PAGE_SIZE);
                 totalRecords = dao.getTotalSearchHistoryEventsByNameAndStatus(searchKeyword, statusFilter);
             } else {
-                historyEvents = dao.searchHistoryEventsByName(searchKeyword, page, PAGE_SIZE);
-                totalRecords = dao.getTotalSearchHistoryApprovedEventsByName(searchKeyword);
+                // Tìm kiếm theo từ khóa nhưng không lọc trạng thái (status = "all" hoặc không có)
+                historyEvents = dao.searchEventsByName(searchKeyword, page, PAGE_SIZE);
+                totalRecords = dao.getTotalSearchEventsByName(searchKeyword);
             }
         } else {
+            // Không có từ khóa tìm kiếm
             if (statusFilter != null && !statusFilter.trim().isEmpty()) {
-                // Nếu không có từ khóa nhưng có lọc trạng thái, sử dụng phương thức mới
-                historyEvents = dao.getHistoryEventsByStatus(statusFilter, page, PAGE_SIZE);
-                totalRecords = dao.getTotalHistoryEventsByStatus(statusFilter);
+                if (statusFilter.equalsIgnoreCase("all")) {
+                    // Nếu status là "all", lấy tất cả các sự kiện không lọc trạng thái
+                    historyEvents = dao.getAllEvents(page, PAGE_SIZE);
+                    totalRecords = dao.getTotalAllEvents();
+                } else {
+                    // Lọc theo trạng thái cụ thể
+                    historyEvents = dao.filterHistoryEventsByStatus(statusFilter, page, PAGE_SIZE);
+                    totalRecords = dao.getTotalHistoryEventsByStatus(statusFilter);
+                }
             } else {
-                // Mặc định: lấy danh sách sự kiện đã duyệt (status = 'active')
-                historyEvents = dao.getHistoryApprovedEvents(page, PAGE_SIZE);
-                totalRecords = dao.getTotalHistoryApprovedEvents();
+                // Mặc định: Nếu không có trạng thái nào được chọn, mặc định lấy trạng thái "approved"
+                historyEvents = dao.filterHistoryEventsByStatus("approved", page, PAGE_SIZE);
+                totalRecords = dao.getTotalHistoryEventsByStatus("approved");
             }
         }
 

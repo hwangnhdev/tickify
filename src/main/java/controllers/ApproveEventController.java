@@ -24,8 +24,8 @@ public class ApproveEventController extends HttpServlet {
                 && newStatus != null && !newStatus.trim().isEmpty()) {
             try {
                 int eventId = Integer.parseInt(eventIdParam);
-                // Chỉ cho phép cập nhật thành "Active" (Accept) hoặc "Rejected" (Reject)
-                if (!newStatus.equals("Active") && !newStatus.equals("Rejected")) {
+
+                if (!newStatus.equals("Approved") && !newStatus.equals("Rejected")) {
                     response.getWriter().write("invalid");
                     return;
                 }

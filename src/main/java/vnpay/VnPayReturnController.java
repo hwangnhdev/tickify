@@ -104,6 +104,13 @@ public class VnPayReturnController extends HttpServlet {
         String transactionId = request.getParameter("vnp_TransactionNo");
         String transactionStatus = request.getParameter("vnp_TransactionStatus").equals("00") ? "paid" : "unsuccessful";
 
+        // Kiểm tra xem giao dịch đã được xử lý chưa
+        Boolean isProcessed = (Boolean) session.getAttribute("paymentProcessed");
+        if (Boolean.TRUE.equals(isProcessed)) {
+            System.out.println("Payment already processed, skipping duplicate processing.");
+            return; // Dừng xử lý nếu đã xử lý trước đó
+        }
+
         //Begin process return from VNPAY
         Map fields = new HashMap();
         for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
@@ -126,21 +133,27 @@ public class VnPayReturnController extends HttpServlet {
         VnPayUtils vnPayUtil = new VnPayUtils();
         String signValue = vnPayUtil.hashAllFields(fields);
 
+        Order existingOrder = orderDao.getOrderByTransactionId(transactionId);
+        if (existingOrder != null) {
+            System.out.println("Order with transactionId " + transactionId + " already exists. Skipping duplicate processing.");
+            request.getRequestDispatcher("pages/vnPay/vnpay_return.jsp").forward(request, response);
+        }
+
         // Xử lý sau khi thanh toán thành công
         if ("00".equals(request.getParameter("vnp_ResponseCode"))) {
             List<String> ticketCodes = new ArrayList<>();
-            
+
             // Insert order
             Order newOrder = new Order(0, customer.getCustomerId(), 0, total, null, transactionStatus, transactionId, null, null);
             orderDao.insertOrder(newOrder);
-            
+
             // Insert orderDetail
             for (Map<String, Object> seatData : seatDataList) {
                 int ticketTypeId = (int) Double.parseDouble(seatData.get("ticketTypeId").toString());
                 String nameTicketType = seatData.get("name").toString();
                 double price = Double.parseDouble(seatData.get("price").toString());
                 int count = (int) Double.parseDouble(seatData.get("count").toString());
-                
+
                 List<Map<String, String>> seats = (List<Map<String, String>>) seatData.get("seats");
 
                 Order latestOrder = orderDao.getLatestOrder(customer.getCustomerId());
@@ -183,23 +196,24 @@ public class VnPayReturnController extends HttpServlet {
                             System.out.println("Failed to create ticket for seat: " + seatId);
                             // Có thể rollback hoặc log để xử lý sau
                         }
-                        
+
                         ticketCodes.add(ticketCode);
                     }
                 }
             }
-            
+
             // Send QR to Email 
             String ticketCodesString = String.join(";", ticketCodes);
-            
+
             String qrData = "ticketCode=" + ticketCodesString;
-//            String recipient = customer.getEmail();
-            String recipient = "hwang.huyhoang@gmail.com";
+            String recipient = customer.getEmail();
+//            String recipient = "hwang.huyhoang@gmail.com";
             String subject = "Your Ticket!";
             String content = "Here is the QR code for your ticket. Please bring it with you to the event.";
-            
+
             EmailUtility.sendEmailWithQRCode(recipient, subject, content, qrData);
-            
+
+            session.setAttribute("paymentProcessed", true);
         }
 
         // Chuyển các giá trị sang request để dùng trong JSP

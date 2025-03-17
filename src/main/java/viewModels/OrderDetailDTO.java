@@ -1,9 +1,11 @@
 package viewModels;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class OrderDetailDTO {
 
+    private int orderDetailId;
     private int orderId;
     private Timestamp orderDate;
     private String customerName;
@@ -12,22 +14,34 @@ public class OrderDetailDTO {
     private String location;
     private double grandTotal;
     private String voucherCode;
-    private String discount_type;
-    private double discount_value;
-    private double discountAmount;
+    private String voucherPercentageCode;
+    private double discountPercentValue;
+    private double discountPercentage;
+    private String voucherFixedCode;
+    private double discountFixed;
     private double totalAfterDiscount;
     private String image_url;
     private String paymentStatus;
-    // Trường mới cho thông tin Seat
     private String seat;
+    private String discountType;
+    // Thuộc tính mới cho Ticket Type
+    private String ticketType;
+    // Danh sách order items (vé)
+    private List<TicketItemDTO> orderItems;
+    // Thêm 2 trường cho lịch trình sự kiện (showtime)
+    private Timestamp startDate;
+    private Timestamp endDate;
 
     public OrderDetailDTO() {
     }
 
-    public OrderDetailDTO(int orderId, Timestamp orderDate, String customerName, String customerEmail,
+    public OrderDetailDTO(int orderDetailId, int orderId, Timestamp orderDate, String customerName, String customerEmail,
             String eventName, String location, double grandTotal, String voucherCode,
-            String discount_type, double discount_value, double discountAmount,
-            double totalAfterDiscount, String image_url, String paymentStatus, String seat) {
+            String voucherPercentageCode, double discountPercentValue, double discountPercentage,
+            String voucherFixedCode, double discountFixed,
+            double totalAfterDiscount, String image_url, String paymentStatus, String seat, String discountType,
+            String ticketType, List<TicketItemDTO> orderItems, Timestamp startDate, Timestamp endDate) {
+        this.orderDetailId = orderDetailId;
         this.orderId = orderId;
         this.orderDate = orderDate;
         this.customerName = customerName;
@@ -36,16 +50,65 @@ public class OrderDetailDTO {
         this.location = location;
         this.grandTotal = grandTotal;
         this.voucherCode = voucherCode;
-        this.discount_type = discount_type;
-        this.discount_value = discount_value;
-        this.discountAmount = discountAmount;
+        this.voucherPercentageCode = voucherPercentageCode;
+        this.discountPercentValue = discountPercentValue;
+        this.discountPercentage = discountPercentage;
+        this.voucherFixedCode = voucherFixedCode;
+        this.discountFixed = discountFixed;
         this.totalAfterDiscount = totalAfterDiscount;
         this.image_url = image_url;
         this.paymentStatus = paymentStatus;
         this.seat = seat;
+        this.discountType = discountType;
+        this.ticketType = ticketType;
+        this.orderItems = orderItems;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     // Getters and Setters
+    // ... (các getter/setter cũ)
+
+    public Timestamp getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Timestamp startDate) {
+        this.startDate = startDate;
+    }
+
+    public Timestamp getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Timestamp endDate) {
+        this.endDate = endDate;
+    }
+
+    public List<TicketItemDTO> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<TicketItemDTO> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public String getTicketType() {
+        return ticketType;
+    }
+
+    public void setTicketType(String ticketType) {
+        this.ticketType = ticketType;
+    }
+
+    public int getOrderDetailId() {
+        return orderDetailId;
+    }
+
+    public void setOrderDetailId(int orderDetailId) {
+        this.orderDetailId = orderDetailId;
+    }
+
     public int getOrderId() {
         return orderId;
     }
@@ -110,28 +173,44 @@ public class OrderDetailDTO {
         this.voucherCode = voucherCode;
     }
 
-    public String getDiscount_type() {
-        return discount_type;
+    public String getVoucherPercentageCode() {
+        return voucherPercentageCode;
     }
 
-    public void setDiscount_type(String discount_type) {
-        this.discount_type = discount_type;
+    public void setVoucherPercentageCode(String voucherPercentageCode) {
+        this.voucherPercentageCode = voucherPercentageCode;
     }
 
-    public double getDiscount_value() {
-        return discount_value;
+    public double getDiscountPercentValue() {
+        return discountPercentValue;
     }
 
-    public void setDiscount_value(double discount_value) {
-        this.discount_value = discount_value;
+    public void setDiscountPercentValue(double discountPercentValue) {
+        this.discountPercentValue = discountPercentValue;
     }
 
-    public double getDiscountAmount() {
-        return discountAmount;
+    public double getDiscountPercentage() {
+        return discountPercentage;
     }
 
-    public void setDiscountAmount(double discountAmount) {
-        this.discountAmount = discountAmount;
+    public void setDiscountPercentage(double discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
+
+    public String getVoucherFixedCode() {
+        return voucherFixedCode;
+    }
+
+    public void setVoucherFixedCode(String voucherFixedCode) {
+        this.voucherFixedCode = voucherFixedCode;
+    }
+
+    public double getDiscountFixed() {
+        return discountFixed;
+    }
+
+    public void setDiscountFixed(double discountFixed) {
+        this.discountFixed = discountFixed;
     }
 
     public double getTotalAfterDiscount() {
@@ -165,4 +244,13 @@ public class OrderDetailDTO {
     public void setSeat(String seat) {
         this.seat = seat;
     }
+
+    public String getDiscountType() {
+        return discountType;
+    }
+
+    public void setDiscountType(String discountType) {
+        this.discountType = discountType;
+    }
+    
 }

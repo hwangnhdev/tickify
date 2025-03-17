@@ -10,20 +10,19 @@ public class EventSummaryDTO {
     private Timestamp startDate;
     private Timestamp endDate;
     private String imageUrl;
-    private String paymentStatus;  // Thông tin thanh toán nếu cần hiển thị
-    private String eventStatus;    // Ví dụ: "Upcoming", "Past", "Ongoing"
+    // Không cần trường paymentStatus nữa, dùng eventStatus cho trạng thái của sự kiện
+    private String eventStatus;    // Ví dụ: "processing", "approved", "rejected", "upcoming", "past"
 
     public EventSummaryDTO() {
     }
 
-    public EventSummaryDTO(int eventId, String eventName, String location, Timestamp startDate, Timestamp endDate, String imageUrl, String paymentStatus, String eventStatus) {
+    public EventSummaryDTO(int eventId, String eventName, String location, Timestamp startDate, Timestamp endDate, String imageUrl, String eventStatus) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.location = location;
         this.startDate = startDate;
         this.endDate = endDate;
         this.imageUrl = imageUrl;
-        this.paymentStatus = paymentStatus;
         this.eventStatus = eventStatus;
     }
 
@@ -63,12 +62,6 @@ public class EventSummaryDTO {
     }
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
     }
     public String getEventStatus() {
         return eventStatus;

@@ -1,29 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dals;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Objects;
 import viewModels.EventDetailDTO;
 import viewModels.EventSummaryDTO;
-import models.Order;
 import viewModels.OrderDetailDTO;
-
 import utils.DBContext;
 
-/**
- *
- * @author Duong Minh Kiet - CE180166
- */
 public class OrganizerDAO extends DBContext {
 
+    // Lấy thông tin chi tiết của event mà customer đã mua vé (nếu cần)
     public EventDetailDTO getCustomerEventDetail(int customerId, int eventId) {
         EventDetailDTO detail = null;
         String sql = "SELECT "
@@ -32,17 +22,7 @@ public class OrganizerDAO extends DBContext {
                 + "    MIN(s.start_date) AS startDate, "
                 + "    MAX(s.end_date) AS endDate, "
                 + "    e.location AS location, "
-                + "    ( "
-                + "        SELECT TOP 1 o.payment_status "
-                + "        FROM Orders o "
-                + "        JOIN OrderDetails od ON o.order_id = od.order_id "
-                + "        JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-                + "        JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id "
-                + "        WHERE s2.event_id = e.event_id "
-                + "          AND o.customer_id = ? "
-                + "        ORDER BY o.created_at DESC "
-                + "    ) AS paymentStatus, "
-                + "    e.status AS status, "
+                + "    e.status AS eventStatus, "
                 + "    e.description AS description, "
                 + "    ( "
                 + "        SELECT TOP 1 image_url "
@@ -55,6 +35,7 @@ public class OrganizerDAO extends DBContext {
                 + "JOIN Organizers org ON e.organizer_id = org.organizer_id "
                 + "JOIN Showtimes s ON e.event_id = s.event_id "
                 + "WHERE e.event_id = ? "
+                // Đảm bảo event chỉ được lấy khi customer có đặt vé liên quan
                 + "  AND EXISTS ( "
                 + "      SELECT 1 "
                 + "      FROM Orders o "
@@ -66,23 +47,21 @@ public class OrganizerDAO extends DBContext {
                 + "  ) "
                 + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            // Gán customerId cho subquery lấy paymentStatus và điều kiện EXISTS
-            ps.setInt(1, customerId);
-            ps.setInt(2, eventId);
-            ps.setInt(3, customerId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                detail = new EventDetailDTO();
-                detail.setEventId(rs.getInt("eventId"));
-                detail.setEventName(rs.getString("eventName"));
-                detail.setStartDate(rs.getTimestamp("startDate"));
-                detail.setEndDate(rs.getTimestamp("endDate"));
-                detail.setLocation(rs.getString("location"));
-                detail.setPaymentStatus(rs.getString("paymentStatus"));
-                detail.setStatus(rs.getString("status"));
-                detail.setDescription(rs.getString("description"));
-                detail.setImageUrl(rs.getString("imageURL")); // Thuộc tính imageUrl của model
-                detail.setOrganizationName(rs.getString("organizationName"));
+            ps.setInt(1, eventId);
+            ps.setInt(2, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    detail = new EventDetailDTO();
+                    detail.setEventId(rs.getInt("eventId"));
+                    detail.setEventName(Objects.toString(rs.getString("eventName"), ""));
+                    detail.setStartDate(rs.getTimestamp("startDate"));
+                    detail.setEndDate(rs.getTimestamp("endDate"));
+                    detail.setLocation(Objects.toString(rs.getString("location"), ""));
+                    detail.setEventStatus(Objects.toString(rs.getString("eventStatus"), ""));
+                    detail.setDescription(Objects.toString(rs.getString("description"), ""));
+                    detail.setImageUrl(Objects.toString(rs.getString("imageURL"), ""));
+                    detail.setOrganizationName(Objects.toString(rs.getString("organizationName"), ""));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -90,202 +69,190 @@ public class OrganizerDAO extends DBContext {
         return detail;
     }
 
+    // Lấy danh sách event theo customer (theo organizer được liên kết với customer)
     public List<EventSummaryDTO> getEventsByCustomer(int customerId, String filter) {
-        List<EventSummaryDTO> events = new ArrayList<>();
-
-        // Truy vấn cơ bản lấy thông tin sự kiện từ bảng Events và Showtimes,
-        // đồng thời dùng subquery để lấy payment_status và image của sự kiện,
-        // chỉ lấy các sự kiện mà khách hàng đã có đơn hàng
-        String baseSql = "SELECT \n"
-                + "    e.event_id AS eventId,\n"
-                + "    e.event_name AS eventName,\n"
-                + "    MIN(s.start_date) AS startDate,\n"
-                + "    MAX(s.end_date) AS endDate,\n"
-                + "    e.location AS location,\n"
-                + "    ( \n"
-                + "        SELECT TOP 1 o.payment_status\n"
-                + "        FROM Orders o\n"
-                + "        JOIN OrderDetails od ON o.order_id = od.order_id\n"
-                + "        JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
-                + "        JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
-                + "        WHERE s2.event_id = e.event_id\n"
-                + "          AND o.customer_id = ?\n"
-                + "        ORDER BY o.created_at DESC\n"
-                + "    ) AS paymentStatus,\n"
-                + "    ( \n"
-                + "        SELECT TOP 1 image_url\n"
-                + "        FROM EventImages\n"
-                + "        WHERE event_id = e.event_id\n"
-                + "        ORDER BY image_id\n"
-                + "    ) AS image\n"
-                + "FROM Events e\n"
-                + "JOIN Showtimes s ON e.event_id = s.event_id\n"
-                + "WHERE EXISTS (\n"
-                + "    SELECT 1\n"
-                + "    FROM Orders o\n"
-                + "    JOIN OrderDetails od ON o.order_id = od.order_id\n"
-                + "    JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
-                + "    JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
-                + "    WHERE s2.event_id = e.event_id\n"
-                + "      AND o.customer_id = ?\n"
-                + ")\n";
-
-        // Xử lý bộ lọc (nếu có)
-        String groupBy = " GROUP BY e.event_id, e.event_name, e.location ";
-        String havingClause = "";
-        if (filter != null && !filter.equalsIgnoreCase("all")) {
-            if (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid")) {
-                baseSql += " AND (\n"
-                        + "     SELECT TOP 1 o.payment_status\n"
-                        + "     FROM Orders o\n"
-                        + "     JOIN OrderDetails od ON o.order_id = od.order_id\n"
-                        + "     JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
-                        + "     JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id\n"
-                        + "     WHERE s2.event_id = e.event_id\n"
-                        + "     ORDER BY o.created_at DESC\n"
-                        + " ) = ? ";
-            } else if (filter.equalsIgnoreCase("upcoming")) {
-                havingClause = " HAVING MIN(s.start_date) > GETDATE() ";
-            } else if (filter.equalsIgnoreCase("past")) {
-                havingClause = " HAVING MAX(s.end_date) < GETDATE() ";
-            }
+    List<EventSummaryDTO> events = new ArrayList<>();
+    String sql = "SELECT "
+            + "    e.event_id AS eventId, "
+            + "    e.event_name AS eventName, "
+            + "    MIN(s.start_date) AS startDate, "
+            + "    MAX(s.end_date) AS endDate, "
+            + "    e.location AS location, "
+            + "    e.status AS status, "
+            + "    ( "
+            + "        SELECT TOP 1 image_url "
+            + "        FROM EventImages "
+            + "        WHERE event_id = e.event_id "
+            + "        ORDER BY image_id "
+            + "    ) AS image "
+            + "FROM Events e "
+            + "JOIN Showtimes s ON e.event_id = s.event_id "
+            + "WHERE e.organizer_id IN (SELECT organizer_id FROM Organizers WHERE customer_id = ?) ";
+    
+    // Nếu filter là processing, approved hoặc rejected thì lọc theo e.status
+    if (filter != null && (filter.equalsIgnoreCase("processing")
+            || filter.equalsIgnoreCase("approved")
+            || filter.equalsIgnoreCase("rejected"))) {
+        sql += "AND LOWER(e.status) = ? ";
+    }
+    
+    sql += "GROUP BY e.event_id, e.event_name, e.location, e.status ";
+    
+    // Nếu filter là upcoming hoặc past thì sử dụng HAVING để lọc theo thời gian
+    if (filter != null && filter.equalsIgnoreCase("upcoming")) {
+        sql += "HAVING MIN(s.start_date) > GETDATE() ";
+    } else if (filter != null && filter.equalsIgnoreCase("past")) {
+        sql += "HAVING MAX(s.end_date) < GETDATE() ";
+    }
+    
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        int index = 1;
+        ps.setInt(index++, customerId);
+        if (filter != null && (filter.equalsIgnoreCase("processing")
+                || filter.equalsIgnoreCase("approved")
+                || filter.equalsIgnoreCase("rejected"))) {
+            ps.setString(index++, filter.toLowerCase());
         }
-
-        String finalSql = baseSql + groupBy + havingClause;
-
-        try (PreparedStatement ps = connection.prepareStatement(finalSql)) {
-            int paramIndex = 1;
-            // Gán customerId cho subquery trong SELECT paymentStatus
-            ps.setInt(paramIndex++, customerId);
-            // Gán customerId cho subquery trong WHERE EXISTS
-            ps.setInt(paramIndex++, customerId);
-            // Nếu filter theo payment status thì gán tham số cho điều kiện đó
-            if (filter != null && (filter.equalsIgnoreCase("pending") || filter.equalsIgnoreCase("paid"))) {
-                ps.setString(paramIndex++, filter);
-            }
-
-            ResultSet rs = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            EventSummaryDTO eventSummary = new EventSummaryDTO();
+            eventSummary.setEventId(rs.getInt("eventId"));
+            eventSummary.setEventName(rs.getString("eventName") != null ? rs.getString("eventName") : "");
+            eventSummary.setStartDate(rs.getTimestamp("startDate"));
+            eventSummary.setEndDate(rs.getTimestamp("endDate"));
+            eventSummary.setLocation(rs.getString("location") != null ? rs.getString("location") : "");
+            // Gán giá trị của e.status vào thuộc tính eventStatus
+            eventSummary.setEventStatus(rs.getString("status") != null ? rs.getString("status") : "");
+            eventSummary.setImageUrl(rs.getString("image") != null ? rs.getString("image") : "");
+            events.add(eventSummary);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return events;
+}
+    
+    // ---------------------------
+    // Lấy danh sách order theo organizer, event, trạng thái thanh toán và tìm kiếm theo tên khách hàng
+    public List<OrderDetailDTO> getOrderDetailsByOrganizerAndPaymentStatus(
+        int organizerId, int eventId, String paymentStatus, String searchOrder, int offset, int pageSize) {
+    List<OrderDetailDTO> orders = new ArrayList<>();
+    String sql = "SELECT " +
+                 "    o.order_id, " +
+                 "    o.order_date, " +
+                 "    o.total_price, " +
+                 "    o.payment_status, " +
+                 "    c.full_name AS customerName, " +
+                 "    MIN(e.event_name) AS event_name, " +
+                 "    MIN(e.location) AS location " +
+                 "FROM Orders o " +
+                 "JOIN Customers c ON o.customer_id = c.customer_id " +
+                 "JOIN OrderDetails od ON o.order_id = od.order_id " +
+                 "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id " +
+                 "JOIN Showtimes s ON tt.showtime_id = s.showtime_id " +
+                 "JOIN Events e ON s.event_id = e.event_id " +
+                 "WHERE e.organizer_id = ? " +
+                 "  AND ( ? <= 0 OR e.event_id = ? ) " +
+                 "  AND ( LOWER(?) = 'all' OR LOWER(o.payment_status) = LOWER(?) ) " +
+                 "  AND ( ? IS NULL OR c.full_name LIKE ? ) " +
+                 "GROUP BY " +
+                 "    o.order_id, " +
+                 "    o.order_date, " +
+                 "    o.total_price, " +
+                 "    o.payment_status, " +
+                 "    c.full_name " +
+                 "ORDER BY o.order_date DESC " +
+                 "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+    
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        int index = 1;
+        // organizerId
+        ps.setInt(index++, organizerId);
+        // eventId: dùng cho điều kiện ( ? <= 0 OR e.event_id = ? )
+        ps.setInt(index++, eventId);
+        ps.setInt(index++, eventId);
+        // paymentStatus: dùng cho điều kiện ( LOWER(?) = 'all' OR LOWER(o.payment_status) = LOWER(?) )
+        ps.setString(index++, paymentStatus);
+        ps.setString(index++, paymentStatus);
+        // searchOrder: nếu null hoặc rỗng thì set null, ngược lại đặt giá trị tìm kiếm
+        if (searchOrder == null || searchOrder.trim().isEmpty()) {
+            ps.setString(index++, null);
+            ps.setString(index++, null);
+        } else {
+            ps.setString(index++, searchOrder);
+            ps.setString(index++, "%" + searchOrder + "%");
+        }
+        // Phân trang
+        ps.setInt(index++, offset);
+        ps.setInt(index++, pageSize);
+        
+        try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                EventSummaryDTO eventSummary = new EventSummaryDTO();
-                eventSummary.setEventId(rs.getInt("eventId"));
-                eventSummary.setEventName(rs.getString("eventName"));
-                eventSummary.setStartDate(rs.getTimestamp("startDate"));
-                eventSummary.setEndDate(rs.getTimestamp("endDate"));
-                eventSummary.setLocation(rs.getString("location"));
-                eventSummary.setPaymentStatus(rs.getString("paymentStatus"));
-                // Lưu ý: alias trong SQL là "image" nhưng bạn set vào thuộc tính imageUrl của DTO
-                eventSummary.setImageUrl(rs.getString("image"));
-
-                events.add(eventSummary);
+                OrderDetailDTO order = new OrderDetailDTO();
+                order.setOrderId(rs.getInt("order_id"));
+                order.setOrderDate(rs.getTimestamp("order_date"));
+                order.setGrandTotal(rs.getDouble("total_price"));
+                order.setPaymentStatus(rs.getString("payment_status"));
+                order.setCustomerName(rs.getString("customerName"));
+                order.setEventName(rs.getString("event_name"));
+                order.setLocation(rs.getString("location"));
+                orders.add(order);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Xử lý lỗi nếu cần thiết
         }
-        return events;
+    } catch (SQLException ex) {
+        ex.printStackTrace();
     }
+    return orders;
+}
 
-    public List<OrderDetailDTO> getOrderDetailsByOrganizerAndPaymentStatus(int organizerId, String paymentStatus, String searchOrder, int offset, int pageSize) {
-        List<OrderDetailDTO> orders = new ArrayList<>();
 
-        // Kiểm tra connection, nếu null thì ghi log hoặc ném exception để dễ debug
-        if (connection == null) {
-            throw new IllegalStateException("Database connection is null. Please check DBConnection.getConnection() configuration.");
-        }
-
-        String sql = "SELECT o.order_id, o.order_date, o.total_price, o.payment_status, "
-                + "       c.full_name AS customer_name, e.event_name, e.location "
-                + "FROM Orders o "
-                + "INNER JOIN Customers c ON o.customer_id = c.customer_id "
-                + "INNER JOIN OrderDetails od ON o.order_id = od.order_id "
-                + "INNER JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
-                + "INNER JOIN Events e ON st.event_id = e.event_id "
-                + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
-                + "WHERE org.organizer_id = ? "
-                + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? ) "
-                + "  AND ( ? IS NULL OR LOWER(c.full_name) LIKE ? ) "
-                + "ORDER BY o.order_date DESC "
-                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, organizerId);
-            stmt.setString(2, paymentStatus.toLowerCase());
-            stmt.setString(3, paymentStatus.toLowerCase());
-            if (searchOrder == null) {
-                stmt.setNull(4, java.sql.Types.VARCHAR);
-                stmt.setNull(5, java.sql.Types.VARCHAR);
-            } else {
-                stmt.setString(4, searchOrder.toLowerCase());
-                stmt.setString(5, "%" + searchOrder.toLowerCase() + "%");
-            }
-            stmt.setInt(6, offset);
-            stmt.setInt(7, pageSize);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    OrderDetailDTO order = new OrderDetailDTO();
-                    order.setOrderId(rs.getInt("order_id"));
-                    order.setOrderDate(rs.getTimestamp("order_date"));
-                    // Map cột total_price sang grandTotal
-                    order.setGrandTotal(rs.getDouble("total_price"));
-                    order.setPaymentStatus(rs.getString("payment_status"));
-                    order.setCustomerName(rs.getString("customer_name"));
-                    order.setEventName(rs.getString("event_name"));
-                    order.setLocation(rs.getString("location"));
-                    orders.add(order);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return orders;
-    }
-
-    // Đếm số bản ghi order theo điều kiện lọc
-    public int countOrdersByOrganizerAndPaymentStatus(int organizerId, String paymentStatus, String searchOrder) {
+    // Đếm số order theo organizer, event, trạng thái thanh toán và tìm kiếm theo tên khách hàng
+    public int countOrdersByOrganizerAndPaymentStatus(
+            int organizerId, int eventId, String paymentStatus, String searchOrder) {
         int count = 0;
-        String sql = "SELECT COUNT(*) AS total "
-                + "FROM Orders o "
-                + "INNER JOIN Customers c ON o.customer_id = c.customer_id "
-                + "INNER JOIN OrderDetails od ON o.order_id = od.order_id "
-                + "INNER JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
-                + "INNER JOIN Events e ON st.event_id = e.event_id "
-                + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
-                + "WHERE org.organizer_id = ? "
-                + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? ) "
-                + "  AND ( ? IS NULL OR LOWER(c.full_name) LIKE ? )";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, organizerId);
-            stmt.setString(2, paymentStatus.toLowerCase());
-            stmt.setString(3, paymentStatus.toLowerCase());
-            if (searchOrder == null) {
-                stmt.setNull(4, Types.NVARCHAR);
-                stmt.setNull(5, Types.NVARCHAR);
-            } else {
-                stmt.setString(4, searchOrder.toLowerCase());
-                stmt.setString(5, "%" + searchOrder.toLowerCase() + "%");
-            }
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) ");
+        sql.append("FROM Orders o ");
+        sql.append("JOIN OrderDetails od ON o.order_id = od.order_id ");
+        sql.append("JOIN Customers c ON o.customer_id = c.customer_id ");
+        sql.append("JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id ");
+        sql.append("JOIN Showtimes s ON tt.showtime_id = s.showtime_id ");
+        sql.append("JOIN Events e ON s.event_id = e.event_id ");
+        sql.append("WHERE e.organizer_id = ? ");
+        if (eventId > 0) {
+            sql.append("AND e.event_id = ? ");
+        }
+        if (!"all".equalsIgnoreCase(paymentStatus)) {
+            sql.append("AND LOWER(o.payment_status) = ? ");
+        }
+        if (searchOrder != null && !searchOrder.isEmpty()) {
+            sql.append("AND c.full_name LIKE ? ");
+        }
 
-            try (ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+            ps.setInt(index++, organizerId);
+            if (eventId > 0) {
+                ps.setInt(index++, eventId);
+            }
+            if (!"all".equalsIgnoreCase(paymentStatus)) {
+                ps.setString(index++, paymentStatus.toLowerCase());
+            }
+            if (searchOrder != null && !searchOrder.isEmpty()) {
+                ps.setString(index++, "%" + searchOrder + "%");
+            }
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    count = rs.getInt("total");
+                    count = rs.getInt(1);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return count;
     }
 
-    /**
-     * Đếm tổng số đơn hàng theo organizer và trạng thái thanh toán.
-     *
-     * @param organizerId ID của organizer.
-     * @param paymentStatus Trạng thái thanh toán ("all", "paid", "pending").
-     * @return Số đơn hàng.
-     */
+    // Đếm tổng số đơn hàng theo organizer và trạng thái thanh toán (phiên bản rút gọn)
     public int countOrdersByOrganizerAndPaymentStatus(int organizerId, String paymentStatus) {
         int count = 0;
         String sql = "SELECT COUNT(*) AS total "
@@ -311,57 +278,13 @@ public class OrganizerDAO extends DBContext {
         }
         return count;
     }
-
-//    /**
-//     * Phương thức mới: Tìm kiếm đơn hàng theo organizer và từ khóa tìm kiếm
-//     * (theo tên khách hàng).
-//     *
-//     * @param organizerId ID của organizer.
-//     * @param keyword Từ khóa tìm kiếm.
-//     * @return Danh sách đơn hàng thỏa mãn điều kiện tìm kiếm.
-//     */
-//    public List<Order> searchOrders(int organizerId, String keyword) {
-//        List<Order> orders = new ArrayList<>();
-//        String sql = "SELECT "
-//                + "    o.order_id, "
-//                + "    o.order_date, "
-//                + "    o.total_price, "
-//                + "    o.payment_status, "
-//                + "    c.full_name AS customer_name, "
-//                + "    e.event_name, "
-//                + "    e.location, "
-//                + "    t.ticket_code "
-//                + "FROM Orders o "
-//                + "INNER JOIN Customers c ON o.customer_id = c.customer_id "
-//                + "INNER JOIN OrderDetails od ON o.order_id = od.order_id "
-//                + "INNER JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-//                + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
-//                + "INNER JOIN Events e ON st.event_id = e.event_id "
-//                + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
-//                + "INNER JOIN Ticket t ON t.order_detail_id = od.order_detail_id "
-//                + "WHERE org.organizer_id = ? "
-//                + "  AND LOWER(c.full_name) LIKE ? "
-//                + "ORDER BY o.order_date DESC";
-//        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
-//            stmt.setInt(1, organizerId);
-//            stmt.setString(2, "%" + keyword.toLowerCase() + "%");
-//            try ( ResultSet rs = stmt.executeQuery()) {
-//                while (rs.next()) {
-//                    Order order = new Order();
-//                    order.setOrderId(rs.getInt("order_id"));
-//                    order.setOrderDate(rs.getTimestamp("order_date"));
-//                    order.setTotalPrice(rs.getDouble("total_price"));
-//                    order.setPaymentStatus(rs.getString("payment_status"));
-//                    order.setCustomerName(rs.getString("customer_name"));
-//                    order.setEventName(rs.getString("event_name"));
-//                    order.setLocation(rs.getString("location"));
-//                    order.setTicketCode(rs.getString("ticket_code"));
-//                    orders.add(order);
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return orders;
-//    }
+    
+    public static void main(String[] args) {
+        OrganizerDAO dao = new OrganizerDAO();
+        // Ví dụ kiểm tra lấy event theo customer (customerId = 4, filter = "approved")
+        List<EventSummaryDTO> list = dao.getEventsByCustomer(4, "approved");
+        for (EventSummaryDTO eventSummaryDTO : list) {
+            System.out.println(eventSummaryDTO.getEventId());
+        }
+    }
 }
