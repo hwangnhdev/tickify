@@ -25,11 +25,10 @@ public class FilterEventDAO extends DBContext {
                 "SELECT DISTINCT \n"
                 + "e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
                 + "e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title,\n"
-                + "CAST(s.start_date AS DATE) AS start_date, CAST(s.end_date AS DATE) AS end_date,\n"
+                + "MIN(CAST(s.start_date AS DATE)) AS start_date, MAX(CAST(s.end_date AS DATE)) AS end_date,\n"
                 + "CAST(e.created_at AS DATE) AS created_at, CAST(e.updated_at AS DATE) AS updated_at\n"
                 + "FROM Events e\n"
                 + "LEFT JOIN Showtimes s ON e.event_id = s.event_id \n"
-                + "LEFT JOIN TicketTypes t ON s.showtime_id = t.ticket_type_id\n"
                 + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%'\n"
                 + "WHERE e.status = 'Approved'"
         );
@@ -63,26 +62,14 @@ public class FilterEventDAO extends DBContext {
             parameters.add(new java.sql.Date(filters.getEndDate().getTime()));
         }
 
-        // Filtering by price range
-        if (filters.getPrice() != null && !filters.getPrice().isEmpty()) {
-            switch (filters.getPrice()) {
-                case "below_150":
-                    sql.append(" AND t.price < 150");
-                    break;
-                case "between_150_300":
-                    sql.append(" AND t.price BETWEEN 150 AND 300");
-                    break;
-                case "greater_300":
-                    sql.append(" AND t.price > 300");
-                    break;
-            }
-        }
-
         // Filtering by search query
         if (filters.getSearchQuery() != null && !filters.getSearchQuery().isEmpty()) {
             sql.append(" AND e.event_name LIKE ?");
             parameters.add("%" + filters.getSearchQuery() + "%");
         }
+
+        sql.append(" GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
+                + "e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title");
 
         // Print the final SQL query and parameters for debugging
         System.out.println("Final SQL Query: " + sql.toString());

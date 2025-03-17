@@ -113,7 +113,7 @@ public class AllEventsController extends HttpServlet {
 
         // Get filtered events
         List<EventImage> filteredEvents = filterEventDAO.getFilteredEvents(filters);
-        System.out.println("Filtered Events Count: " + filteredEvents.size()); // Debug log
+//        System.out.println("Filtered Events Count: " + filteredEvents.size()); // Debug log
 
         // Pagination logic
         int page = 1;

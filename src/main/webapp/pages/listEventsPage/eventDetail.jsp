@@ -412,7 +412,7 @@
                                 <span class="show-time-label">Showtime ${loop.count}: </span>
                                 <span>Start Date: ${showtime.startDate} - End Date: ${showtime.endDate}</span>
                             </div>
-                            <div class="show-time-details collapsed space-y-2">
+                            <div class="show-time-details space-y-2">
                                 <!-- Loop through ticketTypes for this showtime -->
                                 <c:forEach var="ticket" items="${showtime.ticketTypes}">
                                     <div class="flex justify-between items-center bg-gray-700 p-3 rounded-lg saved-ticket">
