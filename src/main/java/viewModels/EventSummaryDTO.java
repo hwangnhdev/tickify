@@ -10,7 +10,7 @@ public class EventSummaryDTO {
     private Timestamp startDate;
     private Timestamp endDate;
     private String imageUrl;
-    // Bỏ paymentStatus vì không sử dụng nữa
+    // Không cần trường paymentStatus nữa, dùng eventStatus cho trạng thái của sự kiện
     private String eventStatus;    // Ví dụ: "processing", "approved", "rejected", "upcoming", "past"
 
     public EventSummaryDTO() {

@@ -18,9 +18,9 @@ public class OrganizerOrdersController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy organizerId từ session hoặc sử dụng giá trị mặc định cho test
+        // Lấy organizerId từ session hoặc sử dụng giá trị mặc định cho test (đã update thành 16)
         HttpSession session = request.getSession();
-        int organizerId = 1; // Giá trị mặc định
+        int organizerId = 16; // Giá trị mặc định cho test
         Object orgIdObj = session.getAttribute("organizerId");
         if (orgIdObj != null) {
             organizerId = Integer.parseInt(orgIdObj.toString());
