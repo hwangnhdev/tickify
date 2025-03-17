@@ -136,6 +136,18 @@ public class CustomerDAO extends DBContext {
         }
         return false;
     }
+    
+    public boolean updateCustomerImageProfile(Customer customer) {
+        String query = "UPDATE Customers SET profile_picture = ? WHERE customer_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, customer.getProfilePicture());
+            ps.setInt(2, customer.getCustomerId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating profile: " + e.getMessage());
+        }
+        return false;
+    }
 
     /**
      * Method to get customer's information

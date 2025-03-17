@@ -97,16 +97,18 @@ public class LoginFacebookHandlerController extends HttpServlet {
                 user.setEmail(user.getId() + "@temp.com");
 
             Customer existingCustomer = customerDao.selectCustomerByEmail(user.getEmail());
-            
-            if (!existingCustomer.getStatus()) {
-                request.setAttribute("errorMessage", "This account has been banned!");
-                request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
-            }
 
             int existingCustomerId;
             if (existingCustomer != null) {
                 existingCustomerId = existingCustomer.getCustomerId();
                 customerSendRedirect = existingCustomer;
+                
+                if (!existingCustomer.getStatus()) {
+                    request.setAttribute("errorMessage", "This account has been banned!");
+                    System.out.println("This account has been banned!");
+                    response.sendRedirect("pages/signUpPage/signUp.jsp");
+                    return;
+                }
             } else {
                 existingCustomerId = 0;
             }
@@ -130,17 +132,18 @@ public class LoginFacebookHandlerController extends HttpServlet {
                 CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, provider, null, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
 
-                customerSendRedirect.setCustomerId(insertedCustomerId);
+                customerSendRedirect = customer;
             }
             
             System.out.println(customerSendRedirect);
 
             // Login 
             HttpSession session = request.getSession();
-            session.setMaxInactiveInterval(3 * 60 * 60); // 3hrs
+            session.setMaxInactiveInterval(7 * 24 * 60 * 60); // 7days
             session.setAttribute("customerImage", customerSendRedirect.getProfilePicture());
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
-            response.sendRedirect(request.getContextPath());
+            request.getRequestDispatcher("").forward(request, response);
+//            response.sendRedirect(request.getContextPath());
         } catch (Exception e) {
             request.setAttribute("error", "Login fail!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
