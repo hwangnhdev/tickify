@@ -52,10 +52,10 @@ public class OrganizerDAO extends DBContext {
                 + "        OR o.customer_id = ? "
                 + "  ) "
                 + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             ps.setInt(2, customerId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     detail = new EventDetailDTO();
                     detail.setEventId(rs.getInt("eventId"));
@@ -92,17 +92,9 @@ public class OrganizerDAO extends DBContext {
                 + "    ) AS image "
                 + "FROM Events e "
                 + "JOIN Showtimes s ON e.event_id = s.event_id "
-                + "WHERE EXISTS ( "
-                + "    SELECT 1 "
-                + "    FROM Orders o "
-                + "    JOIN OrderDetails od ON o.order_id = od.order_id "
-                + "    JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-                + "    JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id "
-                + "    WHERE s2.event_id = e.event_id "
-                + "      OR o.customer_id = ? "
-                + ") ";
+                + "WHERE e.organizer_id IN (SELECT organizer_id FROM Organizers WHERE customer_id = ?) ";
 
-        // Nếu filter là processing, approved, hoặc rejected thì lọc theo e.status
+        // Nếu filter là processing, approved hoặc rejected thì lọc theo e.status
         if (filter != null && (filter.equalsIgnoreCase("processing")
                 || filter.equalsIgnoreCase("approved")
                 || filter.equalsIgnoreCase("rejected"))) {
@@ -118,7 +110,7 @@ public class OrganizerDAO extends DBContext {
             sql += "HAVING MAX(s.end_date) < GETDATE() ";
         }
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             int index = 1;
             ps.setInt(index++, customerId);
             if (filter != null && (filter.equalsIgnoreCase("processing")
@@ -174,39 +166,39 @@ public class OrganizerDAO extends DBContext {
     sql.append("ORDER BY o.order_date DESC ");
     sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
-    try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
-        int index = 1;
-        ps.setInt(index++, organizerId);
-        if (eventId > 0) {
-            ps.setInt(index++, eventId);
+        try ( PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+            ps.setInt(index++, organizerId);
+            if (eventId > 0) {
+                ps.setInt(index++, eventId);
+            }
+            if (!"all".equalsIgnoreCase(paymentStatus)) {
+                ps.setString(index++, paymentStatus.toLowerCase());
+            }
+            if (searchOrder != null && !searchOrder.isEmpty()) {
+                ps.setString(index++, "%" + searchOrder + "%");
+            }
+            ps.setInt(index++, offset);
+            ps.setInt(index++, pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                OrderDetailDTO order = new OrderDetailDTO();
+                order.setOrderDetailId(rs.getInt("order_detail_id"));
+                order.setOrderId(rs.getInt("order_id"));
+                order.setOrderDate(rs.getTimestamp("order_date"));
+                order.setGrandTotal(rs.getDouble("total_price"));
+                order.setPaymentStatus(rs.getString("payment_status"));
+                order.setCustomerName(rs.getString("customerName"));
+                order.setEventName(rs.getString("event_name"));
+                order.setLocation(rs.getString("location"));
+                // Các trường khác nếu có
+                orders.add(order);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        if (!"all".equalsIgnoreCase(paymentStatus)) {
-            ps.setString(index++, paymentStatus.toLowerCase());
-        }
-        if (searchOrder != null && !searchOrder.isEmpty()) {
-            ps.setString(index++, "%" + searchOrder + "%");
-        }
-        ps.setInt(index++, offset);
-        ps.setInt(index++, pageSize);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            OrderDetailDTO order = new OrderDetailDTO();
-            order.setOrderDetailId(rs.getInt("order_detail_id"));
-            order.setOrderId(rs.getInt("order_id"));
-            order.setOrderDate(rs.getTimestamp("order_date"));
-            order.setGrandTotal(rs.getDouble("total_price"));
-            order.setPaymentStatus(rs.getString("payment_status"));
-            order.setCustomerName(rs.getString("customerName"));
-            order.setEventName(rs.getString("event_name"));
-            order.setLocation(rs.getString("location"));
-            orders.add(order);
-        }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
+        return orders;
     }
-    return orders;
-}
-
 
     public int countOrdersByOrganizerAndPaymentStatus(
             int organizerId, int eventId, String paymentStatus, String searchOrder) {
@@ -230,7 +222,7 @@ public class OrganizerDAO extends DBContext {
             sql.append("AND c.full_name LIKE ? ");
         }
 
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int index = 1;
             ps.setInt(index++, organizerId);
             if (eventId > 0) {
@@ -270,11 +262,11 @@ public class OrganizerDAO extends DBContext {
                 + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
                 + "WHERE org.organizer_id = ? "
                 + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? )";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             stmt.setString(2, paymentStatus.toLowerCase());
             stmt.setString(3, paymentStatus.toLowerCase());
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt("total");
                 }
@@ -283,5 +275,13 @@ public class OrganizerDAO extends DBContext {
             e.printStackTrace();
         }
         return count;
+    }
+
+    public static void main(String[] args) {
+        OrganizerDAO dao = new OrganizerDAO();
+        List<EventSummaryDTO> list = dao.getEventsByCustomer(4, "approved");
+        for (EventSummaryDTO eventSummaryDTO : list) {
+            System.out.println(eventSummaryDTO.getEventId());
+        }
     }
 }

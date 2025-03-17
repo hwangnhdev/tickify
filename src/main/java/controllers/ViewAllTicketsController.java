@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -21,15 +22,9 @@ public class ViewAllTicketsController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Lấy customerId từ parameter hoặc session (ví dụ đơn giản)
-        String customerIdParam = request.getParameter("customerId");
-        int customerId = 3;
-        if (customerIdParam != null) {
-            try {
-                customerId = Integer.parseInt(customerIdParam);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-        }
+        HttpSession session = request.getSession();
+        System.out.println(session.getAttribute("customerId"));
+        int customerId = (int) session.getAttribute("customerId");
 
         // Lấy trạng thái lọc vé
         String statusFilter = request.getParameter("status");
