@@ -1,6 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%
+    // Đưa thời gian hiện tại vào request để so sánh trong JSTL
+    java.util.Date now = new java.util.Date();
+    request.setAttribute("now", now);
+%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -32,39 +37,37 @@
         <div class="flex">
             <jsp:include page="sidebar.jsp" />
             <jsp:include page="../../components/header.jsp"></jsp:include>
-                <main class="w-3/4 p-8">
-                    <h1 class="text-3xl font-bold mb-6">My Tickets</h1>
-                    <!-- Nút Filter -->
-                    <!-- Filter Buttons Section -->
-                    <div class="grid grid-cols-5 gap-4 mb-6">
-                        <button id="btnAll" onclick="fetchTickets('all'); return false;"
-                                class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
-                            All
-                        </button>
-                        <button id="btnPaid" onclick="fetchTickets('paid'); return false;"
-                                class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
-                            Paid
-                        </button>
-                        <button id="btnPending" onclick="fetchTickets('pending'); return false;"
-                                class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
-                            Pending
-                        </button>
-                        <button id="btnUpcoming" onclick="fetchTickets('upcoming'); return false;"
-                                class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
-                            Upcoming
-                        </button>
-                        <button id="btnPast" onclick="fetchTickets('past'); return false;"
-                                class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
-                            Past
-                        </button>
-                    </div>
+            <main class="w-3/4 p-8">
+                <h1 class="text-3xl font-bold mb-6">My Tickets</h1>
+                <!-- Nút Filter -->
+                <div class="grid grid-cols-5 gap-4 mb-6">
+                    <button id="btnAll" onclick="fetchTickets('all'); return false;"
+                            class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
+                        All
+                    </button>
+                    <button id="btnPaid" onclick="fetchTickets('paid'); return false;"
+                            class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
+                        Paid
+                    </button>
+                    <button id="btnPending" onclick="fetchTickets('pending'); return false;"
+                            class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
+                        Pending
+                    </button>
+                    <button id="btnUpcoming" onclick="fetchTickets('upcoming'); return false;"
+                            class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
+                        Upcoming
+                    </button>
+                    <button id="btnPast" onclick="fetchTickets('past'); return false;"
+                            class="filter-btn bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
+                        Past
+                    </button>
+                </div>
 
+                <!-- Thông báo Loading -->
+                <div id="notification" class="mb-4 flex items-center justify-center"></div>
 
-                    <!-- Thông báo Loading -->
-                    <div id="notification" class="mb-4 flex items-center justify-center"></div>
-
-                    <!-- Container Vé -->
-                    <div id="ticketContainer">
+                <!-- Container Vé -->
+                <div id="ticketContainer">
                     <c:if test="${empty tickets}">
                         <p class="text-center text-gray-300">You have not purchased any tickets yet.</p>
                     </c:if>
@@ -87,8 +90,9 @@
                                     </div>
                                     <div class="p-6 w-3/4">
                                         <h1 class="text-xl font-bold mb-4 text-green-400">${ticket.eventName}</h1>
-                                        <div class="flex items-center mb-2">
-                                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm mr-2">
+                                        <!-- Hiển thị Payment Status và Past/Upcoming nằm ngang -->
+                                        <div class="flex items-center mb-2 space-x-2">
+                                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">
                                                 <c:choose>
                                                     <c:when test="${not empty ticket.paymentStatus}">
                                                         ${ticket.paymentStatus}
@@ -98,6 +102,14 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                             </span>
+                                            <c:choose>
+                                                <c:when test="${ticket.startDate.time lt now.time}">
+                                                    <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">Past</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">Upcoming</span>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                         <div class="mb-2">
                                             <i class="fas fa-ticket-alt mr-2"></i>
@@ -177,9 +189,8 @@
                 return str.charAt(0).toUpperCase() + str.slice(1);
             }
 
-            // Hàm setActive: Cập nhật active state cho nút filter
+            // Cập nhật active state cho nút filter
             function setActive(status) {
-                // Cập nhật biến currentFilter
                 currentFilter = status;
                 var buttons = document.querySelectorAll('.filter-btn');
                 buttons.forEach(function (btn) {
@@ -191,9 +202,8 @@
                 }
             }
 
-            // Hàm fetchTickets: Nếu nút đang active thì không thực hiện fetch lại
+            // Hàm fetchTickets: Nếu nút đang active thì không fetch lại
             function fetchTickets(status) {
-                // Nếu filter đã active, không làm gì
                 if (currentFilter === status)
                     return;
                 setActive(status);
@@ -201,23 +211,23 @@
                 var ticketContainer = document.getElementById("ticketContainer");
                 notification.innerHTML = '<div class="flex items-center"><div class="w-6 h-6 border-4 border-t-transparent border-green-500 rounded-full animate-spin"></div><span class="ml-2">Đang tải dữ liệu...</span></div>';
                 fetch("viewAllTickets?ajax=true&status=" + status)
-                        .then(function (response) {
-                            if (!response.ok) {
-                                throw new Error("Network response was not ok");
-                            }
-                            return response.json();
-                        })
-                        .then(function (data) {
-                            notification.innerText = "";
-                            updateTicketContainer(data);
-                        })
-                        .catch(function (error) {
-                            console.error("Error fetching tickets:", error);
-                            notification.innerText = "Có lỗi xảy ra. Vui lòng thử lại sau.";
-                        });
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        notification.innerText = "";
+                        updateTicketContainer(data);
+                    })
+                    .catch(function (error) {
+                        console.error("Error fetching tickets:", error);
+                        notification.innerText = "Có lỗi xảy ra. Vui lòng thử lại sau.";
+                    });
             }
 
-            // Hàm updateTicketContainer: Cập nhật nội dung danh sách vé với hiệu ứng chuyển mờ
+            // Cập nhật nội dung danh sách vé với hiệu ứng chuyển mờ
             function updateTicketContainer(data) {
                 var ticketContainer = document.getElementById("ticketContainer");
                 ticketContainer.style.opacity = 0;
@@ -239,8 +249,10 @@
                     html += '    </div>';
                     html += '    <div class="p-6 w-3/4">';
                     html += '        <h1 class="text-xl font-bold mb-4 text-green-400">' + ticket.eventName + '</h1>';
-                    html += '        <div class="flex items-center mb-2">';
-                    html += '            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm mr-2">' + (ticket.paymentStatus || 'Successful') + '</span>';
+                    // Hiển thị Payment Status và Past/Upcoming nằm ngang trong JS
+                    html += '        <div class="flex items-center mb-2 space-x-2">';
+                    html += '            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">' + (ticket.paymentStatus || 'Successful') + '</span>';
+                    html += '            <span class="' + (new Date(ticket.startDate) < new Date() ? 'bg-red-500' : 'bg-green-500') + ' text-white px-3 py-1 rounded-full text-sm">' + (new Date(ticket.startDate) < new Date() ? 'Past' : 'Upcoming') + '</span>';
                     html += '        </div>';
                     html += '        <div class="mb-2">';
                     html += '            <i class="fas fa-ticket-alt mr-2"></i>';
