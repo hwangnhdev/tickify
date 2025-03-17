@@ -48,7 +48,7 @@ public class OrganizerDAO extends DBContext {
             + "      JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
             + "      JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id "
             + "      WHERE s2.event_id = e.event_id "
-            + "        AND o.customer_id = ? "
+            + "        OR o.customer_id = ? "
             + "  ) "
             + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
     try (PreparedStatement ps = connection.prepareStatement(sql)) {
