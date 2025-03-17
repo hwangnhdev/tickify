@@ -404,9 +404,9 @@
                         <label>
                             <c:choose>
                                 <c:when test="${not empty sessionScope.selectedPrice}">
-                                    <c:if test="${sessionScope.selectedPrice == 'below_150'}">Below 150,000</c:if>
-                                    <c:if test="${sessionScope.selectedPrice == 'between_150_300'}">150,000 - 300,000</c:if>
-                                    <c:if test="${sessionScope.selectedPrice == 'greater_300'}">Above 300,000</c:if>
+                                    <c:if test="${sessionScope.selectedPrice == 'below_150'}">Below 150</c:if>
+                                    <c:if test="${sessionScope.selectedPrice == 'between_150_300'}">150 - 300</c:if>
+                                    <c:if test="${sessionScope.selectedPrice == 'greater_300'}">Above 300</c:if>
                                     <c:if test="${empty sessionScope.selectedPrice}">All Prices</c:if>
                                 </c:when>
                                 <c:otherwise>
@@ -416,9 +416,9 @@
                         </label>
                     </div>
                     <div class="category-list" data-type="price">
-                        <input type="radio" name="price" value="below_150" ${selectedPrice == 'below_150' ? 'checked' : ''}> Below 150,000<br>
-                        <input type="radio" name="price" value="between_150_300" ${selectedPrice == 'between_150_300' ? 'checked' : ''}> 150,000 - 300,000<br>
-                        <input type="radio" name="price" value="greater_300" ${selectedPrice == 'greater_300' ? 'checked' : ''}> Above 300,000<br>
+                        <input type="radio" name="price" value="below_150" ${selectedPrice == 'below_150' ? 'checked' : ''}> Below 150 <br>
+                        <input type="radio" name="price" value="between_150_300" ${selectedPrice == 'between_150_300' ? 'checked' : ''}> 150 - 300 <br>
+                        <input type="radio" name="price" value="greater_300" ${selectedPrice == 'greater_300' ? 'checked' : ''}> Above 300 <br>
                         <input type="radio" name="price" value="" ${empty selectedPrice ? 'checked' : ''}> All Prices <br>
                     </div>
                 </div>
@@ -439,70 +439,12 @@
                         </label>
                     </div>
                     <div class="category-list" data-type="location">
+                        <input type="radio" name="location" value="Ben Thanh Theater" ${selectedLocation == 'Ben Thanh Theater' ? 'checked' : ''}> Ben Thanh <br>
+                        <input type="radio" name="location" value="Tech Hub" ${selectedLocation == 'Tech Hub' ? 'checked' : ''}> Tech Hub <br>
+                        <input type="radio" name="location" value="Sports Arena" ${selectedLocation == 'Sports Arena' ? 'checked' : ''}> Sports Arena <br>
+                        <input type="radio" name="location" value="Downtown Plaza" ${selectedLocation == 'Downtown Plaza' ? 'checked' : ''}> Downtown Plaza <br>
+                        <input type="radio" name="location" value="Museum Hall" ${selectedLocation == 'Museum Hall' ? 'checked' : ''}> Museum Hall <br>
                         <input type="radio" name="location" value="" ${empty selectedLocation ? 'checked' : ''}> All Locations <br>
-                        <input type="radio" name="location" value="Hà Nội" ${selectedLocation == 'Hà Nội' ? 'checked' : ''}> Hà Nội <br>
-                        <input type="radio" name="location" value="Hồ Chí Minh" ${selectedLocation == 'Hồ Chí Minh' ? 'checked' : ''}> Hồ Chí Minh <br>
-                        <input type="radio" name="location" value="Hà Giang" ${selectedLocation == 'Hà Giang' ? 'checked' : ''}> Hà Giang <br>
-                        <input type="radio" name="location" value="Cao Bằng" ${selectedLocation == 'Cao Bằng' ? 'checked' : ''}> Cao Bằng <br>
-                        <input type="radio" name="location" value="Bắc Kạn" ${selectedLocation == 'Bắc Kạn' ? 'checked' : ''}> Bắc Kạn <br>
-                        <input type="radio" name="location" value="Tuyên Quang" ${selectedLocation == 'Tuyên Quang' ? 'checked' : ''}> Tuyên Quang <br>
-                        <input type="radio" name="location" value="Lào Cai" ${selectedLocation == 'Lào Cai' ? 'checked' : ''}> Lào Cai <br>
-                        <input type="radio" name="location" value="Điện Biên" ${selectedLocation == 'Điện Biên' ? 'checked' : ''}> Điện Biên <br>
-                        <input type="radio" name="location" value="Lai Châu" ${selectedLocation == 'Lai Châu' ? 'checked' : ''}> Lai Châu <br>
-                        <input type="radio" name="location" value="Sơn La" ${selectedLocation == 'Sơn La' ? 'checked' : ''}> Sơn La <br>
-                        <input type="radio" name="location" value="Yên Bái" ${selectedLocation == 'Yên Bái' ? 'checked' : ''}> Yên Bái <br>
-                        <input type="radio" name="location" value="Hoà Bình" ${selectedLocation == 'Hoà Bình' ? 'checked' : ''}> Hoà Bình <br>
-                        <input type="radio" name="location" value="Thái Nguyên" ${selectedLocation == 'Thái Nguyên' ? 'checked' : ''}> Thái Nguyên <br>
-                        <input type="radio" name="location" value="Lạng Sơn" ${selectedLocation == 'Lạng Sơn' ? 'checked' : ''}> Lạng Sơn <br>
-                        <input type="radio" name="location" value="Quảng Ninh" ${selectedLocation == 'Quảng Ninh' ? 'checked' : ''}> Quảng Ninh <br>
-                        <input type="radio" name="location" value="Bắc Giang" ${selectedLocation == 'Bắc Giang' ? 'checked' : ''}> Bắc Giang <br>
-                        <input type="radio" name="location" value="Phú Thọ" ${selectedLocation == 'Phú Thọ' ? 'checked' : ''}> Phú Thọ <br>
-                        <input type="radio" name="location" value="Vĩnh Phúc" ${selectedLocation == 'Vĩnh Phúc' ? 'checked' : ''}> Vĩnh Phúc <br>
-                        <input type="radio" name="location" value="Bắc Ninh" ${selectedLocation == 'Bắc Ninh' ? 'checked' : ''}> Bắc Ninh <br>
-                        <input type="radio" name="location" value="Hải Dương" ${selectedLocation == 'Hải Dương' ? 'checked' : ''}> Hải Dương <br>
-                        <input type="radio" name="location" value="Hải Phòng" ${selectedLocation == 'Hải Phòng' ? 'checked' : ''}> Hải Phòng <br>
-                        <input type="radio" name="location" value="Hưng Yên" ${selectedLocation == 'Hưng Yên' ? 'checked' : ''}> Hưng Yên <br>
-                        <input type="radio" name="location" value="Thái Bình" ${selectedLocation == 'Thái Bình' ? 'checked' : ''}> Thái Bình <br>
-                        <input type="radio" name="location" value="Hà Nam" ${selectedLocation == 'Hà Nam' ? 'checked' : ''}> Hà Nam <br>
-                        <input type="radio" name="location" value="Nam Định" ${selectedLocation == 'Nam Định' ? 'checked' : ''}> Nam Định <br>
-                        <input type="radio" name="location" value="Ninh Bình" ${selectedLocation == 'Ninh Bình' ? 'checked' : ''}> Ninh Bình <br>
-                        <input type="radio" name="location" value="Thanh Hóa" ${selectedLocation == 'Thanh Hóa' ? 'checked' : ''}> Thanh Hóa <br>
-                        <input type="radio" name="location" value="Nghệ An" ${selectedLocation == 'Nghệ An' ? 'checked' : ''}> Nghệ An <br>
-                        <input type="radio" name="location" value="Hà Tĩnh" ${selectedLocation == 'Hà Tĩnh' ? 'checked' : ''}> Hà Tĩnh <br>
-                        <input type="radio" name="location" value="Quảng Bình" ${selectedLocation == 'Quảng Bình' ? 'checked' : ''}> Quảng Bình <br>
-                        <input type="radio" name="location" value="Quảng Trị" ${selectedLocation == 'Quảng Trị' ? 'checked' : ''}> Quảng Trị <br>
-                        <input type="radio" name="location" value="Huế" ${selectedLocation == 'Huế' ? 'checked' : ''}> Huế <br>
-                        <input type="radio" name="location" value="Đà Nẵng" ${selectedLocation == 'Đà Nẵng' ? 'checked' : ''}> Đà Nẵng <br>
-                        <input type="radio" name="location" value="Quảng Nam" ${selectedLocation == 'Quảng Nam' ? 'checked' : ''}> Quảng Nam <br>
-                        <input type="radio" name="location" value="Quảng Ngãi" ${selectedLocation == 'Quảng Ngãi' ? 'checked' : ''}> Quảng Ngãi <br>
-                        <input type="radio" name="location" value="Bình Định" ${selectedLocation == 'Bình Định' ? 'checked' : ''}> Bình Định <br>
-                        <input type="radio" name="location" value="Phú Yên" ${selectedLocation == 'Phú Yên' ? 'checked' : ''}> Phú Yên <br>
-                        <input type="radio" name="location" value="Khánh Hòa" ${selectedLocation == 'Khánh Hòa' ? 'checked' : ''}> Khánh Hòa <br>
-                        <input type="radio" name="location" value="Ninh Thuận" ${selectedLocation == 'Ninh Thuận' ? 'checked' : ''}> Ninh Thuận <br>
-                        <input type="radio" name="location" value="Bình Thuận" ${selectedLocation == 'Bình Thuận' ? 'checked' : ''}> Bình Thuận <br>
-                        <input type="radio" name="location" value="Kon Tum" ${selectedLocation == 'Kon Tum' ? 'checked' : ''}> Kon Tum <br>
-                        <input type="radio" name="location" value="Gia Lai" ${selectedLocation == 'Gia Lai' ? 'checked' : ''}> Gia Lai <br>
-                        <input type="radio" name="location" value="Đắk Lắk" ${selectedLocation == 'Đắk Lắk' ? 'checked' : ''}> Đắk Lắk <br>
-                        <input type="radio" name="location" value="Đắk Nông" ${selectedLocation == 'Đắk Nông' ? 'checked' : ''}> Đắk Nông <br>
-                        <input type="radio" name="location" value="Lâm Đồng" ${selectedLocation == 'Lâm Đồng' ? 'checked' : ''}> Lâm Đồng <br>
-                        <input type="radio" name="location" value="Bình Phước" ${selectedLocation == 'Bình Phước' ? 'checked' : ''}> Bình Phước <br>
-                        <input type="radio" name="location" value="Tây Ninh" ${selectedLocation == 'Tây Ninh' ? 'checked' : ''}> Tây Ninh <br>
-                        <input type="radio" name="location" value="Bình Dương" ${selectedLocation == 'Bình Dương' ? 'checked' : ''}> Bình Dương <br>
-                        <input type="radio" name="location" value="Đồng Nai" ${selectedLocation == 'Đồng Nai' ? 'checked' : ''}> Đồng Nai <br>
-                        <input type="radio" name="location" value="Bà Rịa - Vũng Tàu" ${selectedLocation == 'Bà Rịa - Vũng Tàu' ? 'checked' : ''}> Bà Rịa - Vũng Tàu <br>
-                        <input type="radio" name="location" value="Long An" ${selectedLocation == 'Long An' ? 'checked' : ''}> Long An <br>
-                        <input type="radio" name="location" value="Tiền Giang" ${selectedLocation == 'Tiền Giang' ? 'checked' : ''}> Tiền Giang <br>
-                        <input type="radio" name="location" value="Bến Tre" ${selectedLocation == 'Bến Tre' ? 'checked' : ''}> Bến Tre <br>
-                        <input type="radio" name="location" value="Trà Vinh" ${selectedLocation == 'Trà Vinh' ? 'checked' : ''}> Trà Vinh <br>
-                        <input type="radio" name="location" value="Vĩnh Long" ${selectedLocation == 'Vĩnh Long' ? 'checked' : ''}> Vĩnh Long <br>
-                        <input type="radio" name="location" value="Đồng Tháp" ${selectedLocation == 'Đồng Tháp' ? 'checked' : ''}> Đồng Tháp <br>
-                        <input type="radio" name="location" value="An Giang" ${selectedLocation == 'An Giang' ? 'checked' : ''}> An Giang <br>
-                        <input type="radio" name="location" value="Kiên Giang" ${selectedLocation == 'Kiên Giang' ? 'checked' : ''}> Kiên Giang <br>
-                        <input type="radio" name="location" value="Cần Thơ" ${selectedLocation == 'Cần Thơ' ? 'checked' : ''}> Cần Thơ <br>
-                        <input type="radio" name="location" value="Hậu Giang" ${selectedLocation == 'Hậu Giang' ? 'checked' : ''}> Hậu Giang <br>
-                        <input type="radio" name="location" value="Sóc Trăng" ${selectedLocation == 'Sóc Trăng' ? 'checked' : ''}> Sóc Trăng <br>
-                        <input type="radio" name="location" value="Bạc Liêu" ${selectedLocation == 'Bạc Liêu' ? 'checked' : ''}> Bạc Liêu <br>
-                        <input type="radio" name="location" value="Cà Mau" ${selectedLocation == 'Cà Mau' ? 'checked' : ''}> Cà Mau <br>
                     </div>
                 </div>
 
@@ -514,49 +456,51 @@
         </form>
 
         <!-- Check if there are no filtered events -->
-        <!-- Danh sách sự kiện -->
-        <div id="events-container">
-            <c:choose>
-                <c:when test="${empty filteredEvents}">
-                    <p class="text-center">Không Tìm Thấy Sự Kiện Từ Bộ Lọc Và Tìm Kiếm Của Bạn</p>
-                    <h2 class="text-xl font-bold text-center" style="margin-left: 4%;">
-                        <i class="fas fa-calendar-week text-green-500 mr-2"></i> Tất Cả Sự Kiện Dành Cho Bạn
-                    </h2>
-                    <div class="container py-4">
-                        <div class="row gy-4" id="event-container-all">
-                            <c:forEach var="event" items="${paginatedEventsAll}">
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                    <div class="event-card-all_events">
-                                        <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                            <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                        </a>
-                                    </div>
+        <c:choose>
+            <c:when test="${empty filteredEvents}">
+                <p class="text-center">Not Event Found From Your Filter And Search</p>
+                <!--All Event--> 
+                <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+                    <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+                </h2>
+                <div class="container py-4">
+                    <div class="row gy-4" id="event-container">
+                        <!-- Loop through paginated events -->
+                        <c:forEach var="event" items="${paginatedEventsAll}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                                <div class="event-card-all_events">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    </a>
                                 </div>
-                            </c:forEach>
-                        </div>
+                            </div>
+                        </c:forEach>
                     </div>
-                </c:when>
-                <c:otherwise>
-                    <div class="container py-4">
-                        <div class="row gy-4" id="event-container-filtered">
-                            <c:forEach var="event" items="${filteredEvents}">
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                    <div class="event-card-all_events">
-                                        <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                            <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                        </a>
-                                    </div>
+                </div>
+                <!-- Bootstrap JS for All Events-->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+            </c:when>
+            <c:otherwise>
+                <div class="container py-4">
+                    <div class="row gy-4" id="event-container">
+                        <!-- Loop through paginated events -->
+                        <c:forEach var="event" items="${filteredEvents}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                                <div class="event-card-all_events">
+                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
+                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    </a>
                                 </div>
-                            </c:forEach>
-                        </div>
+                            </div>
+                        </c:forEach>
                     </div>
-                </c:otherwise>
-            </c:choose>
-        </div>
+                </div>
+            </c:otherwise>
+        </c:choose>
 
         <!--Footer-->
         <jsp:include page="../../components/footer.jsp"></jsp:include>
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
             <script>
                 // Khởi tạo Flatpickr cho Start Date
                 flatpickr("#startDate", {
@@ -783,102 +727,6 @@
                 // Cập nhật dropdown ngay khi trang tải
                 document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
                     checkbox.dispatchEvent(new Event('change'));
-                });
-
-                // Hanlde AJAX for filter event
-                $(document).ready(function () {
-                    // Xử lý sự kiện submit của form
-                    $('#filterForm').on('submit', function (e) {
-                        e.preventDefault(); // Ngăn form gửi theo cách mặc định
-
-                        // Thu thập dữ liệu từ form
-                        var formData = $(this).serialize();
-                            
-                        // Gửi yêu cầu AJAX
-                        $.ajax({
-                            url: '${pageContext.request.contextPath}/allEvents',
-                            type: 'POST',
-                            data: formData,
-//                            dataType: 'json',
-                            success: function (data) {
-                                console.log("Sending data:", formData);
-                            console.log("Received data:", data); // In dữ liệu nhận được để debug
-                            if (typeof data === 'object' && data !== null) {
-                                // Kiểm tra filteredEvents và paginatedEventsAll là mảng
-                                if (Array.isArray(data.filteredEvents) && Array.isArray(data.paginatedEventsAll)) {
-                                    updateEventsList(data); // Gọi hàm cập nhật nếu dữ liệu hợp lệ
-                                } else {
-                                    console.error("Invalid data structure:", data);
-                                    $('#events-container').html('<p class="text-center">Dữ liệu nhận được không hợp lệ.</p>');
-                                }
-                            } else {
-                                console.error("Received data is not an object:", data);
-                                $('#events-container').html('<p class="text-center">Đã xảy ra lỗi khi nhận dữ liệu.</p>');
-                            }
-                            },
-                            error: function (xhr, status, error) {
-                                console.error("AJAX Error:", error);
-                                $('#events-container').html('<p class="text-center">Đã xảy ra lỗi khi lọc sự kiện.</p>');
-                            }
-                        });
-                    });
-
-                    // Hàm cập nhật danh sách sự kiện
-                    function updateEventsList(data) {
-                        var container = $('#events-container');
-                        container.empty();
-
-                        // Kiểm tra filteredEvents
-                        if (!Array.isArray(data.filteredEvents) || data.filteredEvents.length === 0) {
-                            container.append(`
-                                <p class="text-center">Không Tìm Thấy Sự Kiện Từ Bộ Lọc Và Tìm Kiếm Của Bạn</p>
-                                <h2 class="text-xl font-bold text-center" style="margin-left: 4%;">
-                                    <i class="fas fa-calendar-week text-green-500 mr-2"></i> Tất Cả Sự Kiện Dành Cho Bạn
-                                </h2>
-                                <div class="container py-4">
-                                    <div class="row gy-4" id="event-container-all">
-                                    </div>
-                                </div>
-                            `);
-                            var allEventsContainer = $('#event-container-all');
-                            if (Array.isArray(data.paginatedEventsAll)) {
-                                $.each(data.paginatedEventsAll, function (index, event) {
-                                    allEventsContainer.append(`
-                                        <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                            <div class="event-card-all_events">
-                                                <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                                    <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                                </a>
-                                            </div>
-                                        </div>
-                                    `);
-                                });
-                            } else {
-                                console.error("paginatedEventsAll is not an array:", data.paginatedEventsAll);
-                                allEventsContainer.append('<p class="text-center">Không có sự kiện nào để hiển thị.</p>');
-                            }
-                        } else {
-                            // Hiển thị sự kiện đã lọc
-                            container.append(`
-                                <div class="container py-4">
-                                    <div class="row gy-4" id="event-container-filtered">
-                                    </div>
-                                </div>
-                            `);
-                            var filteredEventsContainer = $('#event-container-filtered');
-                            $.each(data.filteredEvents, function (index, event) {
-                                filteredEventsContainer.append(`
-                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                        <div class="event-card-all_events">
-                                            <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                                <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                            </a>
-                                        </div>
-                                    </div>
-                                `);
-                            });
-                        }
-                    }
                 });
         </script>
     </body>

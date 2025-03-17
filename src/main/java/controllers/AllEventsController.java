@@ -4,7 +4,6 @@
  */
 package controllers;
 
-import com.google.gson.Gson;
 import dals.CategoryDAO;
 import dals.EventDAO;
 import dals.FilterEventDAO;
@@ -180,91 +179,7 @@ public class AllEventsController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        Gson gson = new Gson();
-
-        HttpSession session = request.getSession();
-        FilterEventDAO filterEventDAO = new FilterEventDAO();
-        EventDAO eventDAO = new EventDAO();
-
-        try {
-            // Lấy tham số bộ lọc
-            String[] categoryIds = request.getParameterValues("category");
-            String location = request.getParameter("location");
-            String startDateStr = request.getParameter("startDate");
-            String endDateStr = request.getParameter("endDate");
-            String price = request.getParameter("price");
-            String searchQuery = request.getParameter("query");
-
-            // Chuyển đổi danh sách category ID với xử lý lỗi
-            List<Integer> categories = new ArrayList<>();
-            if (categoryIds != null) {
-                for (String id : categoryIds) {
-                    try {
-                        categories.add(Integer.parseInt(id));
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid category ID: " + id);
-                        // Bỏ qua ID không hợp lệ thay vì làm hỏng toàn bộ yêu cầu
-                    }
-                }
-            }
-
-            // Chuyển đổi tham số ngày với xử lý lỗi
-            Date startDate = null;
-            try {
-                if (startDateStr != null && !startDateStr.isEmpty()) {
-                    startDate = Date.valueOf(startDateStr);
-                }
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid start date: " + startDateStr);
-            }
-
-            Date endDate = null;
-            try {
-                if (endDateStr != null && !endDateStr.isEmpty()) {
-                    endDate = Date.valueOf(endDateStr);
-                }
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid end date: " + endDateStr);
-            }
-
-            // Tạo đối tượng bộ lọc
-            FilterEvent filters = new FilterEvent(categories, location, startDate, endDate, price, false, searchQuery);
-
-            // Lấy danh sách sự kiện đã lọc
-            List<EventImage> filteredEvents = filterEventDAO.getFilteredEvents(filters);
-            for (EventImage filteredEvent : filteredEvents) {
-                System.out.println(filteredEvent.getEventId());
-            }
-            // Lấy tất cả sự kiện (mặc định)
-            List<EventImage> paginatedEventsAll = eventDAO.getEventsByPage(1, eventDAO.getTotalEvents());
-            for (EventImage eventImage : paginatedEventsAll) {
-                System.out.println("Filted Event" + eventImage.getEventName());
-            }
-            
-            
-            // Tạo đối tượng JSON để trả về
-            class EventsResponse {
-
-                List<EventImage> filteredEvents;
-                List<EventImage> paginatedEventsAll;
-
-                EventsResponse(List<EventImage> filteredEvents, List<EventImage> paginatedEventsAll) {
-                    this.filteredEvents = filteredEvents;
-                    this.paginatedEventsAll = paginatedEventsAll;
-                }
-            }
-
-            EventsResponse responseData = new EventsResponse(filteredEvents, paginatedEventsAll);
-            out.print(gson.toJson(responseData));
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Trả về phản hồi lỗi nhưng vẫn ở định dạng JSON
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            out.flush();
-        }
+        processRequest(request, response);
     }
 
     /**
