@@ -823,7 +823,7 @@ public class EventDAO extends DBContext {
     public int getTotalEvents() {
         String sql = "SELECT COUNT(DISTINCT e.event_id) \n"
                 + "FROM Events e\n"
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%banner%' WHERE e.status = 'Approved';";
+                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id AND ei.image_title LIKE '%logo_banner%' WHERE e.status = 'Approved';";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);

@@ -3,13 +3,12 @@ package controllers;
 import dals.TicketDAO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import viewModels.TicketDetailDTO;
 import java.io.IOException;
-
 
 public class TicketDetailController extends HttpServlet {
 
@@ -19,7 +18,9 @@ public class TicketDetailController extends HttpServlet {
         // Lấy ticketCode từ request (giả sử truyền qua URL)
         String ticketCode = request.getParameter("ticketCode");
         // Giả sử customerId được lấy từ session (hoặc request parameter) - ví dụ: 2
-        int customerId = 3; // Thay thế bằng logic lấy customerId từ session nếu cần
+        HttpSession session = request.getSession();
+        System.out.println(session.getAttribute("customerId"));
+        int customerId = (int) session.getAttribute("customerId");// 
 
         TicketDAO ticketDAO = new TicketDAO();
         TicketDetailDTO ticketDetail = ticketDAO.getTicketDetail(ticketCode, customerId);
