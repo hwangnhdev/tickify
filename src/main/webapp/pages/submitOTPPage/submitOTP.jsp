@@ -52,7 +52,7 @@
         }
 
         .otp-field input:focus {
-            border: 2px solid #a527ff;
+            border: 1px solid rgb(45, 194, 117);
             box-shadow: 0 0 2px 2px #a527ff6a;
         }
 

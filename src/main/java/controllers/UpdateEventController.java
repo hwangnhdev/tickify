@@ -82,7 +82,8 @@ public class UpdateEventController extends HttpServlet {
         EventDAO eventDAO = new EventDAO();
         CategoryDAO categoryDAO = new CategoryDAO();
 
-        String eventIdParam = request.getParameter("eventId");
+//        String eventIdParam = request.getParameter("eventId");
+        String eventIdParam = "21";
         int eventId = 0;
         try {
             if (eventIdParam != null && !eventIdParam.isEmpty()) {
@@ -121,7 +122,6 @@ public class UpdateEventController extends HttpServlet {
             } else if (index == 1) {
                 request.setAttribute("district", string.trim());
             } else if (index == 2) {
-//                String province = string.trim().replace("Tỉnh ", "").replace("Thành phố ", "");
                 provinceLocal = string.trim();
                 request.setAttribute("province", string.trim());
             }

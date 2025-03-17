@@ -67,4 +67,14 @@ public class Admin {
         this.profilePicture = profilePicture;
     }
 
+    @Override
+    public String toString() {
+        return "Admin{"
+                + "adminId=" + adminId
+                + ", name='" + name + '\''
+                + ", email='" + email + '\''
+                + ", password='" + password + '\''
+                + ", profilePicture='" + profilePicture + '\''
+                + '}';
+    }
 }

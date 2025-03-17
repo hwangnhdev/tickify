@@ -1250,82 +1250,181 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     showTab('event-info');
     loadBanks();
-    loadProvinces(); // Load province list
+    const provinceSelect = document.getElementById("province");
+    if (provinceSelect) {
+        loadProvinces(); // Load provinces if needed
+    }
     document.querySelectorAll('input[name="seatRow[]"], input[name="seatNumber[]"]').forEach(input => {
         input.addEventListener('input', calculateSeatSummary);
     });
     calculateSeatSummary();
 });
+// Handle province selection change
+function handleProvinceChange(selectElement) {
+    const selectedValue = selectElement.value;
 
-// Load Provinces
-async function loadProvinces() {
+    // Ensure this only runs for the province element
+    if (selectElement.id === "province") {
+        // Only reload provinces if the user selects the default option and provinces aren't already loaded
+        if (selectedValue === "" && !sessionStorage.getItem("provinces")) {
+            loadProvinces(); // Fetch and populate provinces
+        }
+        updateDistricts(); // Update districts on province change
+    }
+}
+
+// Load provinces
+function loadProvinces() {
     const provinceSelect = document.getElementById("province");
-    const requestedProvince = "${province}"; // Lấy giá trị từ JSP (Thành phố Hà Nội)
+    if (!provinceSelect) return;
 
-    // Kiểm tra xem provinces đã có trong session chưa
-    const provinces = sessionStorage.getItem('provinces');
-    if (provinces) {
-        const provinceData = JSON.parse(provinces);
-        provinceSelect.innerHTML = '<option value="">-- Select Province/City --</option>' +
-            provinceData.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
-        selectDefaultProvince(provinceSelect, requestedProvince); // Chọn giá trị mặc định
+    // Check if the select already has options (excluding the default option)
+    if (provinceSelect.options.length > 1) {
+        console.log("Province options already loaded from JSP, skipping API fetch.");
+        // Ensure districts and wards are loaded
+        updateDistricts();
         return;
     }
 
-    // Nếu không có, gọi API và lưu vào sessionStorage
-    const response = await fetch("https://provinces.open-api.vn/api/p/");
-    const provincesData = await response.json();
-    sessionStorage.setItem('provinces', JSON.stringify(provincesData));
-    provinceSelect.innerHTML = '<option value="">-- Select Province/City --</option>' +
-        provincesData.map(province => `<option value="${province.name}" data-code="${province.code}">${province.name}</option>`).join('');
-    selectDefaultProvince(provinceSelect, requestedProvince); // Chọn giá trị mặc định
+    let provinces = JSON.parse(sessionStorage.getItem("provinces"));
+    
+    if (provinces) {
+        populateProvinces(provinces);
+    } else {
+        fetch("https://provinces.open-api.vn/api/p/")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Fetched provinces from API:", data); // Debug
+                provinces = data;
+                sessionStorage.setItem("provinces", JSON.stringify(provinces));
+                populateProvinces(provinces);
+            })
+            .catch(error => {
+                console.error("Error fetching provinces:", error);
+                const errorSpan = document.getElementById("province_error");
+                if (errorSpan) {
+                    errorSpan.textContent = "Failed to load provinces. Please try again.";
+                    errorSpan.style.color = "red";
+                }
+            });
+    }
 }
 
-// Hàm chọn giá trị mặc định cho Province
-function selectDefaultProvince(provinceSelect, requestedProvince) {
-    if (requestedProvince) {
+function populateProvinces(provinces) {
+    const provinceSelect = document.getElementById("province");
+    if (!provinceSelect) return;
+
+    provinceSelect.innerHTML = ""; // Clear existing options
+    provinceSelect.innerHTML = '<option value="">-- Select Province/City --</option>'; // Add default option
+
+    provinces.forEach(prov => {
+        const option = document.createElement("option");
+        option.value = prov.name;
+        option.textContent = prov.name;
+        option.setAttribute("data-code", prov.code);
+        provinceSelect.appendChild(option);
+    });
+
+    // Reapply pre-selected province using a hidden input
+    const preSelectedProvince = document.getElementById("original_province")?.value || '';
+    if (preSelectedProvince) {
         const options = provinceSelect.options;
         for (let i = 0; i < options.length; i++) {
-            if (options[i].value === requestedProvince) {
+            if (options[i].value === preSelectedProvince) {
                 provinceSelect.selectedIndex = i;
-                console.log(`Selected province: ${options[i].value}`); // Debug
+                console.log(`Pre-selected province: ${preSelectedProvince}`); // Debug
+                updateDistricts(); // Load districts for the pre-selected province
                 break;
             }
         }
+    } else {
+        updateDistricts(); // Populate districts even if no pre-selection
     }
 }
+
 // Load Districts based on selected Province
 async function updateDistricts() {
     const provinceSelect = document.getElementById("province");
     const districtSelect = document.getElementById("district");
     const wardSelect = document.getElementById("ward");
-    const selectedProvinceCode = provinceSelect.options[provinceSelect.selectedIndex].getAttribute("data-code");
+
+    if (!provinceSelect || !districtSelect || !wardSelect) {
+        console.error("One or more select elements are missing: province, district, or ward");
+        return;
+    }
+
     districtSelect.innerHTML = '<option value="">-- Select District --</option>';
     wardSelect.innerHTML = '<option value="">-- Select Ward --</option>';
+    const selectedProvinceCode = provinceSelect.options[provinceSelect.selectedIndex].getAttribute("data-code");
     if (selectedProvinceCode) {
-        const response = await fetch(`https://provinces.open-api.vn/api/p/${selectedProvinceCode}?depth=2`);
-        const provinceData = await response.json();
-        const districts = provinceData.districts;
-        districtSelect.innerHTML = '<option value="">-- Select District --</option>' +
-            districts.map(district => `<option value="${district.name}" data-code="${district.code}">${district.name}</option>`).join('');
+        try {
+            const response = await fetch(`https://provinces.open-api.vn/api/p/${selectedProvinceCode}?depth=2`);
+            const provinceData = await response.json();
+            console.log("Fetched districts for province code", selectedProvinceCode, ":", provinceData.districts); // Debug
+            const districts = provinceData.districts;
+            districtSelect.innerHTML = '<option value="">-- Select District --</option>' +
+                districts.map(district => `<option value="${district.name}" data-code="${district.code}">${district.name}</option>`).join('');
+            // Pre-select district using hidden input
+            const preSelectedDistrict = document.getElementById("original_district")?.value || '';
+            if (preSelectedDistrict) {
+                const options = districtSelect.options;
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].value === preSelectedDistrict) {
+                        districtSelect.selectedIndex = i;
+                        console.log(`Pre-selected district: ${preSelectedDistrict}`); // Debug
+                        updateWards(); // Load wards for the pre-selected district
+                        break;
+                    }
+                }
+            } else {
+                updateWards(); // Populate wards even if no pre-selection
+            }
+        } catch (error) {
+            console.error("Error fetching districts:", error);
+            showError("district", "Failed to load districts. Please try again.");
+        }
     }
-    updateFullAddress(); // Update address after changing districts
+    updateFullAddress();
 }
 
 // Load Wards based on selected District
 async function updateWards() {
     const districtSelect = document.getElementById("district");
     const wardSelect = document.getElementById("ward");
+
+    if (!districtSelect || !wardSelect) {
+        console.error("One or more select elements are missing: district or ward");
+        return;
+    }
+
     const selectedDistrictCode = districtSelect.options[districtSelect.selectedIndex].getAttribute("data-code");
     wardSelect.innerHTML = '<option value="">-- Select Ward --</option>';
     if (selectedDistrictCode) {
-        const response = await fetch(`https://provinces.open-api.vn/api/d/${selectedDistrictCode}?depth=2`);
-        const districtData = await response.json();
-        const wards = districtData.wards;
-        wardSelect.innerHTML = '<option value="">-- Select Ward --</option>' +
-            wards.map(ward => `<option value="${ward.name}">${ward.name}</option>`).join('');
+        try {
+            const response = await fetch(`https://provinces.open-api.vn/api/d/${selectedDistrictCode}?depth=2`);
+            const districtData = await response.json();
+            console.log("Fetched wards for district code", selectedDistrictCode, ":", districtData.wards); // Debug
+            const wards = districtData.wards;
+            wardSelect.innerHTML = '<option value="">-- Select Ward --</option>' +
+                wards.map(ward => `<option value="${ward.name}">${ward.name}</option>`).join('');
+            // Pre-select ward using hidden input
+            const preSelectedWard = document.getElementById("original_ward")?.value || '';
+            if (preSelectedWard) {
+                const options = wardSelect.options;
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].value === preSelectedWard) {
+                        wardSelect.selectedIndex = i;
+                        console.log(`Pre-selected ward: ${preSelectedWard}`); // Debug
+                        break;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching wards:", error);
+            showError("ward", "Failed to load wards. Please try again.");
+        }
     }
-    updateFullAddress(); // Update address after changing wards
+    updateFullAddress();
 }
 
 // Update Full Address
@@ -1333,31 +1432,30 @@ function updateFullAddress() {
     const provinceSelect = document.getElementById("province");
     const districtSelect = document.getElementById("district");
     const wardSelect = document.getElementById("ward");
-    const buildingNumberInput = document.getElementById("buildingNumber"); // Assuming a separate input
     const fullAddressInput = document.getElementById("fullAddress");
+
+    if (!provinceSelect || !districtSelect || !wardSelect || !fullAddressInput) {
+        console.error("One or more elements are missing: province, district, ward, or fullAddress");
+        return;
+    }
+
     const province = provinceSelect.value;
     const district = districtSelect.value;
     const ward = wardSelect.value;
-    const buildingNumber = buildingNumberInput ? buildingNumberInput.value : ''; // Fallback if no input exists
 
-    // Build address in the order: Building number, Ward, District, Province/City
     let fullAddress = '';
-    if (buildingNumber) {
-        fullAddress += buildingNumber; // e.g., "123"
-    }
     if (ward) {
-        fullAddress += fullAddress ? ', ' + ward : ward; // e.g., "Phường Cống Vị"
+        fullAddress += ward;
     }
     if (district) {
-        fullAddress += fullAddress ? ', ' + district : district; // e.g., "Quận Ba Đình"
+        fullAddress += fullAddress ? ', ' + district : district;
     }
     if (province) {
-        fullAddress += fullAddress ? ', ' + province : province; // e.g., "Hà Nội"
+        fullAddress += fullAddress ? ', ' + province : province;
     }
 
-    fullAddressInput.value = fullAddress || 'Building number, Ward, District, Province/City';
+    fullAddressInput.value = fullAddress || 'Ward, District, Province/City';
 }
-
 // Upload image to cloud
 document.addEventListener('DOMContentLoaded', () => {
     // Event Logo

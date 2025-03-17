@@ -93,7 +93,7 @@ public class LoginGoogleHandlerController extends HttpServlet {
             //TH2: Có customer nhưng chưa có customer_auth trong DB 
             if (existingCustomer != null && existingCustomerAuth == null) {
                 // Lấy customer_id đã có trong Customers thêm 1 thằng Customer_auths 
-                CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), null, provider, user.getId());
+                CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), provider, null, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
             }
 
@@ -104,7 +104,7 @@ public class LoginGoogleHandlerController extends HttpServlet {
 
                 int insertedCustomerId = customerDao.selectCustomerByEmail(user.getEmail()).getCustomerId();
 
-                CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, null, provider, user.getId());
+                CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, provider, null, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
 
                 customerSendRedirect.setCustomerId(insertedCustomerId);
@@ -112,9 +112,10 @@ public class LoginGoogleHandlerController extends HttpServlet {
             // Login 
             HttpSession session = request.getSession();
             System.out.println(customerSendRedirect.getProfilePicture());
+            session.setMaxInactiveInterval(3 * 60 * 60); // 3hrs
             session.setAttribute("customerImage", customerSendRedirect.getProfilePicture());
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
-            response.sendRedirect("event");
+            response.sendRedirect(request.getContextPath());
         } catch (Exception e) {
             request.setAttribute("error", "Login fail!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);

@@ -102,7 +102,7 @@
                                 <input id="amount" name="amount" type="hidden" value="${subtotal}" />
 
                                 <div class="flex items-center mb-4">
-                                    <input class="mr-2" type="radio" Checked="True" id="bankCode" name="bankCode" value="">
+                                    <input class="mr-2" type="radio" checked="" id="bankCode" name="bankCode" value="">
                                     <label class="flex items-center" for="vnpay">
                                         <img alt="VNPAY logo" class="mr-2" height="24" src="https://salt.tkbcdn.com/ts/ds/e5/6d/9a/a5262401410b7057b04114ad15b93d85.png" width="24"/>
                                         <span>

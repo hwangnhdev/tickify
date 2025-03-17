@@ -20,17 +20,18 @@
             }
 
             body {
-                background: #f6f5f7;
+                background: rgb(0, 0, 0);
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 flex-direction: column;
                 font-family: 'Montserrat', sans-serif;
                 height: 100vh;
-                margin: -20px 0 50px;
+                margin: 0;
             }
 
             h1 {
+                color: #fff;
                 font-weight: bold;
                 margin: 0;
                 margin-bottom: 46px;
@@ -61,8 +62,8 @@
 
             button {
                 border-radius: 20px;
-                border: 1px solid #d4af7a;
-                background-color: #d4af7a;
+                border: 1px solid rgb(45, 194, 117);
+                background-color: rgb(45, 194, 117);
                 color: #FFFFFF;
                 font-size: 12px;
                 font-weight: bold;
@@ -82,7 +83,8 @@
 
             button:hover {
                 transition: all 0.2s ease-in;
-                background-color: #c2a06f;
+                border: 1px solid rgb(45, 194, 117);
+                background-color: rgb(45, 194, 117);
                 cursor: pointer;
             }
 
@@ -92,7 +94,7 @@
             }
 
             form {
-                background-color: #FFFFFF;
+                background-color: rgb(39, 39, 42);
                 display: flex;
                 align-items: center;
                 justify-content: center;
