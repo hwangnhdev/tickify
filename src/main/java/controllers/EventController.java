@@ -66,26 +66,20 @@ public class EventController extends HttpServlet {
         // Create an instance of EventDAO to interact with the database
         EventDAO eventDAO = new EventDAO();
 
-        // <!--Large-Events--> Get top 10 Event most popular
+        // <!--Large-Events--> Get top 20 Event most popular
         List<EventImage> topEvents = eventDAO.getTopEventsWithLimit();
-        // Split into two lists, each containing 5 events
-        List<Event> carousel1 = new ArrayList<>();
-        List<Event> carousel2 = new ArrayList<>();
-        for (int i = 0; i < topEvents.size(); i++) {
-            if (i < 10) {
-                carousel1.add(topEvents.get(i));
-            } else {
-                carousel2.add(topEvents.get(i));
-            }
-        }
+        // Tính số lượng cần chia
+        int totalEventsLarge = topEvents.size();
+        int halfSize = (totalEventsLarge + 1) / 2; // Nếu lẻ, bên 1 sẽ nhiều hơn 1 phần tử
+        // Chia danh sách thành hai phần động
+        ArrayList<EventImage> carousel1 = new ArrayList<>(topEvents.subList(0, halfSize));
+        ArrayList<EventImage> carousel2 = new ArrayList<>(topEvents.subList(halfSize, totalEventsLarge));
         // Set attributes for JSP
         request.setAttribute("carousel1", carousel1);
         request.setAttribute("carousel2", carousel2);
-
         // <!--New Events-->
         List<EventImage> listEvents = eventDAO.getTop10LatestEvents();
         request.setAttribute("listEvents", listEvents);
-
         List<EventImage> listAllEvents = eventDAO.getAllEvents();
         request.setAttribute("listAllEvents", listAllEvents);
 

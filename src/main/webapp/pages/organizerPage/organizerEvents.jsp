@@ -196,12 +196,14 @@
                                         <i class="fas fa-chair text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Seating Chart</span>
                                     </button>
-                                    <button type="button" 
-                                            onclick="window.open('${pageContext.request.contextPath}/updateEvent?eventId=${event.eventId}', '_blank')" 
-                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                        <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Edit</span>
-                                    </button>
+                                    <c:if test="${event.eventStatus eq 'Processing'}">
+                                        <button type="button" 
+                                                onclick="window.open('${pageContext.request.contextPath}/updateEvent?eventId=${event.eventId}', '_blank')" 
+                                                class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
+                                            <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
+                                            <span class="text-gray-400 group-hover:text-white">Edit</span>
+                                        </button>
+                                    </c:if>
                                 </div>
                             </div>
                         </c:forEach>
