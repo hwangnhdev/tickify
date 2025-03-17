@@ -34,6 +34,9 @@ public class Showtime extends Event{
     public Showtime() {
     }
 
+    
+    
+    
     public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt) {
         this.showtimeId = showtimeId;
         this.eventId = eventId;
