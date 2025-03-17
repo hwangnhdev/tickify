@@ -22,7 +22,7 @@ public class ViewAllTicketsController extends HttpServlet {
             throws ServletException, IOException {
         // Lấy customerId từ parameter hoặc session (ví dụ đơn giản)
         String customerIdParam = request.getParameter("customerId");
-        int customerId = 1;
+        int customerId = 3;
         if (customerIdParam != null) {
             try {
                 customerId = Integer.parseInt(customerIdParam);
