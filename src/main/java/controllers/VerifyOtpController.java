@@ -109,7 +109,7 @@ public class VerifyOtpController extends HttpServlet {
         System.out.println("OTP: " + action);
         System.out.println("OTP valid: " + isOtpValid);
 
-        //Sign Up
+        // Sign Up
         if (isOtpValid && "signup".equals(action)) {
             // Lấy session hiện tại
             String sessionId = session.getId(); // Lấy JSESSIONID
@@ -148,8 +148,13 @@ public class VerifyOtpController extends HttpServlet {
             response.getWriter().write(responseContent.toString());
         } 
 
-        //Foget Password
+        // Foget Password
         if (isOtpValid && "forgetPassword".equals(action)) {
+            response.sendRedirect("pages/changePasswordPage/changePassword.jsp");
+        }
+        
+        // Admin Foget Password
+        if (isOtpValid && "adminForgetPassword".equals(action)) {
             response.sendRedirect("pages/changePasswordPage/changePassword.jsp");
         }
         

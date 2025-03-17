@@ -64,15 +64,6 @@ public class AdminLoginController extends HttpServlet {
             dispatcher.forward(request, response);
             return;
         }
-        
-//        // Mã hóa mật khẩu
-//        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-//        System.out.println(hashedPassword);
-
-        // Debug: In admin ra kiểm tra
-        System.out.println(admin.toString());
-        System.out.println(password);
-        System.out.println(admin.getPassword());
 
         // Kiểm tra mật khẩu có hợp lệ không
         if (password != null && BCrypt.checkpw(password, admin.getPassword())) {

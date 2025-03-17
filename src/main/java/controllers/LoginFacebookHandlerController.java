@@ -97,6 +97,11 @@ public class LoginFacebookHandlerController extends HttpServlet {
                 user.setEmail(user.getId() + "@temp.com");
 
             Customer existingCustomer = customerDao.selectCustomerByEmail(user.getEmail());
+            
+            if (!existingCustomer.getStatus()) {
+                request.setAttribute("errorMessage", "This account has been banned!");
+                request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
+            }
 
             int existingCustomerId;
             if (existingCustomer != null) {

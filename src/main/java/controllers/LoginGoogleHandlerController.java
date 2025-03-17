@@ -79,6 +79,11 @@ public class LoginGoogleHandlerController extends HttpServlet {
             String provider = "google";
 
             Customer existingCustomer = customerDao.selectCustomerByEmail(user.getEmail());
+            
+            if (!existingCustomer.getStatus()) {
+                request.setAttribute("errorMessage", "This account has been banned!");
+                request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
+            }
 
             int existingCustomerId;
             if (existingCustomer != null) {
