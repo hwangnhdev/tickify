@@ -18,7 +18,7 @@ public class OrganizerEventDetailController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Organizer ID lấy từ session hoặc mặc định (ở đây sử dụng 2)
-        int customerId = 2;
+        int customerId = 1;
 
         // Lấy eventId từ request parameter, mặc định là 2 nếu không có
         String eventIdParam = request.getParameter("eventId");

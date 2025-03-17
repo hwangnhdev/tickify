@@ -15,6 +15,8 @@ import models.EventImage;
 
 public class ViewApprovedDetailController extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -24,8 +26,8 @@ public class ViewApprovedDetailController extends HttpServlet {
             eventId = Integer.parseInt(eventIdStr);
             System.out.println("Fetching event with ID: " + eventId); // Log
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Invalid event ID.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            // Trả về lỗi 400 nếu eventId không hợp lệ
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid event ID.");
             return;
         }
 
@@ -34,14 +36,14 @@ public class ViewApprovedDetailController extends HttpServlet {
         Event event = adminDao.getApprovedEventDetailById(eventId);
         if (event == null) {
             System.out.println("Event not found or not approved for ID: " + eventId); // Log
-            request.setAttribute("error", "Event not found or not approved.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            // Trả về lỗi 404 nếu sự kiện không được tìm thấy hoặc không được phê duyệt
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Event not found or not approved.");
             return;
         } else {
             System.out.println("Event found: " + event.getEventName());
         }
 
-        // Lấy danh sách hình ảnh của event (không dùng STRING_AGG)
+        // Lấy danh sách hình ảnh của event
         EventDAO eventDao = new EventDAO(); // Phương thức getImageEventsByEventId phải được định nghĩa trong EventDAO
         List<EventImage> listEventImages = eventDao.getImageEventsByEventId(eventId);
 

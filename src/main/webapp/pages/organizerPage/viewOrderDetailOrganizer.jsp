@@ -25,7 +25,8 @@
     <body class="bg-gray-100 text-gray-900">
         <div class="max-w-4xl mx-auto p-6">
             <div class="bg-white shadow rounded-lg p-6 space-y-8">
-                <!-- Header: Event Name -->
+                
+                <!-- 🔹 Header: Event Name -->
                 <c:if test="${not empty orderDetail.eventName}">
                     <div class="space-y-2">
                         <h1 class="text-3xl font-bold truncate-text">
@@ -33,7 +34,8 @@
                         </h1>
                     </div>
                 </c:if>
-                <!-- Event Image -->
+
+                <!-- 🔹 Event Image -->
                 <c:if test="${not empty orderDetail.image_url}">
                     <div>
                         <img src="${orderDetail.image_url}"
@@ -43,7 +45,8 @@
                              class="w-full h-auto rounded" />
                     </div>
                 </c:if>
-                <!-- Order Code -->
+
+                <!-- 🔹 Order Code -->
                 <c:if test="${not empty orderDetail.orderId}">
                     <div>
                         <p class="text-sm text-gray-600 flex items-center">
@@ -52,7 +55,8 @@
                         </p>
                     </div>
                 </c:if>
-                <!-- Order Overview -->
+
+                <!-- 🔹 Order Overview -->
                 <div class="border-t border-gray-200 pt-4">
                     <h2 class="text-2xl font-bold mb-4">
                         <i class="fas fa-info-circle mr-2"></i>Order Overview
@@ -74,7 +78,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- Buyer Information -->
+
+                <!-- 🔹 Buyer Information -->
                 <c:if test="${not empty orderDetail.customerName or not empty orderDetail.customerEmail}">
                     <div class="border-t border-gray-200 pt-4">
                         <h2 class="text-2xl font-bold mb-4">
@@ -96,7 +101,8 @@
                         </div>
                     </div>
                 </c:if>
-                <!-- Order Summary -->
+
+                <!-- 🔹 Order Summary -->
                 <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
                     <h2 class="text-lg font-semibold mb-4">
                         <i class="fas fa-receipt mr-2"></i>Order Summary
@@ -109,42 +115,41 @@
                                     <fmt:formatNumber value="${orderDetail.grandTotal}" pattern="#,##0.00'đ'" />
                                 </td>
                             </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="p-2 font-semibold">Discount</td>
-                                <td class="p-2">
-                                    <c:choose>
-                                        <c:when test="${orderDetail.discount_type == 'Percentage'}">
-                                            ${orderDetail.discount_value}%
-                                        </c:when>
-                                        <c:otherwise>
-                                            <fmt:formatNumber value="${orderDetail.discount_value}" pattern="#,##0.00'đ'" />
-                                        </c:otherwise>
-                                    </c:choose>
-                                </td>
-                            </tr>
+
+                            <!-- 🔹 Voucher Discount -->
+                            <c:if test="${not empty orderDetail.voucherCode}">
+                                <tr class="border-b border-gray-200">
+                                    <td class="p-2 font-semibold">Voucher</td>
+                                    <td class="p-2">${orderDetail.voucherCode}</td>
+                                </tr>
+                                <tr class="border-b border-gray-200">
+                                    <td class="p-2 font-semibold">Discount</td>
+                                    <td class="p-2">
+                                        <c:choose>
+                                            <c:when test="${orderDetail.discountType eq 'percentage'}">
+                                                ${orderDetail.discountPercentValue}% 
+                                                (<fmt:formatNumber value="${orderDetail.discountPercentage}" pattern="#,##0.00'đ'" />)
+                                            </c:when>
+                                            <c:otherwise>
+                                                <fmt:formatNumber value="${orderDetail.discountFixed}" pattern="#,##0.00'đ'" />
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                </tr>
+                            </c:if>
+
                             <tr class="border-b border-gray-200">
                                 <td class="p-2 font-semibold">Total After Discount</td>
                                 <td class="p-2">
                                     <fmt:formatNumber value="${orderDetail.totalAfterDiscount}" pattern="#,##0.00'đ'" />
                                 </td>
                             </tr>
-                            <c:if test="${not empty orderDetail.voucherCode}">
-                                <tr class="border-b border-gray-200">
-                                    <td class="p-2 font-semibold">Voucher</td>
-                                    <td class="p-2">${orderDetail.voucherCode}</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-2 font-semibold">Savings</td>
-                                    <td class="p-2">
-                                        <fmt:formatNumber value="${orderDetail.discountAmount}" pattern="#,##0.00'đ'" />
-                                    </td>
-                                </tr>
-                            </c:if>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <!-- Thông báo nếu orderDetail rỗng -->
+
+            <!-- 🔹 Thông báo nếu orderDetail rỗng -->
             <c:if test="${empty orderDetail}">
                 <div class="mt-6 p-4 bg-red-100 text-red-700 rounded">
                     <p>Order details not found.</p>

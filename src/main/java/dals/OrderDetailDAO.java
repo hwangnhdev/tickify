@@ -19,9 +19,10 @@ public class OrderDetailDAO extends DBContext {
             + "WHERE order_id = ? AND ticket_type_id = ? "
             + "ORDER BY order_detail_id DESC";
 
-    public OrderDetailDTO getOrderDetailForOrganizer(int organizerId, int orderId) {
+   public OrderDetailDTO getOrderDetailForOrganizer(int organizerId, int orderId) {
     OrderDetailDTO detail = null;
     String sql = "SELECT \n"
+            + "    od.order_detail_id,\n"
             + "    o.order_id,\n"
             + "    o.order_date,\n"
             + "    c.full_name AS customerName,\n"
@@ -52,7 +53,7 @@ public class OrderDetailDAO extends DBContext {
             + "JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
             + "JOIN Events e ON st.event_id = e.event_id\n"
             + "JOIN Organizers org ON e.organizer_id = org.organizer_id\n"
-            // Thay JOIN bằng LEFT JOIN để không bắt buộc có dữ liệu ở Ticket và Seats
+            // Sử dụng LEFT JOIN cho Ticket và Seats để không bắt buộc có dữ liệu ở đó
             + "LEFT JOIN Ticket t ON od.order_detail_id = t.order_detail_id\n"
             + "LEFT JOIN Seats s ON t.seat_id = s.seat_id\n"
             + "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id\n"
@@ -64,6 +65,7 @@ public class OrderDetailDAO extends DBContext {
             + "WHERE org.organizer_id = ? \n"
             + "  AND o.order_id = ?\n"
             + "GROUP BY \n"
+            + "    od.order_detail_id,\n"
             + "    o.order_id,\n"
             + "    o.order_date,\n"
             + "    c.full_name,\n"
@@ -76,7 +78,7 @@ public class OrderDetailDAO extends DBContext {
             + "    v.discount_value,\n"
             + "    ei.image_url,\n"
             + "    o.payment_status";
-
+    
     try (PreparedStatement ps = connection.prepareStatement(sql)) {
         ps.setInt(1, organizerId);
         ps.setInt(2, orderId);
@@ -84,6 +86,7 @@ public class OrderDetailDAO extends DBContext {
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 detail = new OrderDetailDTO();
+                detail.setOrderDetailId(rs.getInt("order_detail_id"));
                 detail.setOrderId(rs.getInt("order_id"));
                 detail.setOrderDate(rs.getTimestamp("order_date"));
                 detail.setCustomerName(rs.getString("customerName"));
@@ -92,13 +95,14 @@ public class OrderDetailDAO extends DBContext {
                 detail.setLocation(rs.getString("location"));
                 detail.setGrandTotal(rs.getDouble("grandTotal"));
                 detail.setVoucherCode(rs.getString("voucherCode"));
-                detail.setDiscount_type(rs.getString("discount_type"));
-                detail.setDiscount_value(rs.getDouble("discount_value"));
-                detail.setDiscountAmount(rs.getDouble("discountAmount"));
+                // Sử dụng setter đúng tên trong OrderDetailDTO
+                detail.setDiscountType(rs.getString("discount_type"));
+                detail.setDiscountPercentValue(rs.getDouble("discount_value"));
+                detail.setDiscountPercentage(rs.getDouble("discountAmount"));
                 detail.setTotalAfterDiscount(rs.getDouble("totalAfterDiscount"));
                 detail.setImage_url(rs.getString("image_url"));
                 detail.setPaymentStatus(rs.getString("payment_status"));
-                detail.setSeat(rs.getString("seat")); // Lấy thông tin seat từ kết quả MIN(...)
+                detail.setSeat(rs.getString("seat"));
             }
         }
     } catch (SQLException ex) {
@@ -106,7 +110,6 @@ public class OrderDetailDAO extends DBContext {
     }
     return detail;
 }
-
 
     public boolean insertOrderDetail(OrderDetail orderDetail) {
         try (PreparedStatement st = connection.prepareStatement(INSERT_ORDER_DETAIL)) {

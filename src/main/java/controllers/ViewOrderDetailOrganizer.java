@@ -37,7 +37,7 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
         }
         
         // Set organizerId (defaulted to 1; adjust as needed)
-        int organizerId = 2;
+        int organizerId = 1;
         
         // Call DAO to retrieve the order details
         OrderDetailDAO dao = new OrderDetailDAO();

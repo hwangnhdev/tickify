@@ -15,8 +15,7 @@ public class EventDetailDTO extends Event {
 
     // Các trường bổ sung cần thiết cho trang chi tiết
     private String imageUrl;      // Hình ảnh đại diện
-    private String paymentStatus; // Trạng thái thanh toán
-    private String status;        // Trạng thái của sự kiện (ví dụ: Upcoming, Past, ...)
+    private String eventStatus;   // Trạng thái của sự kiện (processing, approved, rejected, upcoming, past)
     private String description;   // Mô tả sự kiện
 
     // Getters và Setters cho các trường bổ sung
@@ -68,21 +67,12 @@ public class EventDetailDTO extends Event {
         this.imageUrl = imageUrl;
     }
 
-    public String getPaymentStatus() {
-        return paymentStatus;
+    public String getEventStatus() {
+        return eventStatus;
     }
 
-    // Sửa lại setPaymentStatus để gán giá trị thay vì ném ra ngoại lệ
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setEventStatus(String eventStatus) {
+        this.eventStatus = eventStatus;
     }
 
     public String getDescription() {
@@ -92,5 +82,4 @@ public class EventDetailDTO extends Event {
     public void setDescription(String description) {
         this.description = description;
     }
-
 }

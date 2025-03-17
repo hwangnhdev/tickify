@@ -13,23 +13,15 @@
         <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
           <h2 class="text-3xl font-bold mb-6">History Approved Event Management</h2>
 
-          <!-- Tab Navigation -->
-          <div class="mb-6 border-b pb-2 flex space-x-4">
-            <c:url var="viewAllEventsUrl" value="/admin/viewAllEvents" />
-            <c:url var="viewApprovedEventsUrl" value="/admin/viewApprovedEvents" />
-            <c:url var="viewHistoryApprovedEventsUrl" value="/admin/viewHistoryApprovedEvents" />
-            <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewAllEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewAllEventsUrl}">View All</a>
-            <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewApprovedEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewApprovedEventsUrl}">View Approved</a>
-            <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewHistoryApprovedEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewHistoryApprovedEventsUrl}">View History Approved</a>
-          </div>
+          <jsp:include page="tabNav.jsp" />
 
           <!-- Filter and Search Bar -->
           <form id="filterForm" action="viewHistoryApprovedEvents" method="get" class="mb-6 flex flex-wrap items-center justify-end gap-4">
             <div class="flex items-center space-x-2">
               <label for="statusFilter" class="mr-2">Status:</label>
               <select id="statusFilter" name="status" class="bg-gray-200 text-black p-2 rounded" onchange="this.form.submit()">
-                <option ${empty statusFilter ? "selected" : ""} value="">All</option>
-                <option ${statusFilter == 'active' ? "selected" : ""} value="active">Accepted</option>
+                
+                <option ${statusFilter == 'approved' ? "selected" : ""} value="approved">Approved</option>
                 <option ${statusFilter == 'rejected' ? "selected" : ""} value="rejected">Rejected</option>
               </select>
             </div>
@@ -58,15 +50,21 @@
                   <tr class="hover:bg-gray-50 transition duration-150">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${event.eventId}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                      <!-- Cập nhật liên kết chi tiết sự kiện -->
+                      <!-- Liên kết chi tiết sự kiện -->
                       <c:url var="eventDetailUrl" value="/admin/viewApprovedDetail">
                         <c:param name="eventId" value="${event.eventId}" />
                         <c:param name="page" value="${page}" />
                       </c:url>
-                      <a href="${eventDetailUrl}" class="text-blue-500 hover:underline">${event.eventName}</a>
+                      <a href="${eventDetailUrl}" class="text-blue-500 hover:underline truncate" title="${event.eventName}">
+                        ${event.eventName}
+                      </a>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${event.location}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${event.eventType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 truncate" title="${event.location}">
+                      ${event.location}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 truncate" title="${event.eventType}">
+                      ${event.eventType}
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                       <span class="${event.status == 'Rejected' ? 'bg-red-100 text-red-800' : event.status == 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} py-1 px-3 rounded-full">
                         ${event.status}

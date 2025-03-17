@@ -97,6 +97,18 @@
                                         onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=all'">
                                     All
                                 </button>
+                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'processing' ? 'bg-green-500' : 'bg-gray-600'}" 
+                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=processing'">
+                                    Processing
+                                </button>
+                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'approved' ? 'bg-green-500' : 'bg-gray-600'}" 
+                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=approved'">
+                                    Approved
+                                </button>
+                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'rejected' ? 'bg-green-500' : 'bg-gray-600'}" 
+                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=rejected'">
+                                    Rejected
+                                </button>
                                 <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'upcoming' ? 'bg-green-500' : 'bg-gray-600'}" 
                                         onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=upcoming'">
                                     Upcoming
@@ -104,14 +116,6 @@
                                 <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'past' ? 'bg-green-500' : 'bg-gray-600'}" 
                                         onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=past'">
                                     Past
-                                </button>
-                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'pending' ? 'bg-green-500' : 'bg-gray-600'}" 
-                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=pending'">
-                                    Pending
-                                </button>
-                                <button class="flex-1 px-4 py-2 rounded-full transition duration-200 ${currentFilter == 'paid' ? 'bg-green-500' : 'bg-gray-600'}" 
-                                        onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=paid'">
-                                    Paid
                                 </button>
                             </div>
                         </div>
@@ -153,10 +157,10 @@
                                                     <span>${event.location}</span>
                                                 </div>
                                             </c:if>
-                                            <c:if test="${not empty event.paymentStatus}">
+                                            <c:if test="${not empty event.eventStatus}">
                                                 <div class="flex items-center text-green-400">
-                                                    <i class="fas fa-credit-card mr-2 text-white"></i>
-                                                    <span>Payment Status: ${event.paymentStatus}</span>
+                                                    <i class="fas fa-check-circle  mr-2 text-white"></i>
+                                                    <span>Status: ${event.eventStatus}</span>
                                                 </div>
                                             </c:if>
                                             <c:if test="${not empty event.startDate and not empty event.endDate}">
@@ -180,11 +184,12 @@
                                         <span class="text-gray-400 group-hover:text-white">Overview</span>
                                     </button>
                                     <button type="button" 
-                                            onclick="window.open('${pageContext.request.contextPath}/organizerOrders', '_blank')" 
+                                            onclick="window.open('${pageContext.request.contextPath}/organizerOrders?eventId=${event.eventId}', '_blank')"
                                             class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
                                         <i class="fas fa-list text-2xl text-green-400 mr-2 group-hover:text-white"></i>
                                         <span class="text-gray-400 group-hover:text-white">Orders</span>
                                     </button>
+
                                     <button type="button" 
                                             onclick="window.open('${pageContext.request.contextPath}/viewdetail.jsp', '_blank')" 
                                             class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">

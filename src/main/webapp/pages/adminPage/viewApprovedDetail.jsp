@@ -14,45 +14,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
   </head>
   <body class="bg-gray-100 font-roboto">
-    <!-- Header -->
-    <header class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-gray-900">Admin Approval Dashboard</h1>
-        <nav>
-          <ul class="flex space-x-4">
-            <li><a href="/admin/dashboard" class="text-gray-600 hover:text-gray-900">Dashboard</a></li>
-            <li><a href="/admin/pending" class="text-gray-600 hover:text-gray-900">Pending</a></li>
-            <li><a href="/admin/approved" class="text-gray-600 hover:text-gray-900">Approved</a></li>
-            <li><a href="/admin/rejected" class="text-gray-600 hover:text-gray-900">Rejected</a></li>
-          </ul>
-        </nav>
-      </div>
-    </header>
+
 
     <div class="flex">
-      <!-- Sidebar -->
-      <aside class="w-64 bg-gray-800 text-white min-h-screen">
-        <div class="p-6">
-          <h2 class="text-xl font-semibold">Admin Menu</h2>
-          <ul class="mt-6 space-y-4">
-            <li>
-              <a href="/admin/pending" class="flex items-center hover:text-gray-300">
-                <i class="fas fa-clock mr-2"></i>Pending Approvals
-              </a>
-            </li>
-            <li>
-              <a href="/admin/approved" class="flex items-center hover:text-gray-300">
-                <i class="fas fa-check mr-2"></i>Approved Events
-              </a>
-            </li>
-            <li>
-              <a href="/admin/rejected" class="flex items-center hover:text-gray-300">
-                <i class="fas fa-times mr-2"></i>Rejected Events
-              </a>
-            </li>
-          </ul>
-        </div>
-      </aside>
+      
 
       <!-- Main Content Area -->
       <main class="flex-1 p-6">
@@ -125,14 +90,7 @@
             </div>
           </div>
           <!-- Approval Actions -->
-          <div class="mt-8 flex justify-end space-x-4">
-            <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-              Reject
-            </button>
-            <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-              Approve
-            </button>
-          </div>
+          
         </div>
       </main>
     </div>

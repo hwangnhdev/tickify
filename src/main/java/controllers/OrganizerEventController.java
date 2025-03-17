@@ -1,6 +1,5 @@
 package controllers;
 
-import dals.EventDAO;
 import dals.OrganizerDAO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -16,15 +15,15 @@ public class OrganizerEventController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy organizerId từ session hoặc dùng mặc định (ở đây mặc định là 2)
-        int customerId = 2;
+        // Lấy customerId từ session hoặc dùng mặc định (ở đây mặc định là 1)
+        int customerId = 1;
         String filter = request.getParameter("filter");
         if (filter == null || filter.trim().isEmpty()) {
             filter = "all";
         }
 
-        OrganizerDAO OrganizerDAO = new OrganizerDAO();
-        List<EventSummaryDTO> events = OrganizerDAO.getEventsByCustomer(customerId, filter);
+        OrganizerDAO organizerDAO = new OrganizerDAO();
+        List<EventSummaryDTO> events = organizerDAO.getEventsByCustomer(customerId, filter);
 
         // Đặt danh sách sự kiện và bộ lọc hiện tại vào request để JSP hiển thị
         request.setAttribute("events", events);

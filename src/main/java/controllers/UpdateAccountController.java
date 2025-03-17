@@ -1,6 +1,7 @@
 package controllers;
 
 import dals.CustomerDAO;
+import models.Customer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +10,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import models.Customer;
 
 
 public class UpdateAccountController extends HttpServlet {
 
     private CustomerDAO customerDAO = new CustomerDAO();
 
-    // Xử lý GET: Hiển thị form cập nhật thông tin cá nhân
+    // Hiển thị form cập nhật thông tin cá nhân (với dữ liệu hợp lệ từ DB)
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -26,67 +26,74 @@ public class UpdateAccountController extends HttpServlet {
         request.getRequestDispatcher("/pages/adminPage/updateAccount.jsp").forward(request, response);
     }
 
-    // Xử lý POST: Nhận dữ liệu từ form và cập nhật thông tin nếu hợp lệ
+    // Xử lý POST: Kiểm tra dữ liệu và cập nhật nếu hợp lệ
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         List<String> errors = new ArrayList<>();
 
-        // Lấy dữ liệu từ form
+        // Lấy và trim dữ liệu nhập
         int customerId = Integer.parseInt(request.getParameter("customerId"));
-        String fullName = request.getParameter("fullName");
-        String email = request.getParameter("email");
-        String address = request.getParameter("address");
-        String phone = request.getParameter("phone");
+        String fullName = request.getParameter("fullName").trim();
+        String email = request.getParameter("email").trim();
+        String address = request.getParameter("address").trim();
+        String phone = request.getParameter("phone").trim();
 
-        // Validation cho Full Name: bắt buộc, chỉ cho phép chữ cái và một số ký tự hợp lệ, độ dài 2-50 ký tự.
-        if (fullName == null || fullName.trim().isEmpty()) {
+        // --- Validation cho Full Name ---
+        if (fullName == null || fullName.isEmpty()) {
             errors.add("Full name is required.");
-        } else if (!fullName.matches("^[\\p{L} .'-]{2,50}$")) {
-            errors.add("Full name must contain only letters and valid punctuation (2-50 characters).");
+        } else {
+            String fullNamePattern = "^[\\p{L} .,'-]{2,50}$";
+            if (!fullName.matches(fullNamePattern)) {
+                errors.add("Full name must contain only letters and valid punctuation (2-50 characters).");
+            }
         }
 
-        // Validation cho Email: bắt buộc, định dạng phải đúng và phải là Gmail.
-        if (email == null || email.trim().isEmpty()) {
+        // --- Validation cho Email ---
+        if (email == null || email.isEmpty()) {
             errors.add("Email is required.");
-        } else if (!email.matches("^[A-Za-z0-9+_.-]+@gmail\\.com$")) {
-            errors.add("Email must be a valid Gmail address (e.g., user@gmail.com).");
+        } else {
+            String emailPattern = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,}$";
+            if (!email.matches(emailPattern)) {
+                errors.add("Email must be a valid email address (e.g., user@example.com).");
+            }
         }
 
-        // Validation cho Phone: nếu nhập, phải chỉ chứa chữ số và có độ dài từ 7 đến 15 ký tự.
-        if (phone != null && !phone.trim().isEmpty()) {
-            if (!phone.matches("\\d{7,15}")) {
+        // --- Validation cho Phone ---
+        if (phone != null && !phone.isEmpty()) {
+            if (!phone.matches("^\\d{7,15}$")) {
                 errors.add("Phone number must contain 7 to 15 digits.");
             }
         }
 
-        // Nếu có lỗi, giữ lại dữ liệu vừa nhập và forward lại form cùng danh sách lỗi
+        // Nếu có lỗi, không update dữ liệu:
         if (!errors.isEmpty()) {
+            // Lấy dữ liệu hợp lệ từ DB để hiển thị ở giao diện chính
+            Customer validCustomer = customerDAO.getCustomerById(customerId);
+            request.setAttribute("customer", validCustomer);
+            // Đối tượng tạm chứa dữ liệu nhập (có thể sai) để điền vào form modal
             Customer tempCustomer = new Customer();
             tempCustomer.setCustomerId(customerId);
             tempCustomer.setFullName(fullName);
             tempCustomer.setEmail(email);
             tempCustomer.setAddress(address);
             tempCustomer.setPhone(phone);
-            
+            request.setAttribute("tempCustomer", tempCustomer);
             request.setAttribute("errors", errors);
-            request.setAttribute("customer", tempCustomer);
             request.getRequestDispatcher("/pages/adminPage/updateAccount.jsp").forward(request, response);
-            return;
+            return;  // Dừng xử lý, không cập nhật DB
         }
 
-        // Nếu dữ liệu hợp lệ, tạo đối tượng Customer và cập nhật thông tin
+        // Nếu dữ liệu hợp lệ, update dữ liệu
         Customer customer = new Customer();
         customer.setCustomerId(customerId);
         customer.setFullName(fullName);
         customer.setEmail(email);
         customer.setAddress(address);
         customer.setPhone(phone);
-
         customerDAO.updateCustomerInfo(customer);
 
-        // Chuyển hướng về trang xem chi tiết tài khoản sau khi cập nhật thành công
         response.sendRedirect(request.getContextPath() + "/ViewDetailAccountController?id=" + customerId);
     }
 }

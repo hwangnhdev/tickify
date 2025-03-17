@@ -1,13 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div class="w-1/4 p-6">
-    <div class="flex items-center mb-6">
-        <img alt="User avatar" class="rounded-full h-12 w-12" height="50" 
-             src="https://storage.googleapis.com/a1aa/image/ceBkpIjmHTPrnKV4BYleCKGJdOwxGkNUmgBTZyMa1-A.jpg" width="50"/>
-        <div class="ml-4">
-            <p>Account of</p>
-            <p class="font-bold">Dương Minh Kiệt</p>
-        </div>
-    </div>
+    
     <ul>
         <!-- Account Settings -->
         <li class="mb-4 flex items-center p-2 rounded cursor-pointer 

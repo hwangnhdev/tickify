@@ -1,26 +1,28 @@
 package controllers;
 
-import dals.OrderDAO;
 import dals.TicketDAO;
+import viewModels.CustomerTicketDTO;
+import com.google.gson.Gson;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import viewModels.CustomerTicketDTO;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 public class ViewAllTicketsController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy customerId từ parameter (hoặc có thể lấy từ session nếu đã lưu)
+        // Lấy customerId từ parameter hoặc session (ví dụ đơn giản)
         String customerIdParam = request.getParameter("customerId");
-        int customerId = 2; // Giá trị mặc định (nên thay thế bằng logic lấy từ session)
+        int customerId = 1;
         if (customerIdParam != null) {
             try {
                 customerId = Integer.parseInt(customerIdParam);
@@ -29,21 +31,31 @@ public class ViewAllTicketsController extends HttpServlet {
             }
         }
 
-        // Lấy tham số status để lọc: "all", "paid", "pending", "upcoming", "past"
+        // Lấy trạng thái lọc vé
         String statusFilter = request.getParameter("status");
         if (statusFilter == null || statusFilter.isEmpty()) {
             statusFilter = "all";
         }
 
         TicketDAO ticketDAO = new TicketDAO();
-        // Gọi phương thức lấy vé đã mua của customer theo customerId và status filter
         List<CustomerTicketDTO> tickets = ticketDAO.getTicketsByCustomer(customerId, statusFilter);
 
-        // Đặt dữ liệu vào request attribute để hiển thị trên JSP
+        // Nếu là AJAX request, trả về JSON
+        if ("true".equals(request.getParameter("ajax"))) {
+            response.setContentType("application/json;charset=UTF-8");
+            Map<String, Object> jsonMap = new HashMap<>();
+            jsonMap.put("tickets", tickets);
+            Gson gson = new Gson();
+            String json = gson.toJson(jsonMap);
+            PrintWriter out = response.getWriter();
+            out.write(json);
+            out.flush();
+            return;
+        }
+
+        // Nếu không, forward sang JSP
         request.setAttribute("tickets", tickets);
         request.setAttribute("statusFilter", statusFilter);
-
-        // Forward sang trang JSP hiển thị danh sách vé (View All Tickets)
         RequestDispatcher rd = request.getRequestDispatcher("/pages/ticketPage/viewAllTickets.jsp");
         rd.forward(request, response);
     }

@@ -1,15 +1,9 @@
-<%-- 
-    Document   : sidebar
-    Created on : Mar 6, 2025, 1:41:18 PM
-    Author     : Tang Thanh Vui - CE180901
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Sidebar</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     </head>
@@ -24,12 +18,27 @@
                 <span class="text-lg font-bold text-green-500">Organizer Center</span>
             </div>
             <nav class="space-y-4">
-                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/eventOverview?eventId=612"><i class="fas fa-chart-pie mr-2"></i>Overview</a>
-                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventAnalyst.jsp"><i class="fas fa-chart-line mr-2"></i>Analyst</a>
-                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="updateEvent"><i class="fas fa-edit mr-2"></i>Edit Event</a>
-                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="seatingChart.jsp"><i class="fas fa-chair mr-2"></i>Seat Map</a>
-                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/ViewAllVouchersController"><i class="fas fa-tags mr-2"></i>Voucher</a>
-                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/organizerOrders"><i class="fas fa-list mr-2"></i>Order List</a>
+                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
+                   href="${pageContext.request.contextPath}/eventOverview?eventId=${eventId}">
+                    <i class="fas fa-chart-pie mr-2"></i>Overview
+                </a>
+                
+                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
+                   href="${pageContext.request.contextPath}/updateEvent?eventId=${eventId}">
+                    <i class="fas fa-edit mr-2"></i>Edit Event
+                </a>
+                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
+                   href="${pageContext.request.contextPath}/seatingChart?eventId=${eventId}">
+                    <i class="fas fa-chair mr-2"></i>Seat Map
+                </a>
+                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
+                   href="${pageContext.request.contextPath}/ViewAllVouchersController?eventId=${eventId}">
+                    <i class="fas fa-tags mr-2"></i>Voucher
+                </a>
+                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
+                   href="${pageContext.request.contextPath}/organizerOrders?eventId=${eventId}">
+                    <i class="fas fa-list mr-2"></i>Order List
+                </a>
             </nav>
         </aside>
     </body>

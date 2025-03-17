@@ -196,6 +196,10 @@
         <servlet-name>UpdateAccountController</servlet-name>
         <servlet-class>controllers.UpdateAccountController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ViewProcessingEventsAdminController</servlet-name>
+        <servlet-class>controllers.ViewProcessingEventsAdminController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -369,6 +373,10 @@
         <url-pattern>/CreateVoucherController</url-pattern>
     </servlet-mapping>
     <!-- Session Configuration -->
+    <servlet-mapping>
+        <servlet-name>ViewProcessingEventsAdminController</servlet-name>
+        <url-pattern>/admin/viewProcessingEvents</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>

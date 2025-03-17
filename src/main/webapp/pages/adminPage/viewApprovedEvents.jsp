@@ -8,34 +8,26 @@
   <body class="bg-gray-100 font-sans antialiased">
     <div class="flex h-screen">
       <jsp:include page="sidebar.jsp" />
-      <!-- Main Content -->
-      <div class="flex-1 p-6">
+      <!-- Main Content with overflow-y-auto tương tự trang history -->
+      <div class="flex-1 p-6 overflow-y-auto">
         <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
           <h2 class="text-3xl font-bold mb-6">Approved Event Management</h2>
-          
-          <!-- Tab Navigation -->
-          <div class="mb-6 border-b pb-2 flex space-x-4">
-            <c:url var="viewAllEventsUrl" value="/admin/viewAllEvents" />
-            <c:url var="viewApprovedEventsUrl" value="/admin/viewApprovedEvents" />
-            <c:url var="viewHistoryApprovedEventsUrl" value="/admin/viewHistoryApprovedEvents" />
-            <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewAllEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewAllEventsUrl}">View All</a>
-            <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewApprovedEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewApprovedEventsUrl}">View Approved</a>
-            <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewHistoryApprovedEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewHistoryApprovedEventsUrl}">View History Approved</a>
-          </div>
 
-          <!-- Independent Search Bar for Approved Events -->
-          <form action="viewApprovedEvents" method="get" class="flex justify-end items-center mb-6">
+          <jsp:include page="tabNav.jsp" />
+          <!-- Filter và Search Bar (cập nhật giống trang history approved) -->
+          <form id="filterForm" action="viewApprovedEvents" method="get" class="mb-6 flex flex-wrap items-center justify-end gap-4">
+           
             <div class="relative w-64">
               <input 
                 type="text" 
                 name="search" 
                 placeholder="Search events by name" 
-                value="${searchKeyword}" 
                 class="bg-gray-200 rounded-full py-2 px-4 pl-10 focus:outline-none w-full"
+                value="${searchKeyword}"
               >
               <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
             </div>
-            <button type="submit" class="ml-2 bg-blue-600 text-white py-2 px-4 rounded">Search</button>
+            <input type="submit" value="Search" class="bg-blue-600 text-white py-2 px-4 rounded">
           </form>
 
           <!-- Event List Table -->
@@ -85,12 +77,11 @@
             </table>
           </div>
 
-          <!-- Pagination -->
+          <!-- Phân trang -->
           <jsp:include page="pagination.jsp">
             <jsp:param name="baseUrl" value="/admin/viewApprovedEvents" />
             <jsp:param name="page" value="${page}" />
             <jsp:param name="totalPages" value="${totalPages}" />
-            <jsp:param name="selectedStatus" value="${selectedStatus}" />
           </jsp:include>
         </div>
       </div>
