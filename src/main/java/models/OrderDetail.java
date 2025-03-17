@@ -8,7 +8,7 @@ package models;
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class OrderDetail {
+public class OrderDetail extends TicketType{
 
     private int orderDetailId;
     private int orderId;

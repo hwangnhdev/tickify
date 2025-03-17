@@ -47,6 +47,34 @@ public class OrderDAO extends DBContext {
         return order;
     }
 
+    public Order getOrderByTransactionId(String transactionId) {
+        Order order = null;
+        String sql = "SELECT * FROM Orders WHERE transaction_id = ?";
+
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, transactionId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                order = new Order(
+                        rs.getInt("order_id"),
+                        rs.getInt("customer_id"),
+                        rs.getInt("event_id"),
+                        rs.getDouble("total_price"),
+                        rs.getTimestamp("order_date"),
+                        rs.getString("status"),
+                        rs.getString("transaction_id"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return order;
+    }
+
     public int insertOrder(Order order) {
         try ( PreparedStatement st = connection.prepareStatement(INSERT_ORDER, Statement.RETURN_GENERATED_KEYS)) {
             st.setInt(1, order.getCustomerId());
@@ -163,7 +191,6 @@ public class OrderDAO extends DBContext {
 //        }
 //        return orders;
 //    }
-
 //    /**
 //     * Đếm tổng số đơn hàng theo organizer và trạng thái thanh toán.
 //     *
@@ -196,7 +223,6 @@ public class OrderDAO extends DBContext {
 //        }
 //        return tickets;
 //    }
-
     /**
      * Lấy chi tiết vé cho khách hàng dựa trên ticketCode và customerId.
      *

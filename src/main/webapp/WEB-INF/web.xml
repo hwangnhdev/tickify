@@ -196,6 +196,22 @@
         <servlet-name>UpdateAccountController</servlet-name>
         <servlet-class>controllers.UpdateAccountController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminLoginController</servlet-name>
+        <servlet-class>controllers.AdminLoginController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RevenueController</servlet-name>
+        <servlet-class>controllers.RevenueController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LogoutController</servlet-name>
+        <servlet-class>controllers.LogoutController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RevenueDetailController</servlet-name>
+        <servlet-class>controllers.RevenueDetailController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -345,6 +361,22 @@
         <url-pattern>/eventOverview</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>AdminLoginController</servlet-name>
+        <url-pattern>/adminLogin</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RevenueController</servlet-name>
+        <url-pattern>/admin/revenue</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LogoutController</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RevenueDetailController</servlet-name>
+        <url-pattern>/admin/revenueDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>ViewApprovedDetailController</servlet-name>
         <url-pattern>/admin/viewApprovedDetail</url-pattern>
     </servlet-mapping>
@@ -371,6 +403,10 @@
     <servlet-mapping>
         <servlet-name>VnPayAjaxController</servlet-name>
         <url-pattern>/vnPayAjax</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VnPayReturnController</servlet-name>
+        <url-pattern>/vnPayReturn</url-pattern>
     </servlet-mapping>
     <!-- Session Configuration -->
     <session-config>

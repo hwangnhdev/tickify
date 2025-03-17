@@ -4,8 +4,8 @@
  */
 package controllers;
 
-import dals.CustomerAuthDAO;
-import dals.CustomerDAO;
+import dals.AdminDAO;
+import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -13,14 +13,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import models.Customer;
+import models.Admin;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
  * @author Nguyen Huy Hoang - CE182102
  */
-public class ResetPasswordController extends HttpServlet {
+public class AdminLoginController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,63 +39,51 @@ public class ResetPasswordController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ResetPasswordController</title>");
+            out.println("<title>Servlet AdminLoginController</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ResetPasswordController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet AdminLoginController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
     }
 
-    // Kiểm tra độ mạnh của mật khẩu
-    private boolean isValidPassword(String password) {
-        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}$");
-    }
-
-    private void resetPassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // Xử lý đăng nhập
+    private void handleLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
-        String newPassword = request.getParameter("newPassword");
-        String confirmPassword = request.getParameter("confirmPassword");
+        String password = request.getParameter("password");
 
-        System.out.println(email);
-        System.out.println(newPassword);
-        System.out.println(confirmPassword);
-
-        // Kiểm tra mật khẩu có khớp không
-        if (!newPassword.equals(confirmPassword)) {
-            System.out.println("Mật khẩu xác nhận không khớp!");
-            request.setAttribute("errorMessage", "Mật khẩu xác nhận không khớp!");
-            request.getRequestDispatcher("pages/changePasswordPage/changePassword.jsp").forward(request, response);
+        AdminDAO adminDao = new AdminDAO();
+        Admin admin = adminDao.selectAdminByEmail(email);
+        
+        // Kiểm tra admin có tồn tại không
+        if (admin == null) {
+            System.out.println("Admin không tồn tại!");
+            request.setAttribute("errorMessage", "Invalid email or password");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("pages/adminPage/login.jsp");
+            dispatcher.forward(request, response);
             return;
         }
+        
+//        // Mã hóa mật khẩu
+//        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+//        System.out.println(hashedPassword);
 
-        // Kiểm tra độ mạnh của mật khẩu
-        if (!isValidPassword(newPassword)) {
-            System.out.println("Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số!");
-            request.setAttribute("errorMessage", "Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số!");
-            request.getRequestDispatcher("pages/changePasswordPage/changePassword.jsp").forward(request, response);
-            return;
-        }
+        // Debug: In admin ra kiểm tra
+        System.out.println(admin.toString());
+        System.out.println(password);
+        System.out.println(admin.getPassword());
 
-        // Mã hóa mật khẩu bằng BCrypt
-        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-
-        String provider = "email";
-
-        // Cập nhật mật khẩu vào database
-        CustomerDAO customerDao = new CustomerDAO();
-        CustomerAuthDAO customerAuthDao = new CustomerAuthDAO();
-        Customer customer = customerDao.selectCustomerByEmail(email);
-        boolean updateSuccess = customerAuthDao.updateCustomerAuthPasswordByCustomerId(hashedPassword, customer.getCustomerId(), provider);
-
-        if (updateSuccess) {
+        // Kiểm tra mật khẩu có hợp lệ không
+        if (password != null && BCrypt.checkpw(password, admin.getPassword())) {
             HttpSession session = request.getSession();
-            session.removeAttribute("email");
-            response.sendRedirect("pages/signUpPage/signUp.jsp");
+            session.setAttribute("admin", admin);
+            response.sendRedirect("admin");
         } else {
-            request.setAttribute("errorMessage", "Cập nhật mật khẩu thất bại!");
-            request.getRequestDispatcher("pages/changePasswordPage/changePassword.jsp").forward(request, response);
+            System.out.println("Sai mật khẩu!");
+            request.setAttribute("errorMessage", "Invalid email or password");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("pages/adminPage/login.jsp");
+            dispatcher.forward(request, response);
         }
     }
 
@@ -126,7 +114,7 @@ public class ResetPasswordController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 //        processRequest(request, response);
-        resetPassword(request, response);
+        handleLogin(request, response);
     }
 
     /**

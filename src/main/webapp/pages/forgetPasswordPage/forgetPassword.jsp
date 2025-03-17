@@ -5,13 +5,17 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%--<%@ taglib prefix="noti" uri="http://example.com/notification" %>--%>
+<%--<%@ taglib prefix="noti" uri="/WEB-INF/tags/notificationTag.tld" %>--%>
+
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Input Email Page</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-        
+
         <style>
             @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
@@ -20,17 +24,18 @@
             }
 
             body {
-                background: #f6f5f7;
+                background: rgb(0, 0, 0);
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 flex-direction: column;
                 font-family: 'Montserrat', sans-serif;
                 height: 100vh;
-                margin: -20px 0 50px;
+                margin: 0;
             }
 
             h1 {
+                color: #fff;
                 font-weight: bold;
                 margin: 0;
                 margin-bottom: 46px;
@@ -61,8 +66,8 @@
 
             button {
                 border-radius: 20px;
-                border: 1px solid #d4af7a;
-                background-color: #d4af7a;
+                border: 1px solid rgb(45, 194, 117);
+                background-color: rgb(45, 194, 117);
                 color: #FFFFFF;
                 font-size: 12px;
                 font-weight: bold;
@@ -82,7 +87,8 @@
 
             button:hover {
                 transition: all 0.2s ease-in;
-                background-color: #c2a06f;
+                border: 1px solid rgb(45, 194, 117);
+                background-color: rgb(45, 194, 117);
                 cursor: pointer;
             }
 
@@ -92,7 +98,7 @@
             }
 
             form {
-                background-color: #FFFFFF;
+                background-color: rgb(39, 39, 42);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -109,7 +115,7 @@
                 margin: 8px 0;
                 width: 100%;
             }
-            
+
             input:last-child {
                 background: #000;
             }
@@ -165,7 +171,7 @@
             <div class="form-container log-in-container">
                 <form action="<%= request.getContextPath()%>/verifyEmail" method="post">
                     <h1>Input your Email</h1>
-                    
+
                     <!--Input-->
                     <input type="hidden" name="action" value="forgetPassword"/>
                     <input type="email" placeholder="Email" name="email" required/>

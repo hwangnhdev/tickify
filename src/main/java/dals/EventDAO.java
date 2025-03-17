@@ -432,7 +432,7 @@ public class EventDAO extends DBContext {
      * Retrieves the list of show times for the specified event ID.
      *
      * @param eventId The ID of the event.
-     * @return A list of ShowTime objects.
+     * @return A list of Showtime objects.
      */
     public List<Showtime> getShowTimesByEventId(int eventId) {
         List<Showtime> showTimes = new ArrayList<>();
@@ -737,7 +737,7 @@ public class EventDAO extends DBContext {
      * Retrieves the list of show times for the specified event ID.
      *
      * @param eventId The ID of the event.
-     * @return A list of ShowTime objects.
+     * @return A list of Showtime objects.
      */
     public List<TicketType> getTicketTypeByShowtimeId(int showtimeId) {
         List<TicketType> ticketTypes = new ArrayList<>();

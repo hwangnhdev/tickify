@@ -86,6 +86,7 @@ public class LoginFacebookHandlerController extends HttpServlet {
             String accessToken = getToken(code);
             UserFacebookDTO user = getUserInfo(accessToken);
             System.out.println(user);
+            System.out.println(user.getPicture());
 
             CustomerDAO customerDao = new CustomerDAO();
             CustomerAuthDAO customerAuthDao = new CustomerAuthDAO();
@@ -110,18 +111,18 @@ public class LoginFacebookHandlerController extends HttpServlet {
             //TH2: Có customer nhưng chưa có customer_auth trong DB 
             if (existingCustomer != null && existingCustomerAuth == null) {
                 // Lấy customer_id đã có trong Customers thêm 1 thằng Customer_auths 
-                CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), null, provider, user.getId());
+                CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), provider, null, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
             }
 
             //TH1: Chưa có customer và customer_auth trong DB 
             if (existingCustomer == null && existingCustomerAuth == null) {
-                Customer customer = new Customer(0, user.getName(), user.getEmail(), null, null, null, Boolean.TRUE);
+                Customer customer = new Customer(0, user.getName(), user.getEmail(), null, null, user.getPicture(), Boolean.TRUE);
                 customerDao.insertCustomer(customer);
 
                 int insertedCustomerId = customerDao.selectCustomerByEmail(user.getEmail()).getCustomerId();
 
-                CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, null, provider, user.getId());
+                CustomerAuth customerAuth = new CustomerAuth(0, insertedCustomerId, provider, null, user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
 
                 customerSendRedirect.setCustomerId(insertedCustomerId);
@@ -131,9 +132,10 @@ public class LoginFacebookHandlerController extends HttpServlet {
 
             // Login 
             HttpSession session = request.getSession();
+            session.setMaxInactiveInterval(3 * 60 * 60); // 3hrs
             session.setAttribute("customerImage", customerSendRedirect.getProfilePicture());
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
-            response.sendRedirect("event");
+            response.sendRedirect(request.getContextPath());
         } catch (Exception e) {
             request.setAttribute("error", "Login fail!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
