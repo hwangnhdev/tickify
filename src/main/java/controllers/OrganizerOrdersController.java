@@ -25,31 +25,31 @@ public class OrganizerOrdersController extends HttpServlet {
         if (orgIdObj != null) {
             organizerId = Integer.parseInt(orgIdObj.toString());
         }
-        
+
         // Lấy số trang từ tham số 'page', mặc định là 1
         String pageParam = request.getParameter("page");
         int currentPage = (pageParam != null && !pageParam.trim().isEmpty()) ? Integer.parseInt(pageParam) : 1;
         int offset = (currentPage - 1) * PAGE_SIZE;
-        
+
         // Lấy tham số lọc trạng thái thanh toán, mặc định là "all"
         String paymentStatus = request.getParameter("paymentStatus");
         if (paymentStatus == null || paymentStatus.trim().isEmpty()) {
             paymentStatus = "all";
         }
-        
+
         // Lấy tham số tìm kiếm theo tên khách hàng
         String searchOrder = request.getParameter("searchOrder");
         if (searchOrder != null && searchOrder.trim().isEmpty()) {
             searchOrder = null;
         }
-        
+
         // Lấy eventId từ request (được truyền khi nhấn nút Order của 1 sự kiện cụ thể)
         String eventIdParam = request.getParameter("eventId");
         int eventId = -1;
         if (eventIdParam != null && !eventIdParam.trim().isEmpty()) {
             eventId = Integer.parseInt(eventIdParam);
         }
-        
+
         OrganizerDAO organizerDAO = new OrganizerDAO();
         // Lấy danh sách order theo organizerId, eventId, trạng thái thanh toán và tìm kiếm theo tên khách hàng
         List<OrderDetailDTO> orders = organizerDAO.getOrderDetailsByOrganizerAndPaymentStatus(
@@ -57,14 +57,14 @@ public class OrganizerOrdersController extends HttpServlet {
         int totalRecords = organizerDAO.countOrdersByOrganizerAndPaymentStatus(
                 organizerId, eventId, paymentStatus, searchOrder);
         int totalPages = (int) Math.ceil(totalRecords / (double) PAGE_SIZE);
-        
+
         request.setAttribute("orders", orders);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("paymentStatus", paymentStatus);
         request.setAttribute("searchOrder", searchOrder);
         request.setAttribute("eventId", eventId);
-        
+
         RequestDispatcher rd = request.getRequestDispatcher("/pages/organizerPage/organizerOrders.jsp");
         rd.forward(request, response);
     }
