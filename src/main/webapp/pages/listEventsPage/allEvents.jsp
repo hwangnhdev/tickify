@@ -793,14 +793,15 @@
 
                         // Thu thập dữ liệu từ form
                         var formData = $(this).serialize();
-
+                            
                         // Gửi yêu cầu AJAX
                         $.ajax({
                             url: '${pageContext.request.contextPath}/allEvents',
                             type: 'POST',
                             data: formData,
-                            dataType: 'json',
+//                            dataType: 'json',
                             success: function (data) {
+                                console.log("Sending data:", formData);
                             console.log("Received data:", data); // In dữ liệu nhận được để debug
                             if (typeof data === 'object' && data !== null) {
                                 // Kiểm tra filteredEvents và paginatedEventsAll là mảng
