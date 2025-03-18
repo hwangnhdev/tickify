@@ -1,6 +1,5 @@
 package models;
 
-import com.google.gson.annotations.Expose;
 import java.sql.Timestamp;
 
 /**
@@ -9,12 +8,9 @@ import java.sql.Timestamp;
  */
 public class EventImage extends Event {
 
-    @Expose
     private int imageId;
     private int eventId;
-    @Expose
     private String imageUrl;
-    @Expose
     private String imageTitle;
 
     public EventImage() {

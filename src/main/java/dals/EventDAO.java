@@ -770,31 +770,36 @@ public class EventDAO extends DBContext {
     }
 
     /*=======================================Home Event==============================================================================================*/
- /*getEventsByPage*/
+    /* getEventsByPage */
     public List<EventImage> getEventsByPage(int page, int pageSize) {
         List<EventImage> listEvents = new ArrayList<>();
-        String sql = "WITH EventPagination AS (\n"
-                + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.*\n"
-                + "    FROM Events e\n"
-                + "),\n"
-                + "EventImagesFiltered AS (\n"
-                + "    SELECT ei.event_id, ei.image_id, MIN(ei.image_url) AS image_url, MIN(ei.image_title) AS image_title\n"
-                + "    FROM EventImages ei\n"
-                + "    WHERE ei.image_title LIKE '%logo_banner%'\n"
-                + "    GROUP BY ei.event_id, ei.image_id\n"
-                + ")\n"
-                + "SELECT ep.*, eif.image_id, eif.image_url, eif.image_title\n"
-                + "FROM EventPagination ep\n"
-                + "LEFT JOIN EventImagesFiltered eif \n"
-                + "ON ep.event_id = eif.event_id\n"
-                + "WHERE ep.rownum BETWEEN ? AND ? AND ep.status = 'Approved';";
+        String sql = "WITH EventPagination AS ("
+                + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.* "
+                + "    FROM Events e "
+                + "), "
+                + "EventImagesFiltered AS ("
+                + "    SELECT ei.event_id, ei.image_id, "
+                + "           MIN(ei.image_url) AS image_url, "
+                + "           MIN(ei.image_title) AS image_title "
+                + "    FROM EventImages ei "
+                + "    WHERE ei.image_title LIKE '%logo_banner%' "
+                + "    GROUP BY ei.event_id, ei.image_id "
+                + ") "
+                + "SELECT ep.*, eif.image_id, eif.image_url, eif.image_title "
+                + "FROM EventPagination ep "
+                + "LEFT JOIN EventImagesFiltered eif "
+                + "ON ep.event_id = eif.event_id "
+                + "WHERE ep.status = 'Approved' "
+                + "ORDER BY ep.rownum "
+                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
-            int start = (page - 1) * pageSize + 1;
-            int end = page * pageSize;
-            st.setInt(1, start);
-            st.setInt(2, end);
+            int offset = (page - 1) * pageSize;
+
+            st.setInt(1, offset);   // OFFSET
+            st.setInt(2, pageSize); // FETCH NEXT
+
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 EventImage eventImage = new EventImage(
@@ -1596,6 +1601,14 @@ public class EventDAO extends DBContext {
                 System.out.println("--------------------------------------");
             }
         }
+
+        List<EventImage> listEvent = eventDAO.getEventsByPage(1, 20);
+        int index = 0;
+        for (EventImage eventImage : listEvent) {
+            index++;
+            System.out.println(eventImage.getEventName());
+        }
+        System.out.println(index);
     }
 
 }

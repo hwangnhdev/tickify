@@ -129,8 +129,6 @@ public class EventController extends HttpServlet {
         // Set attribute for DAO
         session.setAttribute("listCategories", listCategories);
 
-//        List<Event> topTicketEvents = eventDAO.getTopPicksForYou(3);
-//        request.setAttribute("topTicketEvents", topTicketEvents);
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
     }
