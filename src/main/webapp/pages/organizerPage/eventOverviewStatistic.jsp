@@ -41,7 +41,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div class="bg-gray-800 rounded-lg shadow-lg p-6">
                             <h3 class="text-lg font-bold text-green-400">Total Revenue</h3>
-                            <p id="totalRevenue" class="text-3xl font-bold text-white mt-2">${totalRevenue} VNÐ</p>
+                            <p id="totalRevenue" class="text-3xl font-bold text-white mt-2"><fmt:formatNumber value="${totalRevenue}" currencyCode="VND" minFractionDigits="0" /> VND</p>
                         </div>
                         <div class="bg-gray-800 rounded-lg shadow-lg p-6">
                             <h3 class="text-lg font-bold text-green-400">Tickets Sold</h3>

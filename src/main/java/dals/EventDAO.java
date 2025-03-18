@@ -1184,7 +1184,7 @@ public class EventDAO extends DBContext {
 
         String sql = "SELECT \n"
                 + "    s.event_id,\n"
-                + "    COALESCE(SUM(od.quantity * od.price), 0) AS total_revenue,\n"
+                + "    COALESCE(SUM(od.quantity * tt.price), 0) AS total_revenue,\n"
                 + "    COALESCE(SUM(od.quantity), 0) AS tickets_sold,\n"
                 + "    SUM(tt.total_quantity) AS total_tickets,\n"
                 + "    SUM(tt.total_quantity) - COALESCE(SUM(od.quantity), 0) AS tickets_remaining,\n"
@@ -1221,7 +1221,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByMonth AS (\n"
                 + "    SELECT \n"
                 + "        MONTH(o.order_date) AS Month,\n"
-                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1270,7 +1270,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByMonth AS (\n"
                 + "    SELECT \n"
                 + "        MONTH(o.order_date) AS Month,\n"
-                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1514,13 +1514,15 @@ public class EventDAO extends DBContext {
             List<TicketType> ticketTypes = getTicketTypesByShowtimeId(showtimeId);
             List<TicketRevenueDTO> ticketRevenueList = new ArrayList<>();
 
-            // Tính toán thông tin doanh thu cho từng loại vé
             for (TicketType ticketType : ticketTypes) {
                 int totalTicket = ticketType.getTotalQuantity();
-                int sold = ticketType.getSoldQuantity();
-                double price = ticketType.getPrice();
+
+                // Sửa: Lấy tổng vé bán thực tế từ OrderDetails
+                int sold = getSoldQuantityFromOrders(ticketType.getTicketTypeId());
+                double price = getActualPriceFromOrders(ticketType.getTicketTypeId());
+
                 int remaining = totalTicket - sold;
-                double totalRevenue = sold * price;
+                double totalRevenue = sold * ticketType.getPrice();
                 double fillRate = totalTicket > 0 ? (sold * 100.0 / totalTicket) : 0;
 
                 TicketRevenueDTO dto = new TicketRevenueDTO(
@@ -1529,7 +1531,7 @@ public class EventDAO extends DBContext {
                         showtime.getEndDate(),
                         ticketType.getName(),
                         totalTicket,
-                        price,
+                        ticketType.getPrice(),
                         sold,
                         remaining,
                         totalRevenue,
@@ -1537,19 +1539,62 @@ public class EventDAO extends DBContext {
                 );
                 ticketRevenueList.add(dto);
             }
-
             showtimeTicketMap.put(showtimeId, ticketRevenueList);
         }
 
         return showtimeTicketMap;
     }
 
+    public int getSoldQuantityFromOrders(int ticketTypeId) {
+        String sql = "SELECT COALESCE(SUM(quantity), 0) FROM OrderDetails WHERE ticket_type_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, ticketTypeId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public double getActualPriceFromOrders(int ticketTypeId) {
+        String sql = "SELECT COALESCE(AVG(price), 0) FROM OrderDetails WHERE ticket_type_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, ticketTypeId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
     public static void main(String[] args) {
         EventDAO eventDAO = new EventDAO();
-        int eventId = 1;
-        List<EventImage> revenue = eventDAO.getAllEvents();
-        for (EventImage double1 : revenue) {
-            System.out.println(double1.getImageUrl());
+        int eventId = 21;
+
+        // Lấy danh sách doanh thu theo showtime
+        Map<Integer, List<TicketRevenueDTO>> revenueData = eventDAO.getTicketRevenueByEventId(eventId);
+
+        // In kết quả ra console để kiểm tra
+        for (Map.Entry<Integer, List<TicketRevenueDTO>> entry : revenueData.entrySet()) {
+            int showtimeId = entry.getKey();
+            System.out.println("Showtime ID: " + showtimeId);
+
+            for (TicketRevenueDTO dto : entry.getValue()) {
+                System.out.println("  Ticket Type: " + dto.getTicketType());
+                System.out.println("  Total Tickets: " + dto.getTotalTicket());
+                System.out.println("  Price: " + dto.getPriceOfTicket());
+                System.out.println("  Sold: " + dto.getSold());
+                System.out.println("  Remaining: " + dto.getRemaining());
+                System.out.println("  Total Revenue: " + dto.getTotalRevenue());
+                System.out.println("  Fill Rate: " + dto.getFillRate() + "%");
+                System.out.println("--------------------------------------");
+            }
         }
     }
 
