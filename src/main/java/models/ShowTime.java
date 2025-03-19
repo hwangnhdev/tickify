@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Tang Thanh Vui - CE180901
  */
-public class Showtime extends Event{
+public class Showtime extends Event {
 
     private int showtimeId;
     private int eventId;

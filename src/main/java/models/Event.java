@@ -13,29 +13,19 @@ import java.sql.Timestamp;
  */
 public class Event {
 
-    @Expose
     private int eventId;
-    @Expose
     private int categoryId;
-    @Expose
     private int organizerId;
-    @Expose
     private String eventName;
-    @Expose
     private String location;
-    @Expose
     private String eventType;
-    @Expose
     private String status;
-    @Expose
     private String description;
     private int totalTicketsSold;
     private double totalRevenue;
     private Timestamp startDate;
     private Timestamp endDate;
-    @Expose
     private Timestamp createdAt;
-    @Expose
     private Timestamp updatedAt;
     private Timestamp approvedAt;
 

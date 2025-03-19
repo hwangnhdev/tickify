@@ -97,7 +97,6 @@ public class EventOverviewController extends HttpServlet {
 
         Map<Integer, List<TicketRevenueDTO>> showtimeTicketMap = eventDAO.getTicketRevenueByEventId(eventId);
         request.setAttribute("showtimeTicketMap", showtimeTicketMap);
-        System.out.println(showtimeTicketMap);
 
         request.getRequestDispatcher("pages/organizerPage/eventOverviewStatistic.jsp").forward(request, response);
     }
