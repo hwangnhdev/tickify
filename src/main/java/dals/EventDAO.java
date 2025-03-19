@@ -27,6 +27,7 @@ import models.Seat;
 import models.Showtime;
 import models.TicketType;
 import utils.DBContext;
+import viewModels.EventDTO;
 import viewModels.TicketRevenueDTO;
 
 /**
@@ -770,27 +771,42 @@ public class EventDAO extends DBContext {
     }
 
     /*=======================================Home Event==============================================================================================*/
-    /* getEventsByPage */
-    public List<EventImage> getEventsByPage(int page, int pageSize) {
-        List<EventImage> listEvents = new ArrayList<>();
-        String sql = "WITH EventPagination AS ("
-                + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.* "
-                + "    FROM Events e "
-                + "), "
-                + "EventImagesFiltered AS ("
-                + "    SELECT ei.event_id, ei.image_id, "
-                + "           MIN(ei.image_url) AS image_url, "
-                + "           MIN(ei.image_title) AS image_title "
-                + "    FROM EventImages ei "
-                + "    WHERE ei.image_title LIKE '%logo_banner%' "
-                + "    GROUP BY ei.event_id, ei.image_id "
-                + ") "
-                + "SELECT ep.*, eif.image_id, eif.image_url, eif.image_title "
-                + "FROM EventPagination ep "
-                + "LEFT JOIN EventImagesFiltered eif "
-                + "ON ep.event_id = eif.event_id "
-                + "WHERE ep.status = 'Approved' "
-                + "ORDER BY ep.rownum "
+ /* getEventsByPage */
+    public List<EventDTO> getEventsByPage(int page, int pageSize) {
+        List<EventDTO> listEvents = new ArrayList<>();
+        String sql = "WITH EventPagination AS (\n"
+                + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.*\n"
+                + "    FROM [dbo].[Events] e\n"
+                + "), \n"
+                + "EventImagesFiltered AS (\n"
+                + "    SELECT ei.event_id, MIN(ei.image_id) AS image_id,\n"
+                + "           MIN(ei.image_url) AS image_url, \n"
+                + "           MIN(ei.image_title) AS image_title\n"
+                + "    FROM [dbo].[EventImages] ei\n"
+                + "    WHERE ei.image_title LIKE '%logo_banner%'\n"
+                + "    GROUP BY ei.event_id\n"
+                + "),\n"
+                + "MinTicketPrices AS (\n"
+                + "    SELECT s.event_id, MIN(tt.price) AS min_price\n"
+                + "    FROM [dbo].[TicketTypes] tt\n"
+                + "    JOIN [dbo].[Showtimes] s ON tt.showtime_id = s.showtime_id\n"
+                + "    GROUP BY s.event_id\n"
+                + "),\n"
+                + "EarliestShowtime AS (\n"
+                + "    SELECT event_id, MIN(start_date) AS first_start_date\n"
+                + "    FROM [dbo].[Showtimes]\n"
+                + "    GROUP BY event_id\n"
+                + ")\n"
+                + "SELECT ep.*, \n"
+                + "       eif.image_id, eif.image_url, eif.image_title,\n"
+                + "       tp.min_price, \n"
+                + "       es.first_start_date\n"
+                + "FROM EventPagination ep\n"
+                + "LEFT JOIN EventImagesFiltered eif ON ep.event_id = eif.event_id\n"
+                + "LEFT JOIN MinTicketPrices tp ON ep.event_id = tp.event_id\n"
+                + "LEFT JOIN EarliestShowtime es ON ep.event_id = es.event_id\n"
+                + "WHERE ep.status = 'Approved'\n"
+                + "ORDER BY ep.rownum\n"
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
 
         try {
@@ -802,9 +818,13 @@ public class EventDAO extends DBContext {
 
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
+
                 EventImage eventImage = new EventImage(
                         rs.getString("image_url"),
-                        rs.getString("image_title"),
+                        rs.getString("image_title")
+                );
+
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getInt("category_id"),
                         rs.getInt("organizer_id"),
@@ -816,7 +836,14 @@ public class EventDAO extends DBContext {
                         rs.getTimestamp("created_at"),
                         rs.getTimestamp("updated_at")
                 );
-                listEvents.add(eventImage);
+
+                EventDTO eventDTO = new EventDTO(
+                        event,
+                        eventImage,
+                        rs.getDouble("min_price"),
+                        rs.getTimestamp("first_start_date"));
+
+                listEvents.add(eventDTO);
             }
         } catch (SQLException e) {
             System.out.println("Error fetching paginated events: " + e.getMessage());
@@ -1602,11 +1629,11 @@ public class EventDAO extends DBContext {
             }
         }
 
-        List<EventImage> listEvent = eventDAO.getEventsByPage(1, 20);
+        List<EventDTO> listEvent = eventDAO.getEventsByPage(2, 20);
         int index = 0;
-        for (EventImage eventImage : listEvent) {
+        for (EventDTO eventImage : listEvent) {
             index++;
-            System.out.println(eventImage.getEventName());
+            System.out.println(eventImage.getEvent().getEventId());
         }
         System.out.println(index);
     }

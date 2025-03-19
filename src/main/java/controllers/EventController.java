@@ -18,6 +18,7 @@ import java.util.List;
 import models.Category;
 import models.Event;
 import models.EventImage;
+import viewModels.EventDTO;
 
 /**
  *
@@ -111,7 +112,7 @@ public class EventController extends HttpServlet {
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
 
         // Fetch paginated list of events
-        List<EventImage> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
+        List<EventDTO> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
         request.setAttribute("paginatedEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);

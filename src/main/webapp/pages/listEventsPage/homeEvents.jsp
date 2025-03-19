@@ -4,6 +4,7 @@
     Author     : Tang Thanh Vui - CE180901
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -13,6 +14,8 @@
         <title>JSP Page</title>
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
         <style>
             body {
                 background-color: #121212;
@@ -23,7 +26,6 @@
             .content-grid-large_events {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                grid-gap: 5px;
                 grid-gap: 5px;
                 padding: 30px;
                 margin: 0 0;
@@ -418,7 +420,6 @@
             }
             .event-card-all_events {
                 background-color: #ffffff;
-                border: 1px solid #ddd;
                 border-radius: 8px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
@@ -439,7 +440,7 @@
                 background-color: #f0f0f0;
                 display: block;
                 transition: filter 0.3s;
-                object-fit: cover;
+                object-fit: fill;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
 
@@ -455,7 +456,7 @@
             }
             .event-card-all_events p {
                 font-size: 14px;
-                margin: 5px 0;
+                margin: 0 0;
                 color: #000000;
             }
             .pagination a {
@@ -711,7 +712,7 @@
                 <c:forEach var="event" items="${listRecommendedEvents}">
                     <div class="event-card-rec_events">
                         <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                            <img src="${event.imageUrl}" alt="${event.imageTitle}" />
+                            <img src="${event.imageUrl}" alt="${event.imageTitle}"/>
                         </a>
                     </div>
                 </c:forEach>
@@ -787,8 +788,16 @@
                 <c:forEach var="event" items="${paginatedEvents}">
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                         <div class="event-card-all_events">
-                            <a style="text-decoration: none; color: white;" href="eventDetail?id=${event.eventId}">
-                                <img src="${event.imageUrl}" alt="${event.imageTitle}" />
+                            <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                    ${event.event.eventName}
+                                </h2>
+                                <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                    <i class="far fa-calendar-alt mr-2"></i>
+                                    <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                </p>
                             </a>
                         </div>
                     </div>

@@ -61,10 +61,10 @@
             }
         </style>
     </head>
-    <body class="bg-gray-100 p-4">
+    <body class="bg-gray-100">
         <div class="flex h-screen">
             <jsp:include page="sidebar.jsp" />
-            <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-md">
+            <div class="max-w-7xl mx-auto bg-white p-4 rounded-lg shadow-md" style="width: 80vw; margin: 20px; height: fit-content;">
                 <h1 class="text-2xl font-bold mb-4">Category Management</h1>
 
                 <!-- Navigation Tabs -->
