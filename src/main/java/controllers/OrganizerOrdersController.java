@@ -20,7 +20,7 @@ public class OrganizerOrdersController extends HttpServlet {
             throws ServletException, IOException {
         // Lấy organizerId từ session hoặc sử dụng giá trị mặc định cho test (đã update thành 16)
         HttpSession session = request.getSession();
-        int organizerId = 14; // Giá trị mặc định cho test
+        int organizerId = 18; // Giá trị mặc định cho test
         Object orgIdObj = session.getAttribute("organizerId");
         if (orgIdObj != null) {
             organizerId = Integer.parseInt(orgIdObj.toString());
