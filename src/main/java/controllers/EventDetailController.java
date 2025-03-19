@@ -22,6 +22,7 @@ import viewModels.FilterEvent;
 import models.Organizer;
 import models.Showtime;
 import models.TicketType;
+import viewModels.EventDTO;
 
 /**
  *
@@ -114,13 +115,13 @@ public class EventDetailController extends HttpServlet {
         request.setAttribute("listShowtimes", listShowtimes);
 
         System.out.println(eventDetail.getCategoryId());
-        
+
         // Filter and pagination logic (unchanged)
         List<Integer> categories = new ArrayList<>();
         categories.add(eventDetail.getCategoryId());
 
         FilterEvent filters = new FilterEvent(categories, null, null, null, null, false, null);
-        List<EventImage> filteredEvents = filterEventDAO.getFilteredEvents(filters);
+        List<EventDTO> filteredEvents = filterEventDAO.getFilteredEvents(filters);
 
         int page = 1;
         int pageSize = 20;
@@ -140,12 +141,12 @@ public class EventDetailController extends HttpServlet {
 
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalEvents);
-        List<EventImage> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
+        List<EventDTO> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
 
         request.setAttribute("filteredEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-        
+
         // <!--All Event For You-->  Get the requested page number, default to 1 if not provided 
         int pageAll = 1;
         int pageSizeAll = 20;
@@ -162,7 +163,7 @@ public class EventDetailController extends HttpServlet {
         int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSizeAll);
 
         // Fetch paginated list of events
-        List<EventImage> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
+        List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
         request.setAttribute("paginatedEventsAll", paginatedEventsAll);
         request.setAttribute("pageAll", pageAll);
         request.setAttribute("totalPagesAll", totalPagesAll);

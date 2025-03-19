@@ -37,6 +37,11 @@ public class EventImage extends Event {
         this.imageTitle = imageTitle;
     }
 
+    public EventImage(String imageUrl, String imageTitle) {
+        this.imageUrl = imageUrl;
+        this.imageTitle = imageTitle;
+    }
+
     public int getImageId() {
         return imageId;
     }

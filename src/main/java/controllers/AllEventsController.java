@@ -20,6 +20,7 @@ import java.util.List;
 import models.Category;
 import models.Event;
 import models.EventImage;
+import viewModels.EventDTO;
 import viewModels.FilterEvent;
 
 /**
@@ -112,7 +113,7 @@ public class AllEventsController extends HttpServlet {
         session.setAttribute("selectedPrice", price);
 
         // Get filtered events
-        List<EventImage> filteredEvents = filterEventDAO.getFilteredEvents(filters);
+        List<EventDTO> filteredEvents = filterEventDAO.getFilteredEvents(filters);
 //        System.out.println("Filtered Events Count: " + filteredEvents.size()); // Debug log
 
         // Pagination logic
@@ -136,7 +137,7 @@ public class AllEventsController extends HttpServlet {
         // Get events for the requested page
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalEvents);
-        List<EventImage> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
+        List<EventDTO> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
 
         // Send attributes to JSP
         request.setAttribute("filteredEvents", paginatedEvents);
@@ -159,7 +160,7 @@ public class AllEventsController extends HttpServlet {
         int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSizeAll);
 
         // Fetch paginated list of events
-        List<EventImage> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
+        List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
         request.setAttribute("paginatedEventsAll", paginatedEventsAll);
         request.setAttribute("pageAll", pageAll);
         request.setAttribute("totalPagesAll", totalPagesAll);
