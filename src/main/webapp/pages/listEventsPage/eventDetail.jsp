@@ -482,7 +482,7 @@
                                     <div class="flex justify-between items-center bg-gray-700 p-3 rounded-lg saved-ticket">
                                         <span class="text-light">${ticket.name}</span>
                                         <div class="flex items-center space-x-2">
-                                            <span class="text-green-400">${ticket.price} đ</span>
+                                            <span class="text-green-400"><fmt:formatNumber value="${ticket.price}" currencyCode="VND" minFractionDigits="0" /> VND</span>
                                             <span class="bg-green-500 text-white px-2 py-1 rounded-lg">
                                                 <c:choose>
                                                     <c:when test="${ticket.totalQuantity - ticket.soldQuantity > 0}">Available</c:when>
