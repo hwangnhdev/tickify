@@ -11,32 +11,44 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import viewModels.EventDetailDTO;
 
+@WebServlet("/organizer/eventDetail")
 public class OrganizerEventDetailController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Organizer ID lấy từ session hoặc mặc định (ở đây sử dụng 2)
+       
         HttpSession session = request.getSession();
-        System.out.println(session.getAttribute("customerId"));
-        int customerId = (int) session.getAttribute("customerId");// 
 
-        // Lấy eventId từ request parameter, mặc định là 2 nếu không có
+        // Lấy eventId từ request parameter, nếu không có thì lấy từ session
         String eventIdParam = request.getParameter("eventId");
-        int eventId = 16;
+        int eventId;
         if (eventIdParam != null && !eventIdParam.trim().isEmpty()) {
             try {
                 eventId = Integer.parseInt(eventIdParam);
+                session.setAttribute("eventId", eventId);
             } catch (NumberFormatException e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid event ID: must be an integer.");
                 return;
             }
+        } else {
+            Object eventIdObj = session.getAttribute("eventId");
+            if (eventIdObj != null) {
+                try {
+                    eventId = Integer.parseInt(eventIdObj.toString());
+                } catch (NumberFormatException e) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid event ID in session.");
+                    return;
+                }
+            } else {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Event ID is required.");
+                return;
+            }
         }
 
-        // Sử dụng DAO để lấy chi tiết sự kiện của organizer
-        OrganizerDAO OrganizerDAO = new OrganizerDAO();
-        EventDetailDTO detail = OrganizerDAO.getCustomerEventDetail(customerId, eventId);
-
+        OrganizerDAO organizerDAO = new OrganizerDAO();
+        // Lấy chi tiết event chỉ dựa trên eventId
+        EventDetailDTO detail = organizerDAO.getEventDetail(eventId);
         if (detail == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Event detail not found.");
             return;
@@ -56,6 +68,6 @@ public class OrganizerEventDetailController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "OrganizerEventDetailController retrieves event detail for an organizer";
+        return "OrganizerEventDetailController retrieves event detail by event ID";
     }
 }
