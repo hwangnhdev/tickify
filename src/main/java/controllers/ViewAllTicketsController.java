@@ -22,8 +22,21 @@ public class ViewAllTicketsController extends HttpServlet {
             throws ServletException, IOException {
         // Lấy customerId từ parameter hoặc session (ví dụ đơn giản)
         HttpSession session = request.getSession();
-        System.out.println(session.getAttribute("customerId"));
-        int customerId = (int) session.getAttribute("customerId");
+        Object customerIdObj = session.getAttribute("customerId");
+        int customerId = 0;
+        if (customerIdObj instanceof Integer) {
+            customerId = (Integer) customerIdObj;
+            System.out.println("Customer ID: " + customerId);
+        } else if (customerIdObj instanceof String) {
+            try {
+                customerId = Integer.parseInt((String) customerIdObj);
+                System.out.println("Customer ID: " + customerId);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
+        }
 
         // Lấy trạng thái lọc vé
         String statusFilter = request.getParameter("status");

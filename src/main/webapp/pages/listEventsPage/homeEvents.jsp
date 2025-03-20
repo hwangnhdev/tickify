@@ -16,6 +16,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"/>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
         <style>
             body {
                 background-color: #121212;
@@ -459,8 +460,15 @@
                 margin: 0 0;
                 color: #000000;
             }
-            .pagination a {
+            #pagination a {
+                margin: 0 5px;
+                padding: 5px 10px;
                 text-decoration: none;
+                color: #007bff;
+            }
+            #pagination a.active {
+                font-weight: bold;
+                color: #0056b3;
             }
             h2.text-xl.font-bold.text-center {
                 margin-top: 2%;
@@ -776,41 +784,131 @@
             });
         </script>
 
-        <!--All Event--> 
+        <!--All Event-->
         <div style="text-align: center;">
-            <h2 id="all-events-title" class="text-xl font-bold  text-center" style="margin-left: 4%;">
+            <h2 id="all-events-title" class="text-xl font-bold text-center" style="margin-left: 4%;">
                 <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
             </h2>
         </div>
         <div class="container py-4">
             <div class="row gy-4" id="event-container">
-                <!-- Event Cards -->
-                <c:forEach var="event" items="${paginatedEvents}">
-                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                        <div class="event-card-all_events">
-                            <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
-                                <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
-                                <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
-                                    ${event.event.eventName}
-                                </h2>
-                                <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
-                                <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
-                                    <i class="far fa-calendar-alt mr-2"></i>
-                                    <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
-                                </p>
-                            </a>
-                        </div>
-                    </div>
-                </c:forEach>
+                <!-- Các event card sẽ được thêm động bằng JavaScript -->
             </div>
-            <!-- Pagination -->
-            <jsp:include page="pagination.jsp">
-                <jsp:param name="baseUrl" value="/event" />
-                <jsp:param name="page" value="${currentPage}" />
-                <jsp:param name="totalPages" value="${totalPages}" />
-                <jsp:param name="selectedStatus" value="${selectedStatus}" />
-            </jsp:include>
+            <!-- Phân trang -->
+            <div id="pagination" class="text-center mt-4">
+                <!-- Các nút sẽ được thêm bằng JS -->
+            </div>
         </div>
+
+        <!-- Thêm jQuery và mã JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+        <script>
+            // All Event
+            function loadEvents(page) {
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/eventAjax',
+                    type: 'GET',
+                    data: {page: page},
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log(data);
+                        updateEventContainer(data.events);
+                        updatePagination(data.totalPages, data.currentPage);
+                    },
+                    error: function () {
+                        console.error('Lỗi khi tải sự kiện');
+                    }
+                });
+            }
+
+            function updateEventContainer(events) {
+                var container = $('#event-container');
+                container.empty();
+                if (Array.isArray(events)) {
+                    events.forEach(function (eventAjax) {
+                        var formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', minimumFractionDigits: 0}).format(eventAjax.minPrice).replace('₫', '').trim();
+                        var formattedDate = moment(eventAjax.firstStartDate).format('hh:mm:ss A, DD MMM YYYY');
+                        var eventHtml = `
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                <div class="event-card-all_events">
+                                    <a style="text-decoration: none;" href="eventDetail?id=` + eventAjax.id + `">
+                                        <img src="` + eventAjax.imageUrl + `" alt="` + eventAjax.imageTitle + `" />
+                                        <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                            ` + eventAjax.name + `
+                                        </h2>
+                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From ` + formattedPrice + ` VND</p>
+                                        <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                            <i class="far fa-calendar-alt mr-2"></i>
+                                            <span>` + formattedDate + `</span>
+                                        </p>
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        container.append(eventHtml);
+                    });
+                } else {
+                    console.error('Expected an array of events, but got:', events);
+                }
+            }
+
+            function updatePagination(totalPages, currentPage) {
+                var pagination = $('#pagination');
+                pagination.empty();
+                pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
+                var ul = pagination.find('ul');
+
+                // Chỉ hiển thị phân trang nếu totalPages > 1
+                if (totalPages > 1) {
+                    // Số lượng trang tối đa hiển thị
+                    var displayPages = 5;
+                    var halfDisplayPages = Math.floor(displayPages / 2);
+                    var startPage = currentPage - halfDisplayPages;
+                    var endPage = currentPage + halfDisplayPages;
+
+                    // Điều chỉnh startPage và endPage
+                    if (startPage < 1) {
+                        startPage = 1;
+                    }
+                    if (endPage > totalPages) {
+                        endPage = totalPages;
+                    }
+
+                    // Nút "First" và "Prev"
+                    if (currentPage > 1) {
+                        var firstItem = '<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>';
+                        ul.append(firstItem);
+
+                        var prevItem = '<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + '); return false;">Prev</a></li>';
+                        ul.append(prevItem);
+                    }
+
+                    // Hiển thị các số trang từ startPage đến endPage
+                    for (var i = startPage; i <= endPage; i++) {
+                        if (i === currentPage) {
+                            var pageItem = '<li class="page-item active"><span class="page-link">' + i + '</span></li>';
+                        } else {
+                            var pageItem = '<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + '); return false;">' + i + '</a></li>';
+                        }
+                        ul.append(pageItem);
+                    }
+
+                    // Nút "Next" và "Last"
+                    if (currentPage < totalPages) {
+                        var nextItem = '<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + '); return false;">Next</a></li>';
+                        ul.append(nextItem);
+
+                        var lastItem = '<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + '); return false;">Last</a></li>';
+                        ul.append(lastItem);
+                    }
+                }
+            }
+
+            $(document).ready(function () {
+                loadEvents(1);
+            });
+        </script>
         <!-- Bootstrap JS for All Events-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     </body>

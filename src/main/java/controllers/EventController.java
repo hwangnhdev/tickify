@@ -96,6 +96,32 @@ public class EventController extends HttpServlet {
         List<EventImage> listRecommendedEvents = eventDAO.getRecommendedEvents(1);
         request.setAttribute("listRecommendedEvents", listRecommendedEvents);
 
+        // Create session to store parameter when filter and search
+        HttpSession session = request.getSession();
+        // Call all DAO to get methods in it
+        CategoryDAO categoryDAO = new CategoryDAO();
+        // Get all category and store it in list categories
+        List<Category> listCategories = categoryDAO.getAllCategories();
+        // Set attribute for DAO
+        session.setAttribute("listCategories", listCategories);
+
+        // Forward the request and response to the home.jsp page to display the events
+        request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Create an instance of EventDAO to interact with the database
+        EventDAO eventDAO = new EventDAO();
         // Get the requested page number, default to 1 if not provided <!--All Event--> 
         int page = 1;
         int pageSize = 20;
@@ -119,33 +145,8 @@ public class EventController extends HttpServlet {
         System.out.println(totalPages);
         System.out.println(paginatedEvents);
         System.out.println(page);
-
-        // Create session to store parameter when filter and search
-        HttpSession session = request.getSession();
-        // Call all DAO to get methods in it
-        CategoryDAO categoryDAO = new CategoryDAO();
-
-        // Get all category and store it in list categories
-        List<Category> listCategories = categoryDAO.getAllCategories();
-        // Set attribute for DAO
-        session.setAttribute("listCategories", listCategories);
-
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
-    }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
     }
 
     /**
