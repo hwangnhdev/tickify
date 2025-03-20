@@ -65,7 +65,7 @@
                 <header class="flex justify-between items-center bg-gray-800 p-4">
                     <h1 class="text-xl font-bold">My Events</h1>
                     <div class="flex items-center space-x-4">
-                        <button type="button" onclick="window.open('${pageContext.request.contextPath}/createNewEvent', '_blank')" 
+                        <button type="button" onclick="window.open('${pageContext.request.contextPath}/createNewEvent?customerId=${sessionScope.customerId}', '_blank')" 
                                 class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
                             + Create Event
                         </button>

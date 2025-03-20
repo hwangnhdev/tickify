@@ -85,7 +85,7 @@ public class UpdateEventController extends HttpServlet {
         CategoryDAO categoryDAO = new CategoryDAO();
 
         String eventIdParam = request.getParameter("eventId");
-//        String eventIdParam = "21";
+
         int eventId = 0;
         try {
             if (eventIdParam != null && !eventIdParam.isEmpty()) {

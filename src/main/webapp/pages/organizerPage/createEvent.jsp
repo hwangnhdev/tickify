@@ -88,7 +88,8 @@
                     <span class="text-lg font-bold text-green-500">Organizer Center</span>
                 </div>
                 <nav class="space-y-4">
-                    <a class="flex items-center w-full p-2 rounded-lg hover:bg-green-700 transition duration-200" href="${pageContext.request.contextPath}/OrganizerEventController">
+                    <a href="${pageContext.request.contextPath}/OrganizerEventController" 
+                       class="flex items-center text-white w-full p-2 rounded-lg hover:bg-green-700 transition duration-200">
                         <i class="fas fa-ticket-alt mr-2"></i>My Events
                     </a>
                     <a class="flex items-center w-full p-2 bg-green-700 rounded-lg" href="${pageContext.request.contextPath}/createNewEvent">

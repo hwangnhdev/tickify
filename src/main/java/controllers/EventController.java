@@ -105,29 +105,6 @@ public class EventController extends HttpServlet {
         // Set attribute for DAO
         session.setAttribute("listCategories", listCategories);
 
-        int page = 1;
-        int pageSize = 20;
-        if (request.getParameter("page") != null) {
-            try {
-                page = Integer.parseInt(request.getParameter("page"));
-            } catch (NumberFormatException e) {
-                page = 1; // Fallback to page 1 in case of an invalid input
-            }
-        }
-
-        // Get total number of events and calculate total pages
-        int totalEvents = eventDAO.getTotalEvents();
-        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
-
-        // Fetch paginated list of events
-        List<EventDTO> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
-        request.setAttribute("paginatedEvents", paginatedEvents);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        System.out.println(totalPages);
-        System.out.println(paginatedEvents);
-        System.out.println(page);
-
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
     }
