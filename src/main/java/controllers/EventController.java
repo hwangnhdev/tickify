@@ -96,7 +96,15 @@ public class EventController extends HttpServlet {
         List<EventImage> listRecommendedEvents = eventDAO.getRecommendedEvents(1);
         request.setAttribute("listRecommendedEvents", listRecommendedEvents);
 
-        // Get the requested page number, default to 1 if not provided <!--All Event--> 
+        // Create session to store parameter when filter and search
+        HttpSession session = request.getSession();
+        // Call all DAO to get methods in it
+        CategoryDAO categoryDAO = new CategoryDAO();
+        // Get all category and store it in list categories
+        List<Category> listCategories = categoryDAO.getAllCategories();
+        // Set attribute for DAO
+        session.setAttribute("listCategories", listCategories);
+
         int page = 1;
         int pageSize = 20;
         if (request.getParameter("page") != null) {
@@ -120,16 +128,6 @@ public class EventController extends HttpServlet {
         System.out.println(paginatedEvents);
         System.out.println(page);
 
-        // Create session to store parameter when filter and search
-        HttpSession session = request.getSession();
-        // Call all DAO to get methods in it
-        CategoryDAO categoryDAO = new CategoryDAO();
-
-        // Get all category and store it in list categories
-        List<Category> listCategories = categoryDAO.getAllCategories();
-        // Set attribute for DAO
-        session.setAttribute("listCategories", listCategories);
-
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
     }
@@ -145,7 +143,33 @@ public class EventController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        // Create an instance of EventDAO to interact with the database
+        EventDAO eventDAO = new EventDAO();
+        // Get the requested page number, default to 1 if not provided <!--All Event--> 
+        int page = 1;
+        int pageSize = 20;
+        if (request.getParameter("page") != null) {
+            try {
+                page = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException e) {
+                page = 1; // Fallback to page 1 in case of an invalid input
+            }
+        }
+
+        // Get total number of events and calculate total pages
+        int totalEvents = eventDAO.getTotalEvents();
+        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+
+        // Fetch paginated list of events
+        List<EventDTO> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
+        request.setAttribute("paginatedEvents", paginatedEvents);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        System.out.println(totalPages);
+        System.out.println(paginatedEvents);
+        System.out.println(page);
+        // Forward the request and response to the home.jsp page to display the events
+        request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
     }
 
     /**
