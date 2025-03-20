@@ -10,9 +10,9 @@
         <div class="flex h-screen">
             <jsp:include page="sidebar.jsp" />
             <!-- Main Content -->
-            <div class="flex-1 p-6">
-                <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold mb-6">Event Management</h2>
+            <div class="flex-1 p-6 overflow-y-auto">
+        <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
+          <h2 class="text-3xl font-bold mb-6">Event Management</h2>
                     <jsp:include page="tabNav.jsp" />
 
                     <!-- Filter and Search Bar -->
@@ -98,6 +98,5 @@
             </div>
         </div>
 
-        <jsp:include page="footer.jsp" />
     </body>
 </html>

@@ -18,14 +18,7 @@ public class OrganizerOrdersController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy organizerId từ session hoặc sử dụng giá trị mặc định cho test (đã update thành 16)
         HttpSession session = request.getSession();
-        int organizerId = 18; // Giá trị mặc định cho test
-        Object orgIdObj = session.getAttribute("organizerId");
-        if (orgIdObj != null) {
-            organizerId = Integer.parseInt(orgIdObj.toString());
-        }
-
         // Lấy số trang từ tham số 'page', mặc định là 1
         String pageParam = request.getParameter("page");
         int currentPage = (pageParam != null && !pageParam.trim().isEmpty()) ? Integer.parseInt(pageParam) : 1;
@@ -43,19 +36,26 @@ public class OrganizerOrdersController extends HttpServlet {
             searchOrder = null;
         }
 
-        // Lấy eventId từ request (được truyền khi nhấn nút Order của 1 sự kiện cụ thể)
+        // Lấy eventId từ request hoặc từ session nếu không có
         String eventIdParam = request.getParameter("eventId");
         int eventId = -1;
         if (eventIdParam != null && !eventIdParam.trim().isEmpty()) {
             eventId = Integer.parseInt(eventIdParam);
+            // Lưu eventId vào session để sử dụng cho các request sau
+            session.setAttribute("eventId", eventId);
+        } else {
+            Object eventIdObj = session.getAttribute("eventId");
+            if (eventIdObj != null) {
+                eventId = Integer.parseInt(eventIdObj.toString());
+            }
         }
 
         OrganizerDAO organizerDAO = new OrganizerDAO();
-        // Lấy danh sách order theo organizerId, eventId, trạng thái thanh toán và tìm kiếm theo tên khách hàng
-        List<OrderDetailDTO> orders = organizerDAO.getOrderDetailsByOrganizerAndPaymentStatus(
-                organizerId, eventId, paymentStatus, searchOrder, offset, PAGE_SIZE);
-        int totalRecords = organizerDAO.countOrdersByOrganizerAndPaymentStatus(
-                organizerId, eventId, paymentStatus, searchOrder);
+        // Gọi các phương thức DAO đã được cập nhật để chỉ lọc theo eventId (không dùng organizerId)
+        List<OrderDetailDTO> orders = organizerDAO.getOrderDetailsByEventAndPaymentStatus(
+                eventId, paymentStatus, searchOrder, offset, PAGE_SIZE);
+        int totalRecords = organizerDAO.countOrdersByEventAndPaymentStatus(
+                eventId, paymentStatus, searchOrder);
         int totalPages = (int) Math.ceil(totalRecords / (double) PAGE_SIZE);
 
         request.setAttribute("orders", orders);
