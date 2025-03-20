@@ -18,7 +18,7 @@ public class OrganizerEventController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         System.out.println(session.getAttribute("customerId"));
-        int customerId = (int) session.getAttribute("customerId");//        int customerId = 4;
+        int customerId = (int) session.getAttribute("customerId");
         String filter = request.getParameter("filter");
         if (filter == null || filter.trim().isEmpty()) {
             filter = "all";

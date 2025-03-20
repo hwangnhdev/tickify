@@ -30,7 +30,9 @@ public class Voucher {
     public Voucher() {
     }
 
-    public Voucher(int voucherId, int eventId, String code, String description, String discountType, int discountValue, Timestamp startDate, Timestamp endDate, int usageLimit, boolean status, Timestamp createdAt, Timestamp updatedAt, boolean deleted) {
+    public Voucher(int voucherId, int eventId, String code, String description, String discountType, int discountValue,
+            Timestamp startDate, Timestamp endDate, int usageLimit, boolean status, Timestamp createdAt,
+            Timestamp updatedAt, boolean deleted) {
         this.voucherId = voucherId;
         this.eventId = eventId;
         this.code = code;
@@ -164,7 +166,8 @@ public class Voucher {
     // Helper method to format discount
     public String setFormattedDiscount(String string) {
         return discountType.equalsIgnoreCase("percentage")
-                ? discountValue + "%" : String.format("%d VND", discountValue);
+                ? discountValue + "%"
+                : String.format("%d VND", discountValue);
     }
 
     public String getFormattedExpirationTime() {

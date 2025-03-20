@@ -4,6 +4,7 @@
     Author     : Tang Thanh Vui - CE180901
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
@@ -295,7 +296,6 @@
             }
             .event-card-all_events {
                 background-color: #ffffff;
-                border: 1px solid #ddd;
                 border-radius: 8px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
@@ -316,7 +316,7 @@
                 background-color: #f0f0f0;
                 display: block;
                 transition: filter 0.3s;
-                object-fit: cover;
+                object-fit: fill;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
 
@@ -324,6 +324,16 @@
                 filter: brightness(1.1);
                 transform: scale(1.1);
                 box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
+            }
+            .event-card-all_events h4 {
+                font-size: 16px;
+                margin: 10px 0 5px;
+                color: #000000;
+            }
+            .event-card-all_events p {
+                font-size: 14px;
+                margin: 0 0;
+                color: #000000;
             }
             .g-4, .gy-4 {
                 --bs-gutter-y: 1.5rem;
@@ -439,12 +449,70 @@
                         </label>
                     </div>
                     <div class="category-list" data-type="location">
-                        <input type="radio" name="location" value="Ben Thanh Theater" ${selectedLocation == 'Ben Thanh Theater' ? 'checked' : ''}> Ben Thanh <br>
-                        <input type="radio" name="location" value="Tech Hub" ${selectedLocation == 'Tech Hub' ? 'checked' : ''}> Tech Hub <br>
-                        <input type="radio" name="location" value="Sports Arena" ${selectedLocation == 'Sports Arena' ? 'checked' : ''}> Sports Arena <br>
-                        <input type="radio" name="location" value="Downtown Plaza" ${selectedLocation == 'Downtown Plaza' ? 'checked' : ''}> Downtown Plaza <br>
-                        <input type="radio" name="location" value="Museum Hall" ${selectedLocation == 'Museum Hall' ? 'checked' : ''}> Museum Hall <br>
                         <input type="radio" name="location" value="" ${empty selectedLocation ? 'checked' : ''}> All Locations <br>
+                        <input type="radio" name="location" value="Thành phố Hà Nội" ${selectedLocation == 'Thành phố Hà Nội' ? 'checked' : ''}> Hà Nội <br>
+                        <input type="radio" name="location" value="Tỉnh Hà Giang" ${selectedLocation == 'Tỉnh Hà Giang' ? 'checked' : ''}> Hà Giang <br>
+                        <input type="radio" name="location" value="Tỉnh Cao Bằng" ${selectedLocation == 'Tỉnh Cao Bằng' ? 'checked' : ''}> Cao Bằng <br>
+                        <input type="radio" name="location" value="Tỉnh Bắc Kạn" ${selectedLocation == 'Tỉnh Bắc Kạn' ? 'checked' : ''}> Bắc Kạn <br>
+                        <input type="radio" name="location" value="Tỉnh Tuyên Quang" ${selectedLocation == 'Tỉnh Tuyên Quang' ? 'checked' : ''}> Tuyên Quang <br>
+                        <input type="radio" name="location" value="Tỉnh Lào Cai" ${selectedLocation == 'Tỉnh Lào Cai' ? 'checked' : ''}> Lào Cai <br>
+                        <input type="radio" name="location" value="Tỉnh Điện Biên" ${selectedLocation == 'Tỉnh Điện Biên' ? 'checked' : ''}> Điện Biên <br>
+                        <input type="radio" name="location" value="Tỉnh Lai Châu" ${selectedLocation == 'Tỉnh Lai Châu' ? 'checked' : ''}> Lai Châu <br>
+                        <input type="radio" name="location" value="Tỉnh Sơn La" ${selectedLocation == 'Tỉnh Sơn La' ? 'checked' : ''}> Sơn La <br>
+                        <input type="radio" name="location" value="Tỉnh Yên Bái" ${selectedLocation == 'Tỉnh Yên Bái' ? 'checked' : ''}> Yên Bái <br>
+                        <input type="radio" name="location" value="Tỉnh Hoà Bình" ${selectedLocation == 'Tỉnh Hoà Bình' ? 'checked' : ''}> Hoà Bình <br>
+                        <input type="radio" name="location" value="Tỉnh Thái Nguyên" ${selectedLocation == 'Tỉnh Thái Nguyên' ? 'checked' : ''}> Thái Nguyên <br>
+                        <input type="radio" name="location" value="Tỉnh Lạng Sơn" ${selectedLocation == 'Tỉnh Lạng Sơn' ? 'checked' : ''}> Lạng Sơn <br>
+                        <input type="radio" name="location" value="Tỉnh Quảng Ninh" ${selectedLocation == 'Tỉnh Quảng Ninh' ? 'checked' : ''}> Quảng Ninh <br>
+                        <input type="radio" name="location" value="Tỉnh Bắc Giang" ${selectedLocation == 'Tỉnh Bắc Giang' ? 'checked' : ''}> Bắc Giang <br>
+                        <input type="radio" name="location" value="Tỉnh Phú Thọ" ${selectedLocation == 'Tỉnh Phú Thọ' ? 'checked' : ''}> Phú Thọ <br>
+                        <input type="radio" name="location" value="Tỉnh Vĩnh Phúc" ${selectedLocation == 'Tỉnh Vĩnh Phúc' ? 'checked' : ''}> Vĩnh Phúc <br>
+                        <input type="radio" name="location" value="Tỉnh Bắc Ninh" ${selectedLocation == 'Tỉnh Bắc Ninh' ? 'checked' : ''}> Bắc Ninh <br>
+                        <input type="radio" name="location" value="Tỉnh Hải Dương" ${selectedLocation == 'Tỉnh Hải Dương' ? 'checked' : ''}> Hải Dương <br>
+                        <input type="radio" name="location" value="Thành phố Hải Phòng" ${selectedLocation == 'Thành phố Hải Phòng' ? 'checked' : ''}> Hải Phòng <br>
+                        <input type="radio" name="location" value="Tỉnh Hưng Yên" ${selectedLocation == 'Tỉnh Hưng Yên' ? 'checked' : ''}> Hưng Yên <br>
+                        <input type="radio" name="location" value="Tỉnh Thái Bình" ${selectedLocation == 'Tỉnh Thái Bình' ? 'checked' : ''}> Thái Bình <br>
+                        <input type="radio" name="location" value="Tỉnh Hà Nam" ${selectedLocation == 'Tỉnh Hà Nam' ? 'checked' : ''}> Hà Nam <br>
+                        <input type="radio" name="location" value="Tỉnh Nam Định" ${selectedLocation == 'Tỉnh Nam Định' ? 'checked' : ''}> Nam Định <br>
+                        <input type="radio" name="location" value="Tỉnh Ninh Bình" ${selectedLocation == 'Tỉnh Ninh Bình' ? 'checked' : ''}> Ninh Bình <br>
+                        <input type="radio" name="location" value="Tỉnh Thanh Hóa" ${selectedLocation == 'Tỉnh Thanh Hóa' ? 'checked' : ''}> Thanh Hóa <br>
+                        <input type="radio" name="location" value="Tỉnh Nghệ An" ${selectedLocation == 'Tỉnh Nghệ An' ? 'checked' : ''}> Nghệ An <br>
+                        <input type="radio" name="location" value="Tỉnh Hà Tĩnh" ${selectedLocation == 'Tỉnh Hà Tĩnh' ? 'checked' : ''}> Hà Tĩnh <br>
+                        <input type="radio" name="location" value="Tỉnh Quảng Bình" ${selectedLocation == 'Tỉnh Quảng Bình' ? 'checked' : ''}> Quảng Bình <br>
+                        <input type="radio" name="location" value="Tỉnh Quảng Trị" ${selectedLocation == 'Tỉnh Quảng Trị' ? 'checked' : ''}> Quảng Trị <br>
+                        <input type="radio" name="location" value="Thành phố Huế" ${selectedLocation == 'Thành phố Huế' ? 'checked' : ''}> Huế <br>
+                        <input type="radio" name="location" value="Thành phố Đà Nẵng" ${selectedLocation == 'Thành phố Đà Nẵng' ? 'checked' : ''}> Đà Nẵng <br>
+                        <input type="radio" name="location" value="Tỉnh Quảng Nam" ${selectedLocation == 'Tỉnh Quảng Nam' ? 'checked' : ''}> Quảng Nam <br>
+                        <input type="radio" name="location" value="Tỉnh Quảng Ngãi" ${selectedLocation == 'Tỉnh Quảng Ngãi' ? 'checked' : ''}> Quảng Ngãi <br>
+                        <input type="radio" name="location" value="Tỉnh Bình Định" ${selectedLocation == 'Tỉnh Bình Định' ? 'checked' : ''}> Bình Định <br>
+                        <input type="radio" name="location" value="Tỉnh Phú Yên" ${selectedLocation == 'Tỉnh Phú Yên' ? 'checked' : ''}> Phú Yên <br>
+                        <input type="radio" name="location" value="Tỉnh Khánh Hòa" ${selectedLocation == 'Tỉnh Khánh Hòa' ? 'checked' : ''}> Khánh Hòa <br>
+                        <input type="radio" name="location" value="Tỉnh Ninh Thuận" ${selectedLocation == 'Tỉnh Ninh Thuận' ? 'checked' : ''}> Ninh Thuận <br>
+                        <input type="radio" name="location" value="Tỉnh Bình Thuận" ${selectedLocation == 'Tỉnh Bình Thuận' ? 'checked' : ''}> Bình Thuận <br>
+                        <input type="radio" name="location" value="Tỉnh Kon Tum" ${selectedLocation == 'Tỉnh Kon Tum' ? 'checked' : ''}> Kon Tum <br>
+                        <input type="radio" name="location" value="Tỉnh Gia Lai" ${selectedLocation == 'Tỉnh Gia Lai' ? 'checked' : ''}> Gia Lai <br>
+                        <input type="radio" name="location" value="Tỉnh Đắk Lắk" ${selectedLocation == 'Tỉnh Đắk Lắk' ? 'checked' : ''}> Đắk Lắk <br>
+                        <input type="radio" name="location" value="Thành phố Hồ Chí Minh" ${selectedLocation == 'Thành phố Hồ Chí Minh' ? 'checked' : ''}> Hồ Chí Minh <br>
+                        <input type="radio" name="location" value="Tỉnh Đắk Nông" ${selectedLocation == 'Tỉnh Đắk Nông' ? 'checked' : ''}> Đắk Nông <br>
+                        <input type="radio" name="location" value="Tỉnh Lâm Đồng" ${selectedLocation == 'Tỉnh Lâm Đồng' ? 'checked' : ''}> Lâm Đồng <br>
+                        <input type="radio" name="location" value="Tỉnh Bình Phước" ${selectedLocation == 'Tỉnh Bình Phước' ? 'checked' : ''}> Bình Phước <br>
+                        <input type="radio" name="location" value="Tỉnh Tây Ninh" ${selectedLocation == 'Tỉnh Tây Ninh' ? 'checked' : ''}> Tây Ninh <br>
+                        <input type="radio" name="location" value="Tỉnh Bình Dương" ${selectedLocation == 'Tỉnh Bình Dương' ? 'checked' : ''}> Bình Dương <br>
+                        <input type="radio" name="location" value="Tỉnh Đồng Nai" ${selectedLocation == 'Tỉnh Đồng Nai' ? 'checked' : ''}> Đồng Nai <br>
+                        <input type="radio" name="location" value="Tỉnh Bà Rịa - Vũng Tàu" ${selectedLocation == 'Tỉnh Bà Rịa - Vũng Tàu' ? 'checked' : ''}> Vũng Tàu <br>
+                        <input type="radio" name="location" value="Tỉnh Long An" ${selectedLocation == 'Tỉnh Long An' ? 'checked' : ''}> Long An <br>
+                        <input type="radio" name="location" value="Tỉnh Tiền Giang" ${selectedLocation == 'Tỉnh Tiền Giang' ? 'checked' : ''}> Tiền Giang <br>
+                        <input type="radio" name="location" value="Tỉnh Bến Tre" ${selectedLocation == 'Tỉnh Bến Tre' ? 'checked' : ''}> Bến Tre <br>
+                        <input type="radio" name="location" value="Tỉnh Trà Vinh" ${selectedLocation == 'Tỉnh Trà Vinh' ? 'checked' : ''}> Trà Vinh <br>
+                        <input type="radio" name="location" value="Tỉnh Vĩnh Long" ${selectedLocation == 'Tỉnh Vĩnh Long' ? 'checked' : ''}> Vĩnh Long <br>
+                        <input type="radio" name="location" value="Tỉnh Đồng Tháp" ${selectedLocation == 'Tỉnh Đồng Tháp' ? 'checked' : ''}> Đồng Tháp <br>
+                        <input type="radio" name="location" value="Tỉnh An Giang" ${selectedLocation == 'Tỉnh An Giang' ? 'checked' : ''}> An Giang <br>
+                        <input type="radio" name="location" value="Tỉnh Kiên Giang" ${selectedLocation == 'Tỉnh Kiên Giang' ? 'checked' : ''}> Kiên Giang <br>
+                        <input type="radio" name="location" value="Thành phố Cần Thơ" ${selectedLocation == 'Thành phố Cần Thơ' ? 'checked' : ''}> Cần Thơ <br>
+                        <input type="radio" name="location" value="Tỉnh Hậu Giang" ${selectedLocation == 'Tỉnh Hậu Giang' ? 'checked' : ''}> Hậu Giang <br>
+                        <input type="radio" name="location" value="Tỉnh Sóc Trăng" ${selectedLocation == 'Tỉnh Sóc Trăng' ? 'checked' : ''}> Sóc Trăng <br>
+                        <input type="radio" name="location" value="Tỉnh Bạc Liêu" ${selectedLocation == 'Tỉnh Bạc Liêu' ? 'checked' : ''}> Bạc Liêu <br>
+                        <input type="radio" name="location" value="Tỉnh Cà Mau" ${selectedLocation == 'Tỉnh Cà Mau' ? 'checked' : ''}> Cà Mau <br>
                     </div>
                 </div>
 
@@ -467,10 +535,18 @@
                     <div class="row gy-4" id="event-container">
                         <!-- Loop through paginated events -->
                         <c:forEach var="event" items="${paginatedEventsAll}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                 <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                        <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                        <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                            ${event.event.eventName}
+                                        </h2>
+                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                        <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                            <i class="far fa-calendar-alt mr-2"></i>
+                                            <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                        </p>
                                     </a>
                                 </div>
                             </div>
@@ -485,10 +561,18 @@
                     <div class="row gy-4" id="event-container">
                         <!-- Loop through paginated events -->
                         <c:forEach var="event" items="${filteredEvents}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                 <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                        <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                        <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                            ${event.event.eventName}
+                                        </h2>
+                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                        <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                            <i class="far fa-calendar-alt mr-2"></i>
+                                            <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                        </p>
                                     </a>
                                 </div>
                             </div>

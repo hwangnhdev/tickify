@@ -10,13 +10,15 @@ public class EventSummaryDTO {
     private Timestamp startDate;
     private Timestamp endDate;
     private String imageUrl;
-    // Bỏ paymentStatus vì không sử dụng nữa
-    private String eventStatus;    // Ví dụ: "processing", "approved", "rejected", "upcoming", "past"
+    // Không cần trường paymentStatus nữa, dùng eventStatus cho trạng thái của sự
+    // kiện
+    private String eventStatus; // Ví dụ: "processing", "approved", "rejected", "upcoming", "past"
 
     public EventSummaryDTO() {
     }
 
-    public EventSummaryDTO(int eventId, String eventName, String location, Timestamp startDate, Timestamp endDate, String imageUrl, String eventStatus) {
+    public EventSummaryDTO(int eventId, String eventName, String location, Timestamp startDate, Timestamp endDate,
+            String imageUrl, String eventStatus) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.location = location;
@@ -30,42 +32,55 @@ public class EventSummaryDTO {
     public int getEventId() {
         return eventId;
     }
+
     public void setEventId(int eventId) {
         this.eventId = eventId;
     }
+
     public String getEventName() {
         return eventName;
     }
+
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
+
     public String getLocation() {
         return location;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
+
     public Timestamp getStartDate() {
         return startDate;
     }
+
     public void setStartDate(Timestamp startDate) {
         this.startDate = startDate;
     }
+
     public Timestamp getEndDate() {
         return endDate;
     }
+
     public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
+
     public String getImageUrl() {
         return imageUrl;
     }
+
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
     public String getEventStatus() {
         return eventStatus;
     }
+
     public void setEventStatus(String eventStatus) {
         this.eventStatus = eventStatus;
     }

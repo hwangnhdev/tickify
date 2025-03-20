@@ -4,6 +4,8 @@
     Author     : Tang Thanh Vui - CE180901
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -44,8 +46,6 @@
                 box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
                 overflow: hidden;
                 max-width: 1300px;
-                max-height: 1000px;
-                height: 100%;
                 width: 100%;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
@@ -54,6 +54,54 @@
                 padding: 25px;
                 flex: 1;
                 color: #fff;
+            }
+
+            .event-details h1 {
+                font-size: 2rem;
+                font-weight: bold;
+                transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            }
+
+            .event-details h1:hover {
+                color: #ffcc00;
+                transform: translateY(-2px);
+            }
+
+            .event-image-event_detail img {
+                transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+                max-width: 100%;
+                height: auto;
+                border-radius: 0 15px 15px 0;
+            }
+
+            .ticket {
+                position: relative;
+                border: 2px dashed #4a5568;
+                border-radius: 10px;
+                padding: 20px;
+                background-color: #2d3748;
+                color: white;
+                margin-bottom: 10px;
+            }
+
+            .ticket::before, .ticket::after {
+                content: '';
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                background-color: #2d3748;
+                border: 2px dashed #4a5568;
+                border-radius: 50%;
+            }
+            .ticket::before {
+                top: -11px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .ticket::after {
+                bottom: -11px;
+                left: 50%;
+                transform: translateX(-50%);
             }
 
             /* Hiệu ứng chữ (text) */
@@ -83,16 +131,6 @@
                 transform: scale(1.02); /* Phóng to nhẹ */
                 box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.3); /* Bóng đổ mạnh hơn */
                 transition: all 0.3s ease-in-out; /* Hiệu ứng mượt */
-            }
-
-            /* Hiệu ứng khi hover vào ảnh */
-            .event-image-event_detail img {
-                transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
-            }
-
-            .event-image-event_detail img:hover {
-                transform: scale(1.05); /* Phóng to ảnh */
-                filter: brightness(1.1); /* Làm sáng ảnh */
             }
 
             /* Hiệu ứng khi hover vào nút */
@@ -153,6 +191,17 @@
                 object-fit: fill;
                 border-top-right-radius: 15px;
                 border-bottom-right-radius: 15px;
+            }
+
+            .event-info-event_detail_relevant {
+                background: linear-gradient(135deg, #ffffff, #f7f7f7);
+                color: #333;
+                padding: 25px;
+                border-radius: 0 0 15px 15px;
+                line-height: 1.8;
+                box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+                font-family: "Roboto", sans-serif;
+                margin: 10px 60px;
             }
 
             .event-info-event_detail {
@@ -321,7 +370,6 @@
                     border-bottom-right-radius: 15px;
                 }
             }
-            
             /*All Events*/
             .title-all_events {
                 text-align: center;
@@ -330,7 +378,6 @@
             }
             .event-card-all_events {
                 background-color: #ffffff;
-                border: 1px solid #ddd;
                 border-radius: 8px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
@@ -351,7 +398,7 @@
                 background-color: #f0f0f0;
                 display: block;
                 transition: filter 0.3s;
-                object-fit: cover;
+                object-fit: fill;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
 
@@ -359,6 +406,16 @@
                 filter: brightness(1.1);
                 transform: scale(1.1);
                 box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
+            }
+            .event-card-all_events h4 {
+                font-size: 16px;
+                margin: 10px 0 5px;
+                color: #000000;
+            }
+            .event-card-all_events p {
+                font-size: 14px;
+                margin: 0 0;
+                color: #000000;
             }
             .g-4, .gy-4 {
                 --bs-gutter-y: 1.5rem;
@@ -383,13 +440,19 @@
         <div class="container-event_detail">
             <div class="event-card-event_detail">
                 <div class="event-details">
-                    <h1>${event.eventName}</h1>
-                    <p><strong>Category:</strong> ${category.categoryName}</p>
-                    <p><strong>Type Of Event:</strong> ${event.eventType}</p>
-                    <p><strong>Organizer:</strong> ${organizer.organizationName}</p>
-                    <p><strong>Venue:</strong> ${event.location}</p>
-                    <p><strong>Status:</strong> <c:if test="${event.status == 'Approved'}">Available</c:if></p>
-                        <a class="btn" href="#ShowtimesInformation">Order Ticket Now</a>
+                    <div class="ticket">
+                        <h1>${event.eventName}</h1>
+                        <p><strong>Category:</strong> ${category.categoryName}</p>
+                        <p><strong>Type Of Event:</strong> ${event.eventType}</p>
+                        <p><strong>Organizer:</strong> ${organizer.organizationName}</p>
+                        <p><strong>Venue:</strong> ${event.location}</p>
+                        <p><strong>Status:</strong> <c:if test="${event.status == 'Approved'}">Available</c:if></p>
+                        </div>
+                        <div class="w-full mt-2 inline-flex items-center justify-center bg-gray-800 border border-red-900 px-4 py-2 rounded-full cursor-pointer" 
+                             onclick="window.location.href = '#ShowtimesInformation'">
+                            <i class="fas fa-check-circle mr-2 text-white"></i>
+                            <span class="text-white-400 text-sm">Order Ticket Now</span>
+                        </div>
                     </div>
                     <div class="event-image-event_detail">
                         <img src="${logoBannerImage}" alt="${titleEventImage}"/>
@@ -412,7 +475,7 @@
                                 <span class="show-time-label">Showtime ${loop.count}: </span>
                                 <span>Start Date: ${showtime.startDate} - End Date: ${showtime.endDate}</span>
                             </div>
-                            <div class="show-time-details collapsed space-y-2">
+                            <div class="show-time-details space-y-2">
                                 <!-- Loop through ticketTypes for this showtime -->
                                 <c:forEach var="ticket" items="${showtime.ticketTypes}">
                                     <div class="flex justify-between items-center bg-gray-700 p-3 rounded-lg saved-ticket">
@@ -483,56 +546,74 @@
             </section>
         </div>
 
-        <c:choose>
-            <c:when test="${empty filteredEvents}">
-                <!--All Event--> 
-                <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
-                    <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
-                </h2>
-                <div class="container py-4">
-                    <div class="row gy-4" id="event-container">
-                        <!-- Loop through paginated events -->
-                        <c:forEach var="event" items="${paginatedEventsAll}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                    </a>
+        <div class="event-info-event_detail_relevant">
+            <c:choose>
+                <c:when test="${empty filteredEvents}">
+                    <!--All Event--> 
+                    <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+                        <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+                    </h2>
+                    <div class="container py-4">
+                        <div class="row gy-4" id="event-container">
+                            <!-- Loop through paginated events -->
+                            <c:forEach var="event" items="${paginatedEventsAll}">
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="event-card-all_events">
+                                        <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                            <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                            <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                                ${event.event.eventName}
+                                            </h2>
+                                            <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                            <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                                <i class="far fa-calendar-alt mr-2"></i>
+                                                <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                            </p>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        </c:forEach>
+                            </c:forEach>
+                        </div>
                     </div>
-                </div>
-                <!-- Bootstrap JS for All Events-->
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-            </c:when>
-            <c:otherwise>
-                <!-- Relevant Events -->
-                <h2 class="text-xl font-bold text-center">
-                    <i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events
-                </h2>
-                <div class="container py-4">
-                    <div class="row gy-4" id="event-container">
-                        <c:forEach var="event" items="${filteredEvents}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                    </a>
+                    <!-- Bootstrap JS for All Events-->
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+                </c:when>
+                <c:otherwise>
+                    <!-- Relevant Events -->
+                    <h2 class="text-xl font-bold text-center">
+                        <i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events
+                    </h2>
+                    <div class="container py-4">
+                        <div class="row gy-4" id="event-container">
+                            <c:forEach var="event" items="${filteredEvents}">
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="event-card-all_events">
+                                        <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                            <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                            <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                                ${event.event.eventName}
+                                            </h2>
+                                            <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                            <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                                <i class="far fa-calendar-alt mr-2"></i>
+                                                <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                            </p>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        </c:forEach>
+                            </c:forEach>
+                        </div>
                     </div>
-                </div>
-                <!-- Pagination -->
-                <jsp:include page="pagination.jsp">
-                    <jsp:param name="baseUrl" value="/eventDetail" />
-                    <jsp:param name="page" value="${currentPage}" />
-                    <jsp:param name="totalPages" value="${totalPages}" />
-                    <jsp:param name="selectedStatus" value="${selectedStatus}" />
-                </jsp:include>
-            </c:otherwise>
-        </c:choose>
+                    <!-- Pagination -->
+                    <jsp:include page="pagination.jsp">
+                        <jsp:param name="baseUrl" value="/eventDetail" />
+                        <jsp:param name="page" value="${currentPage}" />
+                        <jsp:param name="totalPages" value="${totalPages}" />
+                        <jsp:param name="selectedStatus" value="${selectedStatus}" />
+                    </jsp:include>
+                </c:otherwise>
+            </c:choose>
+        </div>
 
         <!-- Footer -->
         <jsp:include page="../../components/footer.jsp"></jsp:include>

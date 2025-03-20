@@ -1,6 +1,7 @@
 package viewModels;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class OrderDetailDTO {
 
@@ -14,24 +15,33 @@ public class OrderDetailDTO {
     private double grandTotal;
     private String voucherCode;
     private String voucherPercentageCode;
-    private double discountPercentValue; // ví dụ: 10 cho 10%
-    private double discountPercentage;   // số tiền được giảm theo phần trăm
+    private double discountPercentValue;
+    private double discountPercentage;
     private String voucherFixedCode;
-    private double discountFixed;        // số tiền được giảm theo voucher cố định
+    private double discountFixed;
     private double totalAfterDiscount;
     private String image_url;
     private String paymentStatus;
     private String seat;
     private String discountType;
+    // Thuộc tính mới cho Ticket Type
+    private String ticketType;
+    // Danh sách order items (vé)
+    private List<TicketItemDTO> orderItems;
+    // Thêm 2 trường cho lịch trình sự kiện (showtime)
+    private Timestamp startDate;
+    private Timestamp endDate;
 
     public OrderDetailDTO() {
     }
 
-    public OrderDetailDTO(int orderDetailId, int orderId, Timestamp orderDate, String customerName, String customerEmail,
+    public OrderDetailDTO(int orderDetailId, int orderId, Timestamp orderDate, String customerName,
+            String customerEmail,
             String eventName, String location, double grandTotal, String voucherCode,
             String voucherPercentageCode, double discountPercentValue, double discountPercentage,
             String voucherFixedCode, double discountFixed,
-            double totalAfterDiscount, String image_url, String paymentStatus, String seat, String discountType) {
+            double totalAfterDiscount, String image_url, String paymentStatus, String seat, String discountType,
+            String ticketType, List<TicketItemDTO> orderItems, Timestamp startDate, Timestamp endDate) {
         this.orderDetailId = orderDetailId;
         this.orderId = orderId;
         this.orderDate = orderDate;
@@ -51,6 +61,45 @@ public class OrderDetailDTO {
         this.paymentStatus = paymentStatus;
         this.seat = seat;
         this.discountType = discountType;
+        this.ticketType = ticketType;
+        this.orderItems = orderItems;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    // Getters and Setters
+    // ... (các getter/setter cũ)
+
+    public Timestamp getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Timestamp startDate) {
+        this.startDate = startDate;
+    }
+
+    public Timestamp getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Timestamp endDate) {
+        this.endDate = endDate;
+    }
+
+    public List<TicketItemDTO> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<TicketItemDTO> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public String getTicketType() {
+        return ticketType;
+    }
+
+    public void setTicketType(String ticketType) {
+        this.ticketType = ticketType;
     }
 
     public int getOrderDetailId() {
@@ -204,4 +253,5 @@ public class OrderDetailDTO {
     public void setDiscountType(String discountType) {
         this.discountType = discountType;
     }
+
 }

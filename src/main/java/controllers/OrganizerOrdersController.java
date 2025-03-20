@@ -13,70 +13,65 @@ import viewModels.OrderDetailDTO;
 
 public class OrganizerOrdersController extends HttpServlet {
 
-    private static final int PAGE_SIZE = 10;
+        private static final int PAGE_SIZE = 10;
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Lấy organizerId từ session hoặc sử dụng giá trị mặc định cho test
-        HttpSession session = request.getSession();
-        int organizerId = 1; // Giá trị mặc định
-        Object orgIdObj = session.getAttribute("organizerId");
-        if (orgIdObj != null) {
-            organizerId = Integer.parseInt(orgIdObj.toString());
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                        throws ServletException, IOException {
+                // Lấy organizerId từ session hoặc sử dụng giá trị mặc định cho test (đã update
+                // thành 16)
+                HttpSession session = request.getSession();
+                int organizerId = 18; // Giá trị mặc định cho test
+                Object orgIdObj = session.getAttribute("organizerId");
+                if (orgIdObj != null) {
+                        organizerId = Integer.parseInt(orgIdObj.toString());
+                }
+                // Lấy số trang từ tham số 'page', mặc định là 1
+                String pageParam = request.getParameter("page");
+                int currentPage = (pageParam != null && !pageParam.trim().isEmpty()) ? Integer.parseInt(pageParam) : 1;
+                int offset = (currentPage - 1) * PAGE_SIZE;
+                // Lấy tham số lọc trạng thái thanh toán, mặc định là "all"
+                String paymentStatus = request.getParameter("paymentStatus");
+                if (paymentStatus == null || paymentStatus.trim().isEmpty()) {
+                        paymentStatus = "all";
+                }
+                // Lấy tham số tìm kiếm theo tên khách hàng
+                String searchOrder = request.getParameter("searchOrder");
+                if (searchOrder != null && searchOrder.trim().isEmpty()) {
+                        searchOrder = null;
+                }
+                // Lấy eventId từ request (được truyền khi nhấn nút Order của 1 sự kiện cụ thể)
+                String eventIdParam = request.getParameter("eventId");
+                int eventId = -1;
+                if (eventIdParam != null && !eventIdParam.trim().isEmpty()) {
+                        eventId = Integer.parseInt(eventIdParam);
+                }
+                OrganizerDAO organizerDAO = new OrganizerDAO();
+                // Lấy danh sách order theo organizerId, eventId, trạng thái thanh toán và tìm
+                // kiếm theo tên khách hàng
+                List<OrderDetailDTO> orders = organizerDAO.getOrderDetailsByOrganizerAndPaymentStatus(
+                                organizerId, eventId, paymentStatus, searchOrder, offset, PAGE_SIZE);
+                int totalRecords = organizerDAO.countOrdersByOrganizerAndPaymentStatus(
+                                organizerId, eventId, paymentStatus, searchOrder);
+                int totalPages = (int) Math.ceil(totalRecords / (double) PAGE_SIZE);
+                request.setAttribute("orders", orders);
+                request.setAttribute("currentPage", currentPage);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("paymentStatus", paymentStatus);
+                request.setAttribute("searchOrder", searchOrder);
+                request.setAttribute("eventId", eventId);
+                RequestDispatcher rd = request.getRequestDispatcher("/pages/organizerPage/organizerOrders.jsp");
+                rd.forward(request, response);
         }
-        
-        // Lấy số trang từ tham số 'page', mặc định là 1
-        String pageParam = request.getParameter("page");
-        int currentPage = (pageParam != null && !pageParam.trim().isEmpty()) ? Integer.parseInt(pageParam) : 1;
-        int offset = (currentPage - 1) * PAGE_SIZE;
-        
-        // Lấy tham số lọc trạng thái thanh toán, mặc định là "all"
-        String paymentStatus = request.getParameter("paymentStatus");
-        if (paymentStatus == null || paymentStatus.trim().isEmpty()) {
-            paymentStatus = "all";
-        }
-        
-        // Lấy tham số tìm kiếm theo tên khách hàng
-        String searchOrder = request.getParameter("searchOrder");
-        if (searchOrder != null && searchOrder.trim().isEmpty()) {
-            searchOrder = null;
-        }
-        
-        // Lấy eventId từ request (được truyền khi nhấn nút Order của 1 sự kiện cụ thể)
-        String eventIdParam = request.getParameter("eventId");
-        int eventId = -1;
-        if (eventIdParam != null && !eventIdParam.trim().isEmpty()) {
-            eventId = Integer.parseInt(eventIdParam);
-        }
-        
-        OrganizerDAO organizerDAO = new OrganizerDAO();
-        // Lấy danh sách order theo organizerId, eventId, trạng thái thanh toán và tìm kiếm theo tên khách hàng
-        List<OrderDetailDTO> orders = organizerDAO.getOrderDetailsByOrganizerAndPaymentStatus(
-                organizerId, eventId, paymentStatus, searchOrder, offset, PAGE_SIZE);
-        int totalRecords = organizerDAO.countOrdersByOrganizerAndPaymentStatus(
-                organizerId, eventId, paymentStatus, searchOrder);
-        int totalPages = (int) Math.ceil(totalRecords / (double) PAGE_SIZE);
-        
-        request.setAttribute("orders", orders);
-        request.setAttribute("currentPage", currentPage);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("paymentStatus", paymentStatus);
-        request.setAttribute("searchOrder", searchOrder);
-        request.setAttribute("eventId", eventId);
-        
-        RequestDispatcher rd = request.getRequestDispatcher("/pages/organizerPage/organizerOrders.jsp");
-        rd.forward(request, response);
-    }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
-    }
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response)
+                        throws ServletException, IOException {
+                doGet(request, response);
+        }
 
-    @Override
-    public String getServletInfo() {
-        return "OrganizerOrdersController retrieves orders for a specific event and forwards to organizerOrders.jsp";
-    }
+        @Override
+        public String getServletInfo() {
+                return "OrganizerOrdersController retrieves orders for a specific event and forwards to organizerOrders.jsp";
+        }
 }

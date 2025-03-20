@@ -22,6 +22,7 @@ import viewModels.FilterEvent;
 import models.Organizer;
 import models.Showtime;
 import models.TicketType;
+import viewModels.EventDTO;
 
 /**
  *
@@ -33,15 +34,15 @@ public class EventDetailController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -55,14 +56,15 @@ public class EventDetailController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -114,13 +116,12 @@ public class EventDetailController extends HttpServlet {
         request.setAttribute("listShowtimes", listShowtimes);
 
         System.out.println(eventDetail.getCategoryId());
-        
         // Filter and pagination logic (unchanged)
         List<Integer> categories = new ArrayList<>();
         categories.add(eventDetail.getCategoryId());
 
         FilterEvent filters = new FilterEvent(categories, null, null, null, null, false, null);
-        List<EventImage> filteredEvents = filterEventDAO.getFilteredEvents(filters);
+        List<EventDTO> filteredEvents = filterEventDAO.getFilteredEvents(filters);
 
         int page = 1;
         int pageSize = 20;
@@ -140,13 +141,13 @@ public class EventDetailController extends HttpServlet {
 
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalEvents);
-        List<EventImage> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
+        List<EventDTO> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
 
         request.setAttribute("filteredEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-        
-        // <!--All Event For You-->  Get the requested page number, default to 1 if not provided 
+        // <!--All Event For You--> Get the requested page number, default to 1 if not
+        // provided
         int pageAll = 1;
         int pageSizeAll = 20;
         if (request.getParameter("page") != null) {
@@ -162,7 +163,7 @@ public class EventDetailController extends HttpServlet {
         int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSizeAll);
 
         // Fetch paginated list of events
-        List<EventImage> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
+        List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
         request.setAttribute("paginatedEventsAll", paginatedEventsAll);
         request.setAttribute("pageAll", pageAll);
         request.setAttribute("totalPagesAll", totalPagesAll);
@@ -173,10 +174,10 @@ public class EventDetailController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

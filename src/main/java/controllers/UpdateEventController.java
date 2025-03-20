@@ -45,15 +45,15 @@ public class UpdateEventController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -67,14 +67,15 @@ public class UpdateEventController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -85,7 +86,7 @@ public class UpdateEventController extends HttpServlet {
         CategoryDAO categoryDAO = new CategoryDAO();
 
         String eventIdParam = request.getParameter("eventId");
-//        String eventIdParam = "25";
+        // String eventIdParam = "21";
         int eventId = 0;
         try {
             if (eventIdParam != null && !eventIdParam.isEmpty()) {
@@ -176,10 +177,10 @@ public class UpdateEventController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -189,7 +190,7 @@ public class UpdateEventController extends HttpServlet {
 
         System.out.println("Received request to /updateEvent");
         StringBuilder jsonBuffer = new StringBuilder();
-        try ( BufferedReader reader = request.getReader()) {
+        try (BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
                 jsonBuffer.append(line);
@@ -224,7 +225,8 @@ public class UpdateEventController extends HttpServlet {
             }
 
             // Get other data
-            String organizationName = jsonData.has("organizationName") ? jsonData.get("organizationName").getAsString() : "";
+            String organizationName = jsonData.has("organizationName") ? jsonData.get("organizationName").getAsString()
+                    : "";
             String accountHolder = jsonData.has("accountHolder") ? jsonData.get("accountHolder").getAsString() : "";
             String accountNumber = jsonData.has("accountNumber") ? jsonData.get("accountNumber").getAsString() : "";
             String bankName = jsonData.has("bankName") ? jsonData.get("bankName").getAsString() : "";
@@ -235,8 +237,12 @@ public class UpdateEventController extends HttpServlet {
             String description = jsonData.has("description") ? jsonData.get("description").getAsString() : "";
             String status = jsonData.has("status") ? jsonData.get("status").getAsString() : "Pending";
             String eventLogoUrl = jsonData.has("eventLogoUrl") ? jsonData.get("eventLogoUrl").getAsString() : "";
-            String backgroundImageUrl = jsonData.has("backgroundImageUrl") ? jsonData.get("backgroundImageUrl").getAsString() : "";
-            String organizerImageUrl = jsonData.has("organizerImageUrl") ? jsonData.get("organizerImageUrl").getAsString() : "";
+            String backgroundImageUrl = jsonData.has("backgroundImageUrl")
+                    ? jsonData.get("backgroundImageUrl").getAsString()
+                    : "";
+            String organizerImageUrl = jsonData.has("organizerImageUrl")
+                    ? jsonData.get("organizerImageUrl").getAsString()
+                    : "";
 
             // Validate required fields
             if (eventName.isEmpty() || categoryId == 0 || location.isEmpty() || eventType.isEmpty()) {
@@ -254,7 +260,8 @@ public class UpdateEventController extends HttpServlet {
                     String endDateStr = showTimeObj.get("endDate").getAsString();
                     showTime.setStartDate(Timestamp.valueOf(startDateStr));
                     showTime.setEndDate(Timestamp.valueOf(endDateStr));
-                    showTime.setStatus(showTimeObj.has("status") ? showTimeObj.get("status").getAsString() : "Scheduled");
+                    showTime.setStatus(
+                            showTimeObj.has("status") ? showTimeObj.get("status").getAsString() : "Scheduled");
                     showTimes.add(showTime);
                 }
             }
@@ -267,13 +274,17 @@ public class UpdateEventController extends HttpServlet {
                     JsonObject ticketTypeObj = ticketTypeElement.getAsJsonObject();
                     TicketType ticketType = new TicketType();
                     ticketType.setName(ticketTypeObj.has("name") ? ticketTypeObj.get("name").getAsString() : "");
-                    ticketType.setDescription(ticketTypeObj.has("description") ? ticketTypeObj.get("description").getAsString() : "");
+                    ticketType.setDescription(
+                            ticketTypeObj.has("description") ? ticketTypeObj.get("description").getAsString() : "");
                     ticketType.setPrice(ticketTypeObj.has("price") ? ticketTypeObj.get("price").getAsDouble() : 0);
-                    ticketType.setColor(ticketTypeObj.has("color") ? ticketTypeObj.get("color").getAsString() : "#000000");
-                    ticketType.setTotalQuantity(ticketTypeObj.has("totalQuantity") ? ticketTypeObj.get("totalQuantity").getAsInt() : 0);
+                    ticketType.setColor(
+                            ticketTypeObj.has("color") ? ticketTypeObj.get("color").getAsString() : "#000000");
+                    ticketType.setTotalQuantity(
+                            ticketTypeObj.has("totalQuantity") ? ticketTypeObj.get("totalQuantity").getAsInt() : 0);
 
                     if (ticketType.getName().isEmpty() || ticketType.getTotalQuantity() == 0) {
-                        throw new IllegalArgumentException("Ticket name and quantity are required for each ticket type");
+                        throw new IllegalArgumentException(
+                                "Ticket name and quantity are required for each ticket type");
                     }
                     ticketTypes.add(ticketType);
                 }
@@ -292,12 +303,14 @@ public class UpdateEventController extends HttpServlet {
                     JsonObject seatObj = seatElement.getAsJsonObject();
 
                     // Lấy thông tin cơ bản từ JSON
-                    String ticketTypeName = seatObj.has("ticketTypeName") ? seatObj.get("ticketTypeName").getAsString() : "";
+                    String ticketTypeName = seatObj.has("ticketTypeName") ? seatObj.get("ticketTypeName").getAsString()
+                            : "";
                     String seatRow = seatObj.has("seatRow") ? seatObj.get("seatRow").getAsString() : "";
                     String seatColStr = seatObj.has("seatCol") ? seatObj.get("seatCol").getAsString() : "";
 
                     if (ticketTypeName.isEmpty() || seatRow.isEmpty() || seatColStr.isEmpty()) {
-                        throw new IllegalArgumentException("TicketTypeName, SeatRow, and SeatCol are required for each seat");
+                        throw new IllegalArgumentException(
+                                "TicketTypeName, SeatRow, and SeatCol are required for each seat");
                     }
 
                     // Chuyển seatCol từ String sang int để biết số lần lặp
@@ -328,8 +341,7 @@ public class UpdateEventController extends HttpServlet {
                     eventId, customerId, organizationName, accountHolder, accountNumber, bankName,
                     categoryId, eventName, location, eventType, description, status,
                     eventLogoUrl, backgroundImageUrl, organizerImageUrl,
-                    showTimes, ticketTypes, seats
-            );
+                    showTimes, ticketTypes, seats);
 
             // Prepare JSON response
             JsonObject responseJson = new JsonObject();

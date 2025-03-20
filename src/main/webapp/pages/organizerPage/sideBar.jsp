@@ -32,7 +32,7 @@
                     <i class="fas fa-chair mr-2"></i>Seat Map
                 </a>
                 <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
-                   href="${pageContext.request.contextPath}/vouchers?eventId=${eventId}">
+                   href="${pageContext.request.contextPath}/ViewAllVouchersController?eventId=${eventId}">
                     <i class="fas fa-tags mr-2"></i>Voucher
                 </a>
                 <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
