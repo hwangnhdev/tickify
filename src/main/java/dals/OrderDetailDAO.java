@@ -1,8 +1,8 @@
 package dals;
 
+import java.sql.Connection;
 import viewModels.OrderDetailDTO;
 import utils.DBContext;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,19 +14,17 @@ import viewModels.TicketItemDTO;
 public class OrderDetailDAO extends DBContext {
 
     private static final String INSERT_ORDER_DETAIL = "INSERT INTO OrderDetails (order_id, ticket_type_id, quantity, price) VALUES (?, ?, ?, ?)";
-    private static final String GET_LATEST_ORDER_DETAIL
-            = "SELECT order_detail_id, order_id, ticket_type_id, quantity, price "
-            + "FROM OrderDetails "
-            + "WHERE order_id = ? AND ticket_type_id = ? "
-            + "ORDER BY order_detail_id DESC";
+    private static final String GET_LATEST_ORDER_DETAIL = "SELECT order_detail_id, order_id, ticket_type_id, quantity, price "
+            + "FROM OrderDetails WHERE order_id = ? AND ticket_type_id = ? ORDER BY order_detail_id DESC";
 
-   /**
-     * Lấy chi tiết đơn hàng cho organizer (bao gồm thông tin chung và danh sách vé – order items)
-     * @param organizerId ID của organizer
+    /**
+     * Lấy chi tiết đơn hàng theo orderId (không cần organizerId)
+     *
      * @param orderId ID của đơn hàng
-     * @return OrderDetailDTO chứa thông tin đơn hàng và danh sách vé
+     * @return OrderDetailDTO chứa thông tin đơn hàng và danh sách vé (order
+     * items)
      */
-    public OrderDetailDTO getOrderDetailForOrganizer(int organizerId, int orderId) {
+    public OrderDetailDTO getOrderDetailByOrderId(int orderId) {
         OrderDetailDTO detail = null;
         String sqlMain = "SELECT \n"
                 + "    O.order_id AS orderId,\n"
@@ -69,16 +67,15 @@ public class OrderDetailDAO extends DBContext {
                 + "LEFT JOIN Vouchers V ON O.voucher_id = V.voucher_id\n"
                 + "LEFT JOIN (SELECT event_id, MIN(image_id) AS min_image_id FROM EventImages GROUP BY event_id) EI_sub ON E.event_id = EI_sub.event_id\n"
                 + "LEFT JOIN EventImages EI ON EI_sub.min_image_id = EI.image_id\n"
-                + "WHERE O.order_id = ? AND E.organizer_id = ?\n"
+                + "WHERE O.order_id = ?\n"
                 + "GROUP BY \n"
                 + "    O.order_id, O.order_date, O.payment_status, O.total_price, O.voucher_id,\n"
                 + "    C.full_name, C.email, C.phone, C.address,\n"
                 + "    E.event_name, E.location, S.start_date, S.end_date, EI.image_url,\n"
                 + "    V.code, V.discount_type, V.discount_value";
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sqlMain)) {
             ps.setInt(1, orderId);
-            ps.setInt(2, organizerId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     detail = new OrderDetailDTO();
@@ -95,7 +92,6 @@ public class OrderDetailDAO extends DBContext {
                     detail.setEventName(rs.getString("eventName"));
                     detail.setLocation(rs.getString("location"));
                     detail.setImage_url(rs.getString("eventImage"));
-                    // Map thêm showtime
                     detail.setStartDate(rs.getTimestamp("startDate"));
                     detail.setEndDate(rs.getTimestamp("endDate"));
                 }
@@ -103,8 +99,8 @@ public class OrderDetailDAO extends DBContext {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        
-        // Truy vấn lấy danh sách order items (ticket items)
+
+        // Lấy danh sách order items (ticket items)
         String sqlItems = "SELECT \n"
                 + "    OD.order_detail_id, \n"
                 + "    TT.name AS ticketType, \n"
@@ -123,7 +119,7 @@ public class OrderDetailDAO extends DBContext {
                 + "JOIN Orders O ON OD.order_id = O.order_id\n"
                 + "WHERE O.order_id = ?\n"
                 + "GROUP BY OD.order_detail_id, TT.name, OD.quantity";
-        
+
         try (PreparedStatement ps2 = connection.prepareStatement(sqlItems)) {
             ps2.setInt(1, orderId);
             try (ResultSet rs2 = ps2.executeQuery()) {
@@ -144,7 +140,7 @@ public class OrderDetailDAO extends DBContext {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        
+
         return detail;
     }
 
@@ -191,7 +187,6 @@ public class OrderDetailDAO extends DBContext {
         String query = "SELECT order_detail_id, order_id, ticketTypeId, quantity, price "
                 + "FROM OrderDetails WHERE order_id = ?";
         try (Connection conn = new DBContext().connection; PreparedStatement ps = conn.prepareStatement(query)) {
-
             ps.setInt(1, orderId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -217,7 +212,6 @@ public class OrderDetailDAO extends DBContext {
         String query = "SELECT order_detail_id, order_id, ticketTypeId, quantity, price "
                 + "FROM OrderDetails WHERE order_detail_id = ?";
         try (Connection conn = new DBContext().connection; PreparedStatement ps = conn.prepareStatement(query)) {
-
             ps.setInt(1, orderDetailId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -233,5 +227,4 @@ public class OrderDetailDAO extends DBContext {
         }
         return od;
     }
-
 }
