@@ -138,6 +138,7 @@ public class ViewAllVouchersController extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("eventId", eventId);
             request.setAttribute("status", eventId);
+            request.setAttribute("voucherStatus", voucherStatus);
             request.getRequestDispatcher("pages/voucherPage/listVoucher.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/event"); // Handle invalid event ID
