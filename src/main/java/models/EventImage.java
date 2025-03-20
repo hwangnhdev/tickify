@@ -1,6 +1,5 @@
 package models;
 
-import com.google.gson.annotations.Expose;
 import java.sql.Timestamp;
 
 /**
@@ -9,12 +8,9 @@ import java.sql.Timestamp;
  */
 public class EventImage extends Event {
 
-    @Expose
     private int imageId;
     private int eventId;
-    @Expose
     private String imageUrl;
-    @Expose
     private String imageTitle;
 
     public EventImage() {
@@ -37,6 +33,11 @@ public class EventImage extends Event {
     public EventImage(String imageUrl, String imageTitle, int eventId, int categoryId, int organizerId, String eventName, String location, String eventType, String status, String description, Timestamp createdAt, Timestamp updatedAt) {
         super(eventId, categoryId, organizerId, eventName, location, eventType, status, description, createdAt, updatedAt);
         this.eventId = eventId;
+        this.imageUrl = imageUrl;
+        this.imageTitle = imageTitle;
+    }
+
+    public EventImage(String imageUrl, String imageTitle) {
         this.imageUrl = imageUrl;
         this.imageTitle = imageTitle;
     }

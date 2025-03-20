@@ -13,55 +13,61 @@ import utils.DBContext;
 
 public class OrganizerDAO extends DBContext {
 
-//    // Lấy thông tin chi tiết của event mà customer đã mua vé (nếu cần)
-//    public EventDetailDTO getCustomerEventDetail(int customerId, int eventId) {
-//        EventDetailDTO detail = null;
-//        String sql = "SELECT "
-//                + "    e.event_id AS eventId, "
-//                + "    e.event_name AS eventName, "
-//                + "    MIN(s.start_date) AS startDate, "
-//                + "    MAX(s.end_date) AS endDate, "
-//                + "    e.location AS location, "
-//                + "    e.status AS eventStatus, "
-//                + "    e.description AS description, "
-//                + "    (SELECT TOP 1 image_url FROM EventImages WHERE event_id = e.event_id ORDER BY image_id) AS imageURL, "
-//                + "    org.organization_name AS organizationName "
-//                + "FROM Events e "
-//                + "JOIN Organizers org ON e.organizer_id = org.organizer_id "
-//                + "JOIN Showtimes s ON e.event_id = s.event_id "
-//                + "WHERE e.event_id = ? "
-//                + "  AND EXISTS ( "
-//                + "      SELECT 1 "
-//                + "      FROM Orders o "
-//                + "      JOIN OrderDetails od ON o.order_id = od.order_id "
-//                + "      JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
-//                + "      JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id "
-//                + "      WHERE s2.event_id = e.event_id "
-//                + "        AND o.customer_id = ? "
-//                + "  ) "
-//                + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
-//        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-//            ps.setInt(1, eventId);
-//            ps.setInt(2, customerId);
-//            try (ResultSet rs = ps.executeQuery()) {
-//                if (rs.next()) {
-//                    detail = new EventDetailDTO();
-//                    detail.setEventId(rs.getInt("eventId"));
-//                    detail.setEventName(rs.getString("eventName") != null ? rs.getString("eventName") : "");
-//                    detail.setStartDate(rs.getTimestamp("startDate"));
-//                    detail.setEndDate(rs.getTimestamp("endDate"));
-//                    detail.setLocation(rs.getString("location") != null ? rs.getString("location") : "");
-//                    detail.setEventStatus(rs.getString("eventStatus") != null ? rs.getString("eventStatus") : "");
-//                    detail.setDescription(rs.getString("description") != null ? rs.getString("description") : "");
-//                    detail.setImageUrl(rs.getString("imageURL") != null ? rs.getString("imageURL") : "");
-//                    detail.setOrganizationName(rs.getString("organizationName") != null ? rs.getString("organizationName") : "");
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return detail;
-//    }
+    // Lấy thông tin chi tiết của event mà customer đã mua vé (nếu cần)
+    public EventDetailDTO getCustomerEventDetail(int customerId, int eventId) {
+        EventDetailDTO detail = null;
+        String sql = "SELECT "
+                + "    e.event_id AS eventId, "
+                + "    e.event_name AS eventName, "
+                + "    MIN(s.start_date) AS startDate, "
+                + "    MAX(s.end_date) AS endDate, "
+                + "    e.location AS location, "
+                + "    e.status AS eventStatus, "
+                + "    e.description AS description, "
+                + "    ( "
+                + "        SELECT TOP 1 image_url "
+                + "        FROM EventImages "
+                + "        WHERE event_id = e.event_id "
+                + "        ORDER BY image_id "
+                + "    ) AS imageURL, "
+                + "    org.organization_name AS organizationName "
+                + "FROM Events e "
+                + "JOIN Organizers org ON e.organizer_id = org.organizer_id "
+                + "JOIN Showtimes s ON e.event_id = s.event_id "
+                + "WHERE e.event_id = ? "
+                // Đảm bảo event chỉ được lấy khi customer có đặt vé liên quan
+                + "  AND EXISTS ( "
+                + "      SELECT 1 "
+                + "      FROM Orders o "
+                + "      JOIN OrderDetails od ON o.order_id = od.order_id "
+                + "      JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+                + "      JOIN Showtimes s2 ON tt.showtime_id = s2.showtime_id "
+                + "      WHERE s2.event_id = e.event_id "
+                + "        AND o.customer_id = ? "
+                + "  ) "
+                + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, eventId);
+            ps.setInt(2, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    detail = new EventDetailDTO();
+                    detail.setEventId(rs.getInt("eventId"));
+                    detail.setEventName(Objects.toString(rs.getString("eventName"), ""));
+                    detail.setStartDate(rs.getTimestamp("startDate"));
+                    detail.setEndDate(rs.getTimestamp("endDate"));
+                    detail.setLocation(Objects.toString(rs.getString("location"), ""));
+                    detail.setEventStatus(Objects.toString(rs.getString("eventStatus"), ""));
+                    detail.setDescription(Objects.toString(rs.getString("description"), ""));
+                    detail.setImageUrl(Objects.toString(rs.getString("imageURL"), ""));
+                    detail.setOrganizationName(Objects.toString(rs.getString("organizationName"), ""));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return detail;
+    }
 
     // Lấy danh sách event theo customer (theo organizer được liên kết với customer)
     public List<EventSummaryDTO> getEventsByCustomer(int customerId, String filter) {
@@ -263,11 +269,11 @@ public class OrganizerDAO extends DBContext {
                 + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
                 + "WHERE org.organizer_id = ? "
                 + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? )";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             stmt.setString(2, paymentStatus.toLowerCase());
             stmt.setString(3, paymentStatus.toLowerCase());
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt("total");
                 }

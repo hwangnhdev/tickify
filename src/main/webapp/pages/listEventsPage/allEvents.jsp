@@ -4,6 +4,7 @@
     Author     : Tang Thanh Vui - CE180901
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
@@ -295,7 +296,6 @@
             }
             .event-card-all_events {
                 background-color: #ffffff;
-                border: 1px solid #ddd;
                 border-radius: 8px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
@@ -316,7 +316,7 @@
                 background-color: #f0f0f0;
                 display: block;
                 transition: filter 0.3s;
-                object-fit: cover;
+                object-fit: fill;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
 
@@ -324,6 +324,16 @@
                 filter: brightness(1.1);
                 transform: scale(1.1);
                 box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
+            }
+            .event-card-all_events h4 {
+                font-size: 16px;
+                margin: 10px 0 5px;
+                color: #000000;
+            }
+            .event-card-all_events p {
+                font-size: 14px;
+                margin: 0 0;
+                color: #000000;
             }
             .g-4, .gy-4 {
                 --bs-gutter-y: 1.5rem;
@@ -482,7 +492,7 @@
                         <input type="radio" name="location" value="Tỉnh Kon Tum" ${selectedLocation == 'Tỉnh Kon Tum' ? 'checked' : ''}> Kon Tum <br>
                         <input type="radio" name="location" value="Tỉnh Gia Lai" ${selectedLocation == 'Tỉnh Gia Lai' ? 'checked' : ''}> Gia Lai <br>
                         <input type="radio" name="location" value="Tỉnh Đắk Lắk" ${selectedLocation == 'Tỉnh Đắk Lắk' ? 'checked' : ''}> Đắk Lắk <br>
-                                               <input type="radio" name="location" value="Thành phố Hồ Chí Minh" ${selectedLocation == 'Thành phố Hồ Chí Minh' ? 'checked' : ''}> Hồ Chí Minh <br>
+                        <input type="radio" name="location" value="Thành phố Hồ Chí Minh" ${selectedLocation == 'Thành phố Hồ Chí Minh' ? 'checked' : ''}> Hồ Chí Minh <br>
                         <input type="radio" name="location" value="Tỉnh Đắk Nông" ${selectedLocation == 'Tỉnh Đắk Nông' ? 'checked' : ''}> Đắk Nông <br>
                         <input type="radio" name="location" value="Tỉnh Lâm Đồng" ${selectedLocation == 'Tỉnh Lâm Đồng' ? 'checked' : ''}> Lâm Đồng <br>
                         <input type="radio" name="location" value="Tỉnh Bình Phước" ${selectedLocation == 'Tỉnh Bình Phước' ? 'checked' : ''}> Bình Phước <br>
@@ -525,10 +535,18 @@
                     <div class="row gy-4" id="event-container">
                         <!-- Loop through paginated events -->
                         <c:forEach var="event" items="${paginatedEventsAll}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                 <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                        <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                        <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                            ${event.event.eventName}
+                                        </h2>
+                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                        <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                            <i class="far fa-calendar-alt mr-2"></i>
+                                            <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                        </p>
                                     </a>
                                 </div>
                             </div>
@@ -543,10 +561,18 @@
                     <div class="row gy-4" id="event-container">
                         <!-- Loop through paginated events -->
                         <c:forEach var="event" items="${filteredEvents}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                 <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
+                                    <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                        <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                        <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                            ${event.event.eventName}
+                                        </h2>
+                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                        <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                            <i class="far fa-calendar-alt mr-2"></i>
+                                            <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                        </p>
                                     </a>
                                 </div>
                             </div>

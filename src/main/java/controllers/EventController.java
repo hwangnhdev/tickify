@@ -18,6 +18,7 @@ import java.util.List;
 import models.Category;
 import models.Event;
 import models.EventImage;
+import viewModels.EventDTO;
 
 /**
  *
@@ -111,7 +112,7 @@ public class EventController extends HttpServlet {
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
 
         // Fetch paginated list of events
-        List<EventImage> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
+        List<EventDTO> paginatedEvents = eventDAO.getEventsByPage(page, pageSize);
         request.setAttribute("paginatedEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -129,8 +130,6 @@ public class EventController extends HttpServlet {
         // Set attribute for DAO
         session.setAttribute("listCategories", listCategories);
 
-//        List<Event> topTicketEvents = eventDAO.getTopPicksForYou(3);
-//        request.setAttribute("topTicketEvents", topTicketEvents);
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
     }
