@@ -70,67 +70,49 @@ public class OrganizerDAO extends DBContext {
     }
 
     // Lấy danh sách event theo customer (theo organizer được liên kết với customer)
-    public List<EventSummaryDTO> getEventsByCustomer(int customerId, String filter) {
-        List<EventSummaryDTO> events = new ArrayList<>();
-        String sql = "SELECT "
-                + "    e.event_id AS eventId, "
-                + "    e.event_name AS eventName, "
-                + "    MIN(s.start_date) AS startDate, "
-                + "    MAX(s.end_date) AS endDate, "
-                + "    e.location AS location, "
-                + "    e.status AS status, "
-                + "    ( "
-                + "        SELECT TOP 1 image_url "
-                + "        FROM EventImages "
-                + "        WHERE event_id = e.event_id "
-                + "        ORDER BY image_id "
-                + "    ) AS image "
-                + "FROM Events e "
-                + "JOIN Showtimes s ON e.event_id = s.event_id "
-                + "WHERE e.organizer_id IN (SELECT organizer_id FROM Organizers WHERE customer_id = ?) ";
-
-        // Nếu filter là processing, approved hoặc rejected thì lọc theo e.status
-        if (filter != null && (filter.equalsIgnoreCase("processing")
-                || filter.equalsIgnoreCase("approved")
-                || filter.equalsIgnoreCase("rejected"))) {
-            sql += "AND LOWER(e.status) = ? ";
+  public List<EventSummaryDTO> getEventsByCustomer(int customerId, String filter) {
+    List<EventSummaryDTO> events = new ArrayList<>();
+    // Lưu ý: Ở đây filter không được sử dụng trong truy vấn; nếu cần, bạn có thể mở rộng truy vấn
+    String sql = "WITH BannerImages AS ( " +
+                 "    SELECT event_id, image_url, " +
+                 "           ROW_NUMBER() OVER (PARTITION BY event_id " +
+                 "                              ORDER BY CASE WHEN LOWER(image_title) LIKE '%banner%' THEN 0 ELSE 1 END, image_id) AS rn " +
+                 "    FROM EventImages " +
+                 ") " +
+                 "SELECT " +
+                 "    e.event_id AS eventId, " +
+                 "    e.event_name AS eventName, " +
+                 "    MIN(s.start_date) AS startDate, " +
+                 "    MAX(s.end_date) AS endDate, " +
+                 "    e.location, " +
+                 "    e.status, " +
+                 "    ISNULL(bi.image_url, 'https://your-cloud-storage.com/path/to/default-banner.jpg') AS image " +
+                 "FROM Events e " +
+                 "JOIN Showtimes s ON e.event_id = s.event_id " +
+                 "LEFT JOIN BannerImages bi ON e.event_id = bi.event_id AND bi.rn = 1 " +
+                 "WHERE e.organizer_id IN (SELECT organizer_id FROM Organizers WHERE customer_id = ?) " +
+                 "GROUP BY e.event_id, e.event_name, e.location, e.status, bi.image_url";
+    
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, customerId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            EventSummaryDTO eventSummary = new EventSummaryDTO();
+            eventSummary.setEventId(rs.getInt("eventId"));
+            eventSummary.setEventName(rs.getString("eventName"));
+            eventSummary.setStartDate(rs.getTimestamp("startDate"));
+            eventSummary.setEndDate(rs.getTimestamp("endDate"));
+            eventSummary.setLocation(rs.getString("location"));
+            eventSummary.setEventStatus(rs.getString("status"));
+            eventSummary.setImageUrl(rs.getString("image"));
+            events.add(eventSummary);
         }
-
-        sql += "GROUP BY e.event_id, e.event_name, e.location, e.status ";
-
-        // Nếu filter là upcoming hoặc past thì sử dụng HAVING để lọc theo thời gian
-        if (filter != null && filter.equalsIgnoreCase("upcoming")) {
-            sql += "HAVING MIN(s.start_date) > GETDATE() ";
-        } else if (filter != null && filter.equalsIgnoreCase("past")) {
-            sql += "HAVING MAX(s.end_date) < GETDATE() ";
-        }
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            int index = 1;
-            ps.setInt(index++, customerId);
-            if (filter != null && (filter.equalsIgnoreCase("processing")
-                    || filter.equalsIgnoreCase("approved")
-                    || filter.equalsIgnoreCase("rejected"))) {
-                ps.setString(index++, filter.toLowerCase());
-            }
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                EventSummaryDTO eventSummary = new EventSummaryDTO();
-                eventSummary.setEventId(rs.getInt("eventId"));
-                eventSummary.setEventName(rs.getString("eventName") != null ? rs.getString("eventName") : "");
-                eventSummary.setStartDate(rs.getTimestamp("startDate"));
-                eventSummary.setEndDate(rs.getTimestamp("endDate"));
-                eventSummary.setLocation(rs.getString("location") != null ? rs.getString("location") : "");
-                // Gán giá trị của e.status vào thuộc tính eventStatus
-                eventSummary.setEventStatus(rs.getString("status") != null ? rs.getString("status") : "");
-                eventSummary.setImageUrl(rs.getString("image") != null ? rs.getString("image") : "");
-                events.add(eventSummary);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return events;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return events;
+}
+
 
     public List<OrderDetailDTO> getOrderDetailsByEventAndPaymentStatus(
             int eventId, String paymentStatus, String searchOrder, int offset, int pageSize) {
@@ -285,42 +267,52 @@ public class OrganizerDAO extends DBContext {
     }
 
     public EventDetailDTO getEventDetail(int eventId) {
-        EventDetailDTO detail = null;
-        String sql = "SELECT "
-                + "    e.event_id AS eventId, "
-                + "    e.event_name AS eventName, "
-                + "    MIN(s.start_date) AS startDate, "
-                + "    MAX(s.end_date) AS endDate, "
-                + "    e.location AS location, "
-                + "    e.status AS eventStatus, "
-                + "    e.description AS description, "
-                + "    (SELECT TOP 1 image_url FROM EventImages WHERE event_id = e.event_id ORDER BY image_id) AS imageURL, "
-                + "    org.organization_name AS organizationName "
-                + "FROM Events e "
-                + "JOIN Organizers org ON e.organizer_id = org.organizer_id "
-                + "JOIN Showtimes s ON e.event_id = s.event_id "
-                + "WHERE e.event_id = ? "
-                + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, eventId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    detail = new EventDetailDTO();
-                    detail.setEventId(rs.getInt("eventId"));
-                    detail.setEventName(rs.getString("eventName") != null ? rs.getString("eventName") : "");
-                    detail.setStartDate(rs.getTimestamp("startDate"));
-                    detail.setEndDate(rs.getTimestamp("endDate"));
-                    detail.setLocation(rs.getString("location") != null ? rs.getString("location") : "");
-                    detail.setEventStatus(rs.getString("eventStatus") != null ? rs.getString("eventStatus") : "");
-                    detail.setDescription(rs.getString("description") != null ? rs.getString("description") : "");
-                    detail.setImageUrl(rs.getString("imageURL") != null ? rs.getString("imageURL") : "");
-                    detail.setOrganizationName(rs.getString("organizationName") != null ? rs.getString("organizationName") : "");
-                }
+    EventDetailDTO detail = null;
+    String sql = 
+          "WITH BannerImages AS ( " +
+          "    SELECT event_id, image_url, " +
+          "           ROW_NUMBER() OVER (PARTITION BY event_id " +
+          "                              ORDER BY CASE WHEN LOWER(image_title) LIKE '%banner%' THEN 0 ELSE 1 END, image_id) AS rn " +
+          "    FROM EventImages " +
+          ") " +
+          "SELECT " +
+          "    e.event_id AS eventId, " +
+          "    e.event_name AS eventName, " +
+          "    MIN(s.start_date) AS startDate, " +
+          "    MAX(s.end_date) AS endDate, " +
+          "    e.location AS location, " +
+          "    e.status AS eventStatus, " +
+          "    e.description AS description, " +
+          "    ISNULL(bi.image_url, 'https://your-cloud-storage.com/path/to/default-banner.jpg') AS imageURL, " +
+          "    org.organization_name AS organizationName " +
+          "FROM Events e " +
+          "JOIN Organizers org ON e.organizer_id = org.organizer_id " +
+          "JOIN Showtimes s ON e.event_id = s.event_id " +
+          "LEFT JOIN BannerImages bi ON e.event_id = bi.event_id AND bi.rn = 1 " +
+          "WHERE e.event_id = ? " +
+          "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name, bi.image_url";
+    
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, eventId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                detail = new EventDetailDTO();
+                detail.setEventId(rs.getInt("eventId"));
+                detail.setEventName(rs.getString("eventName") != null ? rs.getString("eventName") : "");
+                detail.setStartDate(rs.getTimestamp("startDate"));
+                detail.setEndDate(rs.getTimestamp("endDate"));
+                detail.setLocation(rs.getString("location") != null ? rs.getString("location") : "");
+                detail.setEventStatus(rs.getString("eventStatus") != null ? rs.getString("eventStatus") : "");
+                detail.setDescription(rs.getString("description") != null ? rs.getString("description") : "");
+                detail.setImageUrl(rs.getString("imageURL") != null ? rs.getString("imageURL") 
+                               : "https://your-cloud-storage.com/path/to/default-banner.jpg");
+                detail.setOrganizationName(rs.getString("organizationName") != null ? rs.getString("organizationName") : "");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return detail;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return detail;
+}
 
 }

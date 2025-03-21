@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import models.EventImage;
 import viewModels.EventDetailDTO;
-
 @WebServlet("/organizer/eventDetail")
 public class OrganizerEventDetailController extends HttpServlet {
 
@@ -22,7 +21,6 @@ public class OrganizerEventDetailController extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-
         String eventIdParam = request.getParameter("eventId");
         int eventId;
         if (eventIdParam != null && !eventIdParam.trim().isEmpty()) {
@@ -55,11 +53,10 @@ public class OrganizerEventDetailController extends HttpServlet {
             return;
         }
 
-        // Lấy danh sách hình ảnh của sự kiện từ EventDAO
+        // Lấy danh sách hình ảnh phụ của sự kiện
         EventDAO eventDAO = new EventDAO();
         List<EventImage> listImages = eventDAO.getImageEventsByEventId(eventId);
 
-        // Set attribute để JSP hiển thị thông tin chi tiết và danh sách hình ảnh
         request.setAttribute("organizerEventDetail", detail);
         request.setAttribute("listEventImages", listImages);
 
@@ -75,6 +72,6 @@ public class OrganizerEventDetailController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "OrganizerEventDetailController retrieves event detail by event ID with all associated images";
+        return "OrganizerEventDetailController retrieves event detail with banner image";
     }
 }

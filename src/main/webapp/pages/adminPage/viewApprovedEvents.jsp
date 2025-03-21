@@ -48,7 +48,7 @@
                   <tr class="hover:bg-gray-50 transition duration-150">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${event.eventId}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                      <c:url var="eventDetailUrl" value="/admin/viewApprovedDetail">
+                      <c:url var="eventDetailUrl" value="/admin/viewEventDetail">
                         <c:param name="eventId" value="${event.eventId}" />
                         <c:param name="page" value="${page}" />
                       </c:url>
