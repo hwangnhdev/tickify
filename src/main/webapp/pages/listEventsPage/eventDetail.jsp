@@ -448,7 +448,7 @@
         <input value="${eventId}" name="eventID" hidden/>
         <input value="${event.organizerId}" name="organizerId" hidden/>
 
-        <div class="container-event_detail">
+        <div class="container-event_detail" id="container-event_detail">
             <div class="event-card-event_detail">
                 <div class="event-details">
                     <div class="ticket">
@@ -624,7 +624,7 @@
                                 function loadEvents(page, isRelevant) {
                                     var url = '${pageContext.request.contextPath}/eventDetail';
                                     var data = {
-                                        id: ${eventID},
+                                        id: ${eventId},
                                         page: isRelevant ? page : undefined,
                                         pageAll: isRelevant ? undefined : page
                                     };
@@ -636,9 +636,10 @@
                                         dataType: 'json',
                                         headers: {'X-Requested-With': 'XMLHttpRequest'},
                                         success: function (data) {
+                                            console.log("AJAX Response:", data);
                                             updateEventContainer(data.events, data.type);
                                             updatePagination(data.totalPages, data.currentPage, data.type === 'relevant');
-                                            $('#events-title')[0].scrollIntoView({behavior: 'smooth'});
+                                            $('#container-event_detail')[0].scrollIntoView({behavior: 'smooth'});
                                         },
                                         error: function () {
                                             console.error('Error loading events');
@@ -681,49 +682,48 @@
                                 function updatePagination(totalPages, currentPage, isRelevant) {
                                     var pagination = $('#pagination');
                                     pagination.empty();
-
-                                    if (!totalPages || totalPages <= 1) {
-                                        console.log("Total pages <= 1 or invalid:", totalPages);
-                                        return;
-                                    }
-
                                     pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
                                     var ul = pagination.find('ul');
+                                    console.log("Total Pages: " + totalPages + ", Current Page: " + currentPage);
 
-                                    var displayPages = 5;
-                                    var halfDisplayPages = Math.floor(displayPages / 2);
-                                    var startPage = currentPage - halfDisplayPages;
-                                    var endPage = currentPage + halfDisplayPages;
-                                    if (startPage < 1)
-                                        startPage = 1;
-                                    if (endPage > totalPages)
-                                        endPage = totalPages;
+                                    if (totalPages > 1) {
+                                        var displayPages = 5;
+                                        var halfDisplayPages = Math.floor(displayPages / 2);
+                                        var startPage = currentPage - halfDisplayPages;
+                                        var endPage = currentPage + halfDisplayPages;
+                                        if (startPage < 1)
+                                            startPage = 1;
+                                        if (endPage > totalPages)
+                                            endPage = totalPages;
 
-                                    if (currentPage > 1) {
-                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1, ' + isRelevant + '); return false;">First</a></li>');
-                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + ', ' + isRelevant + '); return false;">Prev</a></li>');
-                                    }
-
-                                    for (var i = startPage; i <= endPage; i++) {
-                                        if (i === currentPage) {
-                                            ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
-                                        } else {
-                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + ', ' + isRelevant + '); return false;">' + i + '</a></li>');
+                                        if (currentPage > 1) {
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1, ' + isRelevant + '); return false;">First</a></li>');
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + ', ' + isRelevant + '); return false;">Prev</a></li>');
                                         }
-                                    }
 
-                                    if (currentPage < totalPages) {
-                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + ', ' + isRelevant + '); return false;">Next</a></li>');
-                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + ', ' + isRelevant + '); return false;">Last</a></li>');
+                                        for (var i = startPage; i <= endPage; i++) {
+                                            if (i === currentPage) {
+                                                ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
+                                            } else {
+                                                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + ', ' + isRelevant + '); return false;">' + i + '</a></li>');
+                                            }
+                                        }
+
+                                        if (currentPage < totalPages) {
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + ', ' + isRelevant + '); return false;">Next</a></li>');
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + ', ' + isRelevant + '); return false;">Last</a></li>');
+                                        }
+                                    } else {
+                                        ul.append('<li class="page-item active"><span class="page-link">1</span></li>'); // Chỉ hiển thị trang 1
                                     }
                                 }
 
                                 $(document).ready(function () {
                                     var isRelevant = ${not empty relevantEvents};
-                                    var totalPages = ${isRelevant ? totalPages : totalPagesAll};
                                     var currentPage = ${isRelevant ? currentPage : pageAll};
-                                    console.log("isRelevant:", isRelevant, "totalPages:", totalPages, "currentPage:", currentPage);
-                                    updatePagination(totalPages, currentPage, isRelevant);
+                                    console.log("isRelevant:", isRelevant, "currentPage:", currentPage);
+                                    // Gọi loadEvents ngay khi trang được tải
+                                    loadEvents(currentPage, isRelevant);
                                 });
         </script>
         <script>

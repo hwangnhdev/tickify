@@ -95,13 +95,11 @@ public class EventDetailController extends HttpServlet {
         Organizer organizer = eventDAO.getOrganizerByEventId(eventId);
         List<Showtime> listShowtimes = eventDAO.getShowTimesByEventId(eventId);
 
-        // Populate ticket types for each showtime
         for (Showtime showtime : listShowtimes) {
             List<TicketType> ticketTypes = eventDAO.getTicketTypesByShowtimeId(showtime.getShowtimeId());
             showtime.setTicketTypes(ticketTypes);
         }
 
-        // Set event image attributes
         for (EventImage image : listEventImages) {
             if (image.getImageTitle().equalsIgnoreCase("logo_event")) {
                 request.setAttribute("logoEventImage", image.getImageUrl());
@@ -117,15 +115,15 @@ public class EventDetailController extends HttpServlet {
             }
         }
 
-        request.setAttribute("eventID", eventId);
+        request.setAttribute("eventId", eventId); // Sửa eventID thành eventId để đồng bộ với JSP
         request.setAttribute("eventDetail", eventDetail);
         request.setAttribute("eventCategories", eventCategories);
         request.setAttribute("organizer", organizer);
         request.setAttribute("listShowtimes", listShowtimes);
 
-        // Pagination parameters
+        // Pagination parameters for Relevant Events
         int page = 1;
-        int pageSize = 20;
+        int pageSize = 20; // Đặt pageSize là 1 để đồng bộ với giao diện (1 sự kiện mỗi trang)
         if (request.getParameter("page") != null) {
             try {
                 page = Integer.parseInt(request.getParameter("page"));
@@ -136,11 +134,11 @@ public class EventDetailController extends HttpServlet {
 
         // Relevant Events
         List<Integer> categories = new ArrayList<>();
-        categories.add(4);
+        categories.add(eventDetail.getCategoryId());
         FilterEvent filters = new FilterEvent(categories, null, null, null, null, false, null);
         List<EventDTO> relevantEvents = filterEventDAO.getFilteredEvents(filters);
 
-        // Loại bỏ sự kiện hiện tại khỏi danh sách Relevant Events mà không dùng Lambda
+        // Loại bỏ sự kiện hiện tại
         Iterator<EventDTO> iterator = relevantEvents.iterator();
         while (iterator.hasNext()) {
             EventDTO event = iterator.next();
@@ -149,14 +147,24 @@ public class EventDetailController extends HttpServlet {
             }
         }
 
+        // Tính toán phân trang cho Relevant Events
         int totalRelevantEvents = relevantEvents.size();
         int totalPages = (int) Math.ceil((double) totalRelevantEvents / pageSize);
+
+        // Đảm bảo page không vượt quá totalPages
+        if (page > totalPages && totalPages > 0) {
+            page = totalPages; // Nếu page vượt quá totalPages, đặt lại về trang cuối
+        } else if (page < 1) {
+            page = 1; // Nếu page nhỏ hơn 1, đặt về trang 1
+        }
+
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalRelevantEvents);
-        List<EventDTO> paginatedRelevantEvents = (List<EventDTO>) (totalRelevantEvents > 0 ? relevantEvents.subList(startIndex, endIndex) : new ArrayList<>());
+        List<EventDTO> paginatedRelevantEvents = (List<EventDTO>) ((totalRelevantEvents > 0) ? relevantEvents.subList(startIndex, endIndex) : new ArrayList<>());
 
-        // All Events
+        // Pagination parameters for All Events
         int pageAll = 1;
+        int pageSizeAll = 20; // pageSize cho All Events có thể giữ nguyên 20
         if (request.getParameter("pageAll") != null) {
             try {
                 pageAll = Integer.parseInt(request.getParameter("pageAll"));
@@ -164,16 +172,23 @@ public class EventDetailController extends HttpServlet {
                 pageAll = 1;
             }
         }
-        int totalEventsAll = eventDAO.getTotalEvents();
-        int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSize);
-        List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSize);
 
-        // Check if this is an Ajax request
+        // All Events
+        int totalEventsAll = eventDAO.getTotalEvents();
+        int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSizeAll);
+        if (pageAll > totalPagesAll && totalPagesAll > 0) {
+            pageAll = totalPagesAll; // Đảm bảo pageAll không vượt quá totalPagesAll
+        } else if (pageAll < 1) {
+            pageAll = 1;
+        }
+        List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
+
+        // Ajax request
         String ajaxHeader = request.getHeader("X-Requested-With");
         if ("XMLHttpRequest".equals(ajaxHeader)) {
             response.setContentType("application/json");
             PrintWriter out = response.getWriter();
-            if (totalRelevantEvents > 0) {
+            if (!paginatedRelevantEvents.isEmpty()) {
                 out.print(toJson(paginatedRelevantEvents, totalPages, page, "relevant"));
             } else {
                 out.print(toJson(paginatedEventsAll, totalPagesAll, pageAll, "all"));
