@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import viewModels.EventSummaryDTO;
 
+
 public class OrganizerEventController extends HttpServlet {
 
     @Override
@@ -48,8 +49,6 @@ public class OrganizerEventController extends HttpServlet {
 
         // Đặt danh sách sự kiện và bộ lọc hiện tại vào request để JSP hiển thị
         request.setAttribute("events", events);
-        request.setAttribute("currentFilter", filter);
-
         RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/organizerEvents.jsp");
         dispatcher.forward(request, response);
     }
@@ -59,9 +58,10 @@ public class OrganizerEventController extends HttpServlet {
             throws ServletException, IOException {
         doGet(request, response);
     }
-
+    
     @Override
     public String getServletInfo() {
-        return "OrganizerEventController retrieves filtered events and forwards to organizerEvents.jsp";
+        return "OrganizerEventController retrieves events with banner images";
     }
 }
+
