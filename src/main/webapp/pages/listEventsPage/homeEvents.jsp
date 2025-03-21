@@ -236,7 +236,7 @@
             .event-card-spec_event img {
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: fill;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, filter 0.3s ease-in-out;
             }
 
@@ -307,7 +307,7 @@
             .event-card-trend_events img {
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: fill;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, filter 0.3s ease-in-out;
             }
 
@@ -378,7 +378,7 @@
             .event-card-rec_events img {
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: fill;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
 
@@ -470,6 +470,7 @@
                 font-weight: bold;
                 color: #0056b3;
             }
+            /* Title*/
             h2.text-xl.font-bold.text-center {
                 margin-top: 2%;
                 margin-bottom: -1.5rem !important;
