@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import models.Category;
 import viewModels.EventDTO;
@@ -74,11 +75,9 @@ public class AllEventsController extends HttpServlet {
         EventDAO eventDAO = new EventDAO();
         CategoryDAO categoryDAO = new CategoryDAO();
 
-        // Load categories
         List<Category> listCategories = categoryDAO.getAllCategories();
         session.setAttribute("listCategories", listCategories);
 
-        // Get filter parameters
         String[] categoryIds = request.getParameterValues("category");
         String location = request.getParameter("location");
         String startDateStr = request.getParameter("startDate");
@@ -86,22 +85,30 @@ public class AllEventsController extends HttpServlet {
         String price = request.getParameter("price");
         String searchQuery = request.getParameter("query");
 
-        // Convert category IDs
+        System.out.println("=== Request Parameters ===");
+        System.out.println("Category IDs: " + (categoryIds != null ? Arrays.toString(categoryIds) : "null"));
+        System.out.println("Location: " + location);
+        System.out.println("Start Date: " + startDateStr);
+        System.out.println("End Date: " + endDateStr);
+        System.out.println("Price: " + price);
+        System.out.println("Search Query: " + searchQuery);
+
         List<Integer> categories = new ArrayList<>();
         if (categoryIds != null) {
             for (String id : categoryIds) {
-                categories.add(Integer.parseInt(id));
+                try {
+                    categories.add(Integer.parseInt(id));
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid category ID: " + id);
+                }
             }
         }
 
-        // Convert dates
         Date startDate = (startDateStr != null && !startDateStr.isEmpty()) ? Date.valueOf(startDateStr) : null;
         Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? Date.valueOf(endDateStr) : null;
 
-        // Create filter object
         FilterEvent filters = new FilterEvent(categories, location, startDate, endDate, price, false, searchQuery);
 
-        // Store session for attributes
         session.setAttribute("searchQuery", searchQuery);
         session.setAttribute("selectedCategories", categories);
         session.setAttribute("selectedLocation", location);
@@ -109,7 +116,6 @@ public class AllEventsController extends HttpServlet {
         session.setAttribute("selectedEndDate", endDateStr);
         session.setAttribute("selectedPrice", price);
 
-        // Pagination parameters
         int page = 1;
         int pageSize = 20;
         if (request.getParameter("page") != null) {
@@ -120,36 +126,38 @@ public class AllEventsController extends HttpServlet {
             }
         }
 
-        // Get filtered events
         List<EventDTO> filteredEvents = filterEventDAO.getFilteredEvents(filters);
         int totalEvents = filteredEvents.size();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
-        int startIndex = (page - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, totalEvents);
-        List<EventDTO> paginatedFilteredEvents = (List<EventDTO>) ((totalEvents > 0) ? filteredEvents.subList(startIndex, endIndex) : new ArrayList<>());
 
-        // Get all events for fallback
+        int startIndex = (page - 1) * pageSize;
+        List<EventDTO> paginatedFilteredEvents;
+        if (totalEvents > 0 && startIndex < totalEvents) {
+            int endIndex = Math.min(startIndex + pageSize, totalEvents);
+            paginatedFilteredEvents = filteredEvents.subList(startIndex, endIndex);
+        } else {
+            paginatedFilteredEvents = new ArrayList<>(); // Trả về rỗng nếu vượt quá trang
+        }
+
         int totalEventsAll = eventDAO.getTotalEvents();
         int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSize);
         List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(page, pageSize);
 
-        // Check if this is an Ajax request
         String ajaxHeader = request.getHeader("X-Requested-With");
         if ("XMLHttpRequest".equals(ajaxHeader)) {
             response.setContentType("application/json");
             PrintWriter out = response.getWriter();
             if (totalEvents == 0) {
-                // Không có sự kiện lọc nào khớp, trả về fallback với cờ noFilteredEvents = true
+                System.out.println("No filtered events found, returning fallback, totalEventsAll: " + totalEventsAll + ", page: " + page);
                 out.print(toJsonWithFlag(paginatedEventsAll, totalPagesAll, page, true));
             } else {
-                // Có sự kiện lọc khớp, trả về filtered events với cờ noFilteredEvents = false
+                System.out.println("Returning filtered events, totalEvents: " + totalEvents + ", page: " + page);
                 out.print(toJsonWithFlag(paginatedFilteredEvents, totalPages, page, false));
             }
             out.flush();
             return;
         }
 
-        // Normal request: Forward to JSP
         request.setAttribute("filteredEvents", paginatedFilteredEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
