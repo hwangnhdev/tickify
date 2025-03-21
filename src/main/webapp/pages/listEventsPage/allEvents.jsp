@@ -535,13 +535,13 @@
         </form>
 
         <!-- All Events Section -->
-        <c:choose>
-            <c:when test="${empty filteredEvents}">
-                <p class="text-center">No Events Found From Your Filter And Search</p>
-                <h2 class="text-xl font-bold text-center" style="margin-left: 4%;">
-                    <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
-                </h2>
-                <div class="container py-4">
+        <div class="container py-4">
+            <c:choose>
+                <c:when test="${empty filteredEvents}">
+                    <p class="text-center">No Events Found From Your Filter And Search</p>
+                    <h2 class="text-xl font-bold text-center" style="margin-left: 4%;" id="all-events-title">
+                        <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
+                    </h2>
                     <div class="row gy-4" id="event-container">
                         <c:forEach var="event" items="${paginatedEventsAll}">
                             <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -561,39 +561,13 @@
                             </div>
                         </c:forEach>
                     </div>
-                    <div id="pagination" class="text-center mt-4">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                <c:if test="${pageAll > 1}">
-                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>
-                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${pageAll - 1}); return false;">Prev</a></li>
-                                    </c:if>
-                                    <c:forEach begin="${pageAll - 2 > 0 ? pageAll - 2 : 1}" end="${pageAll + 2 < totalPagesAll ? pageAll + 2 : totalPagesAll}" var="i">
-                                        <c:choose>
-                                            <c:when test="${i == pageAll}">
-                                            <li class="page-item active"><span class="page-link">${i}</span></li>
-                                            </c:when>
-                                            <c:otherwise>
-                                            <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${i}); return false;">${i}</a></li>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:forEach>
-                                    <c:if test="${pageAll < totalPagesAll}">
-                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${pageAll + 1}); return false;">Next</a></li>
-                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${totalPagesAll}); return false;">Last</a></li>
-                                    </c:if>
-                            </ul>
-                        </nav>
+                </c:when>
+                <c:otherwise>
+                    <div style="text-align: center;">
+                        <h2 id="all-events-title" class="text-xl font-bold text-center" style="margin-left: 4%;">
+                            <i class="fas fa-calendar-week text-green-500 mr-2"></i> Filtered Events For You
+                        </h2>
                     </div>
-                </div>
-            </c:when>
-            <c:otherwise>
-                <div style="text-align: center;">
-                    <h2 id="all-events-title" class="text-xl font-bold text-center" style="margin-left: 4%;">
-                        <i class="fas fa-calendar-week text-green-500 mr-2"></i> Filtered Events For You
-                    </h2>
-                </div>
-                <div class="container py-4">
                     <div class="row gy-4" id="event-container">
                         <c:forEach var="event" items="${filteredEvents}">
                             <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -613,187 +587,220 @@
                             </div>
                         </c:forEach>
                     </div>
-                    <div id="pagination" class="text-center mt-4">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                <c:if test="${currentPage > 1}">
-                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>
-                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${currentPage - 1}); return false;">Prev</a></li>
-                                    </c:if>
-                                    <c:forEach begin="${currentPage - 2 > 0 ? currentPage - 2 : 1}" end="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}" var="i">
-                                        <c:choose>
-                                            <c:when test="${i == currentPage}">
-                                            <li class="page-item active"><span class="page-link">${i}</span></li>
-                                            </c:when>
-                                            <c:otherwise>
-                                            <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${i}); return false;">${i}</a></li>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:forEach>
-                                    <c:if test="${currentPage < totalPages}">
-                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${currentPage + 1}); return false;">Next</a></li>
-                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${totalPages}); return false;">Last</a></li>
-                                    </c:if>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </c:otherwise>
-        </c:choose>
+                </c:otherwise>
+            </c:choose>
+            <div id="pagination" class="text-center mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <c:if test="${currentPage > 1}">
+                            <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>
+                            <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${currentPage - 1}); return false;">Prev</a></li>
+                            </c:if>
+                            <c:forEach begin="${currentPage - 2 > 0 ? currentPage - 2 : 1}" end="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}" var="i">
+                                <c:choose>
+                                    <c:when test="${i == currentPage}">
+                                    <li class="page-item active"><span class="page-link">${i}</span></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${i}); return false;">${i}</a></li>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                            <c:if test="${currentPage < totalPages}">
+                            <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${currentPage + 1}); return false;">Next</a></li>
+                            <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${totalPages}); return false;">Last</a></li>
+                            </c:if>
+                    </ul>
+                </nav>
+            </div>
+        </div>
 
         <!-- JavaScript -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
         <script>
-                                        // Store initial filters from header
-                                        var initialFilters = {
-                                            query: '${searchQuery != null ? searchQuery : ''}',
-                                            category: [<c:forEach var="cat" items="${selectedCategories}">${cat},</c:forEach>],
-                                            location: '${selectedLocation != null ? selectedLocation : ''}',
-                                            startDate: '${selectedStartDate != null ? selectedStartDate : ''}',
-                                            endDate: '${selectedEndDate != null ? selectedEndDate : ''}',
-                                            price: '${selectedPrice != null ? selectedPrice : ''}'
-                                        };
+                                // Store initial filters from header
+                                var initialFilters = {
+                                    query: '${searchQuery != null ? searchQuery : ''}',
+                                    category: [<c:forEach var="cat" items="${selectedCategories}">${cat},</c:forEach>],
+                                    location: '${selectedLocation != null ? selectedLocation : ''}',
+                                    startDate: '${selectedStartDate != null ? selectedStartDate : ''}',
+                                    endDate: '${selectedEndDate != null ? selectedEndDate : ''}',
+                                    price: '${selectedPrice != null ? selectedPrice : ''}'
+                                };
 
-                                        function loadEvents(page, filters = {}) {
-                                            // Combine initial filters with new filters
-                                            var combinedFilters = $.extend(true, {}, initialFilters, filters);
-                                            combinedFilters.page = page;
-                                            console.log("Combined Filters:", combinedFilters); // Debug
-                                            // Đảm bảo category là mảng, ngay cả khi không có giá trị mới
-                                            if (!combinedFilters.category || !Array.isArray(combinedFilters.category)) {
-                                                combinedFilters.category = initialFilters.category || [];
-                                            }
+                                function loadEvents(page, filters = {}) {
+                                    var combinedFilters = $.extend(true, {}, initialFilters, filters);
+                                    combinedFilters.page = page;
+                                    if (!combinedFilters.category || !Array.isArray(combinedFilters.category)) {
+                                        combinedFilters.category = initialFilters.category || [];
+                                    }
 
-                                            $.ajax({
-                                                url: '${pageContext.request.contextPath}/allEvents',
-                                                type: 'GET',
-                                                data: combinedFilters,
-                                                dataType: 'json',
-                                                headers: {'X-Requested-With': 'XMLHttpRequest'},
-                                                success: function (data) {
-                                                    updateEventContainer(data.events);
-                                                    updatePagination(data.totalPages, data.currentPage);
-                                                    document.getElementById('all-events-title').scrollIntoView({behavior: 'smooth'});
-                                                    if (data.events.length > 0) {
-                                                        $('#all-events-title').html('<i class="fas fa-calendar-week text-green-500 mr-2"></i> Filtered Events For You');
-                                                    } else {
-                                                        $('#all-events-title').html('<i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You');
-                                                    }
-                                                },
-                                                error: function () {
-                                                    console.error('Lỗi khi tải sự kiện');
-                                                }
-                                            });
+                                    console.log("Request Parameters:", JSON.stringify(combinedFilters, null, 2));
+
+                                    var ajaxData = {
+                                        page: combinedFilters.page,
+                                        query: combinedFilters.query,
+                                        location: combinedFilters.location,
+                                        startDate: combinedFilters.startDate,
+                                        endDate: combinedFilters.endDate,
+                                        price: combinedFilters.price
+                                    };
+                                    if (combinedFilters.category.length > 0) {
+                                        ajaxData.category = combinedFilters.category;
+                                    }
+
+                                    $.ajax({
+                                        url: '${pageContext.request.contextPath}/allEvents',
+                                        type: 'GET',
+                                        data: ajaxData,
+                                        dataType: 'json',
+                                        traditional: true,
+                                        headers: {'X-Requested-With': 'XMLHttpRequest'},
+                                        success: function (data) {
+                                            console.log("Response Data:", JSON.stringify(data, null, 2));
+                                            updateEventContainer(data.events, data.noFilteredEvents);
+                                            updatePagination(data.totalPages, data.currentPage);
+                                            document.getElementById('all-events-title')?.scrollIntoView({behavior: 'smooth'});
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error loading events:', status, error);
                                         }
+                                    });
+                                }
 
-                                        function updateEventContainer(events) {
-                                            var container = $('#event-container');
-                                            container.empty();
-                                            if (events.length > 0) {
-                                                events.forEach(function (eventAjax) {
-                                                    var formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', minimumFractionDigits: 0}).format(eventAjax.minPrice).replace('₫', '').trim();
-                                                    var formattedDate = moment(eventAjax.firstStartDate).format('hh:mm:ss A, DD MMM YYYY');
-                                                    var eventHtml = '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
-                                                            '<div class="event-card-all_events">' +
-                                                            '<a style="text-decoration: none;" href="eventDetail?id=' + eventAjax.id + '">' +
-                                                            '<img src="' + eventAjax.imageUrl + '" alt="' + eventAjax.imageTitle + '" />' +
-                                                            '<h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">' +
-                                                            eventAjax.name +
-                                                            '</h2>' +
-                                                            '<p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From ' + formattedPrice + ' VND</p>' +
-                                                            '<p class="text-sm font-semibold" style="color: white; background-color: #121212;">' +
-                                                            '<i class="far fa-calendar-alt mr-2"></i>' +
-                                                            '<span>' + formattedDate + '</span>' +
-                                                            '</p>' +
-                                                            '</a>' +
-                                                            '</div>' +
-                                                            '</div>';
-                                                    container.append(eventHtml);
-                                                });
-                                            } else {
-                                                container.html('<p class="text-center">No Events Found</p>');
-                                            }
-                                        }
+                                function updateEventContainer(events, noFilteredEvents) {
+                                    var container = $('#event-container');
+                                    var titleElement = $('#all-events-title');
+                                    var noEventsMessage = $('.text-center:contains("No Events Found From Your Filter And Search")');
 
-                                        function updatePagination(totalPages, currentPage) {
-                                            var pagination = $('#pagination');
-                                            pagination.empty();
-                                            pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
-                                            var ul = pagination.find('ul');
-                                            if (totalPages > 1) {
-                                                var displayPages = 5;
-                                                var halfDisplayPages = Math.floor(displayPages / 2);
-                                                var startPage = currentPage - halfDisplayPages;
-                                                var endPage = currentPage + halfDisplayPages;
-                                                if (startPage < 1)
-                                                    startPage = 1;
-                                                if (endPage > totalPages)
-                                                    endPage = totalPages;
+                                    // Xóa tiêu đề và thông báo cũ (nếu có)
+                                    titleElement.parent().remove(); // Xóa cả div bao quanh nếu tồn tại
+                                    noEventsMessage.remove();
+                                    container.empty();
 
-                                                if (currentPage > 1) {
-                                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>');
-                                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + '); return false;">Prev</a></li>');
-                                                }
+                                    // Thêm tiêu đề và thông báo mới dựa trên noFilteredEvents
+                                    if (noFilteredEvents) {
+                                        // Không có sự kiện lọc nào khớp, hiển thị thông báo và fallback
+                                        container.before(
+                                                '<p class="text-center">No Events Found From Your Filter And Search</p>' +
+                                                '<h2 class="text-xl font-bold text-center" style="margin-left: 4%;" id="all-events-title">' +
+                                                '<i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You</h2>'
+                                                );
+                                    } else {
+                                        // Có sự kiện lọc khớp, hiển thị tiêu đề "Filtered Events For You"
+                                        container.before(
+                                                '<div style="text-align: center;">' +
+                                                '<h2 id="all-events-title" class="text-xl font-bold text-center" style="margin-left: 4%;">' +
+                                                '<i class="fas fa-calendar-week text-green-500 mr-2"></i> Filtered Events For You</h2>' +
+                                                '</div>'
+                                                );
+                                    }
 
-                                                for (var i = startPage; i <= endPage; i++) {
-                                                    if (i === currentPage) {
-                                                        ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
-                                                    } else {
-                                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + '); return false;">' + i + '</a></li>');
-                                                    }
-                                                }
-
-                                                if (currentPage < totalPages) {
-                                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + '); return false;">Next</a></li>');
-                                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + '); return false;">Last</a></li>');
-                                                }
-                                            }
-                                        }
-
-                                        function getFilters() {
-                                            var filters = {};
-                                            var startDateVal = $('#startDate').val();
-                                            var endDateVal = $('#endDate').val();
-                                            var categoryVals = $('input[name="category"]:checked').map(function () {
-                                                return this.value;
-                                            }).get();
-                                            var priceVal = $('input[name="price"]:checked').val();
-                                            var locationVal = $('input[name="location"]:checked').val();
-                                            var queryVal = $('input[name="query"]').val();
-
-                                            // Chỉ thêm vào filters nếu giá trị không rỗng hoặc undefined
-                                            if (startDateVal)
-                                                filters.startDate = startDateVal;
-                                            if (endDateVal)
-                                                filters.endDate = endDateVal;
-                                            if (categoryVals.length > 0)
-                                                filters.category = categoryVals; // Chỉ ghi đè nếu có category được chọn
-                                            if (priceVal !== undefined && priceVal !== "")
-                                                filters.price = priceVal; // Chỉ ghi đè nếu có price được chọn và không phải "All Prices"
-                                            if (locationVal !== undefined && locationVal !== "")
-                                                filters.location = locationVal; // Chỉ ghi đè nếu có location được chọn và không phải "All Locations"
-                                            if (queryVal)
-                                                filters.query = queryVal;
-
-                                            return filters;
-                                        }
-
-                                        $(document).ready(function () {
-                                            // Handle Apply button in filter form
-                                            $('#applyFilter').click(function () {
-                                                // Đóng tất cả các dropdown
-                                                document.querySelectorAll('.category-toggle.active').forEach(toggle => {
-                                                    toggle.classList.remove('active');
-                                                });
-                                                document.querySelectorAll('.category-list.active').forEach(list => {
-                                                    list.classList.remove('active');
-                                                });
-
-                                                // Tiếp tục gọi loadEvents với các bộ lọc
-                                                loadEvents(1, getFilters());
-                                            });
+                                    if (events.length > 0) {
+                                        events.forEach(function (eventAjax) {
+                                            var formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', minimumFractionDigits: 0}).format(eventAjax.minPrice).replace('₫', '').trim();
+                                            var formattedDate = moment(eventAjax.firstStartDate).format('hh:mm:ss A, DD MMM YYYY');
+                                            var eventHtml = '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
+                                                    '<div class="event-card-all_events">' +
+                                                    '<a style="text-decoration: none;" href="eventDetail?id=' + eventAjax.id + '">' +
+                                                    '<img src="' + eventAjax.imageUrl + '" alt="' + eventAjax.imageTitle + '" />' +
+                                                    '<h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">' +
+                                                    eventAjax.name +
+                                                    '</h2>' +
+                                                    '<p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From ' + formattedPrice + ' VND</p>' +
+                                                    '<p class="text-sm font-semibold" style="color: white; background-color: #121212;">' +
+                                                    '<i class="far fa-calendar-alt mr-2"></i>' +
+                                                    '<span>' + formattedDate + '</span>' +
+                                                    '</p>' +
+                                                    '</a>' +
+                                                    '</div>' +
+                                                    '</div>';
+                                            container.append(eventHtml);
                                         });
+                                    } else {
+                                        container.html('<p class="text-center">No Events Found</p>');
+                                    }
+                                }
+
+                                function updatePagination(totalPages, currentPage) {
+                                    var pagination = $('#pagination');
+                                    pagination.empty();
+                                    pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
+                                    var ul = pagination.find('ul');
+                                    if (totalPages > 1) {
+                                        var displayPages = 5;
+                                        var halfDisplayPages = Math.floor(displayPages / 2);
+                                        var startPage = currentPage - halfDisplayPages;
+                                        var endPage = currentPage + halfDisplayPages;
+                                        if (startPage < 1)
+                                            startPage = 1;
+                                        if (endPage > totalPages)
+                                            endPage = totalPages;
+
+                                        if (currentPage > 1) {
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>');
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + '); return false;">Prev</a></li>');
+                                        }
+
+                                        for (var i = startPage; i <= endPage; i++) {
+                                            if (i === currentPage) {
+                                                ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
+                                            } else {
+                                                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + '); return false;">' + i + '</a></li>');
+                                            }
+                                        }
+
+                                        if (currentPage < totalPages) {
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + '); return false;">Next</a></li>');
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + '); return false;">Last</a></li>');
+                                        }
+                                    }
+                                }
+
+                                function getFilters() {
+                                    var filters = {};
+                                    var startDateVal = $('#startDate').val();
+                                    var endDateVal = $('#endDate').val();
+                                    var categoryVals = $('input[name="category"]:checked').map(function () {
+                                        return this.value;
+                                    }).get();
+                                    var priceVal = $('input[name="price"]:checked').val();
+                                    var locationVal = $('input[name="location"]:checked').val();
+                                    var queryVal = $('input[name="query"]').val();
+
+                                    if (startDateVal)
+                                        filters.startDate = startDateVal;
+                                    if (endDateVal)
+                                        filters.endDate = endDateVal;
+                                    if (categoryVals.length > 0)
+                                        filters.category = categoryVals;
+                                    if (priceVal !== undefined && priceVal !== "")
+                                        filters.price = priceVal;
+                                    if (locationVal !== undefined && locationVal !== "")
+                                        filters.location = locationVal;
+                                    if (queryVal)
+                                        filters.query = queryVal;
+
+                                    // Debug: Log các bộ lọc trước khi gửi
+                                    console.log("Filters to be sent:", JSON.stringify(filters, null, 2));
+                                    return filters;
+                                }
+
+                                $(document).ready(function () {
+                                    $('#applyFilter').click(function () {
+                                        document.querySelectorAll('.category-toggle.active').forEach(toggle => {
+                                            toggle.classList.remove('active');
+                                        });
+                                        document.querySelectorAll('.category-list.active').forEach(list => {
+                                            list.classList.remove('active');
+                                        });
+
+                                        // Debug: Log khi nhấn Apply
+                                        console.log("Apply button clicked");
+                                        loadEvents(1, getFilters());
+                                    });
+                                });
         </script>
 
         <!--Footer-->
@@ -949,25 +956,21 @@
                 });
 
                 // Cập nhật dropdown khi người dùng chọn category
+                // Sửa lỗi TypeError
                 document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
                     checkbox.addEventListener('change', function () {
                         const selectedCategories = Array.from(
                                 document.querySelectorAll('.category-list input[type="checkbox"]:checked')
-                                ).map(cb => cb.nextSibling.textContent.trim());
-
+                                ).map(cb => cb.nextSibling && cb.nextSibling.textContent ? cb.nextSibling.textContent.trim() : '');
                         const categoryToggle = document.querySelector('.category-toggle label');
-
                         if (selectedCategories.length > 0) {
                             if (selectedCategories.length > 1) {
-                                // Hiển thị category mới được chọn gần đây nhất kèm "..."
-                                const latestCategory = this.nextSibling.textContent.trim(); // Lấy category từ checkbox vừa thay đổi
-                                categoryToggle.textContent = `${latestCategory}...`;
+                                const latestCategory = this.nextSibling && this.nextSibling.textContent ? this.nextSibling.textContent.trim() : '';
+                                categoryToggle.textContent = latestCategory ? `${latestCategory}...` : 'Category';
                             } else {
-                                // Nếu chỉ có 1 category, hiển thị category đó
-                                categoryToggle.textContent = selectedCategories[0];
+                                categoryToggle.textContent = selectedCategories[0] || 'Category';
                             }
                         } else {
-                            // Nếu không có category nào được chọn, hiển thị placeholder "Category"
                             categoryToggle.textContent = 'Category';
                         }
                     });

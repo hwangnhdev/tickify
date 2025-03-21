@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import models.Category;
 import viewModels.EventDTO;
@@ -100,7 +101,7 @@ public class AllEventsController extends HttpServlet {
         // Create filter object
         FilterEvent filters = new FilterEvent(categories, location, startDate, endDate, price, false, searchQuery);
 
-        // Store filters in session (for persistence across requests)
+        // Store session for attributes
         session.setAttribute("searchQuery", searchQuery);
         session.setAttribute("selectedCategories", categories);
         session.setAttribute("selectedLocation", location);
@@ -138,28 +139,30 @@ public class AllEventsController extends HttpServlet {
             response.setContentType("application/json");
             PrintWriter out = response.getWriter();
             if (totalEvents == 0) {
-                out.print(toJson(paginatedEventsAll, totalPagesAll, page));
+                // Không có sự kiện lọc nào khớp, trả về fallback với cờ noFilteredEvents = true
+                out.print(toJsonWithFlag(paginatedEventsAll, totalPagesAll, page, true));
             } else {
-                out.print(toJson(paginatedFilteredEvents, totalPages, page));
+                // Có sự kiện lọc khớp, trả về filtered events với cờ noFilteredEvents = false
+                out.print(toJsonWithFlag(paginatedFilteredEvents, totalPages, page, false));
             }
             out.flush();
             return;
         }
 
-        // Normal request: Forward to JSP with all filter params preserved
+        // Normal request: Forward to JSP
         request.setAttribute("filteredEvents", paginatedFilteredEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("paginatedEventsAll", paginatedEventsAll);
         request.setAttribute("pageAll", page);
         request.setAttribute("totalPagesAll", totalPagesAll);
-        // Preserve original query string for pagination links
         request.setAttribute("queryString", request.getQueryString());
 
         request.getRequestDispatcher("pages/listEventsPage/allEvents.jsp").forward(request, response);
     }
 
-    private String toJson(List<EventDTO> events, int totalPages, int currentPage) {
+    // Hàm toJson mới với cờ noFilteredEvents
+    private String toJsonWithFlag(List<EventDTO> events, int totalPages, int currentPage, boolean noFilteredEvents) {
         StringBuilder json = new StringBuilder();
         json.append("{");
         json.append("\"events\":[");
@@ -182,7 +185,8 @@ public class AllEventsController extends HttpServlet {
         }
         json.append("],");
         json.append("\"totalPages\":").append(totalPages).append(",");
-        json.append("\"currentPage\":").append(currentPage);
+        json.append("\"currentPage\":").append(currentPage).append(",");
+        json.append("\"noFilteredEvents\":").append(noFilteredEvents); // Thêm cờ
         json.append("}");
         return json.toString();
     }
