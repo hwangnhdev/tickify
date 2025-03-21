@@ -38,8 +38,13 @@ public class OrganizerEventController extends HttpServlet {
             filter = "all";
         }
 
+        String eventName = request.getParameter("eventName");
+        if (eventName == null || eventName.trim().isEmpty()) {
+            eventName = null;
+        }
+
         OrganizerDAO organizerDAO = new OrganizerDAO();
-        List<EventSummaryDTO> events = organizerDAO.getEventsByCustomer(customerId, filter);
+        List<EventSummaryDTO> events = organizerDAO.getEventsByCustomer(customerId, filter, eventName);
 
         // Đặt danh sách sự kiện và bộ lọc hiện tại vào request để JSP hiển thị
         request.setAttribute("events", events);

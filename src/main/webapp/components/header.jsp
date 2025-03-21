@@ -67,11 +67,6 @@
                 font-size: 14px;
             }
 
-            /* Khi focus vào input */
-            .search-bar-header input:focus {
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            }
-
             /* Hiệu ứng hover cho nút search */
             .search-bar-header button {
                 cursor: pointer;

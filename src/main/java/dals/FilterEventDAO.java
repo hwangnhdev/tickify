@@ -54,16 +54,16 @@ public class FilterEventDAO extends DBContext {
         List<Object> parameters = new ArrayList<>();
 
         // Filtering by category IDs
-        if (filters.getCategoryID() != null && !filters.getCategoryID().isEmpty()) {
+        if (filters.getCategories() != null && !filters.getCategories().isEmpty()) {
             StringBuilder categoryPlaceholders = new StringBuilder();
-            for (int i = 0; i < filters.getCategoryID().size(); i++) {
+            for (int i = 0; i < filters.getCategories().size(); i++) {
                 if (i > 0) {
                     categoryPlaceholders.append(", ");
                 }
                 categoryPlaceholders.append("?");
             }
             sql.append(" AND e.category_id IN (").append(categoryPlaceholders).append(")");
-            parameters.addAll(filters.getCategoryID());
+            parameters.addAll(filters.getCategories());
         }
 
         // Filtering by location
@@ -85,12 +85,22 @@ public class FilterEventDAO extends DBContext {
             parameters.add("%" + filters.getSearchQuery() + "%");
         }
 
+        if (filters.getPrice() != null) {
+            switch (filters.getPrice()) {
+                case "below_150":
+                    sql.append(" AND tt.price < 150000");
+                    break;
+                case "between_150_300":
+                    sql.append(" AND tt.price BETWEEN 150000 AND 300000");
+                    break;
+                case "above_300":
+                    sql.append(" AND tt.price > 300000");
+                    break;
+            }
+        }
+
         sql.append(" GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
                 + "e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title");
-
-        // Print the final SQL query and parameters for debugging
-        System.out.println("Final SQL Query: " + sql.toString());
-        System.out.println("Parameters: " + parameters);
 
         try ( PreparedStatement st = connection.prepareStatement(sql.toString())) {
             // Set query parameters dynamically
@@ -139,16 +149,16 @@ public class FilterEventDAO extends DBContext {
 
         // Defining filter criteria
         List<Integer> categories = new ArrayList<>();
-        categories.add(1);
+        categories.add(3);
         String location = "Thành Phố Hồ Chí Minh";
-        java.util.Date startDate = java.sql.Date.valueOf("2025-03-01");
-        java.util.Date endDate = java.sql.Date.valueOf("2025-03-31");
-        String priceRange = "below_150";
+        java.sql.Date startDate = java.sql.Date.valueOf("2025-05-01");
+        java.sql.Date endDate = java.sql.Date.valueOf("2025-05-31");
+        String priceRange = "above_300";
         boolean hasVoucher = true;
         String query = "Concert";
 
         // Creating a filter object with the specified criteria
-        FilterEvent filterEvent = new FilterEvent(categories, null, null, null, null, false, null);
+        FilterEvent filterEvent = new FilterEvent(categories, null, null, null, priceRange, false, null);
 
         // Fetching the filtered events
         List<EventDTO> filteredEvents = filterEventDAO.getFilteredEvents(filterEvent);
@@ -158,6 +168,7 @@ public class FilterEventDAO extends DBContext {
         for (EventDTO filteredEvent : filteredEvents) {
             System.out.println("Event ID: " + filteredEvent.getEvent().getEventId());
             System.out.println("Event Name: " + filteredEvent.getEvent().getEventName());
+            System.out.println("Event Name: " + filteredEvent.getEvent().getCategoryId());
             System.out.println("Image Title: " + filteredEvent.getEventImage().getImageTitle());
             System.out.println("Image URL: " + filteredEvent.getEventImage().getImageUrl());
             System.out.println("------------------------");

@@ -418,6 +418,16 @@
                 margin: 0 0;
                 color: #000000;
             }
+            #pagination a {
+                margin: 0 5px;
+                padding: 5px 10px;
+                text-decoration: none;
+                color: #007bff;
+            }
+            #pagination a.active {
+                font-weight: bold;
+                color: #0056b3;
+            }
             .g-4, .gy-4 {
                 --bs-gutter-y: 1.5rem;
                 margin: 0 7%;
@@ -474,7 +484,7 @@
                             <div class="text-gray-400 show-time-header text-light" onclick="toggleShowTime(this)">
                                 <i class="fas fa-chevron-down"></i>
                                 <span class="show-time-label">Showtime ${loop.count}: </span>
-                                <span>Start Date: ${showtime.startDate} - End Date: ${showtime.endDate}</span>
+                                <span>Start Date: <fmt:formatDate value="${showtime.startDate}" pattern="hh:mm a, dd MMM yyyy"/> - End Date: <fmt:formatDate value="${showtime.endDate}" pattern="hh:mm a, dd MMM yyyy"/></span>
                             </div>
                             <div class="show-time-details space-y-2">
                                 <!-- Loop through ticketTypes for this showtime -->
@@ -547,16 +557,41 @@
             </section>
         </div>
 
+        <!-- Relevant Events hoặc All Events với Ajax -->
         <div class="event-info-event_detail_relevant">
-            <c:choose>
-                <c:when test="${empty filteredEvents}">
-                    <!--All Event--> 
-                    <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+            <h2 id="events-title" class="text-xl font-bold text-center" style="margin-left: 4%;">
+                <c:choose>
+                    <c:when test="${not empty relevantEvents}">
+                        <i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events
+                    </c:when>
+                    <c:otherwise>
                         <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
-                    </h2>
-                    <div class="container py-4">
-                        <div class="row gy-4" id="event-container">
-                            <!-- Loop through paginated events -->
+                    </c:otherwise>
+                </c:choose>
+            </h2>
+            <div class="container py-4">
+                <div class="row gy-4" id="event-container">
+                    <c:choose>
+                        <c:when test="${not empty relevantEvents}">
+                            <c:forEach var="event" items="${relevantEvents}">
+                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                    <div class="event-card-all_events">
+                                        <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                            <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                            <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                                ${event.event.eventName}
+                                            </h2>
+                                            <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                            <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                                <i class="far fa-calendar-alt mr-2"></i>
+                                                <span><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                            </p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
                             <c:forEach var="event" items="${paginatedEventsAll}">
                                 <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                     <div class="event-card-all_events">
@@ -565,97 +600,170 @@
                                             <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
                                                 ${event.event.eventName}
                                             </h2>
-                                            <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                            <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
                                             <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
                                                 <i class="far fa-calendar-alt mr-2"></i>
-                                                <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                                <span><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
                                             </p>
                                         </a>
                                     </div>
                                 </div>
                             </c:forEach>
-                        </div>
-                    </div>
-                    <!-- Bootstrap JS for All Events-->
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-                </c:when>
-                <c:otherwise>
-                    <!-- Relevant Events -->
-                    <h2 class="text-xl font-bold text-center">
-                        <i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events
-                    </h2>
-                    <div class="container py-4">
-                        <div class="row gy-4" id="event-container">
-                            <c:forEach var="event" items="${filteredEvents}">
-                                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                    <div class="event-card-all_events">
-                                        <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
-                                            <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
-                                            <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
-                                                ${event.event.eventName}
-                                            </h2>
-                                            <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
-                                            <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
-                                                <i class="far fa-calendar-alt mr-2"></i>
-                                                <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
-                                            </p>
-                                        </a>
-                                    </div>
-                                </div>
-                            </c:forEach>
-                        </div>
-                    </div>
-                    <!-- Pagination -->
-                    <jsp:include page="pagination.jsp">
-                        <jsp:param name="baseUrl" value="/eventDetail" />
-                        <jsp:param name="page" value="${currentPage}" />
-                        <jsp:param name="totalPages" value="${totalPages}" />
-                        <jsp:param name="selectedStatus" value="${selectedStatus}" />
-                    </jsp:include>
-                </c:otherwise>
-            </c:choose>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+                <div id="pagination" class="text-center mt-4"></div>
+            </div>
         </div>
-
         <!-- Footer -->
         <jsp:include page="../../components/footer.jsp"></jsp:include>
+            <!-- JavaScript -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
             <script>
-                                function toggleShowTime(button) {
-                                    const showTime = button.closest('.show-time');
-                                    const details = showTime.querySelector('.show-time-details');
-                                    const labelSpan = showTime.querySelector('.show-time-label');
-                                    const icon = button.querySelector('i');
+                                function loadEvents(page, isRelevant) {
+                                    var url = '${pageContext.request.contextPath}/eventDetail';
+                                    var data = {
+                                        id: ${eventID},
+                                        page: isRelevant ? page : undefined,
+                                        pageAll: isRelevant ? undefined : page
+                                    };
 
-                                    // Toggle the collapsed state
-                                    details.classList.toggle('collapsed');
-                                    icon.classList.toggle('fa-chevron-down');
-                                    icon.classList.toggle('fa-chevron-up');
+                                    $.ajax({
+                                        url: url,
+                                        type: 'GET',
+                                        data: data,
+                                        dataType: 'json',
+                                        headers: {'X-Requested-With': 'XMLHttpRequest'},
+                                        success: function (data) {
+                                            updateEventContainer(data.events, data.type);
+                                            updatePagination(data.totalPages, data.currentPage, data.type === 'relevant');
+                                            $('#events-title')[0].scrollIntoView({behavior: 'smooth'});
+                                        },
+                                        error: function () {
+                                            console.error('Error loading events');
+                                        }
+                                    });
+                                }
 
-                                    // Get showtime index from label
-                                    let showTimeIndex = '1';
-                                    if (labelSpan && labelSpan.textContent) {
-                                        const match = labelSpan.textContent.match(/\d+/);
-                                        showTimeIndex = match ? match[0] : '1';
-                                    }
-
-                                    // Get start and end dates from the header
-                                    const dateSpan = button.querySelector('span:last-child');
-                                    const dateText = dateSpan ? dateSpan.textContent : '';
-
-                                    if (details.classList.contains('collapsed')) {
-                                        // Collapsed state: show dates in label
-                                        labelSpan.textContent = `Showtime ${showTimeIndex}: ${dateText}`;
-                                        details.style.height = '0';
+                                function updateEventContainer(events, type) {
+                                    var container = $('#event-container');
+                                    container.empty();
+                                    if (events.length > 0) {
+                                        $('#events-title').html(type === 'relevant'
+                                                ? '<i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events'
+                                                : '<i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You');
+                                        events.forEach(function (eventAjax) {
+                                            var formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', minimumFractionDigits: 0}).format(eventAjax.minPrice).replace('₫', '').trim();
+                                            var formattedDate = moment(eventAjax.firstStartDate).format('hh:mm:ss A, DD MMM YYYY');
+                                            var eventHtml = '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
+                                                    '<div class="event-card-all_events">' +
+                                                    '<a style="text-decoration: none;" href="eventDetail?id=' + eventAjax.id + '">' +
+                                                    '<img src="' + eventAjax.imageUrl + '" alt="' + eventAjax.imageTitle + '" />' +
+                                                    '<h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">' +
+                                                    eventAjax.name +
+                                                    '</h2>' +
+                                                    '<p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From ' + formattedPrice + ' VND</p>' +
+                                                    '<p class="text-sm font-semibold" style="color: white; background-color: #121212;">' +
+                                                    '<i class="far fa-calendar-alt mr-2"></i>' +
+                                                    '<span>' + formattedDate + '</span>' +
+                                                    '</p>' +
+                                                    '</a>' +
+                                                    '</div>' +
+                                                    '</div>';
+                                            container.append(eventHtml);
+                                        });
                                     } else {
-                                        // Expanded state: reset label and expand details
-                                        labelSpan.textContent = `Showtime ${showTimeIndex}: `;
-                                        details.style.height = `${details.scrollHeight}px`;
-
-                                        // Reset height to auto after transition for dynamic content
-                                        setTimeout(() => {
-                                            details.style.height = 'auto';
-                                        }, 0); // Match transition duration
+                                        container.html('<p class="text-center">No Events Found</p>');
                                     }
                                 }
+
+                                function updatePagination(totalPages, currentPage, isRelevant) {
+                                    var pagination = $('#pagination');
+                                    pagination.empty();
+
+                                    if (!totalPages || totalPages <= 1) {
+                                        console.log("Total pages <= 1 or invalid:", totalPages);
+                                        return;
+                                    }
+
+                                    pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
+                                    var ul = pagination.find('ul');
+
+                                    var displayPages = 5;
+                                    var halfDisplayPages = Math.floor(displayPages / 2);
+                                    var startPage = currentPage - halfDisplayPages;
+                                    var endPage = currentPage + halfDisplayPages;
+                                    if (startPage < 1)
+                                        startPage = 1;
+                                    if (endPage > totalPages)
+                                        endPage = totalPages;
+
+                                    if (currentPage > 1) {
+                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1, ' + isRelevant + '); return false;">First</a></li>');
+                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + ', ' + isRelevant + '); return false;">Prev</a></li>');
+                                    }
+
+                                    for (var i = startPage; i <= endPage; i++) {
+                                        if (i === currentPage) {
+                                            ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
+                                        } else {
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + ', ' + isRelevant + '); return false;">' + i + '</a></li>');
+                                        }
+                                    }
+
+                                    if (currentPage < totalPages) {
+                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + ', ' + isRelevant + '); return false;">Next</a></li>');
+                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + ', ' + isRelevant + '); return false;">Last</a></li>');
+                                    }
+                                }
+
+                                $(document).ready(function () {
+                                    var isRelevant = ${not empty relevantEvents};
+                                    var totalPages = ${isRelevant ? totalPages : totalPagesAll};
+                                    var currentPage = ${isRelevant ? currentPage : pageAll};
+                                    console.log("isRelevant:", isRelevant, "totalPages:", totalPages, "currentPage:", currentPage);
+                                    updatePagination(totalPages, currentPage, isRelevant);
+                                });
+        </script>
+        <script>
+            function toggleShowTime(button) {
+                const showTime = button.closest('.show-time');
+                const details = showTime.querySelector('.show-time-details');
+                const labelSpan = showTime.querySelector('.show-time-label');
+                const icon = button.querySelector('i');
+
+                // Toggle the collapsed state
+                details.classList.toggle('collapsed');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+
+                // Get showtime index from label
+                let showTimeIndex = '1';
+                if (labelSpan && labelSpan.textContent) {
+                    const match = labelSpan.textContent.match(/\d+/);
+                    showTimeIndex = match ? match[0] : '1';
+                }
+
+                // Get start and end dates from the header
+                const dateSpan = button.querySelector('span:last-child');
+                const dateText = dateSpan ? dateSpan.textContent : '';
+
+                if (details.classList.contains('collapsed')) {
+                    // Collapsed state: show dates in label
+                    labelSpan.textContent = `Showtime ${showTimeIndex}: ${dateText}`;
+                    details.style.height = '0';
+                } else {
+                    // Expanded state: reset label and expand details
+                    labelSpan.textContent = `Showtime ${showTimeIndex}: `;
+                    details.style.height = `${details.scrollHeight}px`;
+
+                    // Reset height to auto after transition for dynamic content
+                    setTimeout(() => {
+                        details.style.height = 'auto';
+                    }, 0); // Match transition duration
+                }
+            }
         </script>
     </body>
 </html>

@@ -335,6 +335,16 @@
                 margin: 0 0;
                 color: #000000;
             }
+            #pagination a {
+                margin: 0 5px;
+                padding: 5px 10px;
+                text-decoration: none;
+                color: #007bff;
+            }
+            #pagination a.active {
+                font-weight: bold;
+                color: #0056b3;
+            }
             .g-4, .gy-4 {
                 --bs-gutter-y: 1.5rem;
                 margin: 0 7%;
@@ -350,9 +360,9 @@
         <jsp:include page="../../components/header.jsp"></jsp:include>
 
             <!-- Filter Form -->
-            <form id="filterForm" action="${pageContext.request.contextPath}/allEvents" method="GET" class="filter-container">
-            <!-- Include the search query in the form -->
-            <input type="hidden" name="query" value="${searchQuery}">
+            <form id="filterForm" class="filter-container">
+                <!-- Include the search query in the form -->
+                <input type="hidden" name="query" value="${searchQuery}">
 
             <!-- Filter Section -->
             <div class="filter-row">
@@ -367,6 +377,7 @@
                     <input type="text" name="endDate" id="endDate" value="${selectedEndDate}" class="flatpickr-input" placeholder="Select End Date" readonly>
                 </div>
 
+                <!-- Filter Category (Multiple Selection) -->
                 <!-- Filter Category (Multiple Selection) -->
                 <div class="filter-group category-group">
                     <label for="categoryDropdown">Category:</label>
@@ -428,7 +439,7 @@
                     <div class="category-list" data-type="price">
                         <input type="radio" name="price" value="below_150" ${selectedPrice == 'below_150' ? 'checked' : ''}> Below 150 <br>
                         <input type="radio" name="price" value="between_150_300" ${selectedPrice == 'between_150_300' ? 'checked' : ''}> 150 - 300 <br>
-                        <input type="radio" name="price" value="greater_300" ${selectedPrice == 'greater_300' ? 'checked' : ''}> Above 300 <br>
+                        <input type="radio" name="price" value="above_300" ${selectedPrice == 'above_300' ? 'checked' : ''}> Above 300 <br>
                         <input type="radio" name="price" value="" ${empty selectedPrice ? 'checked' : ''}> All Prices <br>
                     </div>
                 </div>
@@ -518,22 +529,20 @@
 
                 <!-- Apply Button (Đặt trực tiếp trong filter-row, không dùng filter-group) -->
                 <div class="apply-button">
-                    <button type="submit" class="btn btn-success">Apply</button>
+                    <button type="button" id="applyFilter" class="btn btn-success">Apply</button>
                 </div>
             </div>
         </form>
 
-        <!-- Check if there are no filtered events -->
+        <!-- All Events Section -->
         <c:choose>
             <c:when test="${empty filteredEvents}">
-                <p class="text-center">Not Event Found From Your Filter And Search</p>
-                <!--All Event--> 
-                <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
+                <p class="text-center">No Events Found From Your Filter And Search</p>
+                <h2 class="text-xl font-bold text-center" style="margin-left: 4%;">
                     <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
                 </h2>
                 <div class="container py-4">
                     <div class="row gy-4" id="event-container">
-                        <!-- Loop through paginated events -->
                         <c:forEach var="event" items="${paginatedEventsAll}">
                             <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                 <div class="event-card-all_events">
@@ -542,24 +551,50 @@
                                         <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
                                             ${event.event.eventName}
                                         </h2>
-                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
                                         <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
                                             <i class="far fa-calendar-alt mr-2"></i>
-                                            <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                            <span><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
                                         </p>
                                     </a>
                                 </div>
                             </div>
                         </c:forEach>
                     </div>
+                    <div id="pagination" class="text-center mt-4">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <c:if test="${pageAll > 1}">
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${pageAll - 1}); return false;">Prev</a></li>
+                                    </c:if>
+                                    <c:forEach begin="${pageAll - 2 > 0 ? pageAll - 2 : 1}" end="${pageAll + 2 < totalPagesAll ? pageAll + 2 : totalPagesAll}" var="i">
+                                        <c:choose>
+                                            <c:when test="${i == pageAll}">
+                                            <li class="page-item active"><span class="page-link">${i}</span></li>
+                                            </c:when>
+                                            <c:otherwise>
+                                            <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${i}); return false;">${i}</a></li>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                    <c:if test="${pageAll < totalPagesAll}">
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${pageAll + 1}); return false;">Next</a></li>
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${totalPagesAll}); return false;">Last</a></li>
+                                    </c:if>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
-                <!-- Bootstrap JS for All Events-->
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
             </c:when>
             <c:otherwise>
+                <div style="text-align: center;">
+                    <h2 id="all-events-title" class="text-xl font-bold text-center" style="margin-left: 4%;">
+                        <i class="fas fa-calendar-week text-green-500 mr-2"></i> Filtered Events For You
+                    </h2>
+                </div>
                 <div class="container py-4">
                     <div class="row gy-4" id="event-container">
-                        <!-- Loop through paginated events -->
                         <c:forEach var="event" items="${filteredEvents}">
                             <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                 <div class="event-card-all_events">
@@ -568,19 +603,198 @@
                                         <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
                                             ${event.event.eventName}
                                         </h2>
-                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From  <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
+                                        <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND</p>
                                         <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
                                             <i class="far fa-calendar-alt mr-2"></i>
-                                            <span class=""><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                            <span><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
                                         </p>
                                     </a>
                                 </div>
                             </div>
                         </c:forEach>
                     </div>
+                    <div id="pagination" class="text-center mt-4">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <c:if test="${currentPage > 1}">
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${currentPage - 1}); return false;">Prev</a></li>
+                                    </c:if>
+                                    <c:forEach begin="${currentPage - 2 > 0 ? currentPage - 2 : 1}" end="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}" var="i">
+                                        <c:choose>
+                                            <c:when test="${i == currentPage}">
+                                            <li class="page-item active"><span class="page-link">${i}</span></li>
+                                            </c:when>
+                                            <c:otherwise>
+                                            <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${i}); return false;">${i}</a></li>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                    <c:if test="${currentPage < totalPages}">
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${currentPage + 1}); return false;">Next</a></li>
+                                    <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${totalPages}); return false;">Last</a></li>
+                                    </c:if>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
             </c:otherwise>
         </c:choose>
+
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+        <script>
+                                        // Store initial filters from header
+                                        var initialFilters = {
+                                            query: '${searchQuery != null ? searchQuery : ''}',
+                                            category: [<c:forEach var="cat" items="${selectedCategories}">${cat},</c:forEach>],
+                                            location: '${selectedLocation != null ? selectedLocation : ''}',
+                                            startDate: '${selectedStartDate != null ? selectedStartDate : ''}',
+                                            endDate: '${selectedEndDate != null ? selectedEndDate : ''}',
+                                            price: '${selectedPrice != null ? selectedPrice : ''}'
+                                        };
+
+                                        function loadEvents(page, filters = {}) {
+                                            // Combine initial filters with new filters
+                                            var combinedFilters = $.extend(true, {}, initialFilters, filters);
+                                            combinedFilters.page = page;
+                                            console.log("Combined Filters:", combinedFilters); // Debug
+                                            // Đảm bảo category là mảng, ngay cả khi không có giá trị mới
+                                            if (!combinedFilters.category || !Array.isArray(combinedFilters.category)) {
+                                                combinedFilters.category = initialFilters.category || [];
+                                            }
+
+                                            $.ajax({
+                                                url: '${pageContext.request.contextPath}/allEvents',
+                                                type: 'GET',
+                                                data: combinedFilters,
+                                                dataType: 'json',
+                                                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                                                success: function (data) {
+                                                    updateEventContainer(data.events);
+                                                    updatePagination(data.totalPages, data.currentPage);
+                                                    document.getElementById('all-events-title').scrollIntoView({behavior: 'smooth'});
+                                                    if (data.events.length > 0) {
+                                                        $('#all-events-title').html('<i class="fas fa-calendar-week text-green-500 mr-2"></i> Filtered Events For You');
+                                                    } else {
+                                                        $('#all-events-title').html('<i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You');
+                                                    }
+                                                },
+                                                error: function () {
+                                                    console.error('Lỗi khi tải sự kiện');
+                                                }
+                                            });
+                                        }
+
+                                        function updateEventContainer(events) {
+                                            var container = $('#event-container');
+                                            container.empty();
+                                            if (events.length > 0) {
+                                                events.forEach(function (eventAjax) {
+                                                    var formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', minimumFractionDigits: 0}).format(eventAjax.minPrice).replace('₫', '').trim();
+                                                    var formattedDate = moment(eventAjax.firstStartDate).format('hh:mm:ss A, DD MMM YYYY');
+                                                    var eventHtml = '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
+                                                            '<div class="event-card-all_events">' +
+                                                            '<a style="text-decoration: none;" href="eventDetail?id=' + eventAjax.id + '">' +
+                                                            '<img src="' + eventAjax.imageUrl + '" alt="' + eventAjax.imageTitle + '" />' +
+                                                            '<h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">' +
+                                                            eventAjax.name +
+                                                            '</h2>' +
+                                                            '<p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From ' + formattedPrice + ' VND</p>' +
+                                                            '<p class="text-sm font-semibold" style="color: white; background-color: #121212;">' +
+                                                            '<i class="far fa-calendar-alt mr-2"></i>' +
+                                                            '<span>' + formattedDate + '</span>' +
+                                                            '</p>' +
+                                                            '</a>' +
+                                                            '</div>' +
+                                                            '</div>';
+                                                    container.append(eventHtml);
+                                                });
+                                            } else {
+                                                container.html('<p class="text-center">No Events Found</p>');
+                                            }
+                                        }
+
+                                        function updatePagination(totalPages, currentPage) {
+                                            var pagination = $('#pagination');
+                                            pagination.empty();
+                                            pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
+                                            var ul = pagination.find('ul');
+                                            if (totalPages > 1) {
+                                                var displayPages = 5;
+                                                var halfDisplayPages = Math.floor(displayPages / 2);
+                                                var startPage = currentPage - halfDisplayPages;
+                                                var endPage = currentPage + halfDisplayPages;
+                                                if (startPage < 1)
+                                                    startPage = 1;
+                                                if (endPage > totalPages)
+                                                    endPage = totalPages;
+
+                                                if (currentPage > 1) {
+                                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>');
+                                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + '); return false;">Prev</a></li>');
+                                                }
+
+                                                for (var i = startPage; i <= endPage; i++) {
+                                                    if (i === currentPage) {
+                                                        ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
+                                                    } else {
+                                                        ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + '); return false;">' + i + '</a></li>');
+                                                    }
+                                                }
+
+                                                if (currentPage < totalPages) {
+                                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + '); return false;">Next</a></li>');
+                                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + '); return false;">Last</a></li>');
+                                                }
+                                            }
+                                        }
+
+                                        function getFilters() {
+                                            var filters = {};
+                                            var startDateVal = $('#startDate').val();
+                                            var endDateVal = $('#endDate').val();
+                                            var categoryVals = $('input[name="category"]:checked').map(function () {
+                                                return this.value;
+                                            }).get();
+                                            var priceVal = $('input[name="price"]:checked').val();
+                                            var locationVal = $('input[name="location"]:checked').val();
+                                            var queryVal = $('input[name="query"]').val();
+
+                                            // Chỉ thêm vào filters nếu giá trị không rỗng hoặc undefined
+                                            if (startDateVal)
+                                                filters.startDate = startDateVal;
+                                            if (endDateVal)
+                                                filters.endDate = endDateVal;
+                                            if (categoryVals.length > 0)
+                                                filters.category = categoryVals; // Chỉ ghi đè nếu có category được chọn
+                                            if (priceVal !== undefined && priceVal !== "")
+                                                filters.price = priceVal; // Chỉ ghi đè nếu có price được chọn và không phải "All Prices"
+                                            if (locationVal !== undefined && locationVal !== "")
+                                                filters.location = locationVal; // Chỉ ghi đè nếu có location được chọn và không phải "All Locations"
+                                            if (queryVal)
+                                                filters.query = queryVal;
+
+                                            return filters;
+                                        }
+
+                                        $(document).ready(function () {
+                                            // Handle Apply button in filter form
+                                            $('#applyFilter').click(function () {
+                                                // Đóng tất cả các dropdown
+                                                document.querySelectorAll('.category-toggle.active').forEach(toggle => {
+                                                    toggle.classList.remove('active');
+                                                });
+                                                document.querySelectorAll('.category-list.active').forEach(list => {
+                                                    list.classList.remove('active');
+                                                });
+
+                                                // Tiếp tục gọi loadEvents với các bộ lọc
+                                                loadEvents(1, getFilters());
+                                            });
+                                        });
+        </script>
 
         <!--Footer-->
         <jsp:include page="../../components/footer.jsp"></jsp:include>

@@ -18,8 +18,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import models.Category;
-import models.Event;
-import models.EventImage;
 import viewModels.EventDTO;
 import viewModels.FilterEvent;
 
@@ -73,12 +71,10 @@ public class AllEventsController extends HttpServlet {
         HttpSession session = request.getSession();
         FilterEventDAO filterEventDAO = new FilterEventDAO();
         EventDAO eventDAO = new EventDAO();
-
-        // Call all DAO to get methods in it
         CategoryDAO categoryDAO = new CategoryDAO();
-        // Get all category and store it in list categories
+
+        // Load categories
         List<Category> listCategories = categoryDAO.getAllCategories();
-        // Set attribute for DAO
         session.setAttribute("listCategories", listCategories);
 
         // Get filter parameters
@@ -89,7 +85,7 @@ public class AllEventsController extends HttpServlet {
         String price = request.getParameter("price");
         String searchQuery = request.getParameter("query");
 
-        // Convert category ID list
+        // Convert category IDs
         List<Integer> categories = new ArrayList<>();
         if (categoryIds != null) {
             for (String id : categoryIds) {
@@ -97,14 +93,14 @@ public class AllEventsController extends HttpServlet {
             }
         }
 
-        // Convert date parameters
+        // Convert dates
         Date startDate = (startDateStr != null && !startDateStr.isEmpty()) ? Date.valueOf(startDateStr) : null;
         Date endDate = (endDateStr != null && !endDateStr.isEmpty()) ? Date.valueOf(endDateStr) : null;
 
         // Create filter object
         FilterEvent filters = new FilterEvent(categories, location, startDate, endDate, price, false, searchQuery);
 
-        // Store filters in session to persist state across pages
+        // Store filters in session (for persistence across requests)
         session.setAttribute("searchQuery", searchQuery);
         session.setAttribute("selectedCategories", categories);
         session.setAttribute("selectedLocation", location);
@@ -112,61 +108,83 @@ public class AllEventsController extends HttpServlet {
         session.setAttribute("selectedEndDate", endDateStr);
         session.setAttribute("selectedPrice", price);
 
-        // Get filtered events
-        List<EventDTO> filteredEvents = filterEventDAO.getFilteredEvents(filters);
-//        System.out.println("Filtered Events Count: " + filteredEvents.size()); // Debug log
-
-        // Pagination logic
+        // Pagination parameters
         int page = 1;
-        int pageSize = 20; // Show 10 events per page
-        int totalEvents = filteredEvents.size();
-        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
-
-        // Get requested page number
+        int pageSize = 20;
         if (request.getParameter("page") != null) {
             try {
                 page = Integer.parseInt(request.getParameter("page"));
-                if (page < 1 || page > totalPages) {
-                    page = 1; // Reset to page 1 if invalid
-                }
             } catch (NumberFormatException e) {
                 page = 1;
             }
         }
 
-        // Get events for the requested page
+        // Get filtered events
+        List<EventDTO> filteredEvents = filterEventDAO.getFilteredEvents(filters);
+        int totalEvents = filteredEvents.size();
+        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalEvents);
-        List<EventDTO> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
+        List<EventDTO> paginatedFilteredEvents = (List<EventDTO>) ((totalEvents > 0) ? filteredEvents.subList(startIndex, endIndex) : new ArrayList<>());
 
-        // Send attributes to JSP
-        request.setAttribute("filteredEvents", paginatedEvents);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+        // Get all events for fallback
+        int totalEventsAll = eventDAO.getTotalEvents();
+        int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSize);
+        List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(page, pageSize);
 
-        // <!--All Event For You-->  Get the requested page number, default to 1 if not provided 
-        int pageAll = 1;
-        int pageSizeAll = 20;
-        if (request.getParameter("page") != null) {
-            try {
-                pageAll = Integer.parseInt(request.getParameter("page"));
-            } catch (NumberFormatException e) {
-                pageAll = 1; // Fallback to page 1 in case of an invalid input
+        // Check if this is an Ajax request
+        String ajaxHeader = request.getHeader("X-Requested-With");
+        if ("XMLHttpRequest".equals(ajaxHeader)) {
+            response.setContentType("application/json");
+            PrintWriter out = response.getWriter();
+            if (totalEvents == 0) {
+                out.print(toJson(paginatedEventsAll, totalPagesAll, page));
+            } else {
+                out.print(toJson(paginatedFilteredEvents, totalPages, page));
             }
+            out.flush();
+            return;
         }
 
-        // Get total number of events and calculate total pages
-        int totalEventsAll = eventDAO.getTotalEvents();
-        int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSizeAll);
-
-        // Fetch paginated list of events
-        List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
+        // Normal request: Forward to JSP with all filter params preserved
+        request.setAttribute("filteredEvents", paginatedFilteredEvents);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
         request.setAttribute("paginatedEventsAll", paginatedEventsAll);
-        request.setAttribute("pageAll", pageAll);
+        request.setAttribute("pageAll", page);
         request.setAttribute("totalPagesAll", totalPagesAll);
+        // Preserve original query string for pagination links
+        request.setAttribute("queryString", request.getQueryString());
 
-        // Forward to JSP
         request.getRequestDispatcher("pages/listEventsPage/allEvents.jsp").forward(request, response);
+    }
+
+    private String toJson(List<EventDTO> events, int totalPages, int currentPage) {
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"events\":[");
+        for (int i = 0; i < events.size(); i++) {
+            EventDTO event = events.get(i);
+            json.append("{");
+            json.append("\"id\":").append(event.getEvent().getEventId()).append(",");
+            String escapedName = event.getEvent().getEventName().replace("\"", "\\\"");
+            json.append("\"name\":\"").append(escapedName).append("\",");
+            String escapedImageUrl = event.getEventImage().getImageUrl().replace("\"", "\\\"");
+            String escapedImageTitle = event.getEventImage().getImageTitle().replace("\"", "\\\"");
+            json.append("\"imageUrl\":\"").append(escapedImageUrl).append("\",");
+            json.append("\"imageTitle\":\"").append(escapedImageTitle).append("\",");
+            json.append("\"minPrice\":").append(event.getMinPrice()).append(",");
+            json.append("\"firstStartDate\":\"").append(event.getFirstStartDate()).append("\"");
+            json.append("}");
+            if (i < events.size() - 1) {
+                json.append(",");
+            }
+        }
+        json.append("],");
+        json.append("\"totalPages\":").append(totalPages).append(",");
+        json.append("\"currentPage\":").append(currentPage);
+        json.append("}");
+        return json.toString();
     }
 
     /**
