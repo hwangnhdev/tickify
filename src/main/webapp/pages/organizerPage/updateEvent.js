@@ -260,7 +260,6 @@ function isTimeLogisticsValid() {
             const startDate = showTime.querySelector('input[name="showStartDate"]').value;
             const endDate = showTime.querySelector('input[name="showEndDate"]').value;
             const ticketList = showTime.querySelector('.space-y-2').children.length;
-            console.log(`Show Time #${i+1}: startDate=${startDate}, endDate=${endDate}, ticketList=${ticketList}`);
             
             if (!startDate) {
                 showError(`showStartDate_${showTime.querySelector('input[name="showStartDate"]').id}`, 'Start Date is required');
@@ -659,7 +658,6 @@ function updateShowTimeCount() {
 }
 // Cập nhật addNewShowTime
 function addNewShowTime() {
-    console.log('Adding new showtime, showTimeCount:', showTimeCount);
     if (!showTimeCount || showTimeCount < 1) {
         showTimeCount = 1; // Reset về 1 nếu không hợp lệ
     }
@@ -1006,8 +1004,8 @@ async function saveNewTicket() {
         const selectedSeats = document.querySelectorAll('#seatSelection input[name="selectedSeats"]:checked');
         const seatsArray = Array.from(selectedSeats).map(checkbox => {
             const seatRow = checkbox.value;
-            const seatCol = checkbox.dataset.seats; // Lấy số ghế thực tế từ data-seats (e.g., "10", "16", "15")
-            return `${seatRow} ${seatCol}`; // Tạo chuỗi "A 10", "B 16", "C 15"
+            const seatCol = checkbox.dataset.seats;
+            return `${seatRow} ${seatCol}`;
         });
         selectedSeatsText = seatsArray.join(', ');
 
@@ -1078,7 +1076,6 @@ function editTicket(button, showTimeId) {
     const ticket = button.closest('.saved-ticket');
     const ticketDetails = ticket.querySelector('.ticket-details');
     const modal = document.getElementById('newTicketModal');
-    console.log(ticketDetails.innerHTML);
 
     // Thiết lập giá trị và kiểm tra lỗi
     try {
@@ -1097,14 +1094,12 @@ function editTicket(button, showTimeId) {
         // Price (VND)
         const priceDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Price (VND):');
         if (priceDiv) {
-            console.log('Price:', priceDiv.querySelector('span').textContent);
             document.getElementById('modalTicketPrice').value = priceDiv.querySelector('span').textContent;
         }
 
         // Quantity
         const quantityDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Quantity:');
         if (quantityDiv) {
-            console.log('Quantity:', quantityDiv.querySelector('span').textContent);
             document.getElementById('modalTicketQuantity').value = quantityDiv.querySelector('span').textContent;
         }
 
@@ -1126,10 +1121,11 @@ function editTicket(button, showTimeId) {
     if (eventType === 'Seating Event') {
         try {
             const seatsByRow = calculateSeatSummary();
-            // Tìm div chứa label "Seats:"
-            const seatsDiv = Array.from(ticketDetails.querySelectorAll('div')).find(div => div.querySelector('label')?.textContent === 'Seats:');
-            const selectedRowsText = seatsDiv ? seatsDiv.querySelector('span').textContent : '';
-            const selectedRows = selectedRowsText.split(', ').map(row => row.split(' ')[0]);
+            // Lấy tất cả các ghế đã chọn
+            const seatsDivs = Array.from(ticketDetails.querySelectorAll('div')).filter(div => div.querySelector('label')?.textContent === 'Seats:');
+            const selectedSeats = seatsDivs.map(div => div.querySelector('span').textContent.trim());
+            const selectedRows = [...new Set(selectedSeats.map(seat => seat.split(' ')[0]))];
+
             let seatOptions = '<label class="block text-gray-300 mb-2">Select Seat Rows (VIP: A, B; Normal: C):</label>';
 
             const ticketName = document.getElementById('modalTicketName').value.toLowerCase();
@@ -1138,9 +1134,11 @@ function editTicket(button, showTimeId) {
             ticketList.querySelectorAll('.saved-ticket').forEach(otherTicket => {
                 const otherTicketName = otherTicket.querySelector('.ticket-label').getAttribute('data-ticket-name');
                 if (otherTicketName !== ticket.querySelector('.ticket-label').getAttribute('data-ticket-name')) {
-                    const otherSeatsDiv = Array.from(otherTicket.querySelector('.ticket-details').querySelectorAll('div')).find(div => div.querySelector('label')?.textContent === 'Seats:');
-                    const rowsText = otherSeatsDiv ? otherSeatsDiv.querySelector('span').textContent : '';
-                    rowsText.split(', ').forEach(row => usedRows.add(row.split(' ')[0]));
+                    const otherSeatsDivs = Array.from(otherTicket.querySelector('.ticket-details').querySelectorAll('div')).filter(div => div.querySelector('label')?.textContent === 'Seats:');
+                    otherSeatsDivs.forEach(div => {
+                        const row = div.querySelector('span').textContent.split(' ')[0];
+                        usedRows.add(row);
+                    });
                 }
             });
 
@@ -1270,7 +1268,6 @@ async function loadBanks() {
     const banks = sessionStorage.getItem('banks');
     if (banks) {
         const bankData = JSON.parse(banks);
-        console.log('Banks from sessionStorage:', bankData);
         const bankSelect = document.getElementById("bank");
         bankSelect.innerHTML = '<option value="">Bank Name</option>' +
             bankData.map(bank => `<option value="${bank.code}">${bank.shortName} - ${bank.name}</option>`).join('');
@@ -1282,7 +1279,6 @@ async function loadBanks() {
         const response = await fetch("https://api.vietqr.io/v2/banks");
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        console.log('Banks from API:', data.data);
         const bankSelect = document.getElementById("bank");
         bankSelect.innerHTML = '<option value="">Bank Name</option>' +
             data.data.map(bank => `<option value="${bank.code}">${bank.shortName} - ${bank.name}</option>`).join('');
@@ -1367,7 +1363,6 @@ function loadProvinces() {
 
     // Check if the select already has options (excluding the default option)
     if (provinceSelect.options.length > 1) {
-        console.log("Province options already loaded from JSP, skipping API fetch.");
         // Ensure districts and wards are loaded
         updateDistricts();
         return;
@@ -1381,7 +1376,6 @@ function loadProvinces() {
         fetch("https://provinces.open-api.vn/api/p/")
             .then(response => response.json())
             .then(data => {
-                console.log("Fetched provinces from API:", data); // Debug
                 provinces = data;
                 sessionStorage.setItem("provinces", JSON.stringify(provinces));
                 populateProvinces(provinces);
@@ -1419,7 +1413,6 @@ function populateProvinces(provinces) {
         for (let i = 0; i < options.length; i++) {
             if (options[i].value === preSelectedProvince) {
                 provinceSelect.selectedIndex = i;
-                console.log(`Pre-selected province: ${preSelectedProvince}`); // Debug
                 updateDistricts(); // Load districts for the pre-selected province
                 break;
             }
@@ -1447,7 +1440,6 @@ async function updateDistricts() {
         try {
             const response = await fetch(`https://provinces.open-api.vn/api/p/${selectedProvinceCode}?depth=2`);
             const provinceData = await response.json();
-            console.log("Fetched districts for province code", selectedProvinceCode, ":", provinceData.districts); // Debug
             const districts = provinceData.districts;
             districtSelect.innerHTML = '<option value="">-- Select District --</option>' +
                 districts.map(district => `<option value="${district.name}" data-code="${district.code}">${district.name}</option>`).join('');
@@ -1458,7 +1450,6 @@ async function updateDistricts() {
                 for (let i = 0; i < options.length; i++) {
                     if (options[i].value === preSelectedDistrict) {
                         districtSelect.selectedIndex = i;
-                        console.log(`Pre-selected district: ${preSelectedDistrict}`); // Debug
                         updateWards(); // Load wards for the pre-selected district
                         break;
                     }
@@ -1490,7 +1481,6 @@ async function updateWards() {
         try {
             const response = await fetch(`https://provinces.open-api.vn/api/d/${selectedDistrictCode}?depth=2`);
             const districtData = await response.json();
-            console.log("Fetched wards for district code", selectedDistrictCode, ":", districtData.wards); // Debug
             const wards = districtData.wards;
             wardSelect.innerHTML = '<option value="">-- Select Ward --</option>' +
                 wards.map(ward => `<option value="${ward.name}">${ward.name}</option>`).join('');
@@ -1501,7 +1491,6 @@ async function updateWards() {
                 for (let i = 0; i < options.length; i++) {
                     if (options[i].value === preSelectedWard) {
                         wardSelect.selectedIndex = i;
-                        console.log(`Pre-selected ward: ${preSelectedWard}`); // Debug
                         break;
                     }
                 }

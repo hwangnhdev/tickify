@@ -705,7 +705,7 @@
                             <div id="seatSection" class="">
                                 <h5 class="text-white mb-3">Seat Management (Seated Event)</h5>
                                 <div id="seatsContainer" class="space-y-4">
-                                <c:forEach var="seat" items="${seats}" varStatus="loop">
+                                <c:forEach var="seat" items="${uniqueSeatTypes}" varStatus="loop">
                                     <div class="seat-input flex flex-col md:flex-row gap-4">
                                         <div class="flex-1">
                                             <label class="text-gray-300">Row:</label>
@@ -790,9 +790,9 @@
                                                                         <div><label>Price (VND):</label> <span>${ticket.price}</span></div>
                                                                         <div><label>Quantity:</label> <span>${ticket.totalQuantity}</span></div>
                                                                         <div><label>Color:</label> <span style="color: ${ticket.color}">${ticket.color}</span></div>
-                                                                            <c:forEach var="seat" items="${seats}">
-                                                                                <c:if test="${seat.ticketTypeId == ticket.ticketTypeId}">
-                                                                                <div><label>Seats:</label> <span>${seat.seatRow} ${seat.seatCol}</span></div>
+                                                                        <c:forEach var="seat" items="${seats}">
+                                                                            <c:if test="${seat.ticketTypeId == ticket.ticketTypeId}">
+                                                                                <div class="seat-info"><label>Seats:</label> <span>${seat.seatRow} ${seat.seatCol}</span></div>
                                                                             </c:if>
                                                                         </c:forEach>
                                                                     </div>
@@ -874,7 +874,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div style="display: block !important;">
                             <label class="block text-gray-300 mb-2">Price (VND)</label>
-                            <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 150,000">
+                            <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 150000">
                             <span class="error-message" id="modalTicketPrice_error"></span>
                         </div>
                         <div style="display: block !important;">

@@ -553,7 +553,7 @@ public class EventDAO extends DBContext {
                 + "    WHERE Showtimes.event_id = ?\n"
                 + "    GROUP BY Seats.seat_row\n"
                 + ")\n"
-                + "SELECT TOP 1 WITH TIES\n"
+                + "SELECT \n"
                 + "    s.seat_id,\n"
                 + "    s.ticket_type_id,\n"
                 + "    s.seat_row,\n"
@@ -564,7 +564,7 @@ public class EventDAO extends DBContext {
                 + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
                 + "INNER JOIN MaxSeats ms ON s.seat_row = ms.seat_row AND CAST(s.seat_col AS INT) = ms.max_seat_col\n"
                 + "WHERE st.event_id = ?\n"
-                + "ORDER BY ROW_NUMBER() OVER (PARTITION BY s.seat_row ORDER BY s.seat_id);";
+                + "ORDER BY s.seat_row;";
         try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setInt(2, eventId);
@@ -576,6 +576,47 @@ public class EventDAO extends DBContext {
                         rs.getString("seat_row"),
                         rs.getString("seat_col"),
                         rs.getString("status")
+                );
+                seats.add(seat);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving seats: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return seats;
+    }
+
+    /**
+     * Retrieves the list of seats for the specified event ID.
+     *
+     * @param eventId The ID of the event.
+     * @return A list of Seat objects.
+     */
+    public List<Seat> getUniqueSeatTypesByEventId(int eventId) {
+        List<Seat> seats = new ArrayList<>();
+        String sql = "SELECT \n"
+                + "    s.seat_row,\n"
+                + "    MAX(CAST(s.seat_col AS INT)) AS seat_col\n"
+                + "FROM \n"
+                + "    Seats s\n"
+                + "INNER JOIN \n"
+                + "    TicketTypes tt ON s.ticket_type_id = tt.ticket_type_id\n"
+                + "INNER JOIN \n"
+                + "    Showtimes st ON tt.showtime_id = st.showtime_id\n"
+                + "WHERE \n"
+                + "    st.event_id = ?\n"
+                + "GROUP BY \n"
+                + "    s.seat_row;";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Seat seat = new Seat(
+                        0,
+                        0,
+                        rs.getString("seat_row"),
+                        rs.getString("seat_col"),
+                        null
                 );
                 seats.add(seat);
             }
