@@ -1,13 +1,4 @@
-/*
- * =============================================================================
- * AdminDAO.java
- * =============================================================================
- * Mô tả: Data Access Object (DAO) xử lý các thao tác truy vấn dữ liệu liên quan đến 
- *        các sự kiện (Events) và chi tiết sự kiện (EventDetailDTO) cho quản trị.
- * 
- * Tác giả: Duong Minh Kiet - CE180166
- * =============================================================================
- */
+
 package dals;
 
 import java.sql.PreparedStatement;
@@ -175,15 +166,7 @@ public class AdminDAO extends DBContext {
         return revenueDetails;
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    //                      EVENT DETAIL SECTION                         //
-    /////////////////////////////////////////////////////////////////////////
-    /**
-     * Lấy chi tiết sự kiện theo ID (bao gồm thông tin các ảnh liên quan)
-     *
-     * @param eventId ID của sự kiện
-     * @return đối tượng EventDetailDTO chứa thông tin chi tiết của sự kiện
-     */
+
     public EventDetailDTO getEventDetailById(int eventId) {
         EventDetailDTO eventDetail = new EventDetailDTO();
         // Truy vấn lấy thông tin sự kiện, join thêm các bảng liên quan: Categories, Organizers, Showtimes và EventImages
@@ -334,9 +317,7 @@ public class AdminDAO extends DBContext {
         return eventDetail;
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    //                        VIEW ALL EVENTS SECTION                      //
-    /////////////////////////////////////////////////////////////////////////
+
     /**
      * Lấy danh sách tất cả sự kiện (dùng cho chức năng View All)
      *
@@ -370,9 +351,7 @@ public class AdminDAO extends DBContext {
         return events;
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    //                    FILTER EVENTS BY STATUS SECTION                //
-    /////////////////////////////////////////////////////////////////////////
+
     /**
      * Lấy danh sách sự kiện theo trạng thái (dùng cho chức năng Filter)
      *
@@ -413,9 +392,7 @@ public class AdminDAO extends DBContext {
         return events;
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    //                   APPROVED & HISTORY EVENTS SECTION               //
-    /////////////////////////////////////////////////////////////////////////
+
     /**
      * Lấy danh sách các sự kiện đã duyệt (Active) với thông tin approvedAt lấy
      * từ approved_at
@@ -618,9 +595,7 @@ public class AdminDAO extends DBContext {
         return 0;
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    //                        MAPPING METHODS SECTION                      //
-    /////////////////////////////////////////////////////////////////////////
+
     /**
      * Mapping kết quả truy vấn (ResultSet) sang đối tượng Event (không có
      * trường approvedAt)

@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class FilterEvent {
 
-    private List<Integer> categoryID;
+    private List<Integer> categories;
     private String location;
     private Date startDate;
     private Date endDate;
@@ -24,8 +24,8 @@ public class FilterEvent {
     public FilterEvent() {
     }
 
-    public FilterEvent(List<Integer> categoryID, String location, Date startDate, Date endDate, String price, boolean vouchers, String searchQuery) {
-        this.categoryID = categoryID;
+    public FilterEvent(List<Integer> categories, String location, Date startDate, Date endDate, String price, boolean vouchers, String searchQuery) {
+        this.categories = categories;
         this.location = location;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -34,12 +34,12 @@ public class FilterEvent {
         this.searchQuery = searchQuery;
     }
 
-    public List<Integer> getCategoryID() {
-        return categoryID;
+    public List<Integer> getCategories() {
+        return categories;
     }
 
-    public void setCategoryID(List<Integer> categoryID) {
-        this.categoryID = categoryID;
+    public void setCategories(List<Integer> categories) {
+        this.categories = categories;
     }
 
     public String getLocation() {

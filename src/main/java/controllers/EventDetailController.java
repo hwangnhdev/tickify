@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import models.Category;
 import models.EventImage;
@@ -79,21 +80,27 @@ public class EventDetailController extends HttpServlet {
             eventId = Integer.parseInt(id);
         } catch (NumberFormatException e) {
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid event ID");
+            return;
         }
 
+        // Lấy thông tin chi tiết của sự kiện
         Event eventDetail = eventDAO.selectEventByID(eventId);
+        if (eventDetail == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Event not found");
+            return;
+        }
+
         Category eventCategories = eventDAO.selectEventCategoriesID(eventId);
         List<EventImage> listEventImages = eventDAO.getImageEventsByEventId(eventId);
         Organizer organizer = eventDAO.getOrganizerByEventId(eventId);
         List<Showtime> listShowtimes = eventDAO.getShowTimesByEventId(eventId);
 
-        // Populate ticket types for each showtime
         for (Showtime showtime : listShowtimes) {
             List<TicketType> ticketTypes = eventDAO.getTicketTypesByShowtimeId(showtime.getShowtimeId());
             showtime.setTicketTypes(ticketTypes);
         }
 
-        // Set event image attributes
         for (EventImage image : listEventImages) {
             if (image.getImageTitle().equalsIgnoreCase("logo_event")) {
                 request.setAttribute("logoEventImage", image.getImageUrl());
@@ -109,66 +116,129 @@ public class EventDetailController extends HttpServlet {
             }
         }
 
-        request.setAttribute("eventID", eventId);
+        request.setAttribute("eventId", eventId); // Sửa eventID thành eventId để đồng bộ với JSP
         request.setAttribute("eventDetail", eventDetail);
         request.setAttribute("eventCategories", eventCategories);
         request.setAttribute("organizer", organizer);
         request.setAttribute("listShowtimes", listShowtimes);
 
-        System.out.println(eventDetail.getCategoryId());
-        // Filter and pagination logic (unchanged)
-        List<Integer> categories = new ArrayList<>();
-        categories.add(eventDetail.getCategoryId());
-
-        FilterEvent filters = new FilterEvent(categories, null, null, null, null, false, null);
-        List<EventDTO> filteredEvents = filterEventDAO.getFilteredEvents(filters);
-
+        // Pagination parameters for Relevant Events
         int page = 1;
-        int pageSize = 20;
-        int totalEvents = filteredEvents.size();
-        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
-
+        int pageSize = 20; // Đặt pageSize là 1 để đồng bộ với giao diện (1 sự kiện mỗi trang)
         if (request.getParameter("page") != null) {
             try {
                 page = Integer.parseInt(request.getParameter("page"));
-                if (page < 1 || page > totalPages) {
-                    page = 1;
-                }
             } catch (NumberFormatException e) {
                 page = 1;
             }
         }
 
-        int startIndex = (page - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, totalEvents);
-        List<EventDTO> paginatedEvents = filteredEvents.subList(startIndex, endIndex);
+        // Relevant Events
+        List<Integer> categories = new ArrayList<>();
+        categories.add(eventDetail.getCategoryId());
+        FilterEvent filters = new FilterEvent(categories, null, null, null, null, false, null);
+        List<EventDTO> relevantEvents = filterEventDAO.getFilteredEvents(filters);
 
-        request.setAttribute("filteredEvents", paginatedEvents);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        // <!--All Event For You--> Get the requested page number, default to 1 if not
-        // provided
-        int pageAll = 1;
-        int pageSizeAll = 20;
-        if (request.getParameter("page") != null) {
-            try {
-                pageAll = Integer.parseInt(request.getParameter("page"));
-            } catch (NumberFormatException e) {
-                pageAll = 1; // Fallback to page 1 in case of an invalid input
+        // Loại bỏ sự kiện hiện tại
+        Iterator<EventDTO> iterator = relevantEvents.iterator();
+        while (iterator.hasNext()) {
+            EventDTO event = iterator.next();
+            if (event.getEvent().getEventId() == eventId) {
+                iterator.remove();
             }
         }
 
-        // Get total number of events and calculate total pages
+        // Tính toán phân trang cho Relevant Events
+        int totalRelevantEvents = relevantEvents.size();
+        int totalPages = (int) Math.ceil((double) totalRelevantEvents / pageSize);
+
+        // Đảm bảo page không vượt quá totalPages
+        if (page > totalPages && totalPages > 0) {
+            page = totalPages; // Nếu page vượt quá totalPages, đặt lại về trang cuối
+        } else if (page < 1) {
+            page = 1; // Nếu page nhỏ hơn 1, đặt về trang 1
+        }
+
+        int startIndex = (page - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, totalRelevantEvents);
+        List<EventDTO> paginatedRelevantEvents = (List<EventDTO>) ((totalRelevantEvents > 0)
+                ? relevantEvents.subList(startIndex, endIndex)
+                : new ArrayList<>());
+
+        // Pagination parameters for All Events
+        int pageAll = 1;
+        int pageSizeAll = 20; // pageSize cho All Events có thể giữ nguyên 20
+        if (request.getParameter("pageAll") != null) {
+            try {
+                pageAll = Integer.parseInt(request.getParameter("pageAll"));
+            } catch (NumberFormatException e) {
+                pageAll = 1;
+            }
+        }
+
+        // All Events
         int totalEventsAll = eventDAO.getTotalEvents();
         int totalPagesAll = (int) Math.ceil((double) totalEventsAll / pageSizeAll);
-
-        // Fetch paginated list of events
+        if (pageAll > totalPagesAll && totalPagesAll > 0) {
+            pageAll = totalPagesAll; // Đảm bảo pageAll không vượt quá totalPagesAll
+        } else if (pageAll < 1) {
+            pageAll = 1;
+        }
         List<EventDTO> paginatedEventsAll = eventDAO.getEventsByPage(pageAll, pageSizeAll);
+
+        // Ajax request
+        String ajaxHeader = request.getHeader("X-Requested-With");
+        if ("XMLHttpRequest".equals(ajaxHeader)) {
+            response.setContentType("application/json");
+            PrintWriter out = response.getWriter();
+            if (!paginatedRelevantEvents.isEmpty()) {
+                out.print(toJson(paginatedRelevantEvents, totalPages, page, "relevant"));
+            } else {
+                out.print(toJson(paginatedEventsAll, totalPagesAll, pageAll, "all"));
+            }
+            out.flush();
+            return;
+        }
+
+        // Normal request
+        request.setAttribute("relevantEvents", paginatedRelevantEvents);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
         request.setAttribute("paginatedEventsAll", paginatedEventsAll);
         request.setAttribute("pageAll", pageAll);
         request.setAttribute("totalPagesAll", totalPagesAll);
 
         request.getRequestDispatcher("pages/listEventsPage/eventDetail.jsp").forward(request, response);
+    }
+
+    // Hàm trả về JSON với thêm type để phân biệt "relevant" hay "all"
+    private String toJson(List<EventDTO> events, int totalPages, int currentPage, String type) {
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"type\":\"").append(type).append("\",");
+        json.append("\"events\":[");
+        for (int i = 0; i < events.size(); i++) {
+            EventDTO event = events.get(i);
+            json.append("{");
+            json.append("\"id\":").append(event.getEvent().getEventId()).append(",");
+            String escapedName = event.getEvent().getEventName().replace("\"", "\\\"");
+            json.append("\"name\":\"").append(escapedName).append("\",");
+            String escapedImageUrl = event.getEventImage().getImageUrl().replace("\"", "\\\"");
+            String escapedImageTitle = event.getEventImage().getImageTitle().replace("\"", "\\\"");
+            json.append("\"imageUrl\":\"").append(escapedImageUrl).append("\",");
+            json.append("\"imageTitle\":\"").append(escapedImageTitle).append("\",");
+            json.append("\"minPrice\":").append(event.getMinPrice()).append(",");
+            json.append("\"firstStartDate\":\"").append(event.getFirstStartDate()).append("\"");
+            json.append("}");
+            if (i < events.size() - 1) {
+                json.append(",");
+            }
+        }
+        json.append("],");
+        json.append("\"totalPages\":").append(totalPages).append(",");
+        json.append("\"currentPage\":").append(currentPage);
+        json.append("}");
+        return json.toString();
     }
 
     /**

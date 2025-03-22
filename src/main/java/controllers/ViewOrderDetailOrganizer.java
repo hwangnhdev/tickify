@@ -36,12 +36,9 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
             return;
         }
 
-        // Set organizerId (defaulted to 1; adjust as needed)
-        int organizerId = 18;
-
-        // Call DAO to retrieve the order details
+        // Call DAO to retrieve the order details by orderId only
         OrderDetailDAO dao = new OrderDetailDAO();
-        OrderDetailDTO orderDetail = dao.getOrderDetailForOrganizer(organizerId, orderId);
+        OrderDetailDTO orderDetail = dao.getOrderDetailByOrderId(orderId);
 
         if (orderDetail == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Order not found.");

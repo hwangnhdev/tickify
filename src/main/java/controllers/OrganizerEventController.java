@@ -11,26 +11,44 @@ import java.io.IOException;
 import java.util.List;
 import viewModels.EventSummaryDTO;
 
+
 public class OrganizerEventController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        System.out.println(session.getAttribute("customerId"));
-        int customerId = (int) session.getAttribute("customerId");
+        Object customerIdObj = session.getAttribute("customerId");
+        int customerId = 0;
+        if (customerIdObj instanceof Integer) {
+            customerId = (Integer) customerIdObj;
+            System.out.println("Customer ID: " + customerId);
+        } else if (customerIdObj instanceof String) {
+            try {
+                customerId = Integer.parseInt((String) customerIdObj);
+                System.out.println("Customer ID: " + customerId);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
+        }
+
         String filter = request.getParameter("filter");
         if (filter == null || filter.trim().isEmpty()) {
             filter = "all";
         }
 
+        String eventName = request.getParameter("eventName");
+        if (eventName == null || eventName.trim().isEmpty()) {
+            eventName = null;
+        }
+
         OrganizerDAO organizerDAO = new OrganizerDAO();
-        List<EventSummaryDTO> events = organizerDAO.getEventsByCustomer(customerId, filter);
+        List<EventSummaryDTO> events = organizerDAO.getEventsByCustomer(customerId, filter, eventName);
 
         // Đặt danh sách sự kiện và bộ lọc hiện tại vào request để JSP hiển thị
         request.setAttribute("events", events);
-        request.setAttribute("currentFilter", filter);
-
         RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/organizerEvents.jsp");
         dispatcher.forward(request, response);
     }
@@ -40,9 +58,10 @@ public class OrganizerEventController extends HttpServlet {
             throws ServletException, IOException {
         doGet(request, response);
     }
-
+    
     @Override
     public String getServletInfo() {
-        return "OrganizerEventController retrieves filtered events and forwards to organizerEvents.jsp";
+        return "OrganizerEventController retrieves events with banner images";
     }
 }
+

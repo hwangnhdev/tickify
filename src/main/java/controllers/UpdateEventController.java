@@ -86,7 +86,7 @@ public class UpdateEventController extends HttpServlet {
         CategoryDAO categoryDAO = new CategoryDAO();
 
         String eventIdParam = request.getParameter("eventId");
-        // String eventIdParam = "21";
+
         int eventId = 0;
         try {
             if (eventIdParam != null && !eventIdParam.isEmpty()) {
@@ -115,11 +115,9 @@ public class UpdateEventController extends HttpServlet {
         request.setAttribute("provinces", provinces);
 
         String provinceLocal = "";
-        System.out.println(event.getLocation());
         String[] locationPart = event.getLocation().split(",");
         int index = 0;
         for (String string : locationPart) {
-            System.out.println("Part " + index + ": " + string.trim());
             if (index == 0) {
                 request.setAttribute("ward", string.trim());
             } else if (index == 1) {
@@ -131,20 +129,6 @@ public class UpdateEventController extends HttpServlet {
             index++;
         }
 
-        System.out.println("Provinces list: " + provinces);
-        for (Province province : provinces) {
-            System.out.println(province.getCodename());
-            System.out.println(province.getCode());
-            System.out.println(province.getName());
-            if (province.getName().equalsIgnoreCase(provinceLocal)) {
-                System.out.println("Successfully");
-            }
-        }
-        System.out.println(provinceLocal);
-        System.out.println("Set ward: " + request.getAttribute("ward"));
-        System.out.println("Set district: " + request.getAttribute("district"));
-        System.out.println("Set province: " + request.getAttribute("province"));
-
         // Set attributes
         request.setAttribute("event", event);
         request.setAttribute("eventImages", eventImages);
@@ -155,21 +139,10 @@ public class UpdateEventController extends HttpServlet {
         request.setAttribute("seats", seats);
         session.setAttribute("listCategories", listCategories);
         request.setAttribute("bankName", organizer.getBankName().trim());
-        System.out.println("Your BankName: " + organizer.getBankName());
-
-        for (Seat seat : seats) {
-            System.out.println("Seat: " + seat.getSeatRow() + ", " + seat.getSeatCol());
-        }
 
         // Tải danh sách ngân hàng từ API
         List<Bank> banks = loadBanksFromAPI();
         request.setAttribute("banks", banks);
-        for (Bank bank : banks) {
-            System.out.println(bank.getCode());
-            if (bank.getCode().equalsIgnoreCase(organizer.getBankName())) {
-                System.out.println("Successfully!");
-            }
-        }
 
         request.getRequestDispatcher("pages/organizerPage/updateEvent.jsp").forward(request, response);
     }
@@ -188,7 +161,6 @@ public class UpdateEventController extends HttpServlet {
         response.setContentType("application/json");
         EventDAO eventDAO = new EventDAO();
 
-        System.out.println("Received request to /updateEvent");
         StringBuilder jsonBuffer = new StringBuilder();
         try (BufferedReader reader = request.getReader()) {
             String line;

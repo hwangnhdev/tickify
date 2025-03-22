@@ -59,3 +59,52 @@ window.addEventListener("resize", () => {
     });
 });
 
+// Nagipation
+let currentPage = 1;
+const pageSize = 20;
+
+function loadEvents(page) {
+    $.ajax({
+        url: "event",
+        type: "POST",
+        data: {page: page},
+        dataType: "json",
+        success: function (data) {
+            $("#event-container").empty();
+            data.events.forEach(event => {
+                let eventHTML = `
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="event-card">
+                            <a>${event.name}</a> <!-- Hiển thị tên sự kiện từ JSON -->
+                        </div>
+                    </div>
+                `;
+                $("#event-container").append(eventHTML);
+            });
+            updatePagination(data.currentPage, data.totalPages);
+        },
+        error: function (xhr, status, error) {
+            console.log("Lỗi AJAX: ", status, error); // Ghi log lỗi nếu có
+        }
+    });
+}
+
+function updatePagination(currentPage, totalPages) {
+    let paginationHTML = `
+        <button onclick="changePage(1)">First</button>
+        <button onclick="changePage(${Math.max(1, currentPage - 1)})">Prev</button>
+        <span>Page ${currentPage} of ${totalPages}</span>
+        <button onclick="changePage(${Math.min(totalPages, currentPage + 1)})">Next</button>
+        <button onclick="changePage(${totalPages})">Last</button>
+    `;
+    $("#pagination").html(paginationHTML);
+}
+
+function changePage(page) {
+    currentPage = page;
+    loadEvents(page);
+}
+
+$(document).ready(function () {
+    loadEvents(1);
+});
