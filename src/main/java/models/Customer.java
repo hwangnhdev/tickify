@@ -19,6 +19,8 @@ public class Customer {
     private String phone;
     private String profilePicture;
     private Boolean status;
+    private Date dob;
+    private String gender;
 
     public Customer() {
     }
@@ -31,6 +33,18 @@ public class Customer {
         this.phone = phone;
         this.profilePicture = profilePicture;
         this.status = status;
+    }
+
+    public Customer(int customerId, String fullName, String email, String address, String phone, String profilePicture, Boolean status, Date dob, String gender) {
+        this.customerId = customerId;
+        this.fullName = fullName;
+        this.email = email;
+        this.address = address;
+        this.phone = phone;
+        this.profilePicture = profilePicture;
+        this.status = status;
+        this.dob = dob;
+        this.gender = gender;
     }
 
     public int getCustomerId() {
@@ -92,6 +106,22 @@ public class Customer {
 
     public String getStatusText() {
         return (status != null && status) ? "Active" : "Inactive";
+    }
+
+    public Date getDob() {
+        return dob;
+    }
+
+    public void setDob(Date dob) {
+        this.dob = dob;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     @Override

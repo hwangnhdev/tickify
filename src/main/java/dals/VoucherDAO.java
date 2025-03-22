@@ -174,13 +174,13 @@ public class VoucherDAO extends DBContext {
         return vouchers;
     }
 
-    public static void main(String[] args) {
-        VoucherDAO dao = new VoucherDAO();
-        int page = 1;
-        int PAGE_SIZE = 1;
-        List<Voucher> vouchers = dao.getVouchersByEventAndStatus(1, page, PAGE_SIZE, true, false);
-        System.out.println(vouchers);
-    }
+//    public static void main(String[] args) {
+//        VoucherDAO dao = new VoucherDAO();
+//        int page = 1;
+//        int PAGE_SIZE = 1;
+//        List<Voucher> vouchers = dao.getVouchersByEventAndStatus(1, page, PAGE_SIZE, true, false);
+//        System.out.println(vouchers);
+//    }
 
     // Get total number of vouchers by event ID
     public int getTotalVouchersByEventAndStatus(int eventId, boolean status) {

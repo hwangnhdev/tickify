@@ -220,6 +220,10 @@
         <servlet-name>EventAjaxController</servlet-name>
         <servlet-class>controllers.EventAjaxController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminProfileController</servlet-name>
+        <servlet-class>controllers.AdminProfileController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -428,6 +432,10 @@
     <servlet-mapping>
         <servlet-name>EventAjaxController</servlet-name>
         <url-pattern>/eventAjax</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminProfileController</servlet-name>
+        <url-pattern>/adminProfile</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>10080</session-timeout>

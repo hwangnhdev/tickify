@@ -61,9 +61,12 @@ public class ChangePasswordController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         Integer customerId = (Integer) session.getAttribute("customerId");
-        CustomerDAO dao = new CustomerDAO();
-        CustomerAuth customer = dao.getPassword(customerId);
-        request.setAttribute("profile", customer);
+
+        if (customerId == null) {
+            response.sendRedirect("event");
+            return;
+        }
+
         request.getRequestDispatcher("pages/profile/changePassword.jsp").forward(request, response);
     }
 
@@ -107,7 +110,7 @@ public class ChangePasswordController extends HttpServlet {
         } else {
             request.setAttribute("errorMessage", "Error changing password. Please try again.");
         }
-        
+
         boolean isUpdated = dao.updatePassword(customerId, newPassword);
         if (isUpdated) {
             response.sendRedirect("profile");

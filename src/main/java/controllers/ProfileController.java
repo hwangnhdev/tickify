@@ -68,6 +68,7 @@ public class ProfileController extends HttpServlet {
 
         if (customer == null) {
             System.out.println("Customer not found!");
+            response.sendRedirect("event");
         }
     }
 
@@ -90,7 +91,6 @@ public class ProfileController extends HttpServlet {
 //        Date dob = Date.valueOf(request.getParameter("dob")); // Convert string to SQL Date
 //        String gender = request.getParameter("gender");
 
-        // Fetch customer email from the database (since it's not editable)
         CustomerDAO customerDAO = new CustomerDAO();
         Customer existingCustomer = customerDAO.getCustomerById(customerId);
         String email = existingCustomer.getEmail(); // Retain the original email
@@ -101,7 +101,6 @@ public class ProfileController extends HttpServlet {
         customer.setEmail(email);
         customer.setAddress(address);
         customer.setPhone(phone);
-
         customer.setProfilePicture(picture);
 
         boolean isUpdated = customerDAO.updateCustomer(customer);
@@ -124,5 +123,4 @@ public class ProfileController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }
