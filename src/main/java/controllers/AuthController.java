@@ -25,38 +25,35 @@ import org.mindrot.jbcrypt.BCrypt;
  * @author Nguyen Huy Hoang - CE182102
  */
 
-@WebServlet(name = "AuthController", urlPatterns = { "/auth" })
+@WebServlet(name = "AuthController", urlPatterns = {"/auth"})
 public class AuthController extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     * 
-     * @param request  servlet request
+   
+    /** 
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AuthController</title>");
+            out.println("<title>Servlet AuthController</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AuthController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet AuthController at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-    }
-
+    } 
+    
     // Xử lý đăng ký
-    private void handleSignUp(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    private void handleSignUp(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("email");
         String fullName = (String) session.getAttribute("name");
@@ -75,22 +72,21 @@ public class AuthController extends HttpServlet {
             existingCustomerId = 0;
         }
 
-        CustomerAuth existingCustomerAuth = customerAuthDao.selectCustomerAuthByIdProvider(existingCustomerId,
-                provider);
+        CustomerAuth existingCustomerAuth = customerAuthDao.selectCustomerAuthByIdProvider(existingCustomerId, provider);
 
-        // TH0: Chưa có customer_auth trong DB
+        //TH0: Chưa có customer_auth trong DB 
         if (existingCustomerAuth == null) {
-            // TH1: Chưa có customer trong DB
+            //TH1: Chưa có customer trong DB 
             Customer customer = null;
             if (existingCustomer == null) {
                 customer = new Customer(0, fullName, email, null, null, null, Boolean.TRUE);
                 customerDao.insertCustomer(customer);
             }
-            // TH2: Nếu có customer_auth set cho customer thành customer đã có
+            //TH2: Nếu có customer_auth set cho customer thành customer đã có 
             else {
                 customer = existingCustomer;
             }
-
+            
             // Mã hóa mật khẩu
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
@@ -104,9 +100,8 @@ public class AuthController extends HttpServlet {
             System.out.println("Signup successful!");
             request.setAttribute("successfulMessage", "Signup successful!");
             response.sendRedirect("pages/signUpPage/signUp.jsp");
-            // request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request,
-            // response);
-        } else {
+//            request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
+        } else{
             request.setAttribute("errorMessage", "Existing email");
             RequestDispatcher dispatcher = request.getRequestDispatcher("pages/signUpPage/signUp.jsp");
             dispatcher.forward(request, response);
@@ -126,21 +121,14 @@ public class AuthController extends HttpServlet {
         if (customer == null) {
             request.setAttribute("errorMessage", "Invalid email");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
-<<<<<<< HEAD
-=======
             return;
->>>>>>> 9b2899d5bc5fd14442f22e5d9a22f2eb30cdef66
         }
         
         if (!customer.getStatus()) {
             request.setAttribute("errorMessage", "This account has been banned!");
-<<<<<<< HEAD
-            request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
-=======
             System.out.println("This account has been banned!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
             return;
->>>>>>> 9b2899d5bc5fd14442f22e5d9a22f2eb30cdef66
         }
         
         CustomerAuth customerAuth = customerAuthDao.selectCustomerAuthById(customer.getCustomerId());
@@ -157,34 +145,31 @@ public class AuthController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
-    // + sign on the left to edit the code.">
-    /**
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /** 
      * Handles the HTTP <code>GET</code> method.
-     * 
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         processRequest(request, response);
-        // System.out.println("halo");
-    }
+//        System.out.println("halo");
+    } 
 
-    /**
+    /** 
      * Handles the HTTP <code>POST</code> method.
-     * 
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         HttpSession session = request.getSession();
         String action = (String) session.getAttribute("action");
         if (action == null || action.isEmpty())
@@ -200,9 +185,8 @@ public class AuthController extends HttpServlet {
         }
     }
 
-    /**
+    /** 
      * Returns a short description of the servlet.
-     * 
      * @return a String containing servlet description
      */
     @Override
