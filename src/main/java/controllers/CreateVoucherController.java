@@ -77,7 +77,7 @@ public class CreateVoucherController extends HttpServlet {
         try {
             VoucherDAO voucherDAO = new VoucherDAO();
             Voucher voucher = new Voucher();
-            voucher.setEventId(1);
+            voucher.setEventId(16);
             voucher.setCode(request.getParameter("code"));
             voucher.setDescription(request.getParameter("description"));
             voucher.setDiscountType(request.getParameter("discountType"));

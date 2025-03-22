@@ -60,7 +60,7 @@
                             </a>
                         </div>
 
-                        <form action="CreateVoucherController" method="post" class="space-y-6">
+                        <form action="createVoucher" method="post" class="space-y-6">
                             <input type="hidden" name="eventId" value="<%= request.getParameter("eventId") != null ? request.getParameter("eventId") : "" %>">
 
                             <!-- Basic Information -->
