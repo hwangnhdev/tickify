@@ -12,20 +12,17 @@ import viewModels.TicketSeatDTO;
 
 public class TicketDAO extends DBContext {
 
-    private static final String INSERT_TICKET
-            = "INSERT INTO Ticket (order_detail_id, seat_id, ticket_code, price, status, created_at, updated_at) "
+    private static final String INSERT_TICKET = "INSERT INTO Ticket (order_detail_id, seat_id, ticket_code, price, status, created_at, updated_at) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String CHECK_TICKET_EXIST = "SELECT COUNT(*) FROM Ticket WHERE ticket_code = ?";
-    private static final String CHECK_TICKET_STATUS
-            = "SELECT t.status AS ticket_status "
+    private static final String CHECK_TICKET_STATUS = "SELECT t.status AS ticket_status "
             + "FROM Orders o "
             + "JOIN OrderDetails od ON o.order_id = od.order_id "
             + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
             + "JOIN Ticket t ON od.order_detail_id = t.order_detail_id "
             + "JOIN Seats s ON t.seat_id = s.seat_id "
             + "WHERE o.order_id = ? and s.seat_id = ?";
-    private static final String UPDATE_TICKET_STATUS
-            = "UPDATE Ticket SET status = 'used', updated_at = GETDATE() WHERE seat_id = ?";
+    private static final String UPDATE_TICKET_STATUS = "UPDATE Ticket SET status = 'used', updated_at = GETDATE() WHERE seat_id = ?";
 
     public boolean insertTicket(Ticket ticket) {
         try (PreparedStatement st = connection.prepareStatement(INSERT_TICKET)) {
@@ -218,7 +215,8 @@ public class TicketDAO extends DBContext {
             ex.printStackTrace();
         }
 
-        // Nếu tìm thấy orderId, truy vấn 2: Lấy danh sách chi tiết vé (ticket items) theo orderId, bao gồm thông tin ghế
+        // Nếu tìm thấy orderId, truy vấn 2: Lấy danh sách chi tiết vé (ticket items)
+        // theo orderId, bao gồm thông tin ghế
         if (orderId != -1) {
             String itemsSql = "SELECT "
                     + "   OD.order_detail_id, "

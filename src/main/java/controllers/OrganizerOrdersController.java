@@ -21,8 +21,6 @@ public class OrganizerOrdersController extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Lấy organizerId từ session, nếu không có dùng giá trị mặc định (mặc dù ở phiên bản mới không dùng để lọc)
-       
-      
 
         // Lấy số trang từ tham số 'page', mặc định là 1
         String pageParam = request.getParameter("page");

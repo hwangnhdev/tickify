@@ -40,7 +40,8 @@ public class Event {
     public Event() {
     }
 
-    public Event(int eventId, int categoryId, int organizerId, String eventName, String location, String eventType, String status, String description, Timestamp createdAt, Timestamp updatedAt) {
+    public Event(int eventId, int categoryId, int organizerId, String eventName, String location, String eventType,
+            String status, String description, Timestamp createdAt, Timestamp updatedAt) {
         this.eventId = eventId;
         this.categoryId = categoryId;
         this.organizerId = organizerId;
@@ -148,7 +149,7 @@ public class Event {
     public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
-    
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }

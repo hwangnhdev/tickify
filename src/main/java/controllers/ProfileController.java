@@ -60,9 +60,23 @@ public class ProfileController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        int id = (int) session.getAttribute("customerId");
+        Object customerIdObj = session.getAttribute("customerId");
+        int customerId = 0;
+        if (customerIdObj instanceof Integer) {
+            customerId = (Integer) customerIdObj;
+            System.out.println("Customer ID: " + customerId);
+        } else if (customerIdObj instanceof String) {
+            try {
+                customerId = Integer.parseInt((String) customerIdObj);
+                System.out.println("Customer ID: " + customerId);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
+        }
         CustomerDAO dao = new CustomerDAO();
-        Customer customer = dao.getCustomerById(id);
+        Customer customer = dao.getCustomerById(customerId);
         request.setAttribute("profile", customer);
         request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
 
@@ -92,7 +106,7 @@ public class ProfileController extends HttpServlet {
 
         // Fetch customer email from the database (since it's not editable)
         CustomerDAO customerDAO = new CustomerDAO();
-        Customer existingCustomer = customerDAO.getCustomerById(1);
+        Customer existingCustomer = customerDAO.getCustomerById(customerId);
         String email = existingCustomer.getEmail(); // Retain the original email
 
         Customer customer = new Customer();

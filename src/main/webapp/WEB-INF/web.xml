@@ -249,6 +249,10 @@
         <url-pattern>/resetPassword</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/changePassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>EventController</servlet-name>
         <url-pattern>/event</url-pattern>
     </servlet-mapping>
@@ -398,15 +402,15 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VoucherController</servlet-name>
-        <url-pattern>/VoucherController</url-pattern>
+        <url-pattern>/editVoucher</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewAllVouchersController</servlet-name>
-        <url-pattern>/ViewAllVouchersController</url-pattern>
+        <url-pattern>/vouchers</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CreateVoucherController</servlet-name>
-        <url-pattern>/CreateVoucherController</url-pattern>
+        <url-pattern>/createVoucher</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VnPayAjaxController</servlet-name>
