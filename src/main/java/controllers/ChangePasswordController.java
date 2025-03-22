@@ -60,7 +60,21 @@ public class ChangePasswordController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Integer customerId = (Integer) session.getAttribute("customerId");
+        Object customerIdObj = session.getAttribute("customerId");
+        int customerId = 0;
+        if (customerIdObj instanceof Integer) {
+            customerId = (Integer) customerIdObj;
+            System.out.println("Customer ID: " + customerId);
+        } else if (customerIdObj instanceof String) {
+            try {
+                customerId = Integer.parseInt((String) customerIdObj);
+                System.out.println("Customer ID: " + customerId);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
+        }
         CustomerDAO dao = new CustomerDAO();
         CustomerAuth customer = dao.getPassword(customerId);
         request.setAttribute("profile", customer);
@@ -107,7 +121,7 @@ public class ChangePasswordController extends HttpServlet {
         } else {
             request.setAttribute("errorMessage", "Error changing password. Please try again.");
         }
-        
+
         boolean isUpdated = dao.updatePassword(customerId, newPassword);
         if (isUpdated) {
             response.sendRedirect("profile");

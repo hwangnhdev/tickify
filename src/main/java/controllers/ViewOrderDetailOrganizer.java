@@ -12,6 +12,7 @@ import java.io.IOException;
 
 @WebServlet("/viewOrderDetailOrganizer")
 public class ViewOrderDetailOrganizer extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
 
     public ViewOrderDetailOrganizer() {
@@ -35,11 +36,11 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid orderId parameter.");
             return;
         }
-        
+
         // Call DAO to retrieve the order details by orderId only
         OrderDetailDAO dao = new OrderDetailDAO();
         OrderDetailDTO orderDetail = dao.getOrderDetailByOrderId(orderId);
-        
+
         if (orderDetail == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Order not found.");
             return;
@@ -47,8 +48,7 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
 
         // Set orderDetail as a request attribute and forward to JSP view
         request.setAttribute("orderDetail", orderDetail);
-        RequestDispatcher dispatcher = request
-                .getRequestDispatcher("/pages/organizerPage/viewOrderDetailOrganizer.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/viewOrderDetailOrganizer.jsp");
         dispatcher.forward(request, response);
     }
 
