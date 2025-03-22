@@ -92,7 +92,7 @@ public class ProfileController extends HttpServlet {
 
         // Fetch customer email from the database (since it's not editable)
         CustomerDAO customerDAO = new CustomerDAO();
-        Customer existingCustomer = customerDAO.getCustomerById(1);
+        Customer existingCustomer = customerDAO.getCustomerById(customerId);
         String email = existingCustomer.getEmail(); // Retain the original email
 
         Customer customer = new Customer();
