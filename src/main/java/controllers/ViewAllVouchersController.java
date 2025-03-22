@@ -21,19 +21,21 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class ViewAllVouchersController extends HttpServlet {
 
+    private static final int PAGE_SIZE = 10;
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -47,31 +49,68 @@ public class ViewAllVouchersController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Get event ID from request parameter
-//        String eventIdStr = request.getParameter("eventId");
-//
-//        // Validate event ID
-//        if (eventIdStr == null || eventIdStr.isEmpty()) {
-//            response.sendRedirect("pages/profile/profile.jsp"); // Redirect if no event ID is provided
-//            return;
-//        }
+        int eventId = 1;
+        int page = 1;
+        String voucherStatus = request.getParameter("voucherStatus");
+
+        // Default to "all" if no status provided
+        if (voucherStatus == null || voucherStatus.trim().isEmpty()) {
+            voucherStatus = "all";
+        }
+        try {
+            // eventId = Integer.parseInt(request.getParameter("eventId"));
+            String pageParam = request.getParameter("page");
+            if (pageParam != null && !pageParam.trim().isEmpty()) {
+                page = Integer.parseInt(pageParam);
+            }
+        } catch (NumberFormatException e) {
+            response.sendRedirect("error.jsp");
+            return;
+        }
+        // Validate event ID
+        // if (eventId <= 0) {
+        // response.sendRedirect("pages/profile/profile.jsp"); // Redirect if no event
+        // ID is provided
+        // return;
+        // }
 
         try {
-//            int eventId = Integer.parseInt(eventIdStr);
+            // int eventId = Integer.parseInt(eventIdStr);
             VoucherDAO voucherDAO = new VoucherDAO();
-            List<Voucher> vouchers = voucherDAO.getVouchersByEvent(1);
+            List<Voucher> vouchers;
+            int totalVouchers;
+
+            // Filter vouchers based on status
+            switch (voucherStatus.toLowerCase()) {
+                case "active":
+                    vouchers = voucherDAO.getVouchersByEventAndStatus(1, page, PAGE_SIZE, true, false);
+                    totalVouchers = voucherDAO.getTotalVouchersByEventAndStatus(1, true);
+                    break;
+                case "inactive":
+                    vouchers = voucherDAO.getVouchersByEventAndStatus(1, page, PAGE_SIZE, false, false);
+                    totalVouchers = voucherDAO.getTotalVouchersByEventAndStatus(1, false);
+                    break;
+                case "all":
+                default:
+                    vouchers = voucherDAO.getVouchersByEvent(1, page, PAGE_SIZE);
+                    totalVouchers = voucherDAO.getTotalVouchersByEvent(1);
+                    break;
+            }
+            int totalPages = (int) Math.ceil((double) totalVouchers / PAGE_SIZE);
 
             // Format expiration time and determine status
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -87,7 +126,7 @@ public class ViewAllVouchersController extends HttpServlet {
                 if ("percentage".equalsIgnoreCase(v.getDiscountType())) {
                     v.setFormattedDiscount(v.getDiscountValue() + "%");
                 } else {
-                    v.setFormattedDiscount(String.format("%f VND", v.getDiscountValue()));
+                    v.setFormattedDiscount(String.format("%d VND", v.getDiscountValue()));
                 }
             }
 
@@ -97,19 +136,24 @@ public class ViewAllVouchersController extends HttpServlet {
 
             // Send vouchers to JSP
             request.setAttribute("vouchers", vouchers);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("eventId", eventId);
+            request.setAttribute("status", eventId);
+            request.setAttribute("voucherStatus", voucherStatus);
             request.getRequestDispatcher("pages/voucherPage/listVoucher.jsp").forward(request, response);
         } catch (NumberFormatException e) {
-            response.sendRedirect("error.jsp"); // Handle invalid event ID
+            response.sendRedirect(request.getContextPath() + "/event"); // Handle invalid event ID
         }
     }
 
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

@@ -26,16 +26,16 @@ import utils.DBContext;
 public class CustomerDAO extends DBContext {
 
     public static void main(String[] args) {
-//        Customer customer = new Customer();
-//        CustomerAuth customerAuth = new CustomerAuth();
-//        CustomerDAO cusDao = new CustomerDAO();
-//        CustomerAuthDAO cusAuthDao = new CustomerAuthDAO();
-//
-//        customer = cusDao.selectCustomerById(3);
-//        customerAuth = cusAuthDao.selectCustomerAuthById(customer.getCustomerId());
-//
-//        System.out.println(customer);
-//        System.out.println(customerAuth)
+        // Customer customer = new Customer();
+        // CustomerAuth customerAuth = new CustomerAuth();
+        // CustomerDAO cusDao = new CustomerDAO();
+        // CustomerAuthDAO cusAuthDao = new CustomerAuthDAO();
+        //
+        // customer = cusDao.selectCustomerById(3);
+        // customerAuth = cusAuthDao.selectCustomerAuthById(customer.getCustomerId());
+        //
+        // System.out.println(customer);
+        // System.out.println(customerAuth)
 
         CustomerDAO dao = new CustomerDAO();
         System.out.println(dao.getPassword(1));
@@ -136,7 +136,7 @@ public class CustomerDAO extends DBContext {
         }
         return false;
     }
-    
+
     public boolean updateCustomerImageProfile(Customer customer) {
         String query = "UPDATE Customers SET profile_picture = ? WHERE customer_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -220,7 +220,8 @@ public class CustomerDAO extends DBContext {
 
     // Phương thức lấy danh sách khách hàng với tìm kiếm, lọc và phân trang
     // Lấy danh sách khách hàng với tìm kiếm, lọc theo trạng thái và phân trang
-    public List<Customer> getAllCustomers(String searchTerm, String selectedStatus, String sortColumn, String sortOrder, int pageNumber, int pageSize) {
+    public List<Customer> getAllCustomers(String searchTerm, String selectedStatus, String sortColumn, String sortOrder,
+            int pageNumber, int pageSize) {
         List<Customer> customers = new ArrayList<>();
         String sql = "SELECT customer_id, full_name, email, status "
                 + "FROM Customers "
@@ -345,7 +346,8 @@ public class CustomerDAO extends DBContext {
             ps.setInt(1, active ? 1 : 0);
             ps.setInt(2, customerId);
             int updatedRows = ps.executeUpdate();
-            System.out.println("updateAccountStatus: customerId = " + customerId + ", active = " + active + ", updatedRows = " + updatedRows);
+            System.out.println("updateAccountStatus: customerId = " + customerId + ", active = " + active
+                    + ", updatedRows = " + updatedRows);
             return updatedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -353,7 +355,8 @@ public class CustomerDAO extends DBContext {
         return false;
     }
 
-    // Cập nhật thông tin cá nhân của khách hàng (không thay đổi các trường khác như status)
+    // Cập nhật thông tin cá nhân của khách hàng (không thay đổi các trường khác như
+    // status)
     public void updateCustomerInfo(Customer customer) {
         String sql = "UPDATE Customers SET full_name = ?, email = ?, address = ?, phone = ? WHERE customer_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

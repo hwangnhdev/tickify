@@ -14,142 +14,331 @@
         <title>Profile</title>
         <style>
             body {
-                font-family: Inter, sans-serif;
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+                background-color: #fff;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-container {
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                width: 90%;
+                max-width: 420px;
+                padding: 30px;
+                position: relative;
+                border: 1px solid #e0e0e0;
+                margin-top: 60px;
+            }
+
+            .close-btn {
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+
+            .close-btn:hover {
+                transform: scale(1.1);
+            }
+
+            .profile-picture {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                height: 100vh;
-                background-color: #f5f5f5;
-            }
-            .profile-container {
-                border-color: #fff;
-                background-color: #fff;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                width: 360px;
-                padding: 20px;
-                text-align: center;
-                border-width: 0.8px;
-                border-style: solid;
                 position: relative;
+                padding-bottom: 25px;
             }
-            .profile-picture {
-                position: relative;
-            }
+
             .profile-picture img {
-                width: 100px;
-                height: 100px;
+                width: 90px;
+                height: 90px;
                 border-radius: 50%;
+                object-fit: cover;
+                border: 3px solid #2dc275;
+                background-color: #fff;
             }
-            .profile-picture .camera-icon {
+
+            .profile-picture label {
                 position: absolute;
-                bottom: 0;
-                right: 20px;
-                background-color: #4CAF50;
+                bottom: 5px;
+                right: 35%;
+                background-color: #2dc275;
                 border-radius: 50%;
-                padding: 5px;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 color: white;
                 cursor: pointer;
+                transition: background-color 0.3s ease;
+                font-size: 18px;
             }
-            form {
-                margin-top: 20px;
+
+            .profile-picture label:hover {
+                background-color: #45a049;
+            }
+
+            .profile-picture input[type="file"] {
+                display: none;
+            }
+
+            .form-wrapper {
                 text-align: left;
+                padding-top: 10px;
             }
 
             label {
-                font-weight: 700;
+                font-weight: 600;
                 font-size: 14px;
-                line-height: 16px;
+                line-height: 20px;
+                color: #2a2d34;
+                display: block;
             }
 
-            input[type="text"], input[type="email"], input[type="date"] {
-                font-family: Inter, sans-serif;
-                width: 90%;
-                padding: 12px;
-                margin: 10px 0;
-                border-radius: 4px;
-                border-style: solid;
-                border-width: 0.8px;
-                border-radius: 5px;
-                border-color: #FFFFFF;
-                background-color: #f5f7fc;
+            .profile-container input[type="text"],
+            .profile-container input[type="email"] {
+                font-family: 'Inter', sans-serif;
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+                background-color: #f9fafb;
                 font-size: 14px;
                 color: #2a2d34;
+                box-sizing: border-box;
+                transition: border-color 0.2s ease;
             }
-            input[disabled] {
-                background-color: #f5f7fc;
-                color: #afb8c9;
+
+            .profile-container input[type="text"]:focus,
+            .profile-container input[type="email"]:focus {
+                outline: none;
+                border-color: #2dc275;
             }
-            .gender-group {
-                text-align: left;
-                margin: 10px 0;
+
+            .profile-container input[disabled] {
+                background-color: #e5e7eb;
+                color: #6b7280;
+                cursor: not-allowed;
             }
-            .gender-group label {
-                margin-right: 10px;
-            }
+
             .submit-btn {
                 background-color: #2dc275;
                 color: white;
-                padding: 10px;
+                padding: 12px;
                 border: none;
                 border-radius: 20px;
                 cursor: pointer;
                 width: 100%;
-                align-items: center;
-                text-align: center;
-                font-weight: 700;
-                line-height: 18.4px;
+                font-weight: 600;
                 font-size: 16px;
+                transition: background-color 0.3s ease;
             }
+
             .submit-btn:hover {
                 background-color: #45a049;
             }
-            .close-btn {
-                position: absolute;
-                top: 17px; /* Adjust distance from the top */
-                left: 17px; /* Move to the left side inside .profile-container */
+
+            .change-password-link {
+                display: block;
+                text-align: center;
+                margin-top: 15px;
+                color: #2dc275;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+            .change-password-link:hover {
+                color: #45a049;
+            }
+
+            /* Popup Styles */
+            .popup {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                z-index: 2000;
+                text-align: center;
+                width: 300px;
+            }
+
+            .popup.success {
+                border: 2px solid #2dc275;
+            }
+
+            .popup h3 {
+                margin: 0 0 10px;
+                color: #2a2d34;
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            .popup p {
+                margin: 0 0 15px;
+                color: #666;
+                font-size: 14px;
+            }
+
+            .popup button {
+                background-color: #2dc275;
+                color: white;
+                padding: 8px 20px;
+                border: none;
+                border-radius: 20px;
                 cursor: pointer;
+                font-weight: 600;
+                transition: background-color 0.3s ease;
+            }
+
+            .popup button:hover {
+                background-color: #45a049;
+            }
+
+            .popup-backdrop {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1900;
+            }
+
+            @media (max-width: 480px) {
+                .profile-container {
+                    width: 95%;
+                    padding: 20px;
+                    margin-top: 100px;
+                }
+                .profile-picture img {
+                    width: 90px;
+                    height: 90px;
+                }
+                .profile-picture label {
+                    right: 30%;
+                    width: 28px;
+                    height: 28px;
+                    font-size: 16px;
+                }
+                .popup {
+                    width: 90%;
+                    max-width: 280px;
+                }
             }
         </style>
     </head>
     <%
         Customer profile = (Customer) request.getAttribute("profile");
+        String successMessage = (String) request.getAttribute("successMessage");
     %>
-
     <body>
+        <jsp:include page="../../components/header.jsp"></jsp:include>
+
         <div class="profile-container">
-            <div class="close-btn" onclick="window.location.href = 'event';" style="cursor: pointer;">
+            <div class="close-btn" onclick="window.location.href = 'event';" aria-label="Close profile">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 3L3 15M3 3l12 12" stroke="#2A2D34" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M15 3L3 15M3 3l12 12" stroke="#2A2D34" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
                 </svg>
             </div>
-            </br>
 
-            <form action="profile" method="post">
-                <input type="hidden" name="customerId" value="<%= profile.getCustomerId()%>" />
+            <div class="profile-picture">
+                <img name="profile_picture" id="profile_picture" src="<%= profile.getProfilePicture() != null && !profile.getProfilePicture().isEmpty() ? profile.getProfilePicture() : "default-avatar.jpg"%>" alt="Profile Picture" />
+                <label for="imageUpload">📷</label>
+                <input type="file" id="imageUpload" name="image" accept="image/*" onchange="previewImage(event)" />
+            </div>
 
-                <div class="profile-picture">
-                    <label class="camera-icon">
-                        <input type="file" style="display: none;" />
-                        📷
-                    </label>
+            <form action="profile" method="post" onsubmit="return validateForm();">
+                <div class="form-wrapper">
+                    <input type="hidden" name="customerId" value="<%= profile.getCustomerId()%>" />
+
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" name="fullname" maxlength="50" value="<%= profile.getFullName()%>" required />
+
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" maxlength="40" value="<%= profile.getEmail()%>" disabled />
+
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" maxlength="80" value="<%= profile.getAddress() != null ? profile.getAddress() : ""%>" />
+
+                    <label for="phone">Phone Number</label>
+                    <input type="text" id="phone" name="phone" pattern="[0-9]{10}" maxlength="10" value="<%= profile.getPhone() != null ? profile.getPhone() : ""%>" placeholder="10 digits only" required />
+
+                    <button type="submit" class="submit-btn">Complete</button>
                 </div>
-                
-                <label>Full Name</label>
-                <input type="text" name="fullname" maxlength="50" value="<%= profile.getFullName()%>" />
-
-                <label>Email</label>
-                <input type="text" name="email" maxlength="40" value="<%= profile.getEmail()%>" disabled />
-
-                <label>Address</label>
-                <input type="text" name="address" maxlenght="80" value="<%= profile.getAddress()%>"/>
-
-                <label>Phone Number</label>
-                <input type="text" name="phone" pattern="[0-9]*" maxlength="10" value="<%= profile.getPhone()%>" />
-
-                <button type="submit" class="submit-btn" value="Complete">Complete</button>
-
             </form>
+
+            <a href="<%= request.getContextPath() %>/changePassword" class="change-password-link">Change Password</a>
         </div>
+
+        <!-- Popup Notification -->
+        <div class="popup-backdrop" id="popupBackdrop"></div>
+        <div class="popup success" id="successPopup">
+            <h3>Success!</h3>
+            <p>Your profile has been updated successfully.</p>
+            <button onclick="closePopup()">OK</button>
+        </div>
+
+        <script>
+            // Preview uploaded image
+            function previewImage(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById('profile_picture').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            // Form validation
+            function validateForm() {
+                const phone = document.getElementById('phone').value;
+                const fullName = document.getElementById('fullname').value;
+                const phonePattern = /^[0-9]{10}$/;
+
+                if (!phonePattern.test(phone)) {
+                    alert('Please enter a valid 10-digit phone number.');
+                    return false;
+                }
+                if (fullName.trim() === '') {
+                    alert('Full Name cannot be empty.');
+                    return false;
+                }
+                return true;
+            }
+
+            // Popup functions
+            function showPopup() {
+                document.getElementById('successPopup').style.display = 'block';
+                document.getElementById('popupBackdrop').style.display = 'block';
+            }
+
+            function closePopup() {
+                document.getElementById('successPopup').style.display = 'none';
+                document.getElementById('popupBackdrop').style.display = 'none';
+                window.location.href = 'event';
+            }
+
+            // Check for success message and show popup
+            <% if (successMessage != null && !successMessage.isEmpty()) { %>
+                showPopup();
+            <% } %>
+        </script>
     </body>
 </html>

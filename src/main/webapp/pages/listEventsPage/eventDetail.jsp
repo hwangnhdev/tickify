@@ -370,7 +370,6 @@
                     border-bottom-right-radius: 15px;
                 }
             }
-
             /*All Events*/
             .title-all_events {
                 text-align: center;

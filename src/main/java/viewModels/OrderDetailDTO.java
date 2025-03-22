@@ -35,7 +35,8 @@ public class OrderDetailDTO {
     public OrderDetailDTO() {
     }
 
-    public OrderDetailDTO(int orderDetailId, int orderId, Timestamp orderDate, String customerName, String customerEmail,
+    public OrderDetailDTO(int orderDetailId, int orderId, Timestamp orderDate, String customerName,
+            String customerEmail,
             String eventName, String location, double grandTotal, String voucherCode,
             String voucherPercentageCode, double discountPercentValue, double discountPercentage,
             String voucherFixedCode, double discountFixed,
@@ -252,5 +253,5 @@ public class OrderDetailDTO {
     public void setDiscountType(String discountType) {
         this.discountType = discountType;
     }
-    
+
 }

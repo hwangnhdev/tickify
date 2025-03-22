@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import models.Customer;
 import models.CustomerAuth;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -60,10 +59,12 @@ public class ChangePasswordController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer customerId = (Integer) session.getAttribute("customerId");
         CustomerDAO dao = new CustomerDAO();
-        CustomerAuth customer = dao.getPassword(1);
+        CustomerAuth customer = dao.getPassword(customerId);
         request.setAttribute("profile", customer);
-        request.getRequestDispatcher("pages/profile/change-password.jsp").forward(request, response);
+        request.getRequestDispatcher("pages/profile/changePassword.jsp").forward(request, response);
     }
 
     /**
@@ -78,18 +79,18 @@ public class ChangePasswordController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-//        HttpSession session = request.getSession();
-//        Integer customerId = (Integer) session.getAttribute("customerId");
-//        if (customerId == null) {
-//            response.sendRedirect("login.jsp");
-//            return;
-//        }
+        HttpSession session = request.getSession();
+        Integer customerId = (Integer) session.getAttribute("customerId");
+        if (customerId == null) {
+            response.sendRedirect("event");
+            return;
+        }
         String currentPassword = request.getParameter("currentPassword");
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
         CustomerDAO dao = new CustomerDAO();
-        CustomerAuth existingPassword = dao.getPassword(1);
+        CustomerAuth existingPassword = dao.getPassword(customerId);
 
         CustomerAuth customer = new CustomerAuth();
         customer.setPassword(newPassword);
@@ -101,18 +102,19 @@ public class ChangePasswordController extends HttpServlet {
         else if (!newPassword.equals(confirmPassword)) {
             request.setAttribute("errorMessage", "New passwords do not match.");
         } // Update password
-        else if (dao.updatePassword(1, newPassword)) {
+        else if (dao.updatePassword(customerId, newPassword)) {
             request.setAttribute("successMessage", "Password changed successfully.");
         } else {
             request.setAttribute("errorMessage", "Error changing password. Please try again.");
         }
-//        boolean isUpdated = dao.updatePassword(1, newPassword);
-//        if (isUpdated) {
-//            response.sendRedirect("pages/profile/profile.jsp");  // Redirect to the list of products on success
-//        } else {
-//            response.sendRedirect("pages/profile/change-password.jsp");  // Reload the creation page on failure
-//        }
-        request.getRequestDispatcher("pages/profile/change-password.jsp").forward(request, response);
+        
+        boolean isUpdated = dao.updatePassword(customerId, newPassword);
+        if (isUpdated) {
+            response.sendRedirect("profile");
+        } else {
+            response.sendRedirect("changePassword");  // Reload the creation page on failure
+        }
+        request.getRequestDispatcher("pages/profile/changePassword.jsp").forward(request, response);
     }
 
     /**

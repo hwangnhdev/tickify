@@ -13,7 +13,7 @@ import viewModels.OrderDetailDTO;
 
 public class OrganizerOrdersController extends HttpServlet {
 
-    private static final int PAGE_SIZE = 10;
+        private static final int PAGE_SIZE = 10;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -79,14 +79,14 @@ public class OrganizerOrdersController extends HttpServlet {
         rd.forward(request, response);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
-    }
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response)
+                        throws ServletException, IOException {
+                doGet(request, response);
+        }
 
-    @Override
-    public String getServletInfo() {
-        return "OrganizerOrdersController retrieves orders for a specific event and forwards to organizerOrders.jsp";
-    }
+        @Override
+        public String getServletInfo() {
+                return "OrganizerOrdersController retrieves orders for a specific event and forwards to organizerOrders.jsp";
+        }
 }

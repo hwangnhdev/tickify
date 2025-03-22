@@ -17,38 +17,37 @@ import viewModels.EventDTO;
  */
 public class FilterEventDAO extends DBContext {
 
-    /*getFilteredEvents*/
+    /* getFilteredEvents */
     public List<EventDTO> getFilteredEvents(FilterEvent filters) {
         List<EventDTO> events = new ArrayList<>();
 
         // Constructing the base SQL query with event details
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT \n"
-                + "    e.event_id, \n"
-                + "    e.event_name, \n"
-                + "    e.category_id, \n"
-                + "    e.organizer_id, \n"
-                + "    e.description, \n"
-                + "    e.status, \n"
-                + "    e.location, \n"
-                + "    e.event_type, \n"
-                + "    e.created_at, \n"
-                + "    e.updated_at, \n"
-                + "    ei.image_url, \n"
-                + "    ei.image_title,\n"
-                + "    MIN(CAST(s.start_date AS DATE)) AS start_date, \n"
-                + "    MAX(CAST(s.end_date AS DATE)) AS end_date,\n"
-                + "    MIN(tt.price) AS min_price,\n"
-                + "    MIN(s.start_date) AS first_start_date,\n"
-                + "    CAST(e.created_at AS DATE) AS created_at, \n"
-                + "    CAST(e.updated_at AS DATE) AS updated_at\n"
-                + "FROM Events e\n"
-                + "LEFT JOIN Showtimes s ON e.event_id = s.event_id \n"
-                + "LEFT JOIN TicketTypes tt ON s.showtime_id = tt.showtime_id\n"
-                + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id \n"
-                + "    AND ei.image_title LIKE '%logo_banner%'\n"
-                + "WHERE e.status = 'Approved'"
-        );
+                        + "    e.event_id, \n"
+                        + "    e.event_name, \n"
+                        + "    e.category_id, \n"
+                        + "    e.organizer_id, \n"
+                        + "    e.description, \n"
+                        + "    e.status, \n"
+                        + "    e.location, \n"
+                        + "    e.event_type, \n"
+                        + "    e.created_at, \n"
+                        + "    e.updated_at, \n"
+                        + "    ei.image_url, \n"
+                        + "    ei.image_title,\n"
+                        + "    MIN(CAST(s.start_date AS DATE)) AS start_date, \n"
+                        + "    MAX(CAST(s.end_date AS DATE)) AS end_date,\n"
+                        + "    MIN(tt.price) AS min_price,\n"
+                        + "    MIN(s.start_date) AS first_start_date,\n"
+                        + "    CAST(e.created_at AS DATE) AS created_at, \n"
+                        + "    CAST(e.updated_at AS DATE) AS updated_at\n"
+                        + "FROM Events e\n"
+                        + "LEFT JOIN Showtimes s ON e.event_id = s.event_id \n"
+                        + "LEFT JOIN TicketTypes tt ON s.showtime_id = tt.showtime_id\n"
+                        + "LEFT JOIN EventImages ei ON e.event_id = ei.event_id \n"
+                        + "    AND ei.image_title LIKE '%logo_banner%'\n"
+                        + "WHERE e.status = 'Approved'");
 
         // List to store query parameters
         List<Object> parameters = new ArrayList<>();
@@ -113,8 +112,7 @@ public class FilterEventDAO extends DBContext {
             while (rs.next()) {
                 EventImage eventImage = new EventImage(
                         rs.getString("image_url"),
-                        rs.getString("image_title")
-                );
+                        rs.getString("image_title"));
 
                 Event event = new Event(
                         rs.getInt("event_id"),
@@ -126,8 +124,7 @@ public class FilterEventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
 
                 EventDTO eventDTO = new EventDTO(
                         event,
