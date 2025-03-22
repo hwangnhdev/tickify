@@ -16,8 +16,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import models.Category;
 import viewModels.EventDTO;
@@ -84,14 +82,6 @@ public class AllEventsController extends HttpServlet {
         String endDateStr = request.getParameter("endDate");
         String price = request.getParameter("price");
         String searchQuery = request.getParameter("query");
-
-        System.out.println("=== Request Parameters ===");
-        System.out.println("Category IDs: " + (categoryIds != null ? Arrays.toString(categoryIds) : "null"));
-        System.out.println("Location: " + location);
-        System.out.println("Start Date: " + startDateStr);
-        System.out.println("End Date: " + endDateStr);
-        System.out.println("Price: " + price);
-        System.out.println("Search Query: " + searchQuery);
 
         List<Integer> categories = new ArrayList<>();
         if (categoryIds != null) {

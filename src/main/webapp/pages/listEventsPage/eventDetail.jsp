@@ -485,6 +485,22 @@
                                 <i class="fas fa-chevron-down"></i>
                                 <span class="show-time-label">Showtime ${loop.count}: </span>
                                 <span>Start Date: <fmt:formatDate value="${showtime.startDate}" pattern="hh:mm a, dd MMM yyyy"/> - End Date: <fmt:formatDate value="${showtime.endDate}" pattern="hh:mm a, dd MMM yyyy"/></span>
+                                <!-- Show status of each showtime -->
+                                <c:if test="${showtime.status eq 'Scheduled'}">
+                                    <span class="bg-gray-500 text-white px-3 py-1 rounded-full text-sm">Scheduled</span> 
+                                </c:if>
+                                <c:if test="${showtime.status eq 'Upcoming'}">
+                                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">Upcoming</span> 
+                                </c:if>
+                                <c:if test="${showtime.status eq 'Ongoing'}">
+                                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Ongoing</span> 
+                                </c:if>
+                                <c:if test="${showtime.status eq 'Completed'}">
+                                    <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">Completed</span> 
+                                </c:if>
+                                <c:if test="${showtime.status eq 'Soldout'}">
+                                    <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm">Sold Out</span> 
+                                </c:if>
                             </div>
                             <div class="show-time-details space-y-2">
                                 <!-- Loop through ticketTypes for this showtime -->
@@ -493,16 +509,32 @@
                                         <span class="text-light">${ticket.name}</span>
                                         <div class="flex items-center space-x-2">
                                             <span class="text-green-400"><fmt:formatNumber value="${ticket.price}" currencyCode="VND" minFractionDigits="0" /> VND</span>
+
+                                            <!-- Nếu showtime không phải 'Upcoming', hiển thị trạng thái 'Unavailable' -->
                                             <span class="bg-green-500 text-white px-2 py-1 rounded-lg">
                                                 <c:choose>
-                                                    <c:when test="${ticket.totalQuantity - ticket.soldQuantity > 0}">Available</c:when>
-                                                    <c:otherwise>Sold Out</c:otherwise>
+                                                    <c:when test="${showtime.status eq 'Upcoming' and (ticket.totalQuantity - ticket.soldQuantity > 0)}">
+                                                        Available
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        Unavailable
+                                                    </c:otherwise>
                                                 </c:choose>
                                             </span>
+
+                                            <!-- Hiển thị nút Order Now nhưng disable nếu không thể mua -->
                                             <c:choose>
                                                 <c:when test="${not empty sessionScope.customerId}">
-                                                    <a href="viewSeat?showtimeId=${showtime.showtimeId}&ticketTypeId=${ticket.ticketTypeId}" 
-                                                       class="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600">
+                                                    <a 
+                                                        <c:choose>
+                                                            <c:when test="${showtime.status eq 'Upcoming' and (ticket.totalQuantity - ticket.soldQuantity > 0)}">
+                                                                class="px-2 py-1 rounded-lg text-white bg-red-500 hover:bg-red-600" 
+                                                                href="viewSeat?showtimeId=${showtime.showtimeId}&ticketTypeId=${ticket.ticketTypeId}"
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                class="px-2 py-1 rounded-lg text-white bg-gray-500 cursor-not-allowed"
+                                                            </c:otherwise>
+                                                        </c:choose>">
                                                         Order Now
                                                     </a>
                                                 </c:when>
@@ -533,29 +565,108 @@
                 <li><p><strong>Type Of Event:</strong> ${event.eventType}</p></li>
                 <li><p><strong>Venue Address:</strong> ${event.location}</p></li>
                 <li><p><strong>Organizer Name:</strong> ${organizer.organizationName}</p></li>
-                <img style="margin-left: 38%; max-width: 300px; max-height: 300px;" src="${logoOrganizerImage}" alt="${titleOrganizerImage}" />
-                <li><strong>All Images Of Event</strong></li>
-                <div class="flex">
-                    <img style="margin-left: 13%; max-width: 300px; max-height: 600px;" src="${logoEventImage}" alt="${titleEventImage}" />
-                    <img style="margin-left: 1%; width: 700px; max-height: 600px;" src="${logoBannerImage}" alt="${titleEventImage}" />
-                </div>
             </ul>
-        </div>
+            <div class="flex justify-center">
+                <section class="event-info bg-white p-6 rounded-xl shadow-lg mt-6 w-full max-w-8xl">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Event Images</h3>
+                    <hr class="border-gray-300 mb-4">
+                    <div class="flex justify-center gap-6">
+                        <div class="relative group">
+                            <img class="cursor-pointer w-[280px] h-[280px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-105" 
+                                 src="${logoOrganizerImage}" 
+                                 alt="${titleOrganizerImage}" 
+                                 onclick="openModal('${logoOrganizerImage}', '${titleOrganizerImage}')"/>
+                            <div class="inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-25 transition duration-300 rounded-lg"></div>
+                        </div>
 
+                        <div class="relative group">
+                            <img class="cursor-pointer w-[280px] h-[400px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-105" 
+                                 src="${logoEventImage}" 
+                                 alt="${titleEventImage}" 
+                                 onclick="openModal('${logoEventImage}', '${titleEventImage}')"/>
+                            <div class="inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-25 transition duration-300 rounded-lg"></div>
+                        </div>
+
+                        <div class="relative group">
+                            <img class="cursor-pointer w-[600px] h-[400px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-105" 
+                                 src="${logoBannerImage}" 
+                                 alt="${titleEventImage}" 
+                                 onclick="openModal('${logoBannerImage}', '${titleEventImage}')"/>
+                            <div class="inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-25 transition duration-300 rounded-lg"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Modal Lightbox -->
+                <div id="imageModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-75">
+                    <div class="relative bg-white p-4 rounded-lg shadow-lg max-w-[90vw] max-h-[90vh]">
+                        <img id="modalImage" class="max-w-[50vw] max-h-[50vh] object-contain rounded-lg" src="" alt="Enlarged Image"/>
+                        <button onclick="closeModal()" class="absolute top-2 right-2 text-black text-3xl leading-none">&times;</button>
+                    </div>
+                </div>
+
+                <script>
+                    function openModal(imageUrl, imageTitle) {
+                        const modal = document.getElementById('imageModal');
+                        const modalImage = document.getElementById('modalImage');
+                        modalImage.src = imageUrl;
+                        modalImage.alt = imageTitle;
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    }
+
+                    function closeModal() {
+                        const modal = document.getElementById('imageModal');
+                        modal.classList.remove('flex');
+                        modal.classList.add('hidden');
+                    }
+
+                    document.getElementById('imageModal').addEventListener('click', function (e) {
+                        if (e.target === this) {
+                            closeModal();
+                        }
+                    });
+                </script>
+            </div>
+        </div>
         <div class="event-info-event_detail">
             <!-- Google Maps Section -->
             <section class="mapAddress" style="padding: 32px 0">
                 <div class="containers">
                     <div class="infoAddress"></div>
                     <div class="map">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.489511011803!2d106.69907477479463!3d10.776889059126504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3b8f6333d5%3A0xa8f36b0ebda0d20d!2sSaigon%20Opera%20House%20(Ho%20Chi%20Minh%20Municipal%20Theater)!5e0!3m2!1sen!2s!4v1708131234567" 
-                                width="100%" height="450" style="border:0; display: inline-block;" 
-                                allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                        <iframe id="eventMap" 
+                                width="100%" height="450" 
+                                style="border:0; display: inline-block;" 
+                                allowfullscreen="" loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
                         </iframe>
                     </div>
                 </div>
             </section>
         </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+                    // Lấy địa chỉ từ JSP
+                    var eventLocation = '${event.location}';
+                    console.log("Event Details ID: ", eventLocation);
+                    function generateMapURL(address) {
+                        if (!address) {
+                            console.error("Error: Address is empty or undefined!");
+                            return "";
+                        }
+                        const encodedAddress = encodeURIComponent(address);
+                        console.log("encodedAddress: ", encodedAddress);
+                        const url = `https://www.google.com/maps/embed/v1/place?key=AIzaSyCYvHkGCxaPURMndwvUqbLWxDH8eY-f0pM&q=` + encodedAddress + ``;
+                        console.log("Generated Map URL:", url);
+                        return url;
+                    }
+
+                    $(document).ready(function () {
+                        var mapURL = generateMapURL(eventLocation);
+                        $("#eventMap").attr("src", mapURL);
+                    });
+        </script>
 
         <!-- Relevant Events hoặc All Events với Ajax -->
         <div class="event-info-event_detail_relevant">
@@ -621,110 +732,110 @@
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
             <script>
-                                function loadEvents(page, isRelevant) {
-                                    var url = '${pageContext.request.contextPath}/eventDetail';
-                                    var data = {
-                                        id: ${eventId},
-                                        page: isRelevant ? page : undefined,
-                                        pageAll: isRelevant ? undefined : page
-                                    };
+                    function loadEvents(page, isRelevant) {
+                        var url = '${pageContext.request.contextPath}/eventDetail';
+                        var data = {
+                            id: ${eventId},
+                            page: isRelevant ? page : undefined,
+                            pageAll: isRelevant ? undefined : page
+                        };
 
-                                    $.ajax({
-                                        url: url,
-                                        type: 'GET',
-                                        data: data,
-                                        dataType: 'json',
-                                        headers: {'X-Requested-With': 'XMLHttpRequest'},
-                                        success: function (data) {
-                                            console.log("AJAX Response:", data);
-                                            updateEventContainer(data.events, data.type);
-                                            updatePagination(data.totalPages, data.currentPage, data.type === 'relevant');
-                                            $('#container-event_detail')[0].scrollIntoView({behavior: 'smooth'});
-                                        },
-                                        error: function () {
-                                            console.error('Error loading events');
-                                        }
-                                    });
+                        $.ajax({
+                            url: url,
+                            type: 'GET',
+                            data: data,
+                            dataType: 'json',
+                            headers: {'X-Requested-With': 'XMLHttpRequest'},
+                            success: function (data) {
+                                console.log("AJAX Response:", data);
+                                updateEventContainer(data.events, data.type);
+                                updatePagination(data.totalPages, data.currentPage, data.type === 'relevant');
+                                $('#container-event_detail')[0].scrollIntoView({behavior: 'smooth'});
+                            },
+                            error: function () {
+                                console.error('Error loading events');
+                            }
+                        });
+                    }
+
+                    function updateEventContainer(events, type) {
+                        var container = $('#event-container');
+                        container.empty();
+                        if (events.length > 0) {
+                            $('#events-title').html(type === 'relevant'
+                                    ? '<i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events'
+                                    : '<i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You');
+                            events.forEach(function (eventAjax) {
+                                var formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', minimumFractionDigits: 0}).format(eventAjax.minPrice).replace('₫', '').trim();
+                                var formattedDate = moment(eventAjax.firstStartDate).format('hh:mm:ss A, DD MMM YYYY');
+                                var eventHtml = '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
+                                        '<div class="event-card-all_events">' +
+                                        '<a style="text-decoration: none;" href="eventDetail?id=' + eventAjax.id + '">' +
+                                        '<img src="' + eventAjax.imageUrl + '" alt="' + eventAjax.imageTitle + '" />' +
+                                        '<h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">' +
+                                        eventAjax.name +
+                                        '</h2>' +
+                                        '<p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From ' + formattedPrice + ' VND</p>' +
+                                        '<p class="text-sm font-semibold" style="color: white; background-color: #121212;">' +
+                                        '<i class="far fa-calendar-alt mr-2"></i>' +
+                                        '<span>' + formattedDate + '</span>' +
+                                        '</p>' +
+                                        '</a>' +
+                                        '</div>' +
+                                        '</div>';
+                                container.append(eventHtml);
+                            });
+                        } else {
+                            container.html('<p class="text-center">No Events Found</p>');
+                        }
+                    }
+
+                    function updatePagination(totalPages, currentPage, isRelevant) {
+                        var pagination = $('#pagination');
+                        pagination.empty();
+                        pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
+                        var ul = pagination.find('ul');
+                        console.log("Total Pages: " + totalPages + ", Current Page: " + currentPage);
+
+                        if (totalPages > 1) {
+                            var displayPages = 5;
+                            var halfDisplayPages = Math.floor(displayPages / 2);
+                            var startPage = currentPage - halfDisplayPages;
+                            var endPage = currentPage + halfDisplayPages;
+                            if (startPage < 1)
+                                startPage = 1;
+                            if (endPage > totalPages)
+                                endPage = totalPages;
+
+                            if (currentPage > 1) {
+                                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1, ' + isRelevant + '); return false;">First</a></li>');
+                                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + ', ' + isRelevant + '); return false;">Prev</a></li>');
+                            }
+
+                            for (var i = startPage; i <= endPage; i++) {
+                                if (i === currentPage) {
+                                    ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
+                                } else {
+                                    ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + ', ' + isRelevant + '); return false;">' + i + '</a></li>');
                                 }
+                            }
 
-                                function updateEventContainer(events, type) {
-                                    var container = $('#event-container');
-                                    container.empty();
-                                    if (events.length > 0) {
-                                        $('#events-title').html(type === 'relevant'
-                                                ? '<i class="fas fa-star text-yellow-500 mr-2"></i> Relevant Events'
-                                                : '<i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You');
-                                        events.forEach(function (eventAjax) {
-                                            var formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', minimumFractionDigits: 0}).format(eventAjax.minPrice).replace('₫', '').trim();
-                                            var formattedDate = moment(eventAjax.firstStartDate).format('hh:mm:ss A, DD MMM YYYY');
-                                            var eventHtml = '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
-                                                    '<div class="event-card-all_events">' +
-                                                    '<a style="text-decoration: none;" href="eventDetail?id=' + eventAjax.id + '">' +
-                                                    '<img src="' + eventAjax.imageUrl + '" alt="' + eventAjax.imageTitle + '" />' +
-                                                    '<h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">' +
-                                                    eventAjax.name +
-                                                    '</h2>' +
-                                                    '<p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From ' + formattedPrice + ' VND</p>' +
-                                                    '<p class="text-sm font-semibold" style="color: white; background-color: #121212;">' +
-                                                    '<i class="far fa-calendar-alt mr-2"></i>' +
-                                                    '<span>' + formattedDate + '</span>' +
-                                                    '</p>' +
-                                                    '</a>' +
-                                                    '</div>' +
-                                                    '</div>';
-                                            container.append(eventHtml);
-                                        });
-                                    } else {
-                                        container.html('<p class="text-center">No Events Found</p>');
-                                    }
-                                }
+                            if (currentPage < totalPages) {
+                                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + ', ' + isRelevant + '); return false;">Next</a></li>');
+                                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + ', ' + isRelevant + '); return false;">Last</a></li>');
+                            }
+                        } else {
+                            ul.append('<li class="page-item active"><span class="page-link">1</span></li>'); // Chỉ hiển thị trang 1
+                        }
+                    }
 
-                                function updatePagination(totalPages, currentPage, isRelevant) {
-                                    var pagination = $('#pagination');
-                                    pagination.empty();
-                                    pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
-                                    var ul = pagination.find('ul');
-                                    console.log("Total Pages: " + totalPages + ", Current Page: " + currentPage);
-
-                                    if (totalPages > 1) {
-                                        var displayPages = 5;
-                                        var halfDisplayPages = Math.floor(displayPages / 2);
-                                        var startPage = currentPage - halfDisplayPages;
-                                        var endPage = currentPage + halfDisplayPages;
-                                        if (startPage < 1)
-                                            startPage = 1;
-                                        if (endPage > totalPages)
-                                            endPage = totalPages;
-
-                                        if (currentPage > 1) {
-                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1, ' + isRelevant + '); return false;">First</a></li>');
-                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + ', ' + isRelevant + '); return false;">Prev</a></li>');
-                                        }
-
-                                        for (var i = startPage; i <= endPage; i++) {
-                                            if (i === currentPage) {
-                                                ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
-                                            } else {
-                                                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + ', ' + isRelevant + '); return false;">' + i + '</a></li>');
-                                            }
-                                        }
-
-                                        if (currentPage < totalPages) {
-                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + ', ' + isRelevant + '); return false;">Next</a></li>');
-                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + ', ' + isRelevant + '); return false;">Last</a></li>');
-                                        }
-                                    } else {
-                                        ul.append('<li class="page-item active"><span class="page-link">1</span></li>'); // Chỉ hiển thị trang 1
-                                    }
-                                }
-
-                                $(document).ready(function () {
-                                    var isRelevant = ${not empty relevantEvents};
-                                    var currentPage = ${isRelevant ? currentPage : pageAll};
-                                    console.log("isRelevant:", isRelevant, "currentPage:", currentPage);
-                                    // Gọi loadEvents ngay khi trang được tải
-                                    loadEvents(currentPage, isRelevant);
-                                });
+                    $(document).ready(function () {
+                        var isRelevant = ${not empty relevantEvents};
+                        var currentPage = ${isRelevant ? currentPage : pageAll};
+                        console.log("isRelevant:", isRelevant, "currentPage:", currentPage);
+                        // Gọi loadEvents ngay khi trang được tải
+                        loadEvents(currentPage, isRelevant);
+                    });
         </script>
         <script>
             function toggleShowTime(button) {
