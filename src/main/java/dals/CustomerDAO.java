@@ -48,6 +48,8 @@ public class CustomerDAO extends DBContext {
     private static final String INSERT_CUSTOMER = "INSERT INTO Customers (full_name, email, address, phone, profile_picture, status) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_CUSTOMER = "UPDATE Customers SET full_name = ?, email = ?, address = ?, phone = ?, profile_picture = ?, status = ? WHERE customer_id = ?";
 
+    // Các phương thức select, insert, update khác không thay đổi
+
     private Customer mapResultSetToCustomer(ResultSet rs) throws SQLException {
         Customer customer = new Customer();
         customer.setCustomerId(rs.getInt("customer_id"));
@@ -57,8 +59,12 @@ public class CustomerDAO extends DBContext {
         customer.setPhone(rs.getString("phone"));
         customer.setProfilePicture(rs.getString("profile_picture"));
         customer.setStatus(rs.getBoolean("status"));
+        // Lấy thêm các trường bổ sung: dob và gender
+        customer.setDob(rs.getDate("dob"));
+        customer.setGender(rs.getString("gender"));
         return customer;
     }
+
 
     public List<Customer> selectAllCustomers() {
         List<Customer> customers = new ArrayList<>();
@@ -77,7 +83,7 @@ public class CustomerDAO extends DBContext {
     public Customer selectCustomerById(int id) {
         Customer customer = null;
         try {
-            PreparedStatement st = connection.prepareStatement(SELECT_CUSTOMER_BY_ID);
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM Customers WHERE customer_id = ?");
             st.setInt(1, id);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
@@ -303,16 +309,9 @@ public class CustomerDAO extends DBContext {
 
     public Customer getCustomerProfile(int customerId) {
         Customer customer = null;
-        String sql = "SELECT customer_id AS UserID, "
-                + "full_name AS UserName, "
-                + "email, "
-                + "address, "
-                + "phone, "
-                + "profile_picture AS ProfilePicture, "
-                + "status AS AccountStatus "
-                + "FROM Customers "
-                + "WHERE customer_id = ?";
-
+        String sql = "SELECT customer_id AS UserID, full_name AS UserName, email, address, phone, " +
+                     "profile_picture AS ProfilePicture, status AS AccountStatus, dob, gender " +
+                     "FROM Customers WHERE customer_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, customerId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -323,9 +322,10 @@ public class CustomerDAO extends DBContext {
                     customer.setEmail(rs.getString("email"));
                     customer.setAddress(rs.getString("address"));
                     customer.setPhone(rs.getString("phone"));
-                    // Vì trong database đã lưu URL đầy đủ, nên gán trực tiếp
                     customer.setProfilePicture(rs.getString("ProfilePicture"));
                     customer.setStatus(rs.getBoolean("AccountStatus"));
+                    customer.setDob(rs.getDate("dob"));
+                    customer.setGender(rs.getString("gender"));
                 }
             }
         } catch (SQLException e) {
@@ -353,19 +353,22 @@ public class CustomerDAO extends DBContext {
         return false;
     }
 
-    // Cập nhật thông tin cá nhân của khách hàng (không thay đổi các trường khác như status)
+   // Phương thức cập nhật thông tin cá nhân (bao gồm dob và gender)
     public void updateCustomerInfo(Customer customer) {
-        String sql = "UPDATE Customers SET full_name = ?, email = ?, address = ?, phone = ? WHERE customer_id = ?";
+        String sql = "UPDATE Customers SET full_name = ?, email = ?, address = ?, phone = ?, dob = ?, gender = ? WHERE customer_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, customer.getFullName());
             ps.setString(2, customer.getEmail());
             ps.setString(3, customer.getAddress());
             ps.setString(4, customer.getPhone());
-            ps.setInt(5, customer.getCustomerId());
+            ps.setDate(5, customer.getDob());
+            ps.setString(6, customer.getGender());
+            ps.setInt(7, customer.getCustomerId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
 }

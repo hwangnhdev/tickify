@@ -1,6 +1,7 @@
 package viewModels;
 
 import java.sql.Timestamp;
+import models.Event;
 
 public class EventSummaryDTO {
 
@@ -30,42 +31,55 @@ public class EventSummaryDTO {
     public int getEventId() {
         return eventId;
     }
+
     public void setEventId(int eventId) {
         this.eventId = eventId;
     }
+
     public String getEventName() {
         return eventName;
     }
+
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
+
     public String getLocation() {
         return location;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
+
     public Timestamp getStartDate() {
         return startDate;
     }
+
     public void setStartDate(Timestamp startDate) {
         this.startDate = startDate;
     }
+
     public Timestamp getEndDate() {
         return endDate;
     }
+
     public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
+
     public String getImageUrl() {
         return imageUrl;
     }
+
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
     public String getEventStatus() {
         return eventStatus;
     }
+
     public void setEventStatus(String eventStatus) {
         this.eventStatus = eventStatus;
     }

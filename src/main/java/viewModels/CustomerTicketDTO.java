@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class CustomerTicketDTO {
 
-    private String orderCode;       // Mã đơn hàng (ticket_code từ bảng Tickets)
+    private String orderCode;       // Mã đơn hàng 
     private String ticketStatus;    // Trạng thái vé (status từ bảng Tickets)
     private String paymentStatus;   // Trạng thái thanh toán (payment_status từ bảng Orders)
     private Date startDate;         // Ngày bắt đầu (start_date từ bảng Showtimes)

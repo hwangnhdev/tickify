@@ -33,7 +33,7 @@ public class ProfileController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -92,8 +92,8 @@ public class ProfileController extends HttpServlet {
 
         // Fetch customer email from the database (since it's not editable)
         CustomerDAO customerDAO = new CustomerDAO();
-        Customer existingCustomer = customerDAO.getCustomerById(1);
-        String email = existingCustomer.getEmail(); // Retain the original email
+        Customer existingCustomer = customerDAO.getCustomerById(customerId);
+        String email = existingCustomer.getEmail();
 
         Customer customer = new Customer();
         customer.setCustomerId(customerId);
