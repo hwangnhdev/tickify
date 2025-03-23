@@ -24,8 +24,14 @@
         <style>
             /* Custom fadeIn animation for smooth page load */
             @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(20px); }
-                to { opacity: 1; transform: translateY(0); }
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
             .animate-fadeIn {
                 animation: fadeIn 0.8s ease-out forwards;
@@ -36,8 +42,12 @@
                 text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
             }
             /* Consistent spacing for card content */
-            .card-title { margin-bottom: 1.5rem; }
-            .card-content { margin-bottom: 1rem; }
+            .card-title {
+                margin-bottom: 1.5rem;
+            }
+            .card-content {
+                margin-bottom: 1rem;
+            }
             /* Glow border effect for emphasis */
             .glow-border {
                 border: 2px dashed rgba(74,85,104,0.5);
@@ -70,22 +80,22 @@
                                         <i class="fas fa-hourglass-half mr-2"></i>
                                         <span class="text-sm">Status: ${event.status}</span>
                                     </div>
-                           
-<!-- Hiển thị 2 nút Approve và Reject khi trạng thái là Processing -->
-<c:if test="${fn:toLowerCase(event.status) == 'processing'}">
-  <div class="mt-4 flex flex-col sm:flex-row gap-4">
-    <button type="button" onclick="updateEvent(${event.eventId}, 'Approved')"
-      class="w-full sm:w-1/2 bg-green-600 text-white py-2 px-6 rounded-full flex items-center justify-center hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-green-500">
-      <i class="fas fa-check-circle text-xl mr-2"></i>
-      <span class="truncate">Approve</span>
-    </button>
-    <button type="button" onclick="updateEvent(${event.eventId}, 'Rejected')"
-      class="w-full sm:w-1/2 bg-red-600 text-white py-2 px-6 rounded-full flex items-center justify-center hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-red-500">
-      <i class="fas fa-times-circle text-xl mr-2"></i>
-      <span class="truncate">Reject</span>
-    </button>
-  </div>
-</c:if>
+
+                                    <!-- Hiển thị 2 nút Approve và Reject khi trạng thái là Processing -->
+                                    <c:if test="${fn:toLowerCase(event.status) == 'processing'}">
+                                        <div class="mt-4 flex flex-col sm:flex-row gap-4">
+                                            <button type="button" onclick="updateEvent(${event.eventId}, 'Approved')"
+                                                    class="w-full sm:w-1/2 bg-green-600 text-white py-2 px-6 rounded-full flex items-center justify-center hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-green-500">
+                                                <i class="fas fa-check-circle text-xl mr-2"></i>
+                                                <span class="truncate">Approve</span>
+                                            </button>
+                                            <button type="button" onclick="updateEvent(${event.eventId}, 'Rejected')"
+                                                    class="w-full sm:w-1/2 bg-red-600 text-white py-2 px-6 rounded-full flex items-center justify-center hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-red-500">
+                                                <i class="fas fa-times-circle text-xl mr-2"></i>
+                                                <span class="truncate">Reject</span>
+                                            </button>
+                                        </div>
+                                    </c:if>
 
 
 
@@ -184,55 +194,55 @@
                 </div>
             </section>
         </main>
-        
+
         <!-- JavaScript: SweetAlert for confirmation -->
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
-            function updateEvent(eventId, newStatus) {
-                var popupTitle, popupMessage, popupIcon;
-                if (newStatus === 'Approved') {
-                    popupTitle = "Approve Event";
-                    popupMessage = "Are you sure you want to approve event #" + eventId + "?";
-                    popupIcon = "info";
-                } else if (newStatus === 'Rejected') {
-                    popupTitle = "Reject Event";
-                    popupMessage = "Are you sure you want to reject event #" + eventId + "?";
-                    popupIcon = "error";
-                } else {
-                    popupTitle = "Confirm";
-                    popupMessage = "Do you want to update event #" + eventId + "?";
-                    popupIcon = "warning";
-                }
-                swal({
-                    title: popupTitle,
-                    text: popupMessage,
-                    icon: popupIcon,
-                    buttons: true,
-                    dangerMode: true,
-                }).then((willUpdate) => {
-                    if (willUpdate) {
-                        fetch('${pageContext.request.contextPath}/admin/approveEvent', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'eventId=' + eventId + '&newStatus=' + newStatus
-                        })
-                        .then(response => response.text())
-                        .then(result => {
-                            if (result.trim() === 'success') {
-                                swal("Success", "Event updated successfully!", "success")
-                                .then(() => window.location.reload());
-                            } else {
-                                swal("Failed", "Failed to update event.", "error");
-                            }
-                        })
-                        .catch(error => {
-                            swal("Error", "Error: " + error, "error");
-                        });
-                    }
-                });
-            }
+                                                function updateEvent(eventId, newStatus) {
+                                                    var popupTitle, popupMessage, popupIcon;
+                                                    if (newStatus === 'Approved') {
+                                                        popupTitle = "Approve Event";
+                                                        popupMessage = "Are you sure you want to approve event #" + eventId + "?";
+                                                        popupIcon = "info";
+                                                    } else if (newStatus === 'Rejected') {
+                                                        popupTitle = "Reject Event";
+                                                        popupMessage = "Are you sure you want to reject event #" + eventId + "?";
+                                                        popupIcon = "error";
+                                                    } else {
+                                                        popupTitle = "Confirm";
+                                                        popupMessage = "Do you want to update event #" + eventId + "?";
+                                                        popupIcon = "warning";
+                                                    }
+                                                    swal({
+                                                        title: popupTitle,
+                                                        text: popupMessage,
+                                                        icon: popupIcon,
+                                                        buttons: true,
+                                                        dangerMode: true,
+                                                    }).then((willUpdate) => {
+                                                        if (willUpdate) {
+                                                            fetch('${pageContext.request.contextPath}/admin/approveEvent', {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                                                },
+                                                                body: 'eventId=' + eventId + '&newStatus=' + newStatus
+                                                            })
+                                                                    .then(response => response.text())
+                                                                    .then(result => {
+                                                                        if (result.trim() === 'success') {
+                                                                            swal("Success", "Event updated successfully!", "success")
+                                                                                    .then(() => window.location.reload());
+                                                                        } else {
+                                                                            swal("Failed", "Failed to update event.", "error");
+                                                                        }
+                                                                    })
+                                                                    .catch(error => {
+                                                                        swal("Error", "Error: " + error, "error");
+                                                                    });
+                                                        }
+                                                    });
+                                                }
         </script>
     </body>
 </html>

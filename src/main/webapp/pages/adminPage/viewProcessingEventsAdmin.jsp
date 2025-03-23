@@ -16,7 +16,7 @@
                     <h2 class="text-3xl font-bold mb-6">Approve Events</h2>
                     <!-- Tab Navigation (Include chung) -->
                     <jsp:include page="tabNav.jsp" />
-                    
+
                     <!-- Search Bar (Responsive, full width trên mobile,  w-64 trên desktop) -->
                     <form id="filterForm" action="${pageContext.request.contextPath}/admin/viewProcessingEvents" method="get" class="mb-6 flex flex-wrap items-center justify-end gap-4">
                         <div class="relative w-full sm:w-64">
@@ -27,7 +27,7 @@
                         </div>
                         <input type="submit" value="Search" class="bg-blue-600 text-white py-2 px-4 rounded">
                     </form>
-                    
+
                     <!-- Xác định hiển thị cột hành động nếu có sự kiện có trạng thái processing -->
                     <c:set var="showActionColumn" value="false" />
                     <c:forEach items="${events}" var="event">
@@ -35,7 +35,7 @@
                             <c:set var="showActionColumn" value="true" />
                         </c:if>
                     </c:forEach>
-                    
+
                     <!-- Bảng danh sách sự kiện -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -46,9 +46,9 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Location</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Event Type</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
-                                    <c:if test="${showActionColumn}">
+                                        <c:if test="${showActionColumn}">
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Actions</th>
-                                    </c:if>
+                                        </c:if>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-100">
@@ -77,103 +77,103 @@
                                         <!-- Status -->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                                             <span class="${event.status == 'Approved' ? 'bg-green-100 text-green-800' 
-                                                         : event.status == 'Rejected' ? 'bg-red-100 text-red-800' 
-                                                         : event.status == 'Completed' ? 'bg-gray-100 text-gray-800' 
-                                                         : 'bg-yellow-100 text-yellow-800'} py-1 px-3 rounded-full">
-                                                ${event.status}
-                                            </span>
-                                        </td>
-                                        <!-- Actions: chỉ hiển thị nếu status là processing -->
-                                        <c:if test="${showActionColumn}">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                                <c:if test="${fn:toLowerCase(event.status) == 'processing'}">
-                                                    <div class="flex flex-col sm:flex-row gap-2">
-                                                        <button type="button" onclick="updateEvent(${event.eventId}, 'Approved')" 
-                                                                class="w-full sm:w-auto bg-green-600 text-white py-2 px-4 rounded hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-green-500">
-                                                            Approve
+                                                           : event.status == 'Rejected' ? 'bg-red-100 text-red-800' 
+                                                           : event.status == 'Completed' ? 'bg-gray-100 text-gray-800' 
+                                                           : 'bg-yellow-100 text-yellow-800'} py-1 px-3 rounded-full">
+                                                      ${event.status}
+                                                  </span>
+                                            </td>
+                                            <c:if test="${fn:toLowerCase(event.status) == 'processing'}">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <div class="flex flex-col sm:flex-row gap-4">
+                                                        <button type="button" onclick="updateEvent(${event.eventId}, 'Approved')"
+                                                                class="w-full sm:w-1/2 bg-green-600 text-white py-2 px-6 rounded-full flex items-center justify-center hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-green-500">
+                                                            <i class="fas fa-check-circle text-xl mr-2"></i>
+                                                            <span class="truncate">Approve</span>
                                                         </button>
-                                                        <button type="button" onclick="updateEvent(${event.eventId}, 'Rejected')" 
-                                                                class="w-full sm:w-auto bg-red-600 text-white py-2 px-4 rounded hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-red-500">
-                                                            Reject
+                                                        <button type="button" onclick="updateEvent(${event.eventId}, 'Rejected')"
+                                                                class="w-full sm:w-1/2 bg-red-600 text-white py-2 px-6 rounded-full flex items-center justify-center hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-red-500">
+                                                            <i class="fas fa-times-circle text-xl mr-2"></i>
+                                                            <span class="truncate">Reject</span>
                                                         </button>
                                                     </div>
-                                                </c:if>
+                                                </td>
+                                            </c:if>
+
+                                        </tr>
+                                    </c:forEach>
+                                    <c:if test="${empty events}">
+                                        <tr>
+                                            <td class="px-6 py-4 text-center text-gray-500" colspan="${showActionColumn ? 6 : 5}">
+                                                No events found.
                                             </td>
-                                        </c:if>
-                                    </tr>
-                                </c:forEach>
-                                <c:if test="${empty events}">
-                                    <tr>
-                                        <td class="px-6 py-4 text-center text-gray-500" colspan="${showActionColumn ? 6 : 5}">
-                                            No events found.
-                                        </td>
-                                    </tr>
-                                </c:if>
-                            </tbody>
-                        </table>
+                                        </tr>
+                                    </c:if>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Phân trang -->
+                        <jsp:include page="pagination.jsp">
+                            <jsp:param name="baseUrl" value="${pageContext.request.contextPath}/admin/viewProcessingEvents" />
+                            <jsp:param name="page" value="${page}" />
+                            <jsp:param name="totalPages" value="${totalPages}" />
+                            <jsp:param name="selectedStatus" value="processing" />
+                        </jsp:include>
                     </div>
-                    
-                    <!-- Phân trang -->
-                    <jsp:include page="pagination.jsp">
-                        <jsp:param name="baseUrl" value="${pageContext.request.contextPath}/admin/viewProcessingEvents" />
-                        <jsp:param name="page" value="${page}" />
-                        <jsp:param name="totalPages" value="${totalPages}" />
-                        <jsp:param name="selectedStatus" value="processing" />
-                    </jsp:include>
                 </div>
             </div>
-        </div>
-        
-        <jsp:include page="footer.jsp" />
-        
-        <!-- JavaScript: SweetAlert for update confirmation -->
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        <script>
-            function updateEvent(eventId, newStatus) {
-                var popupTitle, popupMessage, popupIcon;
-                if (newStatus === 'Approved') {
-                    popupTitle = "Approve Event";
-                    popupMessage = "Are you sure you want to approve event #" + eventId + "?";
-                    popupIcon = "info";
-                } else if (newStatus === 'Rejected') {
-                    popupTitle = "Reject Event";
-                    popupMessage = "Are you sure you want to reject event #" + eventId + "?";
-                    popupIcon = "error";
-                } else {
-                    popupTitle = "Confirm";
-                    popupMessage = "Do you want to update event #" + eventId + "?";
-                    popupIcon = "warning";
-                }
-                swal({
-                    title: popupTitle,
-                    text: popupMessage,
-                    icon: popupIcon,
-                    buttons: true,
-                    dangerMode: true,
-                }).then((willUpdate) => {
-                    if (willUpdate) {
-                        fetch('${pageContext.request.contextPath}/admin/approveEvent', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'eventId=' + eventId + '&newStatus=' + newStatus
-                        })
-                        .then(response => response.text())
-                        .then(result => {
-                            if (result.trim() === 'success') {
-                                swal("Success", "Event updated successfully!", "success")
-                                .then(() => window.location.reload());
-                            } else {
-                                swal("Failed", "Failed to update event.", "error");
-                            }
-                        })
-                        .catch(error => {
-                            swal("Error", "Error: " + error, "error");
-                        });
-                    }
-                });
-            }
-        </script>
-    </body>
-</html>
+
+            <jsp:include page="footer.jsp" />
+
+            <!-- JavaScript: SweetAlert for update confirmation -->
+            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+            <script>
+                                                            function updateEvent(eventId, newStatus) {
+                                                                var popupTitle, popupMessage, popupIcon;
+                                                                if (newStatus === 'Approved') {
+                                                                    popupTitle = "Approve Event";
+                                                                    popupMessage = "Are you sure you want to approve event #" + eventId + "?";
+                                                                    popupIcon = "info";
+                                                                } else if (newStatus === 'Rejected') {
+                                                                    popupTitle = "Reject Event";
+                                                                    popupMessage = "Are you sure you want to reject event #" + eventId + "?";
+                                                                    popupIcon = "error";
+                                                                } else {
+                                                                    popupTitle = "Confirm";
+                                                                    popupMessage = "Do you want to update event #" + eventId + "?";
+                                                                    popupIcon = "warning";
+                                                                }
+                                                                swal({
+                                                                    title: popupTitle,
+                                                                    text: popupMessage,
+                                                                    icon: popupIcon,
+                                                                    buttons: true,
+                                                                    dangerMode: true,
+                                                                }).then((willUpdate) => {
+                                                                    if (willUpdate) {
+                                                                        fetch('${pageContext.request.contextPath}/admin/approveEvent', {
+                                                                            method: 'POST',
+                                                                            headers: {
+                                                                                'Content-Type': 'application/x-www-form-urlencoded'
+                                                                            },
+                                                                            body: 'eventId=' + eventId + '&newStatus=' + newStatus
+                                                                        })
+                                                                                .then(response => response.text())
+                                                                                .then(result => {
+                                                                                    if (result.trim() === 'success') {
+                                                                                        swal("Success", "Event updated successfully!", "success")
+                                                                                                .then(() => window.location.reload());
+                                                                                    } else {
+                                                                                        swal("Failed", "Failed to update event.", "error");
+                                                                                    }
+                                                                                })
+                                                                                .catch(error => {
+                                                                                    swal("Error", "Error: " + error, "error");
+                                                                                });
+                                                                    }
+                                                                });
+                                                            }
+            </script>
+        </body>
+    </html>

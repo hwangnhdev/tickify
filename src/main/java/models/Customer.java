@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package models;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 
-/**
- *
- * @author Nguyen Huy Hoang - CE182102
- */
 public class Customer {
 
     private int customerId;
@@ -20,10 +12,24 @@ public class Customer {
     private String phone;
     private String profilePicture;
     private Boolean status;
-    private Timestamp dob;
+    // Thêm các trường mới:
+    private Date dob;
     private String gender;
 
     public Customer() {
+    }
+
+    public Customer(int customerId, String fullName, String email, String address, String phone,
+            String profilePicture, Boolean status, Date dob, String gender) {
+        this.customerId = customerId;
+        this.fullName = fullName;
+        this.email = email;
+        this.address = address;
+        this.phone = phone;
+        this.profilePicture = profilePicture;
+        this.status = status;
+        this.dob = dob;
+        this.gender = gender;
     }
 
     public Customer(int customerId, String fullName, String email, String address, String phone, String profilePicture, Boolean status) {
@@ -36,6 +42,7 @@ public class Customer {
         this.status = status;
     }
 
+    // Getters & Setters cũ...
     public int getCustomerId() {
         return customerId;
     }
@@ -91,8 +98,25 @@ public class Customer {
     public void setStatus(Boolean status) {
         this.status = status;
     }
-    // Phương thức getter cho statusText, JSP sẽ sử dụng nó
 
+    // Các getter và setter mới cho dob và gender:
+    public Date getDob() {
+        return dob;
+    }
+
+    public void setDob(Date dob) {
+        this.dob = dob;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    // Phương thức hiển thị trạng thái (có thể giữ nguyên)
     public String getStatusText() {
         return (status != null && status) ? "Active" : "Inactive";
     }
@@ -123,7 +147,8 @@ public class Customer {
                 + ", phone='" + phone + '\''
                 + ", profilePicture='" + profilePicture + '\''
                 + ", status=" + status
+                + ", dob=" + dob
+                + ", gender=" + gender
                 + '}';
     }
-
 }
