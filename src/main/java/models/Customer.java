@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -19,6 +20,8 @@ public class Customer {
     private String phone;
     private String profilePicture;
     private Boolean status;
+    private Timestamp dob;
+    private String gender;
 
     public Customer() {
     }
@@ -92,6 +95,22 @@ public class Customer {
 
     public String getStatusText() {
         return (status != null && status) ? "Active" : "Inactive";
+    }
+
+    public Timestamp getDob() {
+        return dob;
+    }
+
+    public void setDob(Timestamp dob) {
+        this.dob = dob;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     @Override
