@@ -12,7 +12,6 @@ public class Customer {
     private String phone;
     private String profilePicture;
     private Boolean status;
-    // Thêm các trường mới:
     private Date dob;
     private String gender;
 
@@ -119,22 +118,6 @@ public class Customer {
     // Phương thức hiển thị trạng thái (có thể giữ nguyên)
     public String getStatusText() {
         return (status != null && status) ? "Active" : "Inactive";
-    }
-
-    public Timestamp getDob() {
-        return dob;
-    }
-
-    public void setDob(Timestamp dob) {
-        this.dob = dob;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
     }
 
     @Override

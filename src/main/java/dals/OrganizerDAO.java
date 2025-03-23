@@ -73,7 +73,7 @@ public class OrganizerDAO extends DBContext {
     }
 
     // Lấy danh sách event theo customer (theo organizer được liên kết với customer)
-    public List<EventSummaryDTO> getEventsByCustomer(int customerId, String filter) {
+    public List<EventSummaryDTO> getEventsByCustomer(int customerId, String filter, String eventName) {
         List<EventSummaryDTO> events = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
         sql.append("WITH BannerImages AS ( ");
@@ -101,6 +101,11 @@ public class OrganizerDAO extends DBContext {
             sql.append("AND LOWER(e.status) = ? ");
         }
 
+        // Thêm điều kiện tìm kiếm theo eventName nếu có
+        if (eventName != null && !eventName.trim().isEmpty()) {
+            sql.append("AND LOWER(e.event_name) LIKE ? ");
+        }
+
         sql.append("GROUP BY e.event_id, e.event_name, e.location, e.status, bi.image_url ");
 
         // Với upcoming và past, sử dụng mệnh đề HAVING để lọc theo ngày
@@ -112,12 +117,15 @@ public class OrganizerDAO extends DBContext {
             }
         }
 
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int index = 1;
             ps.setInt(index++, customerId);
             if (filter != null && !filter.equalsIgnoreCase("all")
                     && !filter.equalsIgnoreCase("upcoming") && !filter.equalsIgnoreCase("past")) {
                 ps.setString(index++, filter.toLowerCase());
+            }
+            if (eventName != null && !eventName.trim().isEmpty()) {
+                ps.setString(index++, "%" + eventName.toLowerCase() + "%");
             }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -274,11 +282,11 @@ public class OrganizerDAO extends DBContext {
                 + "INNER JOIN Organizers org ON e.organizer_id = org.organizer_id "
                 + "WHERE org.organizer_id = ? "
                 + "  AND ( ? = 'all' OR LOWER(o.payment_status) = ? )";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, organizerId);
             stmt.setString(2, paymentStatus.toLowerCase());
             stmt.setString(3, paymentStatus.toLowerCase());
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt("total");
                 }
@@ -315,9 +323,9 @@ public class OrganizerDAO extends DBContext {
                 + "WHERE e.event_id = ? "
                 + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, org.organization_name, bi.image_url";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     detail = new EventDetailDTO();
                     detail.setEventId(rs.getInt("eventId"));
