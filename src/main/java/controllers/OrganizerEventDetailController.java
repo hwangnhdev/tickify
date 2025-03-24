@@ -1,7 +1,7 @@
 package controllers;
 
 import dals.OrganizerDAO;
-import dals.EventDAO; // Import thêm EventDAO import jakarta.servlet.RequestDispatcher; import jakarta.servlet.ServletException; import jakarta.servlet.annotation.WebServlet; import jakarta.servlet.http.HttpServlet; import jakarta.servlet.http.HttpServletRequest; import jakarta.servlet.http.HttpServletResponse; import jakarta.servlet.http.HttpSession; import java.io.IOException; import viewModels.EventDetailDTO; import java.util.List; import models.EventImage;
+import dals.EventDAO;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.util.List;
 import models.EventImage;
 import viewModels.EventDetailDTO;
-@WebServlet("/organizer/eventDetail")
+import viewModels.ShowtimeDTO;
+import viewModels.TicketTypeDTO;
+
 public class OrganizerEventDetailController extends HttpServlet {
 
     @Override
@@ -57,8 +59,15 @@ public class OrganizerEventDetailController extends HttpServlet {
         EventDAO eventDAO = new EventDAO();
         List<EventImage> listImages = eventDAO.getImageEventsByEventId(eventId);
 
+        // Lấy danh sách lịch diễn và loại vé từ OrganizerDAO
+        List<ShowtimeDTO> listShowtimes = organizerDAO.getShowtimesByEventId(eventId);
+        List<TicketTypeDTO> listTicketTypes = organizerDAO.getTicketTypesByEventId(eventId);
+
+        // Set các attribute cần thiết cho JSP
         request.setAttribute("organizerEventDetail", detail);
         request.setAttribute("listEventImages", listImages);
+        request.setAttribute("listShowtimes", listShowtimes);
+        request.setAttribute("listTicketTypes", listTicketTypes);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/viewOrganizerEventDetail.jsp");
         dispatcher.forward(request, response);
@@ -72,6 +81,6 @@ public class OrganizerEventDetailController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "OrganizerEventDetailController retrieves event detail with banner image";
+        return "OrganizerEventDetailController retrieves event detail along with showtimes and ticket types.";
     }
 }
