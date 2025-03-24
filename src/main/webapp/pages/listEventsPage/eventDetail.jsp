@@ -528,7 +528,7 @@
                                                         <c:choose>
                                                             <c:when test="${showtime.status eq 'Upcoming' and (ticket.totalQuantity - ticket.soldQuantity > 0)}">
                                                                 class="px-2 py-1 rounded-lg text-white bg-red-500 hover:bg-red-600" 
-                                                                href="viewSeat?showtimeId=${showtime.showtimeId}&ticketTypeId=${ticket.ticketTypeId}"
+                                                                href="viewSeat?showtimeId=${showtime.showtimeId}&eventId=${showtime.eventId}"
                                                             </c:when>
                                                             <c:otherwise>
                                                                 class="px-2 py-1 rounded-lg text-white bg-gray-500 cursor-not-allowed"
