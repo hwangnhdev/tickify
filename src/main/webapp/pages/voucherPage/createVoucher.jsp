@@ -166,7 +166,6 @@
                         unit.textContent = '%';
                         discountValue.setAttribute('min', '0');
                         discountValue.setAttribute('max', '100');
-                        discountValue.value = discountValue.value ? Math.min(Math.max(parseFloat(discountValue.value), 0), 100).toFixed(2) : '';
                     } else {
                         unit.textContent = 'VND';
                         discountValue.removeAttribute('max');
@@ -176,12 +175,6 @@
 
                 updateUnit();
                 discountType.addEventListener('change', updateUnit);
-
-                discountValue.addEventListener('input', function () {
-                    if (discountType.value === 'percentage') {
-                        this.value = Math.min(Math.max(parseFloat(this.value) || 0, 0), 100).toFixed(2);
-                    }
-                });
             });
         </script>
     </body>

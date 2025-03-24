@@ -47,36 +47,39 @@
                 <!-- Main Section -->
                 <section class="flex-1 p-4 overflow-y-auto">
                     <!-- Search Section -->
-                    <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-800 p-4 rounded-lg shadow-md">
-                        <!-- Search Form -->
-                        <form action="searchVoucher" method="get" class="flex items-center mt-2 sm:mt-0">
-                            <input type="hidden" name="eventId" value="${eventId}"/>
-                            <div class="relative">
-                                <input type="text" name="searchVoucher" placeholder="Search by voucher code" 
-                                       class="p-1 pl-2 pr-8 text-sm rounded-l bg-gray-700 text-white border border-r-0 border-gray-600 focus:ring-1 focus:ring-green-500" />
-                                <button type="submit" 
-                                        class="absolute right-0 top-0 h-full bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-r transition-colors duration-200">
-                                    <i class="fas fa-search"></i>
+                    <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-800 rounded-lg shadow-md">
+                        <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                            <!-- Search Form -->
+                            <form action="searchVoucher" method="get" class="flex items-center">
+                                <input type="hidden" name="eventId" value="${eventId}"/>
+                                <div class="relative">
+                                    <input type="text" name="searchVoucher" placeholder="Search by voucher code" 
+                                           class="p-1 pl-2 pr-8 text-sm rounded-l bg-gray-700 text-white border border-r-0 border-gray-600 focus:ring-1 focus:ring-green-500" />
+                                    <button type="submit" 
+                                            class="absolute right-0 top-0 h-full bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-r transition-colors duration-200">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Filter Form -->
+                            <form action="${pageContext.request.contextPath}/vouchers" method="get" class="flex items-center space-x-2">
+                                <input type="hidden" name="eventId" value="${eventId}"/>
+                                <label for="voucherStatus" class="text-white text-sm font-medium">Status:</label>
+                                <select name="voucherStatus" id="voucherStatus" class="p-1 text-sm rounded bg-gray-700 text-white border border-gray-600 focus:ring-1 focus:ring-green-500">
+                                    <option value="all" ${voucherStatus == 'all' ? 'selected' : ''}>All</option>
+                                    <option value="active" ${voucherStatus == 'active' ? 'selected' : ''}>Active</option>
+                                    <option value="inactive" ${voucherStatus == 'inactive' ? 'selected' : ''}>Inactive</option>
+                                </select>
+                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white text-sm p-1 px-2 rounded transition-colors duration-200">
+                                    <i class="fas fa-filter"></i>
                                 </button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
 
-                        <!-- Filter Form -->
-                        <form action="${pageContext.request.contextPath}/vouchers" method="get" class="flex items-center space-x-2">
-                            <input type="hidden" name="eventId" value="${eventId}"/>
-                            <label for="voucherStatus" class="text-white text-sm font-medium">Status:</label>
-                            <select name="voucherStatus" id="voucherStatus" class="p-1 text-sm rounded bg-gray-700 text-white border border-gray-600 focus:ring-1 focus:ring-green-500">
-                                <option value="all" ${voucherStatus == 'all' ? 'selected' : ''}>All</option>
-                                <option value="active" ${voucherStatus == 'active' ? 'selected' : ''}>Active</option>
-                                <option value="inactive" ${voucherStatus == 'inactive' ? 'selected' : ''}>Inactive</option>
-                            </select>
-                            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white text-sm p-1 px-2 rounded transition-colors duration-200">
-                                <i class="fas fa-filter"></i>
-                            </button>
-                        </form>
-
+                        <!-- Create Voucher Button -->
                         <a href="${pageContext.request.contextPath}/createVoucher?eventId=${eventId}"
-                           class="flex items-center bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-1 px-3 rounded transition-colors duration-200">
+                           class="flex items-center bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-1 px-3 rounded transition-colors duration-200 mt-2 sm:mt-0">
                             Create Voucher
                         </a>
                     </div>
