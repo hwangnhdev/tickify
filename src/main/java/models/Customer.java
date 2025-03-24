@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -24,6 +25,7 @@ public class Customer {
 
     public Customer() {
     }
+
 
     public Customer(int customerId, String fullName, String email, String address, String phone, String profilePicture, Boolean status) {
         this.customerId = customerId;
@@ -47,6 +49,8 @@ public class Customer {
         this.gender = gender;
     }
 
+
+    // Getters & Setters cũ...
     public int getCustomerId() {
         return customerId;
     }
@@ -102,12 +106,8 @@ public class Customer {
     public void setStatus(Boolean status) {
         this.status = status;
     }
-    // Phương thức getter cho statusText, JSP sẽ sử dụng nó
 
-    public String getStatusText() {
-        return (status != null && status) ? "Active" : "Inactive";
-    }
-
+    // Các getter và setter mới cho dob và gender:
     public Date getDob() {
         return dob;
     }
@@ -124,6 +124,12 @@ public class Customer {
         this.gender = gender;
     }
 
+    // Phương thức hiển thị trạng thái (có thể giữ nguyên)
+    public String getStatusText() {
+        return (status != null && status) ? "Active" : "Inactive";
+    }
+
+
     @Override
     public String toString() {
         return "Customer{"
@@ -134,6 +140,8 @@ public class Customer {
                 + ", phone='" + phone + '\''
                 + ", profilePicture='" + profilePicture + '\''
                 + ", status=" + status
+                + ", dob=" + dob
+                + ", gender=" + gender
                 + '}';
     }
 

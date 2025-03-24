@@ -12,6 +12,7 @@ import java.io.IOException;
 
 @WebServlet("/viewOrderDetailOrganizer")
 public class ViewOrderDetailOrganizer extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
 
     public ViewOrderDetailOrganizer() {
@@ -47,8 +48,7 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
 
         // Set orderDetail as a request attribute and forward to JSP view
         request.setAttribute("orderDetail", orderDetail);
-        RequestDispatcher dispatcher = request
-                .getRequestDispatcher("/pages/organizerPage/viewOrderDetailOrganizer.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/viewOrderDetailOrganizer.jsp");
         dispatcher.forward(request, response);
     }
 

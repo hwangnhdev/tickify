@@ -25,15 +25,15 @@ public class ChangePasswordController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -47,36 +47,48 @@ public class ChangePasswordController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Integer customerId = (Integer) session.getAttribute("customerId");
-
-        if (customerId == null) {
-            response.sendRedirect("event");
-            return;
+        Object customerIdObj = session.getAttribute("customerId");
+        int customerId = 0;
+        if (customerIdObj instanceof Integer) {
+            customerId = (Integer) customerIdObj;
+            System.out.println("Customer ID: " + customerId);
+        } else if (customerIdObj instanceof String) {
+            try {
+                customerId = Integer.parseInt((String) customerIdObj);
+                System.out.println("Customer ID: " + customerId);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
         }
-
+        CustomerDAO dao = new CustomerDAO();
+        CustomerAuth customer = dao.getPassword(customerId);
+        request.setAttribute("profile", customer);
         request.getRequestDispatcher("pages/profile/changePassword.jsp").forward(request, response);
     }
 
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -115,7 +127,7 @@ public class ChangePasswordController extends HttpServlet {
         if (isUpdated) {
             response.sendRedirect("profile");
         } else {
-            response.sendRedirect("changePassword");  // Reload the creation page on failure
+            response.sendRedirect("changePassword"); // Reload the creation page on failure
         }
         request.getRequestDispatcher("pages/profile/changePassword.jsp").forward(request, response);
     }

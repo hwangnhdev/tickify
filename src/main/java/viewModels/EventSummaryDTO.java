@@ -1,6 +1,7 @@
 package viewModels;
 
 import java.sql.Timestamp;
+import models.Event;
 
 public class EventSummaryDTO {
 

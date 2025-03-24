@@ -22,7 +22,7 @@ public class OrderDetailDAO extends DBContext {
      *
      * @param orderId ID của đơn hàng
      * @return OrderDetailDTO chứa thông tin đơn hàng và danh sách vé (order
-     *         items)
+     * items)
      */
     public OrderDetailDTO getOrderDetailByOrderId(int orderId) {
         OrderDetailDTO detail = null;
@@ -82,9 +82,9 @@ public class OrderDetailDAO extends DBContext {
                 + "    E.event_name, E.location, S.start_date, S.end_date, EI.image_url,\n"
                 + "    V.code, V.discount_type, V.discount_value";
 
-        try (PreparedStatement ps = connection.prepareStatement(sqlMain)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sqlMain)) {
             ps.setInt(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     detail = new OrderDetailDTO();
                     detail.setOrderId(rs.getInt("orderId"));
@@ -107,11 +107,11 @@ public class OrderDetailDAO extends DBContext {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        return detail;
+        return null;
     }
 
     public boolean insertOrderDetail(models.OrderDetail orderDetail) {
-        try (PreparedStatement st = connection.prepareStatement(INSERT_ORDER_DETAIL)) {
+        try ( PreparedStatement st = connection.prepareStatement(INSERT_ORDER_DETAIL)) {
             st.setInt(1, orderDetail.getOrderId());
             st.setInt(2, orderDetail.getTicketTypeId());
             st.setInt(3, orderDetail.getQuantity());
@@ -125,10 +125,10 @@ public class OrderDetailDAO extends DBContext {
     }
 
     public models.OrderDetail getLatestOrderDetail(int orderId, int ticketTypeId) {
-        try (PreparedStatement ps = connection.prepareStatement(GET_LATEST_ORDER_DETAIL)) {
+        try ( PreparedStatement ps = connection.prepareStatement(GET_LATEST_ORDER_DETAIL)) {
             ps.setInt(1, orderId);
             ps.setInt(2, ticketTypeId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return new models.OrderDetail(
                             rs.getInt("order_detail_id"),
@@ -151,7 +151,7 @@ public class OrderDetailDAO extends DBContext {
         List<OrderDetail> orderDetails = new ArrayList<>();
         String query = "SELECT order_detail_id, order_id, ticketTypeId, quantity, price "
                 + "FROM OrderDetails WHERE order_id = ?";
-        try (Connection conn = new DBContext().connection; PreparedStatement ps = conn.prepareStatement(query)) {
+        try ( Connection conn = new DBContext().connection;  PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, orderId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -176,7 +176,7 @@ public class OrderDetailDAO extends DBContext {
         OrderDetail od = null;
         String query = "SELECT order_detail_id, order_id, ticketTypeId, quantity, price "
                 + "FROM OrderDetails WHERE order_detail_id = ?";
-        try (Connection conn = new DBContext().connection; PreparedStatement ps = conn.prepareStatement(query)) {
+        try ( Connection conn = new DBContext().connection;  PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, orderDetailId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {

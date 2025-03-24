@@ -108,6 +108,7 @@ public class UpdateEventController extends HttpServlet {
         List<Showtime> showTimes = eventDAO.getShowTimesByEventId(eventId);
         List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(eventId);
         List<Seat> seats = eventDAO.getSeatsByEventId(eventId);
+        List<Seat> uniqueSeatTypes = eventDAO.getUniqueSeatTypesByEventId(eventId);
         List<Category> listCategories = categoryDAO.getAllCategories();
 
         // Fetch provinces from API
@@ -137,6 +138,7 @@ public class UpdateEventController extends HttpServlet {
         request.setAttribute("showTimes", showTimes);
         request.setAttribute("ticketTypes", ticketTypes);
         request.setAttribute("seats", seats);
+        request.setAttribute("uniqueSeatTypes", uniqueSeatTypes);
         session.setAttribute("listCategories", listCategories);
         request.setAttribute("bankName", organizer.getBankName().trim());
 

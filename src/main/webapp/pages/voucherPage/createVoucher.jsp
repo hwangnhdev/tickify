@@ -26,7 +26,7 @@
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventAnalyst.jsp"><i class="fas fa-chart-line mr-2"></i>Analyst</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="editEvent.jsp"><i class="fas fa-edit mr-2"></i>Edit Event</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="seatingChart.jsp"><i class="fas fa-chair mr-2"></i>Seat Map</a>
-                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="VoucherController"><i class="fas fa-tags mr-2"></i>Voucher</a>
+                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="vouchers"><i class="fas fa-tags mr-2"></i>Voucher</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="orders.jsp"><i class="fas fa-list mr-2"></i>Order List</a>
                 </nav>
             </aside>
@@ -37,7 +37,7 @@
                 <header class="flex justify-between items-center bg-gray-800 p-4 shadow-md">
                     <h1 class="text-2xl font-bold text-white">Create Voucher</h1>
                     <div class="flex items-center space-x-4">
-                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/CreateEventController'" class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
+                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/createNewEvent'" class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
                             + Create Event
                         </button>
                         <button class="flex items-center text-white">
@@ -52,17 +52,16 @@
                     <div class="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-3xl mx-auto">
                         <!-- Back Button -->
                         <div class="mb-6">
-                            <a href="ViewAllVouchersController" class="inline-flex items-center text-white hover:text-green-500 transition duration-200">
+                            <a href="vouchers" class="inline-flex items-center text-white hover:text-green-500 transition duration-200">
                                 <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M872 474H286.9l350.2-304c5.6-4.9 2.2-14-5.2-14h-88.5c-3.9 0-7.6 1.4-10.5 3.9L155 487.8a31.96 31.96 0 000 48.3L535.1 866c1.5 1.3 3.3 2 5.2 2h91.5c7.4 0 10.8-9.2 5.2-14L286.9 550H872c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"/>
+                                <path d="M872 474H286.9l350.2-304c5.6-4.9 2.2-14-5.2-14h-88.5c-3.9 0-7.6 1.4-10.5 3.9L155 487.8a31.96 31.96 0 000 48.3L535.1 866c1.5 1.3 3.3 2 5.2 2h91.5c7.4 0 10.8-9.2 5.2-14L286.9 550H872c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"/>
                                 </svg>
                                 <span>Back to All Vouchers</span>
                             </a>
                         </div>
 
-                        <form action="CreateVoucherController" method="post" class="space-y-6">
-                            <input type="hidden" name="eventId" value="<%= request.getParameter("eventId") != null ? request.getParameter("eventId") : "" %>">
-
+                        <form action="createVoucher" method="post" class="space-y-6">
+                            <input type="hidden" name="eventId" value="<%= request.getAttribute("eventId") != null ? request.getAttribute("eventId") : ""%>">
                             <!-- Basic Information -->
                             <div class="space-y-4">
                                 <h2 class="text-lg font-semibold">Basic Information</h2>
@@ -137,20 +136,20 @@
                                     <span class="text-xs text-gray-500">Off: Voucher cannot be used under any circumstances</span><br>
                                     <span class="text-xs text-gray-500">On: Voucher can be used during expiration time</span>
                                 </div>
-                                
+
                                 <input type="hidden" name="isDeleted" value="false">
                             </div>
 
                             <div class="flex justify-end space-x-4">
-                                <button type="button" onclick="location.href = 'ViewAllVouchersController'" 
+                                <button type="button" onclick="location.href = 'vouchers'" 
                                         class="px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-white transition duration-200">Cancel</button>
                                 <button type="submit" 
                                         class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200">Create Voucher</button>
                             </div>
                         </form>
-                        <% if (request.getAttribute("error") != null) { %>
-                            <p class="text-red-500 mt-4"><%= request.getAttribute("error") %></p>
-                        <% } %>
+                        <% if (request.getAttribute("error") != null) {%>
+                        <p class="text-red-500 mt-4"><%= request.getAttribute("error")%></p>
+                        <% }%>
                     </div>
                 </section>
             </main>

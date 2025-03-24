@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import models.Voucher;
@@ -25,15 +26,15 @@ public class CreateVoucherController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -52,32 +53,73 @@ public class CreateVoucherController extends HttpServlet {
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Object eventIdObj = session.getAttribute("eventId");
+        int eventId = 0;
+
+        if (eventIdObj instanceof Integer) {
+            eventId = (Integer) eventIdObj;
+            System.out.println("Event ID: " + eventId);
+        } else if (eventIdObj instanceof String) {
+            try {
+                eventId = Integer.parseInt((String) eventIdObj);
+                System.out.println("Event ID: " + eventId);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Event ID không hợp lệ hoặc chưa được set trong session.");
+        }
+        request.setAttribute("eventId", eventId);
         request.getRequestDispatcher("pages/voucherPage/createVoucher.jsp").forward(request, response);
+
     }
 
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            HttpSession session = request.getSession();
+            Object eventIdObj = session.getAttribute("eventId");
+            Integer eventId = null;
+
+            // Handle eventId retrieval
+            if (eventIdObj instanceof Integer) {
+                eventId = (Integer) eventIdObj;
+            } else if (eventIdObj instanceof String) {
+                try {
+                    eventId = Integer.parseInt((String) eventIdObj);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("error", "Invalid event ID format in session.");
+                    request.getRequestDispatcher("pages/voucherPage/createVoucher.jsp").forward(request, response);
+                    return;
+                }
+            }
+
+            if (eventId == null) {
+                response.sendRedirect("OrganizerEventController");
+                return;
+            }
+
             VoucherDAO voucherDAO = new VoucherDAO();
             Voucher voucher = new Voucher();
-            voucher.setEventId(1);
+            voucher.setEventId(eventId);
             voucher.setCode(request.getParameter("code"));
             voucher.setDescription(request.getParameter("description"));
             voucher.setDiscountType(request.getParameter("discountType"));
