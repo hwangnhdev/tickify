@@ -35,10 +35,10 @@ public class LoginGoogleHandlerController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     public static String getToken(String code) throws ClientProtocolException, IOException {
         String response = Request.Post(AuthConfig.GOOGLE_LINK_GET_TOKEN)
@@ -49,8 +49,7 @@ public class LoginGoogleHandlerController extends HttpServlet {
                                 .add("redirect_uri", AuthConfig.GOOGLE_REDIRECT_URI)
                                 .add("code", code)
                                 .add("grant_type", AuthConfig.GOOGLE_GRANT_TYPE)
-                                .build()
-                )
+                                .build())
                 .execute().returnContent().asString();
 
         JsonObject jobj = new Gson().fromJson(response, JsonObject.class);
@@ -65,7 +64,8 @@ public class LoginGoogleHandlerController extends HttpServlet {
         return googlePojo;
     }
 
-    private void handleLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void handleLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             String code = request.getParameter("code");
             String accessToken = getToken(code);
@@ -84,7 +84,7 @@ public class LoginGoogleHandlerController extends HttpServlet {
             if (existingCustomer != null) {
                 existingCustomerId = existingCustomer.getCustomerId();
                 customerSendRedirect = existingCustomer;
-                
+
                 if (!existingCustomer.getStatus()) {
                     request.setAttribute("errorMessage", "This account has been banned!");
                     System.out.println("This account has been banned!");
@@ -95,23 +95,26 @@ public class LoginGoogleHandlerController extends HttpServlet {
                 existingCustomerId = 0;
             }
 
-            CustomerAuth existingCustomerAuth = customerAuthDao.selectCustomerAuthByIdProvider(existingCustomerId, provider);
+            CustomerAuth existingCustomerAuth = customerAuthDao.selectCustomerAuthByIdProvider(existingCustomerId,
+                    provider);
 
-            //TH2: Có customer nhưng chưa có customer_auth trong DB 
+            // TH2: Có customer nhưng chưa có customer_auth trong DB
             if (existingCustomer != null && existingCustomerAuth == null) {
-                // Lấy customer_id đã có trong Customers thêm 1 thằng Customer_auths 
-                CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), provider, null, user.getId());
+                // Lấy customer_id đã có trong Customers thêm 1 thằng Customer_auths
+                CustomerAuth customerAuth = new CustomerAuth(0, existingCustomer.getCustomerId(), provider, null,
+                        user.getId());
                 customerAuthDao.insertCustomerAuth(customerAuth);
-                
-                if(existingCustomer.getProfilePicture() == null) {
+
+                if (existingCustomer.getProfilePicture() == null) {
                     existingCustomer.setProfilePicture(user.getPicture());
                     customerDao.updateCustomerImageProfile(existingCustomer);
                 }
             }
 
-            //TH1: Chưa có customer và customer_auth trong DB 
+            // TH1: Chưa có customer và customer_auth trong DB
             if (existingCustomer == null && existingCustomerAuth == null) {
-                Customer customer = new Customer(0, user.getName(), user.getEmail(), null, null, user.getPicture(), Boolean.TRUE);
+                Customer customer = new Customer(0, user.getName(), user.getEmail(), null, null, user.getPicture(),
+                        Boolean.TRUE);
                 customerDao.insertCustomer(customer);
 
                 int insertedCustomerId = customerDao.selectCustomerByEmail(user.getEmail()).getCustomerId();
@@ -121,26 +124,29 @@ public class LoginGoogleHandlerController extends HttpServlet {
 
                 customerSendRedirect = customer;
             }
-            // Login 
+            // Login
             HttpSession session = request.getSession();
+            // System.out.println(customerSendRedirect.getProfilePicture());
+            session.setMaxInactiveInterval(7 * 24 * 60 * 60); // 7days
             session.setAttribute("customerImage", customerSendRedirect.getProfilePicture());
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
-//            request.getRequestDispatcher("").forward(request, response);
-            response.sendRedirect(request.getContextPath());
+            request.getRequestDispatcher("").forward(request, response);
+            // response.sendRedirect(request.getContextPath());
         } catch (Exception e) {
             request.setAttribute("error", "Login fail!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -151,15 +157,15 @@ public class LoginGoogleHandlerController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        processRequest(request, response);
+        // processRequest(request, response);
     }
 
     /**

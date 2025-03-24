@@ -25,15 +25,15 @@ public class CreateVoucherController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -47,14 +47,15 @@ public class CreateVoucherController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -65,10 +66,10 @@ public class CreateVoucherController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -76,16 +77,17 @@ public class CreateVoucherController extends HttpServlet {
         try {
             VoucherDAO voucherDAO = new VoucherDAO();
             Voucher voucher = new Voucher();
-            voucher.setEventId(1);
+            voucher.setEventId(16);
             voucher.setCode(request.getParameter("code"));
             voucher.setDescription(request.getParameter("description"));
             voucher.setDiscountType(request.getParameter("discountType"));
-            voucher.setDiscountValue(Double.parseDouble(request.getParameter("discountValue")));
+            voucher.setDiscountValue(Integer.parseInt(request.getParameter("discountValue")));
             voucher.setStartDate(Timestamp.valueOf(request.getParameter("startDate").replace("T", " ") + ":00"));
             voucher.setEndDate(Timestamp.valueOf(request.getParameter("endDate").replace("T", " ") + ":00"));
             voucher.setUsageLimit(Integer.parseInt(request.getParameter("usageLimit")));
             voucher.setStatus("true".equals(request.getParameter("status")));
-            
+            voucher.setDeleted("true".equals(request.getParameter("isDeleted")));
+
             boolean success = voucherDAO.insertVoucher(voucher);
 
             if (success) {

@@ -11,12 +11,12 @@ import java.util.List;
  *
  * @author Tang Thanh Vui - CE180901
  */
-public class Showtime extends Event{
+public class Showtime extends Event {
 
     private int showtimeId;
     private int eventId;
     private Timestamp startDate; // Changed from Date to Timestamp
-    private Timestamp endDate;   // Changed from Date to Timestamp
+    private Timestamp endDate; // Changed from Date to Timestamp
     private String status;
     private Timestamp createdAt; // Changed from Date to Timestamp
     private Timestamp updatedAt; // Changed from Date to Timestamp
@@ -34,10 +34,8 @@ public class Showtime extends Event{
     public Showtime() {
     }
 
-    
-    
-    
-    public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt) {
+    public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status,
+            Timestamp createdAt, Timestamp updatedAt) {
         this.showtimeId = showtimeId;
         this.eventId = eventId;
         this.startDate = startDate;
@@ -47,7 +45,8 @@ public class Showtime extends Event{
         this.updatedAt = updatedAt;
     }
 
-    public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status, Timestamp createdAt, Timestamp updatedAt, List<TicketType> ticketTypes) {
+    public Showtime(int showtimeId, int eventId, Timestamp startDate, Timestamp endDate, String status,
+            Timestamp createdAt, Timestamp updatedAt, List<TicketType> ticketTypes) {
         this.showtimeId = showtimeId;
         this.eventId = eventId;
         this.startDate = startDate;

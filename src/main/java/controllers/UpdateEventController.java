@@ -45,15 +45,15 @@ public class UpdateEventController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -67,14 +67,15 @@ public class UpdateEventController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -85,7 +86,7 @@ public class UpdateEventController extends HttpServlet {
         CategoryDAO categoryDAO = new CategoryDAO();
 
         String eventIdParam = request.getParameter("eventId");
-//        String eventIdParam = "21";
+
         int eventId = 0;
         try {
             if (eventIdParam != null && !eventIdParam.isEmpty()) {
@@ -107,6 +108,7 @@ public class UpdateEventController extends HttpServlet {
         List<Showtime> showTimes = eventDAO.getShowTimesByEventId(eventId);
         List<TicketType> ticketTypes = eventDAO.getTicketTypesByEventId(eventId);
         List<Seat> seats = eventDAO.getSeatsByEventId(eventId);
+        List<Seat> uniqueSeatTypes = eventDAO.getUniqueSeatTypesByEventId(eventId);
         List<Category> listCategories = categoryDAO.getAllCategories();
 
         // Fetch provinces from API
@@ -114,11 +116,9 @@ public class UpdateEventController extends HttpServlet {
         request.setAttribute("provinces", provinces);
 
         String provinceLocal = "";
-        System.out.println(event.getLocation());
         String[] locationPart = event.getLocation().split(",");
         int index = 0;
         for (String string : locationPart) {
-            System.out.println("Part " + index + ": " + string.trim());
             if (index == 0) {
                 request.setAttribute("ward", string.trim());
             } else if (index == 1) {
@@ -130,20 +130,6 @@ public class UpdateEventController extends HttpServlet {
             index++;
         }
 
-        System.out.println("Provinces list: " + provinces);
-        for (Province province : provinces) {
-            System.out.println(province.getCodename());
-            System.out.println(province.getCode());
-            System.out.println(province.getName());
-            if (province.getName().equalsIgnoreCase(provinceLocal)) {
-                System.out.println("Successfully");
-            }
-        }
-        System.out.println(provinceLocal);
-        System.out.println("Set ward: " + request.getAttribute("ward"));
-        System.out.println("Set district: " + request.getAttribute("district"));
-        System.out.println("Set province: " + request.getAttribute("province"));
-
         // Set attributes
         request.setAttribute("event", event);
         request.setAttribute("eventImages", eventImages);
@@ -152,23 +138,13 @@ public class UpdateEventController extends HttpServlet {
         request.setAttribute("showTimes", showTimes);
         request.setAttribute("ticketTypes", ticketTypes);
         request.setAttribute("seats", seats);
+        request.setAttribute("uniqueSeatTypes", uniqueSeatTypes);
         session.setAttribute("listCategories", listCategories);
         request.setAttribute("bankName", organizer.getBankName().trim());
-        System.out.println("Your BankName: " + organizer.getBankName());
-
-        for (Seat seat : seats) {
-            System.out.println("Seat: " + seat.getSeatRow() + ", " + seat.getSeatCol());
-        }
 
         // Tải danh sách ngân hàng từ API
         List<Bank> banks = loadBanksFromAPI();
         request.setAttribute("banks", banks);
-        for (Bank bank : banks) {
-            System.out.println(bank.getCode());
-            if (bank.getCode().equalsIgnoreCase(organizer.getBankName())) {
-                System.out.println("Successfully!");
-            }
-        }
 
         request.getRequestDispatcher("pages/organizerPage/updateEvent.jsp").forward(request, response);
     }
@@ -176,10 +152,10 @@ public class UpdateEventController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -187,9 +163,8 @@ public class UpdateEventController extends HttpServlet {
         response.setContentType("application/json");
         EventDAO eventDAO = new EventDAO();
 
-        System.out.println("Received request to /updateEvent");
         StringBuilder jsonBuffer = new StringBuilder();
-        try ( BufferedReader reader = request.getReader()) {
+        try (BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
                 jsonBuffer.append(line);
@@ -224,7 +199,8 @@ public class UpdateEventController extends HttpServlet {
             }
 
             // Get other data
-            String organizationName = jsonData.has("organizationName") ? jsonData.get("organizationName").getAsString() : "";
+            String organizationName = jsonData.has("organizationName") ? jsonData.get("organizationName").getAsString()
+                    : "";
             String accountHolder = jsonData.has("accountHolder") ? jsonData.get("accountHolder").getAsString() : "";
             String accountNumber = jsonData.has("accountNumber") ? jsonData.get("accountNumber").getAsString() : "";
             String bankName = jsonData.has("bankName") ? jsonData.get("bankName").getAsString() : "";
@@ -235,8 +211,12 @@ public class UpdateEventController extends HttpServlet {
             String description = jsonData.has("description") ? jsonData.get("description").getAsString() : "";
             String status = jsonData.has("status") ? jsonData.get("status").getAsString() : "Pending";
             String eventLogoUrl = jsonData.has("eventLogoUrl") ? jsonData.get("eventLogoUrl").getAsString() : "";
-            String backgroundImageUrl = jsonData.has("backgroundImageUrl") ? jsonData.get("backgroundImageUrl").getAsString() : "";
-            String organizerImageUrl = jsonData.has("organizerImageUrl") ? jsonData.get("organizerImageUrl").getAsString() : "";
+            String backgroundImageUrl = jsonData.has("backgroundImageUrl")
+                    ? jsonData.get("backgroundImageUrl").getAsString()
+                    : "";
+            String organizerImageUrl = jsonData.has("organizerImageUrl")
+                    ? jsonData.get("organizerImageUrl").getAsString()
+                    : "";
 
             // Validate required fields
             if (eventName.isEmpty() || categoryId == 0 || location.isEmpty() || eventType.isEmpty()) {
@@ -254,7 +234,8 @@ public class UpdateEventController extends HttpServlet {
                     String endDateStr = showTimeObj.get("endDate").getAsString();
                     showTime.setStartDate(Timestamp.valueOf(startDateStr));
                     showTime.setEndDate(Timestamp.valueOf(endDateStr));
-                    showTime.setStatus(showTimeObj.has("status") ? showTimeObj.get("status").getAsString() : "Scheduled");
+                    showTime.setStatus(
+                            showTimeObj.has("status") ? showTimeObj.get("status").getAsString() : "Scheduled");
                     showTimes.add(showTime);
                 }
             }
@@ -267,13 +248,17 @@ public class UpdateEventController extends HttpServlet {
                     JsonObject ticketTypeObj = ticketTypeElement.getAsJsonObject();
                     TicketType ticketType = new TicketType();
                     ticketType.setName(ticketTypeObj.has("name") ? ticketTypeObj.get("name").getAsString() : "");
-                    ticketType.setDescription(ticketTypeObj.has("description") ? ticketTypeObj.get("description").getAsString() : "");
+                    ticketType.setDescription(
+                            ticketTypeObj.has("description") ? ticketTypeObj.get("description").getAsString() : "");
                     ticketType.setPrice(ticketTypeObj.has("price") ? ticketTypeObj.get("price").getAsDouble() : 0);
-                    ticketType.setColor(ticketTypeObj.has("color") ? ticketTypeObj.get("color").getAsString() : "#000000");
-                    ticketType.setTotalQuantity(ticketTypeObj.has("totalQuantity") ? ticketTypeObj.get("totalQuantity").getAsInt() : 0);
+                    ticketType.setColor(
+                            ticketTypeObj.has("color") ? ticketTypeObj.get("color").getAsString() : "#000000");
+                    ticketType.setTotalQuantity(
+                            ticketTypeObj.has("totalQuantity") ? ticketTypeObj.get("totalQuantity").getAsInt() : 0);
 
                     if (ticketType.getName().isEmpty() || ticketType.getTotalQuantity() == 0) {
-                        throw new IllegalArgumentException("Ticket name and quantity are required for each ticket type");
+                        throw new IllegalArgumentException(
+                                "Ticket name and quantity are required for each ticket type");
                     }
                     ticketTypes.add(ticketType);
                 }
@@ -292,12 +277,14 @@ public class UpdateEventController extends HttpServlet {
                     JsonObject seatObj = seatElement.getAsJsonObject();
 
                     // Lấy thông tin cơ bản từ JSON
-                    String ticketTypeName = seatObj.has("ticketTypeName") ? seatObj.get("ticketTypeName").getAsString() : "";
+                    String ticketTypeName = seatObj.has("ticketTypeName") ? seatObj.get("ticketTypeName").getAsString()
+                            : "";
                     String seatRow = seatObj.has("seatRow") ? seatObj.get("seatRow").getAsString() : "";
                     String seatColStr = seatObj.has("seatCol") ? seatObj.get("seatCol").getAsString() : "";
 
                     if (ticketTypeName.isEmpty() || seatRow.isEmpty() || seatColStr.isEmpty()) {
-                        throw new IllegalArgumentException("TicketTypeName, SeatRow, and SeatCol are required for each seat");
+                        throw new IllegalArgumentException(
+                                "TicketTypeName, SeatRow, and SeatCol are required for each seat");
                     }
 
                     // Chuyển seatCol từ String sang int để biết số lần lặp
@@ -328,8 +315,7 @@ public class UpdateEventController extends HttpServlet {
                     eventId, customerId, organizationName, accountHolder, accountNumber, bankName,
                     categoryId, eventName, location, eventType, description, status,
                     eventLogoUrl, backgroundImageUrl, organizerImageUrl,
-                    showTimes, ticketTypes, seats
-            );
+                    showTimes, ticketTypes, seats);
 
             // Prepare JSON response
             JsonObject responseJson = new JsonObject();

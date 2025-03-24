@@ -1,12 +1,33 @@
 package viewModels;
 
-public class TicketItemDTO {
+import java.math.BigDecimal;
 
+public class TicketItemDTO {
+    private int ticketTypeId;
     private String ticketType;
+    private BigDecimal unitPrice;
+    private String seats; // Danh sách ghế dạng chuỗi (ví dụ: "A-15, A-16, A-14, A-13")
     private int quantity;
-    private double ticketPrice;
-    private double amount;
-    private String seat; // Danh sách ghế (ví dụ: "A1, A2")
+    private BigDecimal subtotalPerType;
+
+    public TicketItemDTO() {}
+
+    public TicketItemDTO(int ticketTypeId, String ticketType, BigDecimal unitPrice, String seats, int quantity, BigDecimal subtotalPerType) {
+        this.ticketTypeId = ticketTypeId;
+        this.ticketType = ticketType;
+        this.unitPrice = unitPrice;
+        this.seats = seats;
+        this.quantity = quantity;
+        this.subtotalPerType = subtotalPerType;
+    }
+
+    public int getTicketTypeId() {
+        return ticketTypeId;
+    }
+
+    public void setTicketTypeId(int ticketTypeId) {
+        this.ticketTypeId = ticketTypeId;
+    }
 
     public String getTicketType() {
         return ticketType;
@@ -14,6 +35,22 @@ public class TicketItemDTO {
 
     public void setTicketType(String ticketType) {
         this.ticketType = ticketType;
+    }
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public String getSeats() {
+        return seats;
+    }
+
+    public void setSeats(String seats) {
+        this.seats = seats;
     }
 
     public int getQuantity() {
@@ -24,27 +61,11 @@ public class TicketItemDTO {
         this.quantity = quantity;
     }
 
-    public double getTicketPrice() {
-        return ticketPrice;
+    public BigDecimal getSubtotalPerType() {
+        return subtotalPerType;
     }
 
-    public void setTicketPrice(double ticketPrice) {
-        this.ticketPrice = ticketPrice;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public String getSeat() {
-        return seat;
-    }
-
-    public void setSeat(String seat) {
-        this.seat = seat;
+    public void setSubtotalPerType(BigDecimal subtotalPerType) {
+        this.subtotalPerType = subtotalPerType;
     }
 }

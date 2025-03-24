@@ -28,6 +28,7 @@ import models.TicketType;
  * @author Nguyen Huy Hoang - CE182102
  */
 public class ViewSeatController extends HttpServlet {
+
     private SeatDAO seatDAO;
     private EventDAO eventDAO;
     private ShowtimeDAO showtimeDAO;
@@ -42,9 +43,11 @@ public class ViewSeatController extends HttpServlet {
         ticketTypeDAO = new TicketTypeDAO();
         cusDAO = new CustomerDAO();
     }
-    
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -68,22 +71,22 @@ public class ViewSeatController extends HttpServlet {
     }
 
     protected void viewSeatEvent(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        
+            throws ServletException, IOException {
+
         HttpSession session = request.getSession();
         System.out.println(session.getAttribute("customerId"));
         int customerId = (int) session.getAttribute("customerId");
-//        int eventId = Integer.parseInt((String) session.getAttribute("eventId"));
-        int eventId = 2;
+        System.out.println("eventID: " + request.getParameter("eventId"));
+        int eventId = Integer.parseInt(request.getParameter("eventId"));
         int showtimeId = Integer.parseInt(request.getParameter("showtimeId"));
-        
+
         Customer customer = cusDAO.selectCustomerById(customerId);
         Event event = eventDAO.selectEventByID(eventId);
         Showtime showtime = showtimeDAO.selectShowtimeById(showtimeId);
-        
+
         List<TicketType> ticketTypes = ticketTypeDAO.selectTicketTypeByShowtimeId(showtimeId);
         List<Seat> seats = seatDAO.selectSeatsByShowtimeId(showtimeId);
-        
+
         for (Seat seat : seats) {
             System.out.println(seat);
         }
@@ -93,7 +96,7 @@ public class ViewSeatController extends HttpServlet {
         session.setAttribute("showtime", showtime);
         session.setAttribute("ticketTypes", ticketTypes);
         session.setAttribute("seatsForEvent", seats);
-        
+
 //        request.setAttribute("customer", customer);
 //        request.setAttribute("event", event);
 //        request.setAttribute("showtime", showtime);

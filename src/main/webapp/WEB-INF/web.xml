@@ -216,6 +216,10 @@
         <servlet-name>RevenueDetailController</servlet-name>
         <servlet-class>controllers.RevenueDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>EventAjaxController</servlet-name>
+        <servlet-class>controllers.EventAjaxController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -243,6 +247,10 @@
     <servlet-mapping>
         <servlet-name>ResetPasswordController</servlet-name>
         <url-pattern>/resetPassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/changePassword</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>EventController</servlet-name>
@@ -394,15 +402,15 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VoucherController</servlet-name>
-        <url-pattern>/VoucherController</url-pattern>
+        <url-pattern>/editVoucher</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewAllVouchersController</servlet-name>
-        <url-pattern>/ViewAllVouchersController</url-pattern>
+        <url-pattern>/vouchers</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CreateVoucherController</servlet-name>
-        <url-pattern>/CreateVoucherController</url-pattern>
+        <url-pattern>/createVoucher</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VnPayAjaxController</servlet-name>
@@ -416,6 +424,10 @@
     <servlet-mapping>
         <servlet-name>ViewProcessingEventsAdminController</servlet-name>
         <url-pattern>/admin/viewProcessingEvents</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EventAjaxController</servlet-name>
+        <url-pattern>/eventAjax</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>10080</session-timeout>

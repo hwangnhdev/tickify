@@ -9,7 +9,6 @@
         <title>Order List</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-        <!-- JavaScript validation script cho form search -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const searchForm = document.getElementById("searchForm");
@@ -30,45 +29,31 @@
         </script>
     </head>
     <body class="bg-gray-900 text-white">
-        <!-- Sidebar and common layout -->
         <div class="flex h-screen">
-            <!-- Sidebar -->
             <jsp:include page="sideBar.jsp"></jsp:include>
-
-
-                <!-- Main Content -->
-                <main class="flex-1 flex flex-col">
-                    <!-- Header -->
-                    <header class="flex justify-between items-center bg-gray-800 p-4 shadow-md">
-                        <h1 class="text-2xl font-bold text-green-400">Order List</h1>
-                        <div class="flex items-center space-x-4">
-                            <button class="flex items-center text-white">
-                                <img alt="User avatar" class="mr-2 rounded-full" height="30" src="https://storage.googleapis.com/a1aa/image/_qCewoK0KXQhWyQzRe9zG7PpYaYijDdWdPLzWZ3kkg8.jpg" width="30"/>
-                                My Account
-                            </button>
-                        </div>
-                    </header>
-
-                    <!-- Main Section -->
-                    <section class="flex-1 p-4 overflow-y-auto">
-                        <!-- Filter and Search Section -->
-                        <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-800 p-4 rounded-lg shadow-md">
-                            <!-- Filter Form -->
-                            <form id="filterForm" action="${pageContext.request.contextPath}/organizerOrders" method="get" class="flex items-center space-x-4">
-                            <!-- Truyền eventId từ request -->
+            <main class="flex-1 flex flex-col">
+                <header class="flex justify-between items-center bg-gray-800 p-4 shadow-md">
+                    <h1 class="text-2xl font-bold text-green-400">Order List</h1>
+                    <div class="flex items-center space-x-4">
+                        <button class="flex items-center text-white">
+                            <img alt="User avatar" class="mr-2 rounded-full" height="30" src="https://storage.googleapis.com/a1aa/image/_qCewoK0KXQhWyQzRe9zG7PpYaYijDdWdPLzWZ3kkg8.jpg" width="30"/>
+                            My Account
+                        </button>
+                    </div>
+                </header>
+                <section class="flex-1 p-4 overflow-y-auto">
+                    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-800 p-4 rounded-lg shadow-md">
+                        <form id="filterForm" action="${pageContext.request.contextPath}/organizerOrders" method="get" class="flex items-center space-x-4">
                             <input type="hidden" name="eventId" value="${eventId}" />
                             <label for="paymentStatus" class="mr-2 text-white font-medium">Payment Status:</label>
                             <select id="paymentStatus" name="paymentStatus" class="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-green-500">
                                 <option value="all" <c:if test="${paymentStatus eq 'all'}">selected</c:if>>All</option>
                                 <option value="paid" <c:if test="${paymentStatus eq 'paid'}">selected</c:if>>Paid</option>
                                 <option value="pending" <c:if test="${paymentStatus eq 'pending'}">selected</c:if>>Pending</option>
-                                </select>
-                                <input type="submit" value="Filter" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition-colors duration-200"/>
-                            </form>
-
-                            <!-- Search Form -->
-                            <form id="searchForm" action="${pageContext.request.contextPath}/organizerOrders" method="get" class="flex items-center space-x-4 mt-4 sm:mt-0">
-                            <!-- Truyền eventId từ request -->
+                            </select>
+                            <input type="submit" value="Filter" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition-colors duration-200"/>
+                        </form>
+                        <form id="searchForm" action="${pageContext.request.contextPath}/organizerOrders" method="get" class="flex items-center space-x-4 mt-4 sm:mt-0">
                             <input type="hidden" name="eventId" value="${eventId}" />
                             <input type="text" name="searchOrder" placeholder="Search by customer name" 
                                    class="p-2 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-green-500" 
@@ -77,10 +62,7 @@
                                 Search
                             </button>
                         </form>
-
                     </div>
-
-                    <!-- Orders Table -->
                     <div class="bg-gray-800 rounded-lg shadow-lg overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-700">
                             <thead class="bg-gray-700">
@@ -110,18 +92,18 @@
                             </thead>
                             <tbody class="bg-gray-800 divide-y divide-gray-700">
                                 <c:forEach var="order" items="${orders}">
-                                    <tr class="hover:bg-gray-700 transition duration-150 cursor-pointer" onclick="window.open('${pageContext.request.contextPath}/orderDetail?orderId=${order.orderId}', '_blank')">
-                                        <td class="px-6 py-4 text-sm">${order.orderId}</td>
+                                    <tr class="hover:bg-gray-700 transition duration-150 cursor-pointer" onclick="window.open('${pageContext.request.contextPath}/orderDetail?orderId=${order.orderSummary.orderId}', '_blank')">
+                                        <td class="px-6 py-4 text-sm">${order.orderSummary.orderId}</td>
                                         <td class="px-6 py-4 text-sm">
-                                            <fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
+                                            <fmt:formatDate value="${order.orderSummary.orderDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
                                         </td>
                                         <td class="px-6 py-4 text-sm">
-                                            <fmt:formatNumber value="${order.grandTotal}" type="number" pattern="#,##0 đ"/>
+                                            <fmt:formatNumber value="${order.orderSummary.grandTotal}" type="number" pattern="#,##0 đ"/>
                                         </td>
-                                        <td class="px-6 py-4 text-sm">${order.paymentStatus}</td>
-                                        <td class="px-6 py-4 text-sm">${order.customerName}</td>
-                                        <td class="px-6 py-4 text-sm">${order.eventName}</td>
-                                        <td class="px-6 py-4 text-sm">${order.location}</td>
+                                        <td class="px-6 py-4 text-sm">${order.orderSummary.paymentStatus}</td>
+                                        <td class="px-6 py-4 text-sm">${order.orderSummary.customerName}</td>
+                                        <td class="px-6 py-4 text-sm">${order.orderSummary.eventName}</td>
+                                        <td class="px-6 py-4 text-sm">${order.orderSummary.location}</td>
                                     </tr>
                                 </c:forEach>
                                 <c:if test="${empty orders}">
@@ -132,8 +114,7 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Pagination -->
+                    <!-- Phần phân trang giữ nguyên -->
                     <c:if test="${totalPages gt 1}">
                         <div class="flex justify-center items-center mt-6 space-x-1">
                             <c:set var="displayPages" value="5" />

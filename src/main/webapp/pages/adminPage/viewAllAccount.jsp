@@ -98,11 +98,11 @@
                                             <tr class="border-b hover:bg-gray-50">
                                                 <td class="px-6 py-4 whitespace-nowrap font-medium">${customer.customerId}</td>
                                                 <td class="px-6 py-4 font-medium">
-                                                    <a href="${pageContext.request.contextPath}/ViewDetailAccountController?id=${customer.customerId}" target="_blank" class="text-blue-600 hover:underline">
+                                                    <a href="${pageContext.request.contextPath}/ViewDetailAccountController?id=${customer.customerId}" class="text-blue-600 hover:underline">
                                                         ${customer.fullName}
                                                     </a>
-
                                                 </td>
+
                                                 <td class="px-6 py-4">${customer.email}</td>
                                                 <td class="px-6 py-4">
                                                     <span class="py-1 px-3 rounded-full text-xs font-bold
@@ -164,43 +164,43 @@
         <!-- SweetAlert JS for confirmation popups -->
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
-                                      function updateStatus(customerId, action) {
-                                          var popupTitle, popupMessage, popupIcon;
-                                          if (action === 'activate') {
-                                              popupTitle = "Restore Account";
-                                              popupMessage = "Are you sure you want to restore customer #" + customerId + " account?";
-                                              popupIcon = "info";
-                                          } else if (action === 'inactive') {
-                                              popupTitle = "Ban Account";
-                                              popupMessage = "Are you sure you want to ban customer #" + customerId + " account?";
-                                              popupIcon = "error";
-                                          } else {
-                                              popupTitle = "Confirm";
-                                              popupMessage = "Do you want to update customer #" + customerId + " account?";
-                                              popupIcon = "warning";
-                                          }
-                                          swal({
-                                              title: popupTitle,
-                                              text: popupMessage,
-                                              icon: popupIcon,
-                                              buttons: true,
-                                              dangerMode: true,
-                                          }).then((willUpdate) => {
-                                              if (willUpdate) {
-                                                  fetch('${pageContext.request.contextPath}/DeactivateAccountController?id=' + customerId + '&action=' + action, {
-                                                      method: 'GET'
-                                                  })
-                                                          .then(response => response.text())
-                                                          .then(result => {
-                                                              swal("Success", "Customer status updated successfully!", "success")
-                                                                      .then(() => window.location.reload());
-                                                          })
-                                                          .catch(error => {
-                                                              swal("Error", "Error: " + error, "error");
-                                                          });
-                                              }
-                                          });
-                                      }
+                                                                function updateStatus(customerId, action) {
+                                                                    var popupTitle, popupMessage, popupIcon;
+                                                                    if (action === 'activate') {
+                                                                        popupTitle = "Restore Account";
+                                                                        popupMessage = "Are you sure you want to restore customer #" + customerId + " account?";
+                                                                        popupIcon = "info";
+                                                                    } else if (action === 'inactive') {
+                                                                        popupTitle = "Ban Account";
+                                                                        popupMessage = "Are you sure you want to ban customer #" + customerId + " account?";
+                                                                        popupIcon = "error";
+                                                                    } else {
+                                                                        popupTitle = "Confirm";
+                                                                        popupMessage = "Do you want to update customer #" + customerId + " account?";
+                                                                        popupIcon = "warning";
+                                                                    }
+                                                                    swal({
+                                                                        title: popupTitle,
+                                                                        text: popupMessage,
+                                                                        icon: popupIcon,
+                                                                        buttons: true,
+                                                                        dangerMode: true,
+                                                                    }).then((willUpdate) => {
+                                                                        if (willUpdate) {
+                                                                            fetch('${pageContext.request.contextPath}/DeactivateAccountController?id=' + customerId + '&action=' + action, {
+                                                                                method: 'GET'
+                                                                            })
+                                                                                    .then(response => response.text())
+                                                                                    .then(result => {
+                                                                                        swal("Success", "Customer status updated successfully!", "success")
+                                                                                                .then(() => window.location.reload());
+                                                                                    })
+                                                                                    .catch(error => {
+                                                                                        swal("Error", "Error: " + error, "error");
+                                                                                    });
+                                                                        }
+                                                                    });
+                                                                }
         </script>
     </body>
 </html>

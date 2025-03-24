@@ -4,6 +4,7 @@
     Author     : Tang Thanh Vui - CE180901
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
@@ -13,10 +14,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>All Events</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vi.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
         <style>
             body {
                 background-color: black;
@@ -287,6 +289,37 @@
                 box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
             }
 
+            /* All Events Section */
+            .event-info-all_events {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+
+            #no-events-message {
+                display: none; /* Mặc định ẩn, sẽ được điều khiển bởi JavaScript */
+            }
+
+            #event-container {
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                min-height: 200px;
+            }
+
+            .row.gy-4 {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+
+            .col-12.col-sm-6.col-md-4.col-lg-3 {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+
             /*All Events*/
             .title-all_events {
                 text-align: center;
@@ -295,7 +328,6 @@
             }
             .event-card-all_events {
                 background-color: #ffffff;
-                border: 1px solid #ddd;
                 border-radius: 8px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
@@ -316,7 +348,7 @@
                 background-color: #f0f0f0;
                 display: block;
                 transition: filter 0.3s;
-                object-fit: cover;
+                object-fit: fill;
                 transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             }
 
@@ -325,10 +357,31 @@
                 transform: scale(1.1);
                 box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.5);
             }
+            .event-card-all_events h4 {
+                font-size: 16px;
+                margin: 10px 0 5px;
+                color: #000000;
+            }
+            .event-card-all_events p {
+                font-size: 14px;
+                margin: 0 0;
+                color: #000000;
+            }
+            #pagination a {
+                margin: 0 5px;
+                padding: 5px 10px;
+                text-decoration: none;
+                color: #007bff;
+            }
+            #pagination a.active {
+                font-weight: bold;
+                color: #0056b3;
+            }
             .g-4, .gy-4 {
                 --bs-gutter-y: 1.5rem;
                 margin: 0 7%;
             }
+
             .py-4 {
                 padding-top: 0.5rem !important;
                 padding-bottom: 1.5rem !important;
@@ -340,9 +393,9 @@
         <jsp:include page="../../components/header.jsp"></jsp:include>
 
             <!-- Filter Form -->
-            <form id="filterForm" action="${pageContext.request.contextPath}/allEvents" method="GET" class="filter-container">
-            <!-- Include the search query in the form -->
-            <input type="hidden" name="query" value="${searchQuery}">
+            <form id="filterForm" class="filter-container">
+                <!-- Include the search query in the form -->
+                <input type="hidden" name="query" value="${searchQuery}">
 
             <!-- Filter Section -->
             <div class="filter-row">
@@ -397,7 +450,7 @@
                     </div>
                 </div>
 
-                <!-- Filter Price (Radio Selection - Tùy chỉnh giống Category) -->
+                <!-- Filter Price (Radio Selection) -->
                 <div class="filter-group price-group">
                     <label for="priceDropdown">Price:</label>
                     <div class="category-toggle" data-type="price">
@@ -418,12 +471,12 @@
                     <div class="category-list" data-type="price">
                         <input type="radio" name="price" value="below_150" ${selectedPrice == 'below_150' ? 'checked' : ''}> Below 150 <br>
                         <input type="radio" name="price" value="between_150_300" ${selectedPrice == 'between_150_300' ? 'checked' : ''}> 150 - 300 <br>
-                        <input type="radio" name="price" value="greater_300" ${selectedPrice == 'greater_300' ? 'checked' : ''}> Above 300 <br>
+                        <input type="radio" name="price" value="above_300" ${selectedPrice == 'above_300' ? 'checked' : ''}> Above 300 <br>
                         <input type="radio" name="price" value="" ${empty selectedPrice ? 'checked' : ''}> All Prices <br>
                     </div>
                 </div>
 
-                <!-- Filter Location (Radio Selection - Tùy chỉnh giống Category) -->
+                <!-- Filter Location (Radio Selection) -->
                 <div class="filter-group location-group">
                     <label for="locationDropdown">Location:</label>
                     <div class="category-toggle" data-type="location">
@@ -482,7 +535,7 @@
                         <input type="radio" name="location" value="Tỉnh Kon Tum" ${selectedLocation == 'Tỉnh Kon Tum' ? 'checked' : ''}> Kon Tum <br>
                         <input type="radio" name="location" value="Tỉnh Gia Lai" ${selectedLocation == 'Tỉnh Gia Lai' ? 'checked' : ''}> Gia Lai <br>
                         <input type="radio" name="location" value="Tỉnh Đắk Lắk" ${selectedLocation == 'Tỉnh Đắk Lắk' ? 'checked' : ''}> Đắk Lắk <br>
-                                               <input type="radio" name="location" value="Thành phố Hồ Chí Minh" ${selectedLocation == 'Thành phố Hồ Chí Minh' ? 'checked' : ''}> Hồ Chí Minh <br>
+                        <input type="radio" name="location" value="Thành phố Hồ Chí Minh" ${selectedLocation == 'Thành phố Hồ Chí Minh' ? 'checked' : ''}> Hồ Chí Minh <br>
                         <input type="radio" name="location" value="Tỉnh Đắk Nông" ${selectedLocation == 'Tỉnh Đắk Nông' ? 'checked' : ''}> Đắk Nông <br>
                         <input type="radio" name="location" value="Tỉnh Lâm Đồng" ${selectedLocation == 'Tỉnh Lâm Đồng' ? 'checked' : ''}> Lâm Đồng <br>
                         <input type="radio" name="location" value="Tỉnh Bình Phước" ${selectedLocation == 'Tỉnh Bình Phước' ? 'checked' : ''}> Bình Phước <br>
@@ -506,286 +559,531 @@
                     </div>
                 </div>
 
-                <!-- Apply Button (Đặt trực tiếp trong filter-row, không dùng filter-group) -->
+                <!-- Apply Button -->
                 <div class="apply-button">
-                    <button type="submit" class="btn btn-success">Apply</button>
+                    <button type="button" id="applyFilter" class="btn btn-success">Apply</button>
                 </div>
             </div>
         </form>
 
-        <!-- Check if there are no filtered events -->
-        <c:choose>
-            <c:when test="${empty filteredEvents}">
-                <p class="text-center">Not Event Found From Your Filter And Search</p>
-                <!--All Event--> 
-                <h2 class="text-xl font-bold  text-center" style="margin-left: 4%;">
-                    <i class="fas fa-calendar-week text-green-500 mr-2"></i> All Events For You
-                </h2>
-                <div class="container py-4">
-                    <div class="row gy-4" id="event-container">
-                        <!-- Loop through paginated events -->
-                        <c:forEach var="event" items="${paginatedEventsAll}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                    </a>
-                                </div>
+        <!-- All Events Section -->
+        <div class="event-info-all_events">
+            <p class="text-center" id="no-events-message" style="display: ${empty filteredEvents ? 'block' : 'none'};">
+                No Events Found From Your Filter And Search
+            </p>
+            <h2 id="all-events-title" class="text-xl font-bold text-center" style="margin-left: 4%;">
+                <i class="fas fa-calendar-week text-green-500 mr-2"></i>
+                <span id="title-text">${empty filteredEvents ? 'All Events For You' : 'Filtered Events For You'}</span>
+            </h2>
+            <div class="container py-4">
+                <div class="row gy-4" id="event-container">
+                    <c:forEach var="event" items="${empty filteredEvents ? paginatedEventsAll : filteredEvents}">
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <div class="event-card-all_events">
+                                <a style="text-decoration: none;" href="eventDetail?id=${event.event.eventId}">
+                                    <img src="${event.eventImage.imageUrl}" alt="${event.eventImage.imageTitle}" />
+                                    <h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">
+                                        ${event.event.eventName}
+                                    </h2>
+                                    <p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">
+                                        From <fmt:formatNumber value="${event.minPrice}" currencyCode="VND" minFractionDigits="0" /> VND
+                                    </p>
+                                    <p class="text-sm font-semibold" style="color: white; background-color: #121212;">
+                                        <i class="far fa-calendar-alt mr-2"></i>
+                                        <span><fmt:formatDate value="${event.firstStartDate}" pattern="hh:mm:ss a, dd MMM yyyy"/></span>
+                                    </p>
+                                </a>
                             </div>
-                        </c:forEach>
-                    </div>
+                        </div>
+                    </c:forEach>
                 </div>
-                <!-- Bootstrap JS for All Events-->
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-            </c:when>
-            <c:otherwise>
-                <div class="container py-4">
-                    <div class="row gy-4" id="event-container">
-                        <!-- Loop through paginated events -->
-                        <c:forEach var="event" items="${filteredEvents}">
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="${event.eventId}">
-                                <div class="event-card-all_events">
-                                    <a style="text-decoration: none" href="eventDetail?id=${event.eventId}">
-                                        <img src="${event.imageUrl}" alt="${event.eventName}" />
-                                    </a>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </div>
+                <div id="pagination" class="text-center mt-4">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <c:if test="${currentPage > 1}">
+                                <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>
+                                <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${currentPage - 1}); return false;">Prev</a></li>
+                                </c:if>
+                                <c:forEach begin="${currentPage - 2 > 0 ? currentPage - 2 : 1}" end="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}" var="i">
+                                    <c:choose>
+                                        <c:when test="${i == currentPage}">
+                                        <li class="page-item active"><span class="page-link">${i}</span></li>
+                                        </c:when>
+                                        <c:otherwise>
+                                        <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${i}); return false;">${i}</a></li>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                                <c:if test="${currentPage < totalPages}">
+                                <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${currentPage + 1}); return false;">Next</a></li>
+                                <li class="page-item"><a class="page-link" href="#" onclick="loadEvents(${totalPages}); return false;">Last</a></li>
+                                </c:if>
+                        </ul>
+                    </nav>
                 </div>
-            </c:otherwise>
-        </c:choose>
+            </div>
+        </div>
 
-        <!--Footer-->
-        <jsp:include page="../../components/footer.jsp"></jsp:include>
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+        <script>
+                                    // Store initial filters from header
+                                    var initialFilters = {
+                                        query: '${searchQuery != null ? searchQuery : ''}',
+                                        category: [<c:forEach var="cat" items="${selectedCategories}">${cat},</c:forEach>],
+                                        location: '${selectedLocation != null ? selectedLocation : ''}',
+                                        startDate: '${selectedStartDate != null ? selectedStartDate : ''}',
+                                        endDate: '${selectedEndDate != null ? selectedEndDate : ''}',
+                                        price: '${selectedPrice != null ? selectedPrice : ''}'
+                                    };
 
-            <script>
-                // Khởi tạo Flatpickr cho Start Date
-                flatpickr("#startDate", {
-                    dateFormat: "Y-m-d",
-                    defaultDate: "${selectedStartDate}",
-                    locale: "vi",
-                    maxDate: new Date().fp_incr(365), // Giới hạn tối đa là 1 năm từ hôm nay
-                    minDate: "today", // Giới hạn tối thiểu là ngày hôm nay
-                    onChange: function (selectedDates, dateStr, instance) {
-                        // Khi chọn ngày bắt đầu, cập nhật giá trị và giới hạn tối thiểu cho endDate
-                        document.getElementById('startDate').value = dateStr;
-                        const endDatePicker = document.getElementById('endDate')._flatpickr;
-                        const endDateValue = document.getElementById('endDate').value;
+                                    var currentFilters = $.extend(true, {}, initialFilters); // Khởi tạo currentFilters từ initialFilters
 
-                        if (selectedDates[0]) {
-                            // Đặt minDate của endDate là ngày lớn hơn startDate ít nhất 1 ngày
-                            const minEndDate = new Date(selectedDates[0]);
-                            minEndDate.setDate(minEndDate.getDate() + 1); // Tăng 1 ngày
-                            endDatePicker.set("minDate", minEndDate);
+                                    function loadEvents(page, filters = null) {
+                                        // Nếu filters được truyền vào (từ Apply), cập nhật currentFilters
+                                        if (filters) {
+                                            currentFilters = $.extend(true, {}, initialFilters, filters);
+                                        }
+                                        currentFilters.page = page;
 
-                            // Nếu endDate hiện tại nhỏ hơn hoặc bằng startDate, xóa endDate
-                            if (endDateValue && new Date(endDateValue) <= selectedDates[0]) {
-                                endDatePicker.clear(); // Xóa giá trị endDate
-                                document.getElementById('endDate').value = "";
-                            }
+                                        if (!currentFilters.category || !Array.isArray(currentFilters.category)) {
+                                            currentFilters.category = initialFilters.category || [];
+                                        }
+
+                                        console.log("Request Parameters:", JSON.stringify(currentFilters, null, 2));
+
+                                        var ajaxData = {
+                                            page: currentFilters.page,
+                                            query: currentFilters.query,
+                                            location: currentFilters.location,
+                                            startDate: currentFilters.startDate,
+                                            endDate: currentFilters.endDate,
+                                            price: currentFilters.price
+                                        };
+                                        if (currentFilters.category.length > 0) {
+                                            ajaxData.category = currentFilters.category;
+                                        }
+
+                                        $.ajax({
+                                            url: '${pageContext.request.contextPath}/allEvents',
+                                            type: 'GET',
+                                            data: ajaxData,
+                                            dataType: 'json',
+                                            traditional: true,
+                                            headers: {'X-Requested-With': 'XMLHttpRequest'},
+                                            success: function (data) {
+                                                console.log("Response Data:", JSON.stringify(data, null, 2));
+                                                updateEventContainer(data.events, data.noFilteredEvents);
+                                                updatePagination(data.totalPages, data.currentPage);
+                                                document.getElementById('all-events-title')?.scrollIntoView({behavior: 'smooth'});
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error('Error loading events:', status, error);
+                                            }
+                                        });
+                                    }
+
+                                    $(document).ready(function () {
+                                        $('#applyFilter').click(function () {
+                                            document.querySelectorAll('.category-toggle.active').forEach(toggle => {
+                                                toggle.classList.remove('active');
+                                            });
+                                            document.querySelectorAll('.category-list.active').forEach(list => {
+                                                list.classList.remove('active');
+                                            });
+                                            console.log("Apply button clicked");
+                                            loadEvents(1, getFilters()); // Cập nhật currentFilters khi nhấn Apply
+                                        });
+
+                                        // Gắn sự kiện phân trang
+                                        $('#pagination').on('click', 'a', function (e) {
+                                            e.preventDefault();
+                                            var page = parseInt($(this).text()) || parseInt($(this).attr('onclick').match(/\d+/)[0]);
+                                            loadEvents(page); // Sử dụng currentFilters hiện tại
+                                        });
+
+                                        attachCheckboxEvents();
+
+                                        // Gọi loadEvents ngay khi trang tải để đồng bộ với EventDetailController
+                                        loadEvents(${currentPage});
+                                    });
+
+                                    function attachCheckboxEvents() {
+                                        document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
+                                            checkbox.removeEventListener('change', updateCategoryDropdown); // Xóa sự kiện cũ
+                                            checkbox.addEventListener('change', updateCategoryDropdown);
+                                        });
+                                    }
+
+                                    function updateCategoryDropdown() {
+                                        try {
+                                            const selectedCategories = Array.from(
+                                                    document.querySelectorAll('.category-list input[type="checkbox"]:checked')
+                                                    ).map(cb => cb.nextSibling && cb.nextSibling.textContent ? cb.nextSibling.textContent.trim() : '');
+                                            const categoryToggle = document.querySelector('.category-toggle label');
+                                            if (!categoryToggle) {
+                                                console.warn("Category toggle label not found");
+                                                return;
+                                            }
+                                            if (selectedCategories.length > 0) {
+                                                if (selectedCategories.length > 1) {
+                                                    const latestCategory = this.nextSibling && this.nextSibling.textContent ? this.nextSibling.textContent.trim() : '';
+                                                    categoryToggle.textContent = latestCategory ? `${latestCategory}...` : 'Category';
+                                                } else {
+                                                    categoryToggle.textContent = selectedCategories[0] || 'Category';
+                                                }
+                                            } else {
+                                                categoryToggle.textContent = 'Category';
+                                            }
+                                        } catch (error) {
+                                            console.error("Error in updateCategoryDropdown:", error);
+                                        }
+                                    }
+
+                                    function updateEventContainer(events, noFilteredEvents) {
+                                        console.log("Updating event container with events:", events);
+                                        var container = $('#event-container');
+                                        var titleText = $('#title-text');
+                                        var noEventsMessage = $('#no-events-message');
+
+                                        // Cập nhật thông báo và tiêu đề
+                                        if (noFilteredEvents) {
+                                            noEventsMessage.show();
+                                            titleText.text('All Events For You');
+                                        } else {
+                                            noEventsMessage.hide();
+                                            titleText.text('Filtered Events For You');
+                                        }
+
+                                        // Xóa nội dung cũ của container
+                                        container.empty();
+
+                                        // Thêm sự kiện
+                                        if (events && events.length > 0) {
+                                            events.forEach(function (eventAjax, index) {
+                                                try {
+                                                    var formattedPrice = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', minimumFractionDigits: 0}).format(eventAjax.minPrice).replace('₫', '').trim();
+                                                    var formattedDate = moment(eventAjax.firstStartDate).format('hh:mm:ss A, DD MMM YYYY');
+                                                    var eventHtml = '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
+                                                            '<div class="event-card-all_events">' +
+                                                            '<a style="text-decoration: none;" href="eventDetail?id=' + eventAjax.id + '">' +
+                                                            '<img src="' + eventAjax.imageUrl + '" alt="' + eventAjax.imageTitle + '" />' +
+                                                            '<h2 class="text-white text-sm font-semibold mb-2 h-[56px] line-clamp-2 overflow-hidden" style="margin-bottom: -0.5rem !important; padding: 0.5rem !important; background-color: #121212;">' +
+                                                            eventAjax.name +
+                                                            '</h2>' +
+                                                            '<p class="text-sm font-semibold" style="color: #00a651; background-color: #121212;">From ' + formattedPrice + ' VND</p>' +
+                                                            '<p class="text-sm font-semibold" style="color: white; background-color: #121212;">' +
+                                                            '<i class="far fa-calendar-alt mr-2"></i>' +
+                                                            '<span>' + formattedDate + '</span>' +
+                                                            '</p>' +
+                                                            '</a>' +
+                                                            '</div>' +
+                                                            '</div>';
+                                                    container.append(eventHtml);
+                                                    console.log("Added event " + index + ": " + eventAjax.name);
+                                                    // Kiểm tra DOM sau khi thêm
+                                                    console.log("Number of events in DOM:", container.children().length);
+                                                } catch (error) {
+                                                    console.error("Error adding event " + index + ": ", error);
+                                                }
+                                            });
+                                        } else {
+                                            container.html('<p class="text-center">No Events Found</p>');
+                                        }
+
+                                        // Kiểm tra DOM cuối cùng
+                                        console.log("Final DOM content of #event-container:", container.html());
+                                        attachCheckboxEvents();
+                                    }
+
+                                    function updatePagination(totalPages, currentPage) {
+                                        var pagination = $('#pagination');
+                                        pagination.empty();
+                                        pagination.append('<nav aria-label="Page navigation"><ul class="pagination justify-content-center"></ul></nav>');
+                                        var ul = pagination.find('ul');
+
+                                        if (totalPages <= 1) {
+                                            ul.append('<li class="page-item active"><span class="page-link">1</span></li>');
+                                            return;
+                                        }
+
+                                        var displayPages = 5;
+                                        var halfDisplayPages = Math.floor(displayPages / 2);
+                                        var startPage = currentPage - halfDisplayPages;
+                                        var endPage = currentPage + halfDisplayPages;
+
+                                        if (startPage < 1)
+                                            startPage = 1;
+                                        if (endPage > totalPages)
+                                            endPage = totalPages;
+
+                                        if (currentPage > 1) {
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(1); return false;">First</a></li>');
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage - 1) + '); return false;">Prev</a></li>');
+                                        }
+
+                                        for (var i = startPage; i <= endPage; i++) {
+                                            if (i === currentPage) {
+                                                ul.append('<li class="page-item active"><span class="page-link">' + i + '</span></li>');
+                                            } else {
+                                                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + i + '); return false;">' + i + '</a></li>');
+                                            }
+                                        }
+
+                                        if (currentPage < totalPages) {
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + (currentPage + 1) + '); return false;">Next</a></li>');
+                                            ul.append('<li class="page-item"><a class="page-link" href="#" onclick="loadEvents(' + totalPages + '); return false;">Last</a></li>');
+                                        }
+                                    }
+
+                                    function getFilters() {
+                                        var filters = {};
+                                        var startDateVal = $('#startDate').val();
+                                        var endDateVal = $('#endDate').val();
+                                        var categoryVals = $('input[name="category"]:checked').map(function () {
+                                            return this.value;
+                                        }).get();
+                                        var priceVal = $('input[name="price"]:checked').val();
+                                        var locationVal = $('input[name="location"]:checked').val();
+                                        var queryVal = $('input[name="query"]').val();
+
+                                        if (startDateVal)
+                                            filters.startDate = startDateVal;
+                                        if (endDateVal)
+                                            filters.endDate = endDateVal;
+                                        if (categoryVals.length > 0)
+                                            filters.category = categoryVals;
+                                        if (priceVal !== undefined && priceVal !== "")
+                                            filters.price = priceVal;
+                                        if (locationVal !== undefined && locationVal !== "")
+                                            filters.location = locationVal;
+                                        if (queryVal)
+                                            filters.query = queryVal;
+
+                                        console.log("Filters to be sent:", JSON.stringify(filters, null, 2));
+                                        return filters;
+                                    }
+        </script>
+
+        <!-- Flatpickr and Dropdown Scripts -->
+        <script>
+            // Khởi tạo Flatpickr cho Start Date
+            flatpickr("#startDate", {
+                dateFormat: "Y-m-d",
+                defaultDate: "${selectedStartDate}",
+                locale: "vi",
+                maxDate: new Date().fp_incr(365),
+                minDate: "today",
+                onChange: function (selectedDates, dateStr, instance) {
+                    document.getElementById('startDate').value = dateStr;
+                    const endDatePicker = document.getElementById('endDate')._flatpickr;
+                    const endDateValue = document.getElementById('endDate').value;
+
+                    if (selectedDates[0]) {
+                        const minEndDate = new Date(selectedDates[0]);
+                        minEndDate.setDate(minEndDate.getDate() + 1);
+                        endDatePicker.set("minDate", minEndDate);
+
+                        if (endDateValue && new Date(endDateValue) <= selectedDates[0]) {
+                            endDatePicker.clear();
+                            document.getElementById('endDate').value = "";
                         }
-                    },
-                    onReady: function (selectedDates, dateStr, instance) {
-                        // Thêm các nút preset
-                        const ranges = document.createElement('div');
-                        ranges.className = 'flatpickr-ranges';
-                        ranges.innerHTML = `
+                    }
+                },
+                onReady: function (selectedDates, dateStr, instance) {
+                    const ranges = document.createElement('div');
+                    ranges.className = 'flatpickr-ranges';
+                    ranges.innerHTML = `
                         <button data-range="today">Hôm nay</button>
                         <button data-range="tomorrow">Ngày mai</button>
                         <button data-range="weekend">Cuối tuần này</button>
                         <button data-range="month">Tháng này</button>
                     `;
-                        instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
+                    instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
 
-                        ranges.querySelectorAll('button').forEach(button => {
-                            button.addEventListener('click', function () {
-                                const range = this.getAttribute('data-range');
-                                let date;
-                                const now = new Date();
-                                switch (range) {
-                                    case 'today':
-                                        date = now;
-                                        break;
-                                    case 'tomorrow':
-                                        date = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-                                        break;
-                                    case 'weekend':
-                                        date = new Date(now);
-                                        date.setDate(date.getDate() + (6 - date.getDay() + 1) % 7);
-                                        break;
-                                    case 'month':
-                                        date = new Date(now.getFullYear(), now.getMonth(), 1);
-                                        break;
-                                }
-                                instance.setDate(date);
-                                document.getElementById('startDate').value = instance.formatDate(date, "Y-m-d");
-                                const endDatePicker = document.getElementById('endDate')._flatpickr;
-                                const minEndDate = new Date(date);
-                                minEndDate.setDate(minEndDate.getDate() + 1);
-                                endDatePicker.set("minDate", minEndDate);
-                                if (document.getElementById('endDate').value && new Date(document.getElementById('endDate').value) <= date) {
-                                    endDatePicker.clear();
-                                    document.getElementById('endDate').value = "";
-                                }
-                            });
-                        });
-                    }
-                });
-
-                // Khởi tạo Flatpickr cho End Date
-                flatpickr("#endDate", {
-                    dateFormat: "Y-m-d",
-                    defaultDate: "${selectedEndDate}",
-                    locale: "vi",
-                    maxDate: new Date().fp_incr(365), // Giới hạn tối đa là 1 năm từ hôm nay
-                    minDate: "${selectedStartDate}" ? new Date("${selectedStartDate}").fp_incr(1) : "tomorrow", // Nếu có startDate thì min là ngày sau startDate, không thì là ngày mai
-                    onChange: function (selectedDates, dateStr, instance) {
-                        // Khi chọn ngày kết thúc, cập nhật giá trị
-                        document.getElementById('endDate').value = dateStr;
-                        const startDateValue = document.getElementById('startDate').value;
-                        const startDate = startDateValue ? new Date(startDateValue) : null;
-
-                        // Nếu startDate đã chọn và endDate nhỏ hơn hoặc bằng startDate, thông báo và xóa
-                        if (startDate && selectedDates[0] <= startDate) {
-                            alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
-                            instance.clear();
-                            document.getElementById('endDate').value = "";
-                        }
-                    },
-                    onReady: function (selectedDates, dateStr, instance) {
-                        // Thêm các nút preset
-                        const ranges = document.createElement('div');
-                        ranges.className = 'flatpickr-ranges';
-                        ranges.innerHTML = `
-                            <button data-range="today">Hôm nay</button>
-                            <button data-range="tomorrow">Ngày mai</button>
-                            <button data-range="weekend">Cuối tuần này</button>
-                            <button data-range="month">Tháng này</button>
-                        `;
-                        instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
-
-                        ranges.querySelectorAll('button').forEach(button => {
-                            button.addEventListener('click', function () {
-                                const range = this.getAttribute('data-range');
-                                let date;
-                                const now = new Date();
-                                switch (range) {
-                                    case 'today':
-                                        date = now;
-                                        break;
-                                    case 'tomorrow':
-                                        date = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-                                        break;
-                                    case 'weekend':
-                                        date = new Date(now);
-                                        date.setDate(date.getDate() + (6 - date.getDay() + 1) % 7);
-                                        break;
-                                    case 'month':
-                                        date = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Ngày cuối tháng
-                                        break;
-                                }
-                                const startDateValue = document.getElementById('startDate').value;
-                                const startDate = startDateValue ? new Date(startDateValue) : null;
-
-                                if (startDate && date <= startDate) {
-                                    alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
-                                    return;
-                                }
-                                instance.setDate(date);
-                                document.getElementById('endDate').value = instance.formatDate(date, "Y-m-d");
-                            });
-                        });
-                    }
-                });
-
-                // Hàm toggle cho Category, Price, và Location (giữ nguyên)
-                document.querySelectorAll('.category-toggle').forEach(toggle => {
-                    toggle.addEventListener('click', function () {
-                        const categoryList = this.nextElementSibling;
-                        this.classList.toggle('active');
-                        categoryList.classList.toggle('active');
-                    });
-                });
-
-                // Cập nhật dropdown khi người dùng chọn category
-                document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
-                    checkbox.addEventListener('change', function () {
-                        const selectedCategories = Array.from(
-                                document.querySelectorAll('.category-list input[type="checkbox"]:checked')
-                                ).map(cb => cb.nextSibling.textContent.trim());
-
-                        const categoryToggle = document.querySelector('.category-toggle label');
-
-                        if (selectedCategories.length > 0) {
-                            if (selectedCategories.length > 1) {
-                                // Hiển thị category mới được chọn gần đây nhất kèm "..."
-                                const latestCategory = this.nextSibling.textContent.trim(); // Lấy category từ checkbox vừa thay đổi
-                                categoryToggle.textContent = `${latestCategory}...`;
-                            } else {
-                                // Nếu chỉ có 1 category, hiển thị category đó
-                                categoryToggle.textContent = selectedCategories[0];
+                    ranges.querySelectorAll('button').forEach(button => {
+                        button.addEventListener('click', function () {
+                            const range = this.getAttribute('data-range');
+                            let date;
+                            const now = new Date();
+                            switch (range) {
+                                case 'today':
+                                    date = now;
+                                    break;
+                                case 'tomorrow':
+                                    date = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                                    break;
+                                case 'weekend':
+                                    date = new Date(now);
+                                    date.setDate(date.getDate() + (6 - date.getDay() + 1) % 7);
+                                    break;
+                                case 'month':
+                                    date = new Date(now.getFullYear(), now.getMonth(), 1);
+                                    break;
                             }
-                        } else {
-                            // Nếu không có category nào được chọn, hiển thị placeholder "Category"
-                            categoryToggle.textContent = 'Category';
-                        }
+                            instance.setDate(date);
+                            document.getElementById('startDate').value = instance.formatDate(date, "Y-m-d");
+                            const endDatePicker = document.getElementById('endDate')._flatpickr;
+                            const minEndDate = new Date(date);
+                            minEndDate.setDate(minEndDate.getDate() + 1);
+                            endDatePicker.set("minDate", minEndDate);
+                            if (document.getElementById('endDate').value && new Date(document.getElementById('endDate').value) <= date) {
+                                endDatePicker.clear();
+                                document.getElementById('endDate').value = "";
+                            }
+                        });
                     });
-                });
+                }
+            });
 
-                // Cập nhật dropdown ngay khi trang tải (dựa trên sessionScope)
-                window.addEventListener('load', function () {
-                    const selectedCategoryList = "${sessionScope.selectedCategories}"
-                            ? "${sessionScope.selectedCategories}".replace(/[\[\]"]/g, '').split(',')
-                            : [];
+            // Khởi tạo Flatpickr cho End Date
+            flatpickr("#endDate", {
+                dateFormat: "Y-m-d",
+                defaultDate: "${selectedEndDate}",
+                locale: "vi",
+                maxDate: new Date().fp_incr(365),
+                minDate: "${selectedStartDate}" ? new Date("${selectedStartDate}").fp_incr(1) : "tomorrow",
+                onChange: function (selectedDates, dateStr, instance) {
+                    document.getElementById('endDate').value = dateStr;
+                    const startDateValue = document.getElementById('startDate').value;
+                    const startDate = startDateValue ? new Date(startDateValue) : null;
+
+                    if (startDate && selectedDates[0] <= startDate) {
+                        alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
+                        instance.clear();
+                        document.getElementById('endDate').value = "";
+                    }
+                },
+                onReady: function (selectedDates, dateStr, instance) {
+                    const ranges = document.createElement('div');
+                    ranges.className = 'flatpickr-ranges';
+                    ranges.innerHTML = `
+                        <button data-range="today">Hôm nay</button>
+                        <button data-range="tomorrow">Ngày mai</button>
+                        <button data-range="weekend">Cuối tuần này</button>
+                        <button data-range="month">Tháng này</button>
+                    `;
+                    instance.calendarContainer.insertBefore(ranges, instance.calendarContainer.firstChild);
+
+                    ranges.querySelectorAll('button').forEach(button => {
+                        button.addEventListener('click', function () {
+                            const range = this.getAttribute('data-range');
+                            let date;
+                            const now = new Date();
+                            switch (range) {
+                                case 'today':
+                                    date = now;
+                                    break;
+                                case 'tomorrow':
+                                    date = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                                    break;
+                                case 'weekend':
+                                    date = new Date(now);
+                                    date.setDate(date.getDate() + (6 - date.getDay() + 1) % 7);
+                                    break;
+                                case 'month':
+                                    date = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                                    break;
+                            }
+                            const startDateValue = document.getElementById('startDate').value;
+                            const startDate = startDateValue ? new Date(startDateValue) : null;
+
+                            if (startDate && date <= startDate) {
+                                alert("Ngày kết thúc phải lớn hơn ngày bắt đầu!");
+                                return;
+                            }
+                            instance.setDate(date);
+                            document.getElementById('endDate').value = instance.formatDate(date, "Y-m-d");
+                        });
+                    });
+                }
+            });
+
+            // Toggle cho Category, Price, và Location
+            document.querySelectorAll('.category-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    const categoryList = this.nextElementSibling;
+                    this.classList.toggle('active');
+                    categoryList.classList.toggle('active');
+                });
+            });
+
+            // Cập nhật dropdown khi người dùng chọn category
+            document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const selectedCategories = Array.from(
+                            document.querySelectorAll('.category-list input[type="checkbox"]:checked')
+                            ).map(cb => cb.nextSibling && cb.nextSibling.textContent ? cb.nextSibling.textContent.trim() : '');
                     const categoryToggle = document.querySelector('.category-toggle label');
-                    const checkboxes = document.querySelectorAll('.category-list input[type="checkbox"]');
-
-                    if (selectedCategoryList.length > 0) {
-                        let latestCategoryName = '';
-                        checkboxes.forEach(checkbox => {
-                            const categoryId = checkbox.value;
-                            if (selectedCategoryList.includes(categoryId)) {
-                                latestCategoryName = checkbox.nextSibling.textContent.trim();
-                            }
-                        });
-                        if (selectedCategoryList.length > 1) {
-                            categoryToggle.textContent = `${latestCategoryName}...`;
+                    if (selectedCategories.length > 0) {
+                        if (selectedCategories.length > 1) {
+                            const latestCategory = this.nextSibling && this.nextSibling.textContent ? this.nextSibling.textContent.trim() : '';
+                            categoryToggle.textContent = latestCategory ? `${latestCategory}...` : 'Category';
                         } else {
-                            categoryToggle.textContent = latestCategoryName || 'Category';
+                            categoryToggle.textContent = selectedCategories[0] || 'Category';
                         }
                     } else {
                         categoryToggle.textContent = 'Category';
                     }
-
-                    // Kích hoạt sự kiện change để đảm bảo giao diện đồng bộ
-                    document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
-                        checkbox.dispatchEvent(new Event('change'));
-                    });
                 });
+            });
 
-                // Cập nhật dropdown cho Price
-                document.querySelectorAll('.price-group .category-list input[type="radio"]').forEach(radio => {
-                    radio.addEventListener('change', function () {
-                        const selectedPrice = this.nextSibling.textContent.trim();
-                        const priceToggle = document.querySelector('.price-group .category-toggle label');
-                        priceToggle.textContent = selectedPrice;
+            // Cập nhật dropdown ngay khi trang tải (dựa trên sessionScope)
+            window.addEventListener('load', function () {
+                const selectedCategoryList = "${sessionScope.selectedCategories}"
+                        ? "${sessionScope.selectedCategories}".replace(/[\[\]"]/g, '').split(',')
+                        : [];
+                const categoryToggle = document.querySelector('.category-toggle label');
+                const checkboxes = document.querySelectorAll('.category-list input[type="checkbox"]');
+
+                if (selectedCategoryList.length > 0) {
+                    let latestCategoryName = '';
+                    checkboxes.forEach(checkbox => {
+                        const categoryId = checkbox.value;
+                        if (selectedCategoryList.includes(categoryId)) {
+                            latestCategoryName = checkbox.nextSibling.textContent.trim();
+                        }
                     });
-                });
+                    if (selectedCategoryList.length > 1) {
+                        categoryToggle.textContent = `${latestCategoryName}...`;
+                    } else {
+                        categoryToggle.textContent = latestCategoryName || 'Category';
+                    }
+                } else {
+                    categoryToggle.textContent = 'Category';
+                }
 
-                // Cập nhật dropdown cho Location
-                document.querySelectorAll('.location-group .category-list input[type="radio"]').forEach(radio => {
-                    radio.addEventListener('change', function () {
-                        const selectedLocation = this.nextSibling.textContent.trim();
-                        const locationToggle = document.querySelector('.location-group .category-toggle label');
-                        locationToggle.textContent = selectedLocation;
-                    });
-                });
-
-                // Cập nhật dropdown ngay khi trang tải
                 document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
                     checkbox.dispatchEvent(new Event('change'));
                 });
+            });
+
+            // Cập nhật dropdown cho Price
+            document.querySelectorAll('.price-group .category-list input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const selectedPrice = this.nextSibling.textContent.trim();
+                    const priceToggle = document.querySelector('.price-group .category-toggle label');
+                    priceToggle.textContent = selectedPrice;
+                });
+            });
+
+            // Cập nhật dropdown cho Location
+            document.querySelectorAll('.location-group .category-list input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const selectedLocation = this.nextSibling.textContent.trim();
+                    const locationToggle = document.querySelector('.location-group .category-toggle label');
+                    locationToggle.textContent = selectedLocation;
+                });
+            });
+
+            // Cập nhật dropdown ngay khi trang tải
+            document.querySelectorAll('.category-list input[type="checkbox"]').forEach(checkbox => {
+                checkbox.dispatchEvent(new Event('change'));
+            });
         </script>
+
+        <!-- Footer -->
+        <jsp:include page="../../components/footer.jsp"></jsp:include>
     </body>
 </html>

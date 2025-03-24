@@ -27,6 +27,7 @@ import models.Seat;
 import models.Showtime;
 import models.TicketType;
 import utils.DBContext;
+import viewModels.EventDTO;
 import viewModels.TicketRevenueDTO;
 
 /**
@@ -56,7 +57,8 @@ public class EventDAO extends DBContext {
             List<TicketType> ticketTypes,
             List<Seat> seats) {
 
-        // Khởi tạo Gson với định dạng ngày giờ khớp với SQL Server DATETIME (yyyy-MM-dd HH:mm:ss)
+        // Khởi tạo Gson với định dạng ngày giờ khớp với SQL Server DATETIME (yyyy-MM-dd
+        // HH:mm:ss)
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")
                 .create();
@@ -68,7 +70,7 @@ public class EventDAO extends DBContext {
 
         String sql = "{CALL [dbo].[UpdateEventByID](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
-        try ( CallableStatement stmt = connection.prepareCall(sql)) {
+        try (CallableStatement stmt = connection.prepareCall(sql)) {
             // Thiết lập các tham số đầu vào khớp với stored procedure
             stmt.setInt(1, eventId);
             stmt.setInt(2, customerId);
@@ -126,7 +128,8 @@ public class EventDAO extends DBContext {
             List<TicketType> ticketTypes,
             List<Seat> seats) {
 
-        // Initialize Gson with custom date format matching SQL Server DATETIME (yyyy-MM-dd HH:mm:ss)
+        // Initialize Gson with custom date format matching SQL Server DATETIME
+        // (yyyy-MM-dd HH:mm:ss)
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")
                 .create();
@@ -134,12 +137,17 @@ public class EventDAO extends DBContext {
         // Prepare JSON for ShowTimes, TicketTypes, and Seats
         String showTimesJson = prepareShowTimesJson(showTimes, gson);
         String ticketTypesJson = prepareTicketTypesJson(ticketTypes, showTimes, gson);
-        String seatsJson = (seats != null && !seats.isEmpty()) ? prepareSeatsJson(seats, gson) : null; // Removed ticketTypes parameter since ticketTypeName is now in Seat
+        String seatsJson = (seats != null && !seats.isEmpty()) ? prepareSeatsJson(seats, gson) : null; // Removed
+                                                                                                       // ticketTypes
+                                                                                                       // parameter
+                                                                                                       // since
+                                                                                                       // ticketTypeName
+                                                                                                       // is now in Seat
 
         String sql = "{CALL [dbo].[CreateEvent](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
         EventCreationResult result = new EventCreationResult();
 
-        try ( CallableStatement stmt = connection.prepareCall(sql)) {
+        try (CallableStatement stmt = connection.prepareCall(sql)) {
             // Set input parameters (match stored procedure parameters)
             stmt.setInt(1, customerId);
             stmt.setString(2, organizationName);
@@ -179,7 +187,8 @@ public class EventDAO extends DBContext {
 
             // Check if the creation was successful
             if (result.eventId == -1 || result.organizerId == -1) {
-                throw new SQLException("Failed to create event. EventId or OrganizerId returned -1. Check SQL Server logs for details.");
+                throw new SQLException(
+                        "Failed to create event. EventId or OrganizerId returned -1. Check SQL Server logs for details.");
             }
 
         } catch (SQLException e) {
@@ -206,8 +215,7 @@ public class EventDAO extends DBContext {
             showTimesList.add(new ShowTimeJson(
                     st.getStartDate(),
                     st.getEndDate(),
-                    st.getStatus() != null ? st.getStatus() : "Scheduled"
-            ));
+                    st.getStatus() != null ? st.getStatus() : "Scheduled"));
         }
         return gson.toJson(showTimesList);
     }
@@ -238,8 +246,7 @@ public class EventDAO extends DBContext {
                         tt.getDescription() != null ? tt.getDescription() : "",
                         tt.getPrice(),
                         tt.getColor() != null ? tt.getColor() : "#000000",
-                        tt.getTotalQuantity()
-                ));
+                        tt.getTotalQuantity()));
                 showTimeIndex++;
                 if (showTimeIndex >= showTimes.size()) {
                     showTimeIndex = 0; // Reset index to reuse ShowTimes if more ticket types than show times
@@ -307,7 +314,8 @@ public class EventDAO extends DBContext {
         public String color;
         public int totalQuantity;
 
-        public TicketTypeJson(Timestamp showTimeStartDate, Timestamp showTimeEndDate, String name, String description, double price, String color, int totalQuantity) {
+        public TicketTypeJson(Timestamp showTimeStartDate, Timestamp showTimeEndDate, String name, String description,
+                double price, String color, int totalQuantity) {
             this.showTimeStartDate = showTimeStartDate;
             this.showTimeEndDate = showTimeEndDate;
             this.name = name;
@@ -341,7 +349,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
                 + "FROM Events "
                 + "WHERE event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -355,8 +363,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
             }
         } catch (SQLException e) {
             System.err.println("Error retrieving event: " + e.getMessage());
@@ -376,7 +383,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT image_id, event_id, image_url, image_title "
                 + "FROM EventImages "
                 + "WHERE event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -384,8 +391,7 @@ public class EventDAO extends DBContext {
                         rs.getInt("image_id"),
                         rs.getInt("event_id"),
                         rs.getString("image_url"),
-                        rs.getString("image_title")
-                );
+                        rs.getString("image_title"));
                 images.add(image);
             }
         } catch (SQLException e) {
@@ -406,7 +412,7 @@ public class EventDAO extends DBContext {
                 + "FROM Events e "
                 + "INNER JOIN Organizers o ON e.organizer_id = o.organizer_id "
                 + "WHERE e.event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -418,8 +424,7 @@ public class EventDAO extends DBContext {
                         rs.getString("account_number"),
                         rs.getString("bank_name"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
             }
         } catch (SQLException e) {
             System.err.println("Error retrieving organizer: " + e.getMessage());
@@ -439,7 +444,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT showtime_id, event_id, start_date, end_date, status, created_at, updated_at "
                 + "FROM Showtimes "
                 + "WHERE event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -450,8 +455,7 @@ public class EventDAO extends DBContext {
                         rs.getTimestamp("end_date"),
                         rs.getString("status"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 showTimes.add(showTime);
             }
         } catch (SQLException e) {
@@ -473,7 +477,7 @@ public class EventDAO extends DBContext {
                 + "FROM Showtimes st "
                 + "INNER JOIN TicketTypes tt ON st.showtime_id = tt.showtime_id "
                 + "WHERE st.event_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -487,8 +491,7 @@ public class EventDAO extends DBContext {
                         rs.getInt("total_quantity"),
                         rs.getInt("sold_quantity"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 ticketTypes.add(ticketType);
             }
         } catch (SQLException e) {
@@ -509,7 +512,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT ticket_type_id, showtime_id, name, description, price, color, total_quantity, sold_quantity, created_at, updated_at "
                 + "FROM TicketTypes "
                 + "WHERE showtime_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, showtimeId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -523,8 +526,7 @@ public class EventDAO extends DBContext {
                         rs.getInt("total_quantity"),
                         rs.getInt("sold_quantity"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 ticketTypes.add(ticketType);
             }
         } catch (SQLException e) {
@@ -552,7 +554,7 @@ public class EventDAO extends DBContext {
                 + "    WHERE Showtimes.event_id = ?\n"
                 + "    GROUP BY Seats.seat_row\n"
                 + ")\n"
-                + "SELECT TOP 1 WITH TIES\n"
+                + "SELECT \n"
                 + "    s.seat_id,\n"
                 + "    s.ticket_type_id,\n"
                 + "    s.seat_row,\n"
@@ -563,7 +565,7 @@ public class EventDAO extends DBContext {
                 + "INNER JOIN Showtimes st ON tt.showtime_id = st.showtime_id\n"
                 + "INNER JOIN MaxSeats ms ON s.seat_row = ms.seat_row AND CAST(s.seat_col AS INT) = ms.max_seat_col\n"
                 + "WHERE st.event_id = ?\n"
-                + "ORDER BY ROW_NUMBER() OVER (PARTITION BY s.seat_row ORDER BY s.seat_id);";
+                + "ORDER BY s.seat_row;";
         try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setInt(2, eventId);
@@ -585,7 +587,48 @@ public class EventDAO extends DBContext {
         return seats;
     }
 
-    /*getCategoryByName*/
+    /**
+     * Retrieves the list of seats for the specified event ID.
+     *
+     * @param eventId The ID of the event.
+     * @return A list of Seat objects.
+     */
+    public List<Seat> getUniqueSeatTypesByEventId(int eventId) {
+        List<Seat> seats = new ArrayList<>();
+        String sql = "SELECT \n"
+                + "    s.seat_row,\n"
+                + "    MAX(CAST(s.seat_col AS INT)) AS seat_col\n"
+                + "FROM \n"
+                + "    Seats s\n"
+                + "INNER JOIN \n"
+                + "    TicketTypes tt ON s.ticket_type_id = tt.ticket_type_id\n"
+                + "INNER JOIN \n"
+                + "    Showtimes st ON tt.showtime_id = st.showtime_id\n"
+                + "WHERE \n"
+                + "    st.event_id = ?\n"
+                + "GROUP BY \n"
+                + "    s.seat_row;";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Seat seat = new Seat(
+                        0,
+                        0,
+                        rs.getString("seat_row"),
+                        rs.getString("seat_col"),
+                        null
+                );
+                seats.add(seat);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving seats: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return seats;
+    }
+
+    /* getCategoryByName */
     public Category getCategoryByEventID(int eventId) {
         String sql = "SELECT Categories.category_id, Categories.category_name, Categories.description, Categories.created_at, Categories.updated_at\n"
                 + "FROM Categories \n"
@@ -603,8 +646,7 @@ public class EventDAO extends DBContext {
                         rs.getString("category_name"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 return category;
             }
 
@@ -619,7 +661,7 @@ public class EventDAO extends DBContext {
      * Retrieves the list of events by name using a partial match for a specific
      * organizer.
      *
-     * @param eventName The name or partial name of the event to search for.
+     * @param eventName   The name or partial name of the event to search for.
      * @param organizerId The ID of the organizer to filter events.
      * @return A list of Event objects matching the search criteria.
      */
@@ -628,7 +670,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
                 + "FROM Events "
                 + "WHERE event_name LIKE ? AND organizer_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             // Thêm ký tự % để tìm kiếm gần đúng
             stmt.setString(1, "%" + eventName + "%");
             stmt.setInt(2, organizerId);
@@ -644,8 +686,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 events.add(event);
             }
         } catch (SQLException e) {
@@ -659,7 +700,7 @@ public class EventDAO extends DBContext {
      * Retrieves the list of events by name using a partial match for a specific
      * organizer.
      *
-     * @param eventName The name or partial name of the event to search for.
+     * @param eventName   The name or partial name of the event to search for.
      * @param organizerId The ID of the organizer to filter events.
      * @return A list of Event objects matching the search criteria.
      */
@@ -671,7 +712,7 @@ public class EventDAO extends DBContext {
                 + "                FROM EventImages\n"
                 + "                WHERE image_title = 'logo_banner') ei ON e.event_id = ei.event_id\n"
                 + "                WHERE e.event_name LIKE ? AND e.organizer_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + eventName + "%");
             stmt.setInt(2, organizerId);
             ResultSet rs = stmt.executeQuery();
@@ -689,8 +730,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 listEventImage.add(eventImage);
             }
         } catch (SQLException e) {
@@ -700,7 +740,7 @@ public class EventDAO extends DBContext {
         return listEventImage;
     }
 
-    /*selectEventByID*/
+    /* selectEventByID */
     public Event selectEventByID(int id) {
         String sql = "SELECT * FROM Events\n"
                 + "WHERE event_id = ?";
@@ -723,8 +763,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 return event;
             }
         } catch (SQLException e) {
@@ -744,7 +783,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT ticket_type_id, showtime_id, name, description, price, color, total_quantity, sold_quantity, created_at, updated_at\n"
                 + "FROM     TicketTypes\n"
                 + "WHERE showtime_id = ?";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, showtimeId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -758,8 +797,7 @@ public class EventDAO extends DBContext {
                         rs.getInt("total_quantity"),
                         rs.getInt("sold_quantity"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 ticketTypes.add(ticketType);
             }
         } catch (SQLException e) {
@@ -769,37 +807,64 @@ public class EventDAO extends DBContext {
         return ticketTypes;
     }
 
-    /*=======================================Home Event==============================================================================================*/
- /*getEventsByPage*/
-    public List<EventImage> getEventsByPage(int page, int pageSize) {
-        List<EventImage> listEvents = new ArrayList<>();
+    /*
+     * =======================================Home
+     * Event========================================================================
+     * ======================
+     */
+    /* getEventsByPage */
+    public List<EventDTO> getEventsByPage(int page, int pageSize) {
+        List<EventDTO> listEvents = new ArrayList<>();
         String sql = "WITH EventPagination AS (\n"
                 + "    SELECT ROW_NUMBER() OVER (ORDER BY e.created_at ASC) AS rownum, e.*\n"
-                + "    FROM Events e\n"
-                + "),\n"
+                + "    FROM [dbo].[Events] e\n"
+                + "), \n"
                 + "EventImagesFiltered AS (\n"
-                + "    SELECT ei.event_id, ei.image_id, MIN(ei.image_url) AS image_url, MIN(ei.image_title) AS image_title\n"
-                + "    FROM EventImages ei\n"
+                + "    SELECT ei.event_id, MIN(ei.image_id) AS image_id,\n"
+                + "           MIN(ei.image_url) AS image_url, \n"
+                + "           MIN(ei.image_title) AS image_title\n"
+                + "    FROM [dbo].[EventImages] ei\n"
                 + "    WHERE ei.image_title LIKE '%logo_banner%'\n"
-                + "    GROUP BY ei.event_id, ei.image_id\n"
+                + "    GROUP BY ei.event_id\n"
+                + "),\n"
+                + "MinTicketPrices AS (\n"
+                + "    SELECT s.event_id, MIN(tt.price) AS min_price\n"
+                + "    FROM [dbo].[TicketTypes] tt\n"
+                + "    JOIN [dbo].[Showtimes] s ON tt.showtime_id = s.showtime_id\n"
+                + "    GROUP BY s.event_id\n"
+                + "),\n"
+                + "EarliestShowtime AS (\n"
+                + "    SELECT event_id, MIN(start_date) AS first_start_date\n"
+                + "    FROM [dbo].[Showtimes]\n"
+                + "    GROUP BY event_id\n"
                 + ")\n"
-                + "SELECT ep.*, eif.image_id, eif.image_url, eif.image_title\n"
+                + "SELECT ep.*, \n"
+                + "       eif.image_id, eif.image_url, eif.image_title,\n"
+                + "       tp.min_price, \n"
+                + "       es.first_start_date\n"
                 + "FROM EventPagination ep\n"
-                + "LEFT JOIN EventImagesFiltered eif \n"
-                + "ON ep.event_id = eif.event_id\n"
-                + "WHERE ep.rownum BETWEEN ? AND ? AND ep.status = 'Approved';";
+                + "LEFT JOIN EventImagesFiltered eif ON ep.event_id = eif.event_id\n"
+                + "LEFT JOIN MinTicketPrices tp ON ep.event_id = tp.event_id\n"
+                + "LEFT JOIN EarliestShowtime es ON ep.event_id = es.event_id\n"
+                + "WHERE ep.status = 'Approved'\n"
+                + "ORDER BY ep.rownum\n"
+                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
-            int start = (page - 1) * pageSize + 1;
-            int end = page * pageSize;
-            st.setInt(1, start);
-            st.setInt(2, end);
+            int offset = (page - 1) * pageSize;
+
+            st.setInt(1, offset); // OFFSET
+            st.setInt(2, pageSize); // FETCH NEXT
+
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
+
                 EventImage eventImage = new EventImage(
                         rs.getString("image_url"),
-                        rs.getString("image_title"),
+                        rs.getString("image_title"));
+
+                Event event = new Event(
                         rs.getInt("event_id"),
                         rs.getInt("category_id"),
                         rs.getInt("organizer_id"),
@@ -809,9 +874,15 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
-                listEvents.add(eventImage);
+                        rs.getTimestamp("updated_at"));
+
+                EventDTO eventDTO = new EventDTO(
+                        event,
+                        eventImage,
+                        rs.getDouble("min_price"),
+                        rs.getTimestamp("first_start_date"));
+
+                listEvents.add(eventDTO);
             }
         } catch (SQLException e) {
             System.out.println("Error fetching paginated events: " + e.getMessage());
@@ -819,7 +890,7 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-    /*getTotalEvents*/
+    /* getTotalEvents */
     public int getTotalEvents() {
         String sql = "SELECT COUNT(DISTINCT e.event_id) \n"
                 + "FROM Events e\n"
@@ -837,8 +908,8 @@ public class EventDAO extends DBContext {
         return 0;
     }
 
-    /*getTop10LatestEvents*/
- /* Get All Events */
+    /* getTop10LatestEvents */
+    /* Get All Events */
     public List<EventImage> getAllEvents() {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "SELECT e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, "
@@ -849,7 +920,7 @@ public class EventDAO extends DBContext {
                 + "WHERE e.status = 'Approved' "
                 + "ORDER BY e.created_at DESC";
 
-        try ( PreparedStatement st = connection.prepareStatement(sql);  ResultSet rs = st.executeQuery()) {
+        try (PreparedStatement st = connection.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
 
             while (rs.next()) {
                 EventImage eventImage = new EventImage(
@@ -864,8 +935,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 listEvents.add(eventImage);
             }
         } catch (SQLException e) {
@@ -874,7 +944,7 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-    /*getTop10LatestEvents*/
+    /* getTop10LatestEvents */
     public List<EventImage> getTop10LatestEvents() {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "SELECT TOP 20\n"
@@ -900,8 +970,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 listEvents.add(eventImage);
             }
         } catch (SQLException e) {
@@ -910,7 +979,7 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-    /*getUpcomingEvents*/
+    /* getUpcomingEvents */
     public List<EventImage> getUpcomingEvents() {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "SELECT TOP 20\n"
@@ -942,8 +1011,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 listEvents.add(eventImage);
             }
         } catch (SQLException e) {
@@ -952,7 +1020,7 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-    /*getRecommendedEvents*/
+    /* getRecommendedEvents */
     public List<EventImage> getRecommendedEvents(int customerId) {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "WITH UserCategories AS (\n"
@@ -1004,8 +1072,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 listEvents.add(eventImage);
             }
         } catch (SQLException e) {
@@ -1014,7 +1081,7 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-    /*getTopEventsWithLimit*/
+    /* getTopEventsWithLimit */
     public List<EventImage> getTopEventsWithLimit() {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "SELECT TOP 20\n"
@@ -1047,8 +1114,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 listEvents.add(eventImage);
             }
         } catch (SQLException e) {
@@ -1057,7 +1123,7 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-    /*selectEventImagesByID*/
+    /* selectEventImagesByID */
     public EventImage selectEventImagesByID(int id) {
         String sql = "SELECT * FROM EventImages\n"
                 + "WHERE event_id = ? AND image_title LIKE '%banner%';";
@@ -1071,8 +1137,7 @@ public class EventDAO extends DBContext {
                         rs.getInt("image_id"),
                         rs.getInt("event_id"),
                         rs.getString("image_url"),
-                        rs.getString("image_title")
-                );
+                        rs.getString("image_title"));
                 return eventImage;
             }
         } catch (SQLException e) {
@@ -1081,7 +1146,7 @@ public class EventDAO extends DBContext {
         return null;
     }
 
-    /*getTopEventsWithLimit*/
+    /* getTopEventsWithLimit */
     public List<EventImage> getImageEventsByEventId(int eventId) {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "SELECT\n"
@@ -1107,8 +1172,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 listEvents.add(eventImage);
             }
         } catch (SQLException e) {
@@ -1117,7 +1181,7 @@ public class EventDAO extends DBContext {
         return listEvents;
     }
 
-    /*selectEventCategoriesID*/
+    /* selectEventCategoriesID */
     public Category selectEventCategoriesID(int id) {
         String sql = "SELECT c.*\n"
                 + "FROM Categories c\n"
@@ -1134,8 +1198,7 @@ public class EventDAO extends DBContext {
                         rs.getString("category_name"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 return eventCategories;
             }
         } catch (SQLException e) {
@@ -1168,8 +1231,7 @@ public class EventDAO extends DBContext {
                         rs.getString("status"),
                         rs.getString("description"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
+                        rs.getTimestamp("updated_at"));
                 listEvents.add(eventImage);
             }
         } catch (SQLException e) {
@@ -1184,7 +1246,7 @@ public class EventDAO extends DBContext {
 
         String sql = "SELECT \n"
                 + "    s.event_id,\n"
-                + "    COALESCE(SUM(od.quantity * od.price), 0) AS total_revenue,\n"
+                + "    COALESCE(SUM(od.quantity * tt.price), 0) AS total_revenue,\n"
                 + "    COALESCE(SUM(od.quantity), 0) AS tickets_sold,\n"
                 + "    SUM(tt.total_quantity) AS total_tickets,\n"
                 + "    SUM(tt.total_quantity) - COALESCE(SUM(od.quantity), 0) AS tickets_remaining,\n"
@@ -1214,14 +1276,15 @@ public class EventDAO extends DBContext {
         return listTotals;
     }
 
-    /*getTotalRevenueOfEventById*/
+    /* getTotalRevenueOfEventById */
     public List<Double> getTotalRevenueChartOfEventById(int eventId, int year) {
-        List<Double> monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+        List<Double> monthlyRevenue = new ArrayList<>(
+                Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
         String sql = "WITH RevenueByMonth AS (\n"
                 + "    SELECT \n"
                 + "        MONTH(o.order_date) AS Month,\n"
-                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1263,14 +1326,15 @@ public class EventDAO extends DBContext {
         return monthlyRevenue;
     }
 
-    /*getTotalRevenueOfEventById*/
+    /* getTotalRevenueOfEventById */
     public List<Double> getTotalTicketsChartOfEventById(int eventId, int year) {
-        List<Double> monthlyRevenue = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+        List<Double> monthlyRevenue = new ArrayList<>(
+                Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
         String sql = "WITH RevenueByMonth AS (\n"
                 + "    SELECT \n"
                 + "        MONTH(o.order_date) AS Month,\n"
-                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1319,7 +1383,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByDay AS (\n"
                 + "    SELECT \n"
                 + "        DATEDIFF(DAY, o.order_date, GETDATE()) AS DaysAgo,\n"
-                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1411,7 +1475,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByHour AS (\n"
                 + "    SELECT \n"
                 + "        DATEDIFF(HOUR, o.order_date, GETDATE()) AS HoursAgo,\n"
-                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1514,13 +1578,15 @@ public class EventDAO extends DBContext {
             List<TicketType> ticketTypes = getTicketTypesByShowtimeId(showtimeId);
             List<TicketRevenueDTO> ticketRevenueList = new ArrayList<>();
 
-            // Tính toán thông tin doanh thu cho từng loại vé
             for (TicketType ticketType : ticketTypes) {
                 int totalTicket = ticketType.getTotalQuantity();
-                int sold = ticketType.getSoldQuantity();
-                double price = ticketType.getPrice();
+
+                // Sửa: Lấy tổng vé bán thực tế từ OrderDetails
+                int sold = getSoldQuantityFromOrders(ticketType.getTicketTypeId());
+                double price = getActualPriceFromOrders(ticketType.getTicketTypeId());
+
                 int remaining = totalTicket - sold;
-                double totalRevenue = sold * price;
+                double totalRevenue = sold * ticketType.getPrice();
                 double fillRate = totalTicket > 0 ? (sold * 100.0 / totalTicket) : 0;
 
                 TicketRevenueDTO dto = new TicketRevenueDTO(
@@ -1529,28 +1595,78 @@ public class EventDAO extends DBContext {
                         showtime.getEndDate(),
                         ticketType.getName(),
                         totalTicket,
-                        price,
+                        ticketType.getPrice(),
                         sold,
                         remaining,
                         totalRevenue,
-                        fillRate
-                );
+                        fillRate);
                 ticketRevenueList.add(dto);
             }
-
             showtimeTicketMap.put(showtimeId, ticketRevenueList);
         }
 
         return showtimeTicketMap;
     }
 
+    public int getSoldQuantityFromOrders(int ticketTypeId) {
+        String sql = "SELECT COALESCE(SUM(quantity), 0) FROM OrderDetails WHERE ticket_type_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, ticketTypeId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public double getActualPriceFromOrders(int ticketTypeId) {
+        String sql = "SELECT COALESCE(AVG(price), 0) FROM OrderDetails WHERE ticket_type_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, ticketTypeId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
     public static void main(String[] args) {
         EventDAO eventDAO = new EventDAO();
-        int eventId = 1;
-        List<EventImage> revenue = eventDAO.getAllEvents();
-        for (EventImage double1 : revenue) {
-            System.out.println(double1.getImageUrl());
+        int eventId = 21;
+
+        // Lấy danh sách doanh thu theo showtime
+        Map<Integer, List<TicketRevenueDTO>> revenueData = eventDAO.getTicketRevenueByEventId(eventId);
+
+        // In kết quả ra console để kiểm tra
+        for (Map.Entry<Integer, List<TicketRevenueDTO>> entry : revenueData.entrySet()) {
+            int showtimeId = entry.getKey();
+            System.out.println("Showtime ID: " + showtimeId);
+
+            for (TicketRevenueDTO dto : entry.getValue()) {
+                System.out.println("  Ticket Type: " + dto.getTicketType());
+                System.out.println("  Total Tickets: " + dto.getTotalTicket());
+                System.out.println("  Price: " + dto.getPriceOfTicket());
+                System.out.println("  Sold: " + dto.getSold());
+                System.out.println("  Remaining: " + dto.getRemaining());
+                System.out.println("  Total Revenue: " + dto.getTotalRevenue());
+                System.out.println("  Fill Rate: " + dto.getFillRate() + "%");
+                System.out.println("--------------------------------------");
+            }
         }
+
+        List<EventDTO> listEvent = eventDAO.getEventsByPage(2, 20);
+        int index = 0;
+        for (EventDTO eventImage : listEvent) {
+            index++;
+            System.out.println(eventImage.getEvent().getEventId());
+        }
+        System.out.println(index);
     }
 
 }

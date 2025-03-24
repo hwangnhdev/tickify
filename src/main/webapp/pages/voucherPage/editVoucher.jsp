@@ -36,7 +36,7 @@
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="seatingChart.jsp">
                         <i class="fas fa-chair mr-2"></i>Seat Map
                     </a>
-                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="VoucherController">
+                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="editVoucher">
                         <i class="fas fa-tags mr-2"></i>Voucher
                     </a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="orders.jsp">
@@ -66,7 +66,7 @@
                     <div class="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-3xl mx-auto">
                         <!-- Back Button -->
                         <div class="mb-6">
-                            <a href="ViewAllVouchersController" class="inline-flex items-center text-white hover:text-green-500 transition duration-200">
+                            <a href="vouchers" class="inline-flex items-center text-white hover:text-green-500 transition duration-200">
                                 <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M872 474H286.9l350.2-304c5.6-4.9 2.2-14-5.2-14h-88.5c-3.9 0-7.6 1.4-10.5 3.9L155 487.8a31.96 31.96 0 000 48.3L535.1 866c1.5 1.3 3.3 2 5.2 2h91.5c7.4 0 10.8-9.2 5.2-14L286.9 550H872c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"/>
                                 </svg>
@@ -80,7 +80,7 @@
                             String endDateStr = voucher != null && voucher.getEndDate() != null ? inputFormat.format(voucher.getEndDate()) : "";
                         %>
 
-                        <form action="VoucherController" method="post" class="space-y-6">
+                        <form action="editVoucher" method="post" class="space-y-6">
                             <input type="hidden" name="voucherId" value="<%= voucher.getVoucherId()%>">
                             <input type="hidden" name="eventId" value="<%= voucher.getEventId()%>">
 
@@ -139,7 +139,7 @@
                                     <div class="flex items-center mt-1">
                                         <input type="number" name="discountValue" id="discountValue" value="<%= voucher.getDiscountValue()%>" 
                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 pr-8" 
-                                               required step="0.01">
+                                               required>
                                         <span id="unit" class="absolute right-2 text-white pointer-events-none"></span>
                                     </div>
                                 </div>
@@ -172,7 +172,7 @@
                             </div>
 
                             <div class="flex justify-end space-x-4">
-                                <button type="button" onclick="location.href = 'ViewAllVouchersController'" 
+                                <button type="button" onclick="location.href = 'vouchers'" 
                                         class="px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-white transition duration-200">Cancel</button>
                                 <button type="submit" 
                                         class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200">Update Voucher</button>
@@ -194,12 +194,11 @@
 
                 // Function to update the unit based on discount type
                 function updateUnit() {
-                    if (discountType.value === 'percentage') {
+                    if (discountType.value === 'Percentage') {
                         unit.textContent = '%';
                         // Ensure discount value is between 0 and 100 for percentage
                         discountValue.setAttribute('min', '0');
                         discountValue.setAttribute('max', '100');
-                        discountValue.value = Math.min(Math.max(parseFloat(discountValue.value) || 0, 0), 100).toFixed(2);
                     } else { // Fixed Amount
                         unit.textContent = 'VND';
                         // Remove max limit for fixed amount (or set a reasonable range, e.g., 0 to 1,000,000)
@@ -213,13 +212,6 @@
 
                 // Update unit when discount type changes
                 discountType.addEventListener('change', updateUnit);
-
-                // Ensure discount value stays within bounds for percentage
-                discountValue.addEventListener('input', function () {
-                    if (discountType.value === 'percentage') {
-                        this.value = Math.min(Math.max(parseFloat(this.value) || 0, 0), 100).toFixed(2);
-                    }
-                });
             });
         </script>
     </body>

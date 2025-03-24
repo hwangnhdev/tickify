@@ -18,18 +18,21 @@ public class Voucher {
     private String code;
     private String description;
     private String discountType;
-    private double discountValue;
+    private int discountValue;
     private Timestamp startDate;
     private Timestamp endDate;
     private int usageLimit;
     private boolean status;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private boolean deleted;
 
     public Voucher() {
     }
 
-    public Voucher(int voucherId, int eventId, String code, String description, String discountType, double discountValue, Timestamp startDate, Timestamp endDate, int usageLimit, boolean status, Timestamp createdAt, Timestamp updatedAt) {
+    public Voucher(int voucherId, int eventId, String code, String description, String discountType, int discountValue,
+            Timestamp startDate, Timestamp endDate, int usageLimit, boolean status, Timestamp createdAt,
+            Timestamp updatedAt, boolean deleted) {
         this.voucherId = voucherId;
         this.eventId = eventId;
         this.code = code;
@@ -42,9 +45,8 @@ public class Voucher {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.deleted = deleted;
     }
-
-    
 
     public int getVoucherId() {
         return voucherId;
@@ -86,11 +88,11 @@ public class Voucher {
         this.discountType = discountType;
     }
 
-    public double getDiscountValue() {
+    public int getDiscountValue() {
         return discountValue;
     }
 
-    public void setDiscountValue(double discountValue) {
+    public void setDiscountValue(int discountValue) {
         this.discountValue = discountValue;
     }
 
@@ -142,6 +144,14 @@ public class Voucher {
         this.updatedAt = updatedAt;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     // Helper method to format expiration time
     public String setFormattedExpirationTime(String string) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -156,7 +166,8 @@ public class Voucher {
     // Helper method to format discount
     public String setFormattedDiscount(String string) {
         return discountType.equalsIgnoreCase("percentage")
-                ? discountValue + "%" : String.format("%f VND", discountValue);
+                ? discountValue + "%"
+                : String.format("%d VND", discountValue);
     }
 
     public String getFormattedExpirationTime() {
@@ -166,7 +177,8 @@ public class Voucher {
 
     /**
      * Determine status label
-     * @return 
+     *
+     * @return
      */
     public String getStatusLabel() {
         return (endDate.getTime() >= System.currentTimeMillis()) ? "Ongoing" : "Expired";
@@ -174,11 +186,12 @@ public class Voucher {
 
     /**
      * Format discount value
-     * @return 
+     *
+     * @return
      */
     public String getFormattedDiscount() {
         return discountType.equalsIgnoreCase("percentage")
                 ? discountValue + "%"
-                : String.format("%.0f VND", discountValue);
+                : String.format("%d VND", discountValue);
     }
 }

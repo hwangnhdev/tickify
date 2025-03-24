@@ -13,29 +13,19 @@ import java.sql.Timestamp;
  */
 public class Event {
 
-    @Expose
     private int eventId;
-    @Expose
     private int categoryId;
-    @Expose
     private int organizerId;
-    @Expose
     private String eventName;
-    @Expose
     private String location;
-    @Expose
     private String eventType;
-    @Expose
     private String status;
-    @Expose
     private String description;
     private int totalTicketsSold;
     private double totalRevenue;
     private Timestamp startDate;
     private Timestamp endDate;
-    @Expose
     private Timestamp createdAt;
-    @Expose
     private Timestamp updatedAt;
     private Timestamp approvedAt;
 
@@ -50,7 +40,8 @@ public class Event {
     public Event() {
     }
 
-    public Event(int eventId, int categoryId, int organizerId, String eventName, String location, String eventType, String status, String description, Timestamp createdAt, Timestamp updatedAt) {
+    public Event(int eventId, int categoryId, int organizerId, String eventName, String location, String eventType,
+            String status, String description, Timestamp createdAt, Timestamp updatedAt) {
         this.eventId = eventId;
         this.categoryId = categoryId;
         this.organizerId = organizerId;
@@ -158,7 +149,7 @@ public class Event {
     public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
-    
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }
