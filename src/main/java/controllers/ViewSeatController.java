@@ -73,7 +73,7 @@ public class ViewSeatController extends HttpServlet {
         HttpSession session = request.getSession();
         System.out.println(session.getAttribute("customerId"));
         int customerId = (int) session.getAttribute("customerId");
-//        int eventId = Integer.parseInt(request.getParameter("eventID"));
+//        int eventId = Integer.parseInt((String) session.getAttribute("eventId"));
         int eventId = 2;
         int showtimeId = Integer.parseInt(request.getParameter("showtimeId"));
         

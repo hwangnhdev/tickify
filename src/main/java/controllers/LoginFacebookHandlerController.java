@@ -139,7 +139,6 @@ public class LoginFacebookHandlerController extends HttpServlet {
 
             // Login 
             HttpSession session = request.getSession();
-            session.setMaxInactiveInterval(7 * 24 * 60 * 60); // 7days
             session.setAttribute("customerImage", customerSendRedirect.getProfilePicture());
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
             request.getRequestDispatcher("").forward(request, response);

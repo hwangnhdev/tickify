@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import models.Seat;
 import utils.DBContext;
@@ -37,7 +38,7 @@ public class SeatDAO extends DBContext {
     private static final String INSERT_SEAT = "INSERT INTO Seats (event_id, seat_row, seat_number, status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_SEAT_STATUS = "UPDATE Seats SET status = ? WHERE seat_id = ?";
     private static final String DELETE_SEAT = "DELETE FROM Seats WHERE seat_id = ?";
-    
+
     private Seat mapResultSetToSeat(ResultSet rs) throws SQLException {
         Seat seat = new Seat();
         seat.setSeatId(rs.getInt("seat_id"));
@@ -163,11 +164,11 @@ public class SeatDAO extends DBContext {
             return false;
         }
     }
-    
+
     public int getSeatIdByTicketTypeIdColRow(int ticketTypeId, String seatRow, int seatCol) {
         String sql = "SELECT seat_id FROM Seats WHERE ticket_type_id = ? AND seat_row = ? AND seat_col = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, ticketTypeId);
             ps.setString(2, seatRow);
             ps.setInt(3, seatCol);
@@ -194,6 +195,41 @@ public class SeatDAO extends DBContext {
             return rowsDeleted > 0;
         } catch (SQLException e) {
             System.out.println(e);
+            return false;
+        }
+    }
+
+    public boolean holdSeatsForPayment(List<Integer> seatIds) {
+        String query = ""
+                + "UPDATE Seats\n"
+                + "SET [status] = 'pending', [hold_time] = CURRENT_TIMESTAMP\n"
+                + "WHERE seat_id = ?";
+
+        try ( PreparedStatement st = connection.prepareStatement(query)) {
+            for (Integer seatId : seatIds) {
+                st.setInt(1, seatId);
+                st.executeUpdate();
+            }
+            return true;
+//            int[] rowsUpdated = st.executeBatch();
+//            return Arrays.stream(rowsUpdated).sum() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean releaseExpiredSeats() {
+        String query = ""
+                + "UPDATE Seats\n"
+                + "SET status = 'available', [hold_time] = NULL\n"
+                + "WHERE status = 'pending' AND DATEDIFF(MINUTE, [hold_time], CURRENT_TIMESTAMP) > 1";
+
+        try ( PreparedStatement st = connection.prepareStatement(query)) {
+            int rowsUpdated = st.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
