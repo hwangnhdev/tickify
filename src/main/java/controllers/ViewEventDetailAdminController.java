@@ -10,9 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import viewModels.EventDetailDTO;
+import viewModels.ShowtimeDTO;
+import viewModels.TicketTypeDTO;
 import models.EventImage;
 
-
+@WebServlet(name = "ViewEventDetailAdminController", urlPatterns = {"/admin/viewEventDetail"})
 public class ViewEventDetailAdminController extends HttpServlet {
 
     @Override
@@ -30,15 +32,19 @@ public class ViewEventDetailAdminController extends HttpServlet {
             }
         }
 
-        // Lấy chi tiết sự kiện từ DAO
+        // Lấy chi tiết sự kiện từ AdminDAO
         AdminDAO adminDao = new AdminDAO();
         EventDetailDTO event = adminDao.getEventDetailById(eventId);
 
-        // Lấy danh sách hình ảnh từ DAO (không dùng STRING_AGG)
-        EventDAO eventDao = new EventDAO(); // Hoặc bạn có thể thêm phương thức này vào AdminDAO
+        // Lấy danh sách lịch diễn và loại vé của sự kiện
+        List<ShowtimeDTO> showtimes = adminDao.getShowtimesByEventId(eventId);
+        List<TicketTypeDTO> ticketTypes = adminDao.getTicketTypesByEventId(eventId);
+
+        // Lấy danh sách hình ảnh từ EventDAO để phân loại logo
+        EventDAO eventDao = new EventDAO();
         List<EventImage> listEventImages = eventDao.getImageEventsByEventId(eventId);
 
-        // Khai báo biến để chứa URL cho từng loại ảnh
+        // Khai báo các URL logo mặc định
         String logoBannerImage = "";
         String logoEventImage = "";
         String logoOrganizerImage = "";
@@ -54,7 +60,7 @@ public class ViewEventDetailAdminController extends HttpServlet {
             }
         }
 
-        // Nếu không có ảnh nào, gán ảnh mặc định (URL đầy đủ từ Cloudinary hoặc URL local)
+        // Gán ảnh mặc định nếu chưa có
         if (logoBannerImage.isEmpty()) {
             logoBannerImage = "https://res.cloudinary.com/dnvpphtov/image/upload/default_banner.png";
         }
@@ -67,11 +73,13 @@ public class ViewEventDetailAdminController extends HttpServlet {
 
         // Set các attribute cho JSP
         request.setAttribute("event", event);
+        request.setAttribute("showtimes", showtimes);
+        request.setAttribute("ticketTypes", ticketTypes);
         request.setAttribute("logoBannerImage", logoBannerImage);
         request.setAttribute("logoEventImage", logoEventImage);
         request.setAttribute("logoOrganizerImage", logoOrganizerImage);
 
-        // Giữ lại thông tin trang hiện tại để quay lại danh sách nếu có
+        // Nếu có thông tin trang hiện tại để quay lại danh sách
         String currentPage = request.getParameter("page");
         if (currentPage != null && !currentPage.trim().isEmpty()) {
             request.setAttribute("currentPage", currentPage);
