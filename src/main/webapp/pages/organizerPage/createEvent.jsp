@@ -19,7 +19,7 @@
         <style>
 
             /*// pop up*/
-            #successPopup {
+            #successPopup { 
                 display: none; /* Ẩn mặc định */
                 position: fixed;
                 top: 0;

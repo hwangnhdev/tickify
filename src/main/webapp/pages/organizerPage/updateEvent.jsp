@@ -865,7 +865,7 @@
                         <input type="text" id="modalTicketName" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., VIP">
                         <span class="error-message" id="modalTicketName_error"></span>
                     </div>
-                    <!-- Description -->
+                    <!-- Description Update Price for modal -->
                     <div>
                         <label class="block text-gray-300 mb-2">Description</label>
                         <textarea id="modalTicketDescription" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" rows="2" placeholder="e.g., VIP seating"></textarea>
@@ -873,7 +873,7 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div style="display: block !important;">
-                            <label class="block text-gray-300 mb-2">Price (VND)</label>
+                            <label class="block text-gray-300 mb-2">Price (VND)</label> 
                             <input type="number" id="modalTicketPrice" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none" placeholder="e.g., 150000">
                             <span class="error-message" id="modalTicketPrice_error"></span>
                         </div>
