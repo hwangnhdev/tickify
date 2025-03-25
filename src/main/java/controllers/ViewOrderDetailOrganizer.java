@@ -22,13 +22,12 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Retrieve orderId from the request
+        // Lấy orderId từ request
         String orderIdStr = request.getParameter("orderId");
         if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing orderId parameter.");
             return;
         }
-
         int orderId;
         try {
             orderId = Integer.parseInt(orderIdStr);
@@ -36,17 +35,15 @@ public class ViewOrderDetailOrganizer extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid orderId parameter.");
             return;
         }
-
-        // Call DAO to retrieve the order details by orderId only
+        
+        // Gọi DAO để lấy chi tiết đơn hàng theo orderId
         OrderDetailDAO dao = new OrderDetailDAO();
         OrderDetailDTO orderDetail = dao.getOrderDetailByOrderId(orderId);
-
         if (orderDetail == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Order not found.");
             return;
         }
-
-        // Set orderDetail as a request attribute and forward to JSP view
+        
         request.setAttribute("orderDetail", orderDetail);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/viewOrderDetailOrganizer.jsp");
         dispatcher.forward(request, response);

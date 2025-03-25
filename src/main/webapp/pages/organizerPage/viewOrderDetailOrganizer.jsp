@@ -1,220 +1,117 @@
-<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<!DOCTYPE html>
-<html lang="en">
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Order Details</title>
-    <jsp:include page="../../components/header.jsp" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-    <!-- Tippy.js & Popper.js -->
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
+    <title>Order Detail</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
         }
-        .truncate-text {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .container {
+            background: #fff;
+            padding: 20px 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .seat-text {
-            white-space: normal;
-            word-wrap: break-word;
+        h1, h2 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section p {
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+        .section p strong {
+            color: #555;
+        }
+        .item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #fafafa;
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-<div class="max-w-4xl mx-auto p-6">
-    <div class="bg-white shadow rounded-lg p-6 space-y-8">
-        <!-- Title: Event Name -->
-        <div class="space-y-2">
-            <h1 class="text-3xl font-bold truncate-text" title="${orderDetail.eventName}">
-                <c:out value="${orderDetail.eventName}" default="No Data Available" />
-            </h1>
-        </div>
-        <!-- Event Image -->
-        <c:if test="${not empty orderDetail.image_url}">
-            <div>
-                <img src="${orderDetail.image_url}"
-                     alt="<c:out value='${orderDetail.eventName}' default='No Data Available' />"
-                     loading="lazy"
-                     onerror="this.onerror=null; this.style.display='none';"
-                     class="w-full h-auto rounded" />
-            </div>
-        </c:if>
-        <!-- Order ID -->
-        <div>
-            <p class="text-sm text-gray-600 flex items-center">
-                <i class="fas fa-receipt mr-2"></i>
-                <span class="truncate-text" title="${orderDetail.orderId}">
-                    Order ID: <c:out value="${orderDetail.orderId}" default="No Data Available" />
-                </span>
-            </p>
-        </div>
-        <!-- Order Overview -->
-        <div class="border-t border-gray-200 pt-4">
-            <h2 class="text-2xl font-bold mb-4">
-                <i class="fas fa-info-circle mr-2"></i>Order Overview
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Payment Status -->
-                <div class="border border-gray-200 p-4 rounded hover:bg-gray-50">
-                    <h3 class="text-sm font-semibold">Payment Status</h3>
-                    <p class="text-base truncate-text" title="${orderDetail.paymentStatus}">
-                        <c:out value="${orderDetail.paymentStatus}" default="No Data Available" />
+<body>
+    <div class="container">
+        <h1>Order Detail</h1>
+        <c:if test="${not empty orderDetail}">
+            <div class="section">
+                <h2>Order Summary</h2>
+                <c:if test="${not empty orderDetail.orderSummary.orderId}">
+                    <p><strong>Order ID:</strong> <c:out value="${orderDetail.orderSummary.orderId}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.orderSummary.orderDate}">
+                    <p><strong>Order Date:</strong> 
+                        <fmt:formatDate value="${orderDetail.orderSummary.orderDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
                     </p>
-                </div>
-                <!-- Order Date -->
-                <div class="border border-gray-200 p-4 rounded hover:bg-gray-50">
-                    <h3 class="text-sm font-semibold">Order Date</h3>
-                    <p class="text-base">
-                        <c:choose>
-                            <c:when test="${not empty orderDetail.orderDate}">
-                                <fmt:formatDate value="${orderDetail.orderDate}" pattern="dd MMM, yyyy HH:mm" />
-                            </c:when>
-                            <c:otherwise>No Data Available</c:otherwise>
-                        </c:choose>
-                    </p>
-                </div>
-               
+                </c:if>
+                <c:if test="${not empty orderDetail.orderSummary.paymentStatus}">
+                    <p><strong>Payment Status:</strong> <c:out value="${orderDetail.orderSummary.paymentStatus}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.orderSummary.grandTotal}">
+                    <p><strong>Grand Total:</strong> <c:out value="${orderDetail.orderSummary.grandTotal}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.orderSummary.voucherCode}">
+                    <p><strong>Voucher Code:</strong> <c:out value="${orderDetail.orderSummary.voucherCode}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.orderSummary.customerName}">
+                    <p><strong>Customer Name:</strong> <c:out value="${orderDetail.orderSummary.customerName}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.orderSummary.customerEmail}">
+                    <p><strong>Customer Email:</strong> <c:out value="${orderDetail.orderSummary.customerEmail}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.orderSummary.eventName}">
+                    <p><strong>Event Name:</strong> <c:out value="${orderDetail.orderSummary.eventName}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.orderSummary.location}">
+                    <p><strong>Location:</strong> <c:out value="${orderDetail.orderSummary.location}"/></p>
+                </c:if>
             </div>
-        </div>
-        <!-- Event Schedule (Showtime) -->
-        <c:if test="${not empty orderDetail.startDate or not empty orderDetail.endDate}">
-            <div class="border-t border-gray-200 pt-4">
-                <h2 class="text-2xl font-bold mb-4">
-                    <i class="fas fa-clock mr-2"></i>Event Schedule
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <c:if test="${not empty orderDetail.startDate}">
-                        <div class="border border-gray-200 p-4 rounded hover:bg-gray-50">
-                            <h4 class="text-sm font-semibold">Start Date</h4>
-                            <p class="text-base">
-                                <fmt:formatDate value="${orderDetail.startDate}" pattern="HH:mm, dd MMM yyyy" />
-                            </p>
-                        </div>
-                    </c:if>
-                    <c:if test="${not empty orderDetail.endDate}">
-                        <div class="border border-gray-200 p-4 rounded hover:bg-gray-50">
-                            <h4 class="text-sm font-semibold">End Date</h4>
-                            <p class="text-base">
-                                <fmt:formatDate value="${orderDetail.endDate}" pattern="HH:mm, dd MMM yyyy" />
-                            </p>
-                        </div>
-                    </c:if>
-                </div>
+            
+            <div class="section">
+                <h2>Calculation</h2>
+                <c:if test="${not empty orderDetail.calculation.totalSubtotal}">
+                    <p><strong>Subtotal:</strong> <c:out value="${orderDetail.calculation.totalSubtotal}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.calculation.discountAmount}">
+                    <p><strong>Discount Amount:</strong> <c:out value="${orderDetail.calculation.discountAmount}"/></p>
+                </c:if>
+                <c:if test="${not empty orderDetail.calculation.finalTotal}">
+                    <p><strong>Final Total:</strong> <c:out value="${orderDetail.calculation.finalTotal}"/></p>
+                </c:if>
             </div>
-        </c:if>
-        <!-- Customer Information -->
-        <div class="border-t border-gray-200 pt-4">
-            <h2 class="text-2xl font-bold mb-4">
-                <i class="fas fa-user mr-2"></i>Customer Information
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="border border-gray-200 p-4 rounded hover:bg-gray-50">
-                    <h4 class="text-sm font-semibold">Name</h4>
-                    <p class="text-base truncate-text" title="${orderDetail.customerName}">
-                        <c:out value="${orderDetail.customerName}" default="No Data Available" />
-                    </p>
-                </div>
-                <div class="border border-gray-200 p-4 rounded hover:bg-gray-50">
-                    <h4 class="text-sm font-semibold">Email</h4>
-                    <p class="text-base truncate-text" title="${orderDetail.customerEmail}">
-                        <c:out value="${orderDetail.customerEmail}" default="No Data Available" />
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- Order Summary -->
-        
-        <!-- Order Items -->
-        <c:if test="${not empty orderDetail.orderItems}">
-            <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
-                <h2 class="text-lg font-semibold mb-4">
-                    <i class="fas fa-ticket-alt mr-2"></i>Order Items
-                </h2>
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="p-2 border border-gray-200">Ticket Type</th>
-                            <th class="p-2 border border-gray-200">Seat</th>
-                            <th class="p-2 border border-gray-200">Quantity</th>
-                            <th class="p-2 border border-gray-200">Price</th>
-                            <th class="p-2 border border-gray-200">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach items="${orderDetail.orderItems}" var="item">
-                            <tr class="bg-white hover:bg-gray-50">
-                                <td class="p-2 border border-gray-200">
-                                    <span class="truncate-text" title="${item.ticketType}">
-                                        <c:out value="${item.ticketType}" default="No Data Available" />
-                                    </span>
-                                </td>
-                                <td class="p-2 border border-gray-200 seat-text">
-                                    <c:out value="${item.seat}" default="No Data Available" />
-                                </td>
-                                <td class="p-2 border border-gray-200">
-                                    <c:out value="${item.quantity}" default="0" />
-                                </td>
-                                <td class="p-2 border border-gray-200">
-                                    <fmt:formatNumber value="${item.ticketPrice}" pattern="#,##0.00'đ'" />
-                                </td>
-                                <td class="p-2 border border-gray-200">
-                                    <fmt:formatNumber value="${item.ticketPrice * item.quantity}" pattern="#,##0.00'đ'" />
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                    <tfoot class="bg-gray-50">
-                        <tr>
-                            <td class="p-2 font-semibold" colspan="4">Subtotal</td>
-                            <td class="p-2 text-right">
-                                <fmt:formatNumber value="${orderDetail.grandTotal}" pattern="#,##0.00'đ'" />
-                            </td>
-                        </tr>
-                        <c:if test="${not empty orderDetail.voucherCode}">
-                            <tr>
-                                <td class="p-2 font-semibold" colspan="4">Discount</td>
-                                <td class="p-2 text-right">
-                                    <fmt:formatNumber value="${orderDetail.grandTotal - orderDetail.totalAfterDiscount}" pattern="#,##0.00'đ'" />
-                                </td>
-                            </tr>
+            
+            <div class="section">
+                <h2>Order Items</h2>
+                <c:forEach var="item" items="${orderDetail.orderItems}">
+                    <div class="item">
+                        <c:if test="${not empty item.ticketType}">
+                            <p><strong>Ticket Type:</strong> <c:out value="${item.ticketType}"/></p>
                         </c:if>
-                        <tr>
-                            <td class="p-2 font-semibold" colspan="4">Total</td>
-                            <td class="p-2 text-right text-green-500">
-                                <fmt:formatNumber value="${orderDetail.totalAfterDiscount}" pattern="#,##0.00'đ'" />
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+                        <c:if test="${not empty item.quantity}">
+                            <p><strong>Quantity:</strong> <c:out value="${item.quantity}"/></p>
+                        </c:if>
+                        <c:if test="${not empty item.unitPrice}">
+                            <p><strong>Unit Price:</strong> <c:out value="${item.unitPrice}"/></p>
+                        </c:if>
+                        <c:if test="${not empty item.seats}">
+                            <p><strong>Seats:</strong> <c:out value="${item.seats}"/></p>
+                        </c:if>
+                    </div>
+                </c:forEach>
             </div>
+        </c:if>
+        <c:if test="${empty orderDetail}">
+            <p>No order details found.</p>
         </c:if>
     </div>
-    <c:if test="${empty orderDetail}">
-        <div class="mt-6 p-4 bg-red-100 text-red-700 rounded">
-            <p>No order details found.</p>
-        </div>
-    </c:if>
-</div>
-<script>
-    // Configure Tippy.js for tooltips
-    tippy('[title]', {
-        animation: 'shift-away',
-        arrow: true,
-        theme: 'light-border',
-        duration: [200, 150],
-        maxWidth: 300,
-        delay: [100, 50]
-    });
-</script>
 </body>
 </html>
