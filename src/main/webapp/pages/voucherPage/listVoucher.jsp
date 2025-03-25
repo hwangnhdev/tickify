@@ -26,7 +26,7 @@
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="eventAnalyst.jsp"><i class="fas fa-chart-line mr-2"></i>Analyst</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="updateEvent"><i class="fas fa-edit mr-2"></i>Edit Event</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="seatingChart.jsp"><i class="fas fa-chair mr-2"></i>Seat Map</a>
-                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/vouchers"><i class="fas fa-tags mr-2"></i>Voucher</a>
+                    <a class="flex items-center text-white bg-green-700 p-2 rounded" href="${pageContext.request.contextPath}/listVoucher"><i class="fas fa-tags mr-2"></i>Voucher</a>
                     <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" href="/Tickify/organizerOrders"><i class="fas fa-list mr-2"></i>Order List</a>
                 </nav>
             </aside>
@@ -63,7 +63,7 @@
                             </form>
 
                             <!-- Filter Form -->
-                            <form action="${pageContext.request.contextPath}/vouchers" method="get" class="flex items-center space-x-2">
+                            <form action="${pageContext.request.contextPath}/listVoucher" method="get" class="flex items-center space-x-2">
                                 <input type="hidden" name="eventId" value="${eventId}"/>
                                 <label for="voucherStatus" class="text-white text-sm font-medium">Status:</label>
                                 <select name="voucherStatus" id="voucherStatus" class="p-1 text-sm rounded bg-gray-700 text-white border border-gray-600 focus:ring-1 focus:ring-green-500">
@@ -132,7 +132,7 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm">
                                             <div class="flex space-x-2">
-                                                <a href="editVoucher?voucherId=${voucher.voucherId}" 
+                                                <a href="voucher?voucherId=${voucher.voucherId}" 
                                                    class="text-white bg-green-600 hover:bg-green-700 px-2 py-1 rounded" 
                                                    title="Edit Voucher">
                                                     <i class="fas fa-edit"></i>
@@ -199,9 +199,9 @@
                                 </c:if>
                             </c:if>
                             <c:if test="${currentPage gt 1}">
-                                <a href="${pageContext.request.contextPath}/vouchers?eventId=${eventId}&page=1" 
+                                <a href="${pageContext.request.contextPath}/listVoucher?eventId=${eventId}&page=1" 
                                    class="px-3 py-1 bg-green-500 text-white rounded-l hover:bg-green-600">First</a>
-                                <a href="${pageContext.request.contextPath}/vouchers?eventId=${eventId}&page=${currentPage - 1}" 
+                                <a href="${pageContext.request.contextPath}/listVoucher?eventId=${eventId}&page=${currentPage - 1}" 
                                    class="px-3 py-1 bg-green-500 text-white hover:bg-green-600">Prev</a>
                             </c:if>
                             <c:if test="${startPage gt 1}">
@@ -213,7 +213,7 @@
                                         <span class="px-3 py-1 bg-green-700 text-white font-bold rounded">${i}</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <a href="${pageContext.request.contextPath}/vouchers?eventId=${eventId}&page=${i}" 
+                                        <a href="${pageContext.request.contextPath}/listVoucher?eventId=${eventId}&page=${i}" 
                                            class="px-3 py-1 bg-green-500 text-white hover:bg-green-600 rounded">${i}</a>
                                     </c:otherwise>
                                 </c:choose>
@@ -222,9 +222,9 @@
                                 <span class="px-3 py-1">...</span>
                             </c:if>
                             <c:if test="${currentPage lt totalPages}">
-                                <a href="${pageContext.request.contextPath}/vouchers?eventId=${eventId}&page=${currentPage + 1}" 
+                                <a href="${pageContext.request.contextPath}/listVoucher?eventId=${eventId}&page=${currentPage + 1}" 
                                    class="px-3 py-1 bg-green-500 text-white hover:bg-green-600">Next</a>
-                                <a href="${pageContext.request.contextPath}/vouchers?eventId=${eventId}&page=${totalPages}" 
+                                <a href="${pageContext.request.contextPath}/listVoucher?eventId=${eventId}&page=${totalPages}" 
                                    class="px-3 py-1 bg-green-500 text-white rounded-r hover:bg-green-600">Last</a>
                             </c:if>
                         </div>

@@ -406,11 +406,11 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>VoucherController</servlet-name>
-        <url-pattern>/editVoucher</url-pattern>
+        <url-pattern>/voucher</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewAllVouchersController</servlet-name>
-        <url-pattern>/vouchers</url-pattern>
+        <url-pattern>/listVoucher</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CreateVoucherController</servlet-name>

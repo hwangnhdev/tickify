@@ -133,7 +133,7 @@ public class CreateVoucherController extends HttpServlet {
             boolean success = voucherDAO.insertVoucher(voucher);
 
             if (success) {
-                response.sendRedirect("vouchers");
+                response.sendRedirect("listVoucher");
             } else {
                 request.setAttribute("error", "Failed to create voucher");
                 request.getRequestDispatcher("pages/voucherPage/createVoucher.jsp").forward(request, response);

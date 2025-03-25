@@ -111,7 +111,7 @@ public class VoucherController extends HttpServlet {
             boolean success = voucherDAO.updateVoucher(voucher);
 
             if (success) {
-                response.sendRedirect("editVoucher?voucherId=" + voucherId);
+                response.sendRedirect("voucher?voucherId=" + voucherId);
             } else {
                 request.setAttribute("error", "Failed to update voucher");
                 request.setAttribute("voucher", voucher);
