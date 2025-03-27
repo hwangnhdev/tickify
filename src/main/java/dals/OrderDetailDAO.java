@@ -15,94 +15,83 @@ import viewModels.TicketItemDTO;
 public class OrderDetailDAO extends DBContext {
 
     // Query Header: Lấy thông tin đơn hàng, khách hàng, voucher, tổng tính toán và event liên quan
-    private static final String SQL_GET_ORDER_HEADER = 
-            "SELECT " +
-            "   o.order_id, " +
-            "   o.order_date, " +
-            "   o.payment_status, " +
-            "   c.full_name AS customerName, " +
-            "   c.email AS customerEmail, " +
-            "   v.code AS voucherCode, " +
-            "   v.discount_type, " +
-            "   v.discount_value, " +
-            "   tot.total_subtotal, " +
-            "   tot.discount_amount, " +
-            "   tot.final_total, " +
-            "   eventinfo.event_id, " +
-            "   eventinfo.event_name, " +
-            "   eventinfo.location, " +
-            "   eventinfo.start_date, " +
-            "   eventinfo.end_date " +
-            "FROM Orders o " +
-            "JOIN Customers c ON o.customer_id = c.customer_id " +
-            "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id " +
-            "CROSS APPLY ( " +
-            "   SELECT " +
-            "       SUM(od.quantity * od.price) AS total_subtotal, " +
-            "       CASE " +
-            "           WHEN v.discount_type = 'percentage' THEN SUM(od.quantity * od.price) * (v.discount_value / 100.0) " +
-            "           WHEN v.discount_type = 'fixed' THEN v.discount_value " +
-            "           ELSE 0 " +
-            "       END AS discount_amount, " +
-            "       SUM(od.quantity * od.price) - " +
-            "       CASE " +
-            "           WHEN v.discount_type = 'percentage' THEN SUM(od.quantity * od.price) * (v.discount_value / 100.0) " +
-            "           WHEN v.discount_type = 'fixed' THEN v.discount_value " +
-            "           ELSE 0 " +
-            "       END AS final_total " +
-            "   FROM OrderDetails od " +
-            "   WHERE od.order_id = o.order_id " +
-            ") tot " +
-            "CROSS APPLY ( " +
-            "   SELECT TOP 1 " +
-            "       s.showtime_id, " +
-            "       e.event_id, " +
-            "       e.event_name, " +
-            "       e.location, " +
-            "       s.start_date, " +
-            "       s.end_date " +
-            "   FROM OrderDetails od2 " +
-            "   JOIN TicketTypes tt ON od2.ticket_type_id = tt.ticket_type_id " +
-            "   JOIN Showtimes s ON tt.showtime_id = s.showtime_id " +
-            "   JOIN Events e ON s.event_id = e.event_id " +
-            "   WHERE od2.order_id = o.order_id " +
-            "   ORDER BY od2.order_detail_id " +
-            ") eventinfo " +
-            "WHERE o.order_id = ?";
+    // Query Header: Lấy thông tin đơn hàng, khách hàng, voucher, tổng tính toán và event liên quan
+    private static final String SQL_GET_ORDER_HEADER
+            = "SELECT "
+            + "    o.order_id, "
+            + "    o.order_date, "
+            + "    o.payment_status, "
+            + "    c.full_name AS customerName, "
+            + "    c.email AS customerEmail, "
+            + "    v.code AS voucherCode, "
+            + "    v.discount_type, "
+            + "    v.discount_value, "
+            + "    CASE "
+            + "        WHEN v.discount_type = 'percentage' THEN "
+            + "            CONVERT(DECIMAL(10,2), o.total_price / (1 - (v.discount_value / 100.0))) "
+            + "        WHEN v.discount_type = 'fixed_amount' THEN "
+            + "            CONVERT(DECIMAL(10,2), o.total_price + v.discount_value) "
+            + "        ELSE "
+            + "            o.total_price "
+            + "    END AS total_subtotal, "
+            + "    CASE "
+            + "        WHEN v.discount_type = 'percentage' THEN "
+            + "            CONVERT(DECIMAL(10,2), (o.total_price / (1 - (v.discount_value / 100.0))) - o.total_price) "
+            + "        WHEN v.discount_type = 'fixed_amount' THEN "
+            + "            CONVERT(DECIMAL(10,2), v.discount_value) "
+            + "        ELSE "
+            + "            0 "
+            + "    END AS discount_amount, "
+            + "    o.total_price AS final_total, "
+            + "    e.event_id, "
+            + "    e.event_name, "
+            + "    e.location, "
+            + "    s.start_date, "
+            + "    s.end_date, "
+            + "    ei.image_url AS eventImage "
+            + "FROM Orders o "
+            + "JOIN Customers c ON o.customer_id = c.customer_id "
+            + "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id "
+            + "CROSS APPLY ( "
+            + "    SELECT TOP 1 tt.showtime_id "
+            + "    FROM OrderDetails od2 "
+            + "    JOIN TicketTypes tt ON od2.ticket_type_id = tt.ticket_type_id "
+            + "    WHERE od2.order_id = o.order_id "
+            + "    ORDER BY od2.order_detail_id "
+            + ") ot "
+            + "JOIN Showtimes s ON s.showtime_id = ot.showtime_id "
+            + "JOIN Events e ON s.event_id = e.event_id "
+            + "OUTER APPLY ( "
+            + "    SELECT TOP 1 image_url "
+            + "    FROM EventImages ei "
+            + "    WHERE ei.event_id = e.event_id "
+            + "    ORDER BY ei.image_id "
+            + ") ei "
+            + "WHERE o.order_id = ?";
 
-    // Query Order Items: Lấy chi tiết các order items (theo từng loại vé, số lượng, danh sách ghế và subtotal từng loại)
-    private static final String SQL_GET_ORDER_ITEMS =
-            "SELECT " +
-            "   OD.ticket_type_id, " +
-            "   TT.name AS ticketType, " +
-            "   OD.price AS unitPrice, " +
-            "   STRING_AGG((se.seat_row + '-' + se.seat_col), ', ') " +
-            "       WITHIN GROUP (ORDER BY se.seat_row, TRY_CAST(se.seat_col AS INT)) AS seats, " +
-            "   COUNT(se.seat_id) AS Quantity, " +
-            "   OD.price * COUNT(se.seat_id) AS subtotal_per_type " +
-            "FROM OrderDetails OD " +
-            "JOIN TicketTypes TT ON OD.ticket_type_id = TT.ticket_type_id " +
-            "LEFT JOIN Ticket T ON OD.order_detail_id = T.order_detail_id " +
-            "LEFT JOIN Seats se ON T.seat_id = se.seat_id " +
-            "WHERE OD.order_id = ? " +
-            "GROUP BY OD.ticket_type_id, TT.name, OD.price";
+    // Query Order Items: Lấy thông tin chi tiết các order items theo từng loại vé
+    private static final String SQL_GET_ORDER_ITEMS
+            = "SELECT "
+            + "    od.ticket_type_id, "
+            + "    tt.name AS ticketType, "
+            + "    tt.price AS unitPrice, "
+            + "    STRING_AGG('(' + se.seat_row + '-' + se.seat_col + ')', ', ') WITHIN GROUP (ORDER BY se.seat_row, TRY_CAST(se.seat_col AS INT)) AS seats, "
+            + "    od.quantity AS Quantity, "
+            + "    od.quantity * tt.price AS subtotal_per_type "
+            + "FROM OrderDetails od "
+            + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+            + "LEFT JOIN Ticket t ON od.order_detail_id = t.order_detail_id "
+            + "LEFT JOIN Seats se ON t.seat_id = se.seat_id "
+            + "WHERE od.order_id = ? "
+            + "GROUP BY od.ticket_type_id, tt.name, tt.price, od.quantity";
 
-    /**
-     * Lấy chi tiết đơn hàng theo orderId.
-     * Phân tách thành 2 phần:
-     * 1. Header: Thông tin đơn hàng, khách hàng, voucher, tổng tính toán và event.
-     * 2. Order Items: Chi tiết các order items (loại vé, số lượng, danh sách ghế, subtotal từng loại).
-     *
-     * @param orderId ID của đơn hàng
-     * @return OrderDetailDTO chứa thông tin chi tiết đơn hàng
-     */
     public OrderDetailDTO getOrderDetailByOrderId(int orderId) {
         OrderDetailDTO detail = new OrderDetailDTO();
         PreparedStatement psHeader = null;
         PreparedStatement psItems = null;
         ResultSet rsHeader = null;
         ResultSet rsItems = null;
-        
+
         try {
             // --- Query Header ---
             psHeader = connection.prepareStatement(SQL_GET_ORDER_HEADER);
@@ -118,19 +107,20 @@ public class OrderDetailDAO extends DBContext {
                 summary.setVoucherCode(rsHeader.getString("voucherCode"));
                 summary.setDiscountType(rsHeader.getString("discount_type"));
                 summary.setDiscountValue(rsHeader.getBigDecimal("discount_value"));
-                
+
                 CalculationDTO calc = new CalculationDTO();
                 calc.setTotalSubtotal(rsHeader.getBigDecimal("total_subtotal"));
                 calc.setDiscountAmount(rsHeader.getBigDecimal("discount_amount"));
                 calc.setFinalTotal(rsHeader.getBigDecimal("final_total"));
-                
+
                 EventSummaryDTO eventInfo = new EventSummaryDTO();
                 eventInfo.setEventId(rsHeader.getInt("event_id"));
                 eventInfo.setEventName(rsHeader.getString("event_name"));
                 eventInfo.setLocation(rsHeader.getString("location"));
                 eventInfo.setStartDate(rsHeader.getTimestamp("start_date"));
                 eventInfo.setEndDate(rsHeader.getTimestamp("end_date"));
-                
+                eventInfo.setImageUrl(rsHeader.getString("eventImage"));
+
                 detail.setOrderSummary(summary);
                 detail.setCalculation(calc);
                 detail.setEventSummary(eventInfo);
@@ -138,7 +128,7 @@ public class OrderDetailDAO extends DBContext {
                 System.err.println("No header data found for order_id = " + orderId);
                 return null;
             }
-            
+
             // --- Query Order Items ---
             psItems = connection.prepareStatement(SQL_GET_ORDER_ITEMS);
             psItems.setInt(1, orderId);
@@ -149,14 +139,13 @@ public class OrderDetailDAO extends DBContext {
                 item.setTicketTypeId(rsItems.getInt("ticket_type_id"));
                 item.setTicketType(rsItems.getString("ticketType"));
                 item.setUnitPrice(rsItems.getBigDecimal("unitPrice"));
-                // Sử dụng trường seats (danh sách ghế dạng chuỗi)
                 item.setSeats(rsItems.getString("seats"));
                 item.setQuantity(rsItems.getInt("Quantity"));
                 item.setSubtotalPerType(rsItems.getBigDecimal("subtotal_per_type"));
                 ticketItems.add(item);
             }
             detail.setOrderItems(ticketItems);
-            
+
         } catch (SQLException ex) {
             ex.printStackTrace();
             return null;
@@ -168,9 +157,8 @@ public class OrderDetailDAO extends DBContext {
         }
         return detail;
     }
-    
-    // Các phương thức insertOrderDetail, getLatestOrderDetail, getOrderDetailsByOrderId, getOrderDetailById giữ nguyên...
 
+    // Các phương thức insertOrderDetail, getLatestOrderDetail, getOrderDetailsByOrderId, getOrderDetailById giữ nguyên...
     public boolean insertOrderDetail(models.OrderDetail orderDetail) {
         try (PreparedStatement st = connection.prepareStatement("INSERT INTO OrderDetails (order_id, ticket_type_id, quantity, price) VALUES (?, ?, ?, ?)")) {
             st.setInt(1, orderDetail.getOrderId());
@@ -206,7 +194,7 @@ public class OrderDetailDAO extends DBContext {
         }
         return null;
     }
-    
+
     public List<models.OrderDetail> getOrderDetailsByOrderId(int orderId) {
         List<models.OrderDetail> orderDetails = new ArrayList<>();
         String query = "SELECT order_detail_id, order_id, ticketTypeId, quantity, price FROM OrderDetails WHERE order_id = ?";
@@ -228,7 +216,7 @@ public class OrderDetailDAO extends DBContext {
         }
         return orderDetails;
     }
-    
+
     public models.OrderDetail getOrderDetailById(int orderDetailId) {
         models.OrderDetail od = null;
         String query = "SELECT order_detail_id, order_id, ticketTypeId, quantity, price FROM OrderDetails WHERE order_detail_id = ?";
@@ -249,7 +237,7 @@ public class OrderDetailDAO extends DBContext {
         }
         return od;
     }
-    
+
     private void close(AutoCloseable ac) {
         if (ac != null) {
             try {

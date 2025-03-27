@@ -430,7 +430,7 @@
         <url-pattern>/eventAjax</url-pattern>
     </servlet-mapping>
     <session-config>
-        <session-timeout>10080</session-timeout>
+        <session-timeout>1008000000</session-timeout>
     </session-config>
     <welcome-file-list>
         <welcome-file>event</welcome-file>

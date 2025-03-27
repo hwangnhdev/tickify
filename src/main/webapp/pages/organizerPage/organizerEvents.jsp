@@ -110,110 +110,110 @@
                                 </button>
                             </form>
                         </div>
- <!-- Filter Buttons -->
-<div class="flex flex-1 ml-4 space-x-2">
-    <!-- All -->
-    <button
-      onclick="location.href='${pageContext.request.contextPath}/OrganizerEventController?filter=all'"
-      class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-      <c:choose>
-        <c:when test='${currentFilter eq "all"}'>
-          bg-green-500 text-white shadow-lg ring-2 ring-green-300
-        </c:when>
-        <c:otherwise>
-          bg-gray-600 text-gray-200 
-          hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-        </c:otherwise>
-      </c:choose>"
-    >
-      All
-    </button>
+                        <!-- Filter Buttons -->
+                        <div class="flex flex-1 ml-4 space-x-2">
+                            <!-- All -->
+                            <button
+                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=all'"
+                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                <c:choose>
+                                    <c:when test='${currentFilter eq "all"}'>
+                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                    </c:when>
+                                    <c:otherwise>
+                                        bg-gray-600 text-gray-200
+                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                    </c:otherwise>
+                                </c:choose>"
+                                >
+                                All
+                            </button>
 
-    <!-- Processing -->
-    <button
-      onclick="location.href='${pageContext.request.contextPath}/OrganizerEventController?filter=processing'"
-      class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-      <c:choose>
-        <c:when test='${currentFilter eq "processing"}'>
-          bg-green-500 text-white shadow-lg ring-2 ring-green-300
-        </c:when>
-        <c:otherwise>
-          bg-gray-600 text-gray-200 
-          hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-        </c:otherwise>
-      </c:choose>"
-    >
-      Processing
-    </button>
+                            <!-- Processing -->
+                            <button
+                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=processing'"
+                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                <c:choose>
+                                    <c:when test='${currentFilter eq "processing"}'>
+                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                    </c:when>
+                                    <c:otherwise>
+                                        bg-gray-600 text-gray-200
+                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                    </c:otherwise>
+                                </c:choose>"
+                                >
+                                Processing
+                            </button>
 
-    <!-- Approved -->
-    <button
-      onclick="location.href='${pageContext.request.contextPath}/OrganizerEventController?filter=approved'"
-      class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-      <c:choose>
-        <c:when test='${currentFilter eq "approved"}'>
-          bg-green-500 text-white shadow-lg ring-2 ring-green-300
-        </c:when>
-        <c:otherwise>
-          bg-gray-600 text-gray-200 
-          hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-        </c:otherwise>
-      </c:choose>"
-    >
-      Approved
-    </button>
+                            <!-- Approved -->
+                            <button
+                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=approved'"
+                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                <c:choose>
+                                    <c:when test='${currentFilter eq "approved"}'>
+                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                    </c:when>
+                                    <c:otherwise>
+                                        bg-gray-600 text-gray-200
+                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                    </c:otherwise>
+                                </c:choose>"
+                                >
+                                Approved
+                            </button>
 
-    <!-- Rejected -->
-    <button
-      onclick="location.href='${pageContext.request.contextPath}/OrganizerEventController?filter=rejected'"
-      class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-      <c:choose>
-        <c:when test='${currentFilter eq "rejected"}'>
-          bg-green-500 text-white shadow-lg ring-2 ring-green-300
-        </c:when>
-        <c:otherwise>
-          bg-gray-600 text-gray-200 
-          hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-        </c:otherwise>
-      </c:choose>"
-    >
-      Rejected
-    </button>
+                            <!-- Rejected -->
+                            <button
+                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=rejected'"
+                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                <c:choose>
+                                    <c:when test='${currentFilter eq "rejected"}'>
+                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                    </c:when>
+                                    <c:otherwise>
+                                        bg-gray-600 text-gray-200
+                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                    </c:otherwise>
+                                </c:choose>"
+                                >
+                                Rejected
+                            </button>
 
-    <!-- Upcoming -->
-    <button
-      onclick="location.href='${pageContext.request.contextPath}/OrganizerEventController?filter=upcoming'"
-      class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-      <c:choose>
-        <c:when test='${currentFilter eq "upcoming"}'>
-          bg-green-500 text-white shadow-lg ring-2 ring-green-300
-        </c:when>
-        <c:otherwise>
-          bg-gray-600 text-gray-200 
-          hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-        </c:otherwise>
-      </c:choose>"
-    >
-      Upcoming
-    </button>
+                            <!-- Upcoming -->
+                            <button
+                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=upcoming'"
+                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                <c:choose>
+                                    <c:when test='${currentFilter eq "upcoming"}'>
+                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                    </c:when>
+                                    <c:otherwise>
+                                        bg-gray-600 text-gray-200
+                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                    </c:otherwise>
+                                </c:choose>"
+                                >
+                                Upcoming
+                            </button>
 
-    <!-- Past -->
-    <button
-      onclick="location.href='${pageContext.request.contextPath}/OrganizerEventController?filter=past'"
-      class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-      <c:choose>
-        <c:when test='${currentFilter eq "past"}'>
-          bg-green-500 text-white shadow-lg ring-2 ring-green-300
-        </c:when>
-        <c:otherwise>
-          bg-gray-600 text-gray-200 
-          hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-        </c:otherwise>
-      </c:choose>"
-    >
-      Past
-    </button>
-</div>
+                            <!-- Past -->
+                            <button
+                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=past'"
+                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                <c:choose>
+                                    <c:when test='${currentFilter eq "past"}'>
+                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                    </c:when>
+                                    <c:otherwise>
+                                        bg-gray-600 text-gray-200
+                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                    </c:otherwise>
+                                </c:choose>"
+                                >
+                                Past
+                            </button>
+                        </div>
 
 
 
@@ -238,7 +238,7 @@
                                         </div>
                                     </c:if>
                                     <div class="w-2/3 p-4 bg-gray-800 flex flex-col justify-center">
-                                        <h2 class="text-xl font-bold text-white cursor-pointer hover:text-gray-400 mb-4" 
+                                        <h2 class="fancy-text text-3xl font-bold card-title text-white cursor-pointer hover:text-gray-400 mb-4" 
                                             onclick="window.open('${pageContext.request.contextPath}/OrganizerEventDetailController?eventId=${event.eventId}', '_blank')">
                                             ${event.eventName}
                                         </h2>
