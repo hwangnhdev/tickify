@@ -1146,7 +1146,7 @@ public class EventDAO extends DBContext {
         return null;
     }
 
-    /* getTopEventsWithLimit */
+    /* getImageEventsByEventId */
     public List<EventImage> getImageEventsByEventId(int eventId) {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "SELECT\n"
@@ -1638,7 +1638,7 @@ public class EventDAO extends DBContext {
 
     public static void main(String[] args) {
         EventDAO eventDAO = new EventDAO();
-        int eventId = 21;
+        int eventId = 1;
 
         // Lấy danh sách doanh thu theo showtime
         Map<Integer, List<TicketRevenueDTO>> revenueData = eventDAO.getTicketRevenueByEventId(eventId);
@@ -1668,5 +1668,4 @@ public class EventDAO extends DBContext {
         }
         System.out.println(index);
     }
-
 }
