@@ -21,6 +21,7 @@ public class Ticket {
     private String status;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private String ticketQRCode;
 
     public Ticket() {
     }
@@ -34,6 +35,18 @@ public class Ticket {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public Ticket(int ticketId, int orderDetailId, int seatId, String ticketCode, double price, String status, Timestamp createdAt, Timestamp updatedAt, String ticketQRCode) {
+        this.ticketId = ticketId;
+        this.orderDetailId = orderDetailId;
+        this.seatId = seatId;
+        this.ticketCode = ticketCode;
+        this.price = price;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.ticketQRCode = ticketQRCode;
     }
 
     public int getTicketId() {
@@ -100,4 +113,11 @@ public class Ticket {
         this.updatedAt = updatedAt;
     }
 
+    public String getTicketQRCode() {
+        return ticketQRCode;
+    }
+
+    public void setTicketQRCode(String ticketQRCode) {
+        this.ticketQRCode = ticketQRCode;
+    }
 }

@@ -12,8 +12,8 @@ import viewModels.TicketSeatDTO;
 
 public class TicketDAO extends DBContext {
 
-    private static final String INSERT_TICKET = "INSERT INTO Ticket (order_detail_id, seat_id, ticket_code, price, status, created_at, updated_at) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_TICKET = "INSERT INTO Ticket (order_detail_id, seat_id, ticket_code, price, status, created_at, updated_at, ticket_qr_code) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String CHECK_TICKET_EXIST = "SELECT COUNT(*) FROM Ticket WHERE ticket_code = ?";
     private static final String CHECK_TICKET_STATUS = "SELECT t.status AS ticket_status "
             + "FROM Orders o "
@@ -33,6 +33,7 @@ public class TicketDAO extends DBContext {
             st.setString(5, ticket.getStatus());
             st.setTimestamp(6, ticket.getCreatedAt());
             st.setTimestamp(7, ticket.getUpdatedAt());
+            st.setString(8, ticket.getTicketQRCode());
 
             int rowsInserted = st.executeUpdate();
             return rowsInserted > 0;

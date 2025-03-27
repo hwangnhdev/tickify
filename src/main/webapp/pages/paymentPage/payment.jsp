@@ -25,6 +25,20 @@
                 font-family: 'Roboto', sans-serif;
                 background-color: #222;
             }
+            .countdown {
+                background-color: rgb(56, 56, 61);
+                padding: 2rem;
+                border-radius: 8px;
+                text-align: center;
+            }
+            .countdown p {
+                font-size: 1rem;
+            }
+            .countdown .time {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #48BB78; /* Green color */
+            }
         </style>
     </head>
     <body class="bg-dark-100">
@@ -55,13 +69,9 @@
                             <p>${startTime} - ${endTime}, ${formattedDate}</p>
                         </div>
                     </div>
-                    <div class="p-2 mr-8 rounded-md text-center" style="background-color: rgb(56, 56, 61);">
-                        <p class="text-sm">
-                            Complete your booking within
-                        </p>
-                        <div class="text-green-500 text-xl font-bold">
-                            14 : 46
-                        </div>
+                    <div class="p-2 mr-8 rounded-md text-center countdown">
+                        <p class="text-sm">Complete your booking within</p>
+                        <div class="time" id="countdown">15:00</div>
                     </div>
                 </div>
             </div>
@@ -257,5 +267,92 @@
                 return false;
             });
         </script>  
+        <script>
+        let COUNTDOWN_DURATION = 15 * 60; // 15 phút (900 giây)
+        let countdownTimer;
+        let timeLeft;
+
+        function startCountdown(duration) {
+            let countdownDisplay = document.getElementById("countdown");
+
+            let startTime = localStorage.getItem("countdownStartTime");
+            let currentTime = Date.now();
+
+            if (!startTime) {
+                startTime = currentTime;
+                localStorage.setItem("countdownStartTime", startTime);
+            } else {
+                startTime = parseInt(startTime);
+            }
+
+            let elapsedTime = Math.floor((currentTime - startTime) / 1000);
+            timeLeft = duration - elapsedTime;
+
+            if (timeLeft <= 0) {
+                resetCountdown();
+                return;
+            }
+
+            updateCountdownDisplay();
+
+            function countdownStep() {
+                if (timeLeft > 0) {
+                    updateCountdownDisplay();
+                    countdownTimer = setTimeout(countdownStep, 1000);
+                    timeLeft--;
+                } else {
+                    resetCountdown();
+                    alert("Time is up!");
+                }
+            }
+
+            countdownStep();
+        }
+
+        function updateCountdownDisplay() {
+            let countdownDisplay = document.getElementById("countdown");
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            countdownDisplay.textContent = minutes + ":" + seconds;
+        }
+
+        function resetCountdown() {
+            localStorage.removeItem("countdownStartTime");
+            localStorage.setItem("countdownStartTime", Date.now());
+            timeLeft = COUNTDOWN_DURATION;
+            updateCountdownDisplay();
+            startCountdown(COUNTDOWN_DURATION);
+        }
+
+        window.onload = function () {
+            startCountdown(COUNTDOWN_DURATION);
+        };
+
+        // Cảnh báo khi người dùng cố gắng reload hoặc rời trang
+        window.onbeforeunload = function (event) {
+            event.preventDefault();
+            event.returnValue = "Are you sure you want to leave? Your booking progress will be lost.";
+        };
+
+        // Xử lý khi nhấn nút Back
+        window.addEventListener("popstate", function (event) {
+            clearTimeout(countdownTimer); // Dừng đếm ngược tạm thời
+
+            let confirmLeave = confirm("Are you sure you want to go back? Your booking progress will be lost.");
+            if (confirmLeave) {
+                resetCountdown(); // Reset thời gian
+                history.back();
+            } else {
+                startCountdown(timeLeft); // Tiếp tục đếm ngược nếu chọn Cancel
+                history.pushState(null, null, window.location.href); // Giữ nguyên trang
+            }
+        });
+
+        history.pushState(null, null, window.location.href); // Đẩy state vào history
+    </script>
     </body>
 </html>

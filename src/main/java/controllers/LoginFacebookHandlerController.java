@@ -138,16 +138,19 @@ public class LoginFacebookHandlerController extends HttpServlet {
                 customerAuthDao.insertCustomerAuth(customerAuth);
 
                 customerSendRedirect = customer;
+                customerSendRedirect.setCustomerId(insertedCustomerId);
             }
 
-            System.out.println(customerSendRedirect);
+//            System.out.println(customerSendRedirect);
 
             // Login
             HttpSession session = request.getSession();
             session.setAttribute("customerImage", customerSendRedirect.getProfilePicture());
+            System.out.println(customerSendRedirect.getCustomerId());
             session.setAttribute("customerId", customerSendRedirect.getCustomerId());
-            request.getRequestDispatcher("").forward(request, response);
-            // response.sendRedirect(request.getContextPath());
+            session.setAttribute("accountRole", "customer");
+//            request.getRequestDispatcher("").forward(request, response);
+             response.sendRedirect(request.getContextPath());
         } catch (Exception e) {
             request.setAttribute("error", "Login fail!");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
