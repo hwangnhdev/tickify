@@ -49,7 +49,7 @@
             <main class="flex-1 flex flex-col">
                 <!-- Header -->
                 <header class="flex justify-between items-center bg-gray-800 p-4">
-                    <h1 class="text-xl font-bold text-white">Edit Voucher</h1>
+                    <h1 class="text-xl font-bold text-white">Update Voucher</h1>
                     <div class="flex items-center space-x-4">
                         <button type="button" onclick="location.href = 'createEvent.jsp'" class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
                             + Create Event

@@ -175,6 +175,9 @@ public class ViewAllVouchersController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        int eventId = Integer.parseInt(request.getParameter("eventId"));
+        response.sendRedirect(request.getContextPath() + "/listVoucher" + "?eventId=" + eventId);
         doGet(request, response);
     }
 

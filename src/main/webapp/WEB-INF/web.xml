@@ -133,6 +133,10 @@
         <servlet-class>controllers.PaymentController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>AdminChangePasswordController</servlet-name>
+        <servlet-class>controllers.AdminChangePasswordController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ViewSeatController</servlet-name>
         <servlet-class>controllers.ViewSeatController</servlet-class>
     </servlet>
@@ -219,10 +223,6 @@
     <servlet>
         <servlet-name>EventAjaxController</servlet-name>
         <servlet-class>controllers.EventAjaxController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AdminProfileController</servlet-name>
-        <servlet-class>controllers.AdminProfileController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
@@ -424,6 +424,10 @@
         <servlet-name>VnPayReturnController</servlet-name>
         <url-pattern>/vnPayReturn</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminChangePasswordController</servlet-name>
+        <url-pattern>/settings</url-pattern>
+    </servlet-mapping>
     <!-- Session Configuration -->
     <servlet-mapping>
         <servlet-name>ViewProcessingEventsAdminController</servlet-name>
@@ -432,10 +436,6 @@
     <servlet-mapping>
         <servlet-name>EventAjaxController</servlet-name>
         <url-pattern>/eventAjax</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AdminProfileController</servlet-name>
-        <url-pattern>/adminProfile</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>10080</session-timeout>

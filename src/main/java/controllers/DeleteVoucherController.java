@@ -4,23 +4,21 @@
  */
 package controllers;
 
-import dals.AdminDAO;
-import jakarta.servlet.RequestDispatcher;
-import java.io.IOException;
+import dals.VoucherDAO;
 import java.io.PrintWriter;
+import java.io.IOException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import models.Admin;
-import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
- * @author Nguyen Huy Hoang - CE182102
+ * @author Dinh Minh Tien CE190701
  */
-public class AdminLoginController extends HttpServlet {
+@WebServlet(name = "DeleteVoucherController", urlPatterns = {"/DeleteVoucherController"})
+public class DeleteVoucherController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,42 +37,12 @@ public class AdminLoginController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminLoginController</title>");
+            out.println("<title>Servlet DeleteVoucher</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AdminLoginController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DeleteVoucher at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
-        }
-    }
-
-    // Xử lý đăng nhập
-    private void handleLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-
-        AdminDAO adminDao = new AdminDAO();
-        Admin admin = adminDao.selectAdminByEmail(email);
-
-        // Kiểm tra admin có tồn tại không
-        if (admin == null) {
-            System.out.println("Admin không tồn tại!");
-            request.setAttribute("errorMessage", "Invalid email or password");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("pages/adminPage/login.jsp");
-            dispatcher.forward(request, response);
-            return;
-        }
-
-        // Kiểm tra mật khẩu có hợp lệ không
-        if (password != null && BCrypt.checkpw(password, admin.getPassword())) {
-            HttpSession session = request.getSession();
-            session.setAttribute("admin", admin);
-            response.sendRedirect("ViewAllCustomersController");
-        } else {
-            System.out.println("Sai mật khẩu!");
-            request.setAttribute("errorMessage", "Invalid email or password");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("pages/adminPage/login.jsp");
-            dispatcher.forward(request, response);
         }
     }
 
@@ -90,8 +58,7 @@ public class AdminLoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        processRequest(request, response);
-        request.getRequestDispatcher("pages/adminPage/login.jsp").forward(request, response);
+        processRequest(request, response);
     }
 
     /**
@@ -105,8 +72,29 @@ public class AdminLoginController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        processRequest(request, response);
-        handleLogin(request, response);
+        try {
+            // Get voucher ID and event ID from request
+            int voucherId = Integer.parseInt(request.getParameter("voucherId"));
+            int eventId = Integer.parseInt(request.getParameter("eventId"));
+
+            // Create DAO and delete the voucher
+            VoucherDAO voucherDAO = new VoucherDAO();
+            boolean success = voucherDAO.deleteVoucher(voucherId);
+
+            // Set success/error message as attribute
+            String message = success ? "Voucher deleted successfully!" : "Failed to delete voucher.";
+            request.getSession().setAttribute("deleteMessage", message);
+            request.getSession().setAttribute("deleteSuccess", success);
+
+            // Redirect back to the voucher list
+            response.sendRedirect(request.getContextPath() + "/listVoucher" + "?eventId=" + eventId);
+        } catch (NumberFormatException e) {
+            int eventId = Integer.parseInt(request.getParameter("eventId"));
+            // Handle invalid parameters
+            request.getSession().setAttribute("deleteMessage", "Invalid voucher ID.");
+            request.getSession().setAttribute("deleteSuccess", false);
+            response.sendRedirect(request.getContextPath() + "/listVoucher" + "?eventId=" + eventId);
+        }
     }
 
     /**

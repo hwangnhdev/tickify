@@ -245,24 +245,27 @@
     <%
         Customer profile = (Customer) request.getAttribute("profile");
         String successMessage = (String) request.getAttribute("successMessage");
+        String errorMessage = (String) request.getAttribute("errorMessage");
     %>
     <body>
         <jsp:include page="../../components/header.jsp"></jsp:include>
 
-        <div class="profile-container">
-            <div class="close-btn" onclick="window.location.href = 'event';" aria-label="Close profile">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="profile-container">
+                <div class="close-btn" onclick="window.location.href = 'event';" aria-label="Close profile">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M15 3L3 15M3 3l12 12" stroke="#2A2D34" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-            </div>
+                    </svg>
+                </div>
 
-            <div class="profile-picture">
-                <img name="profile_picture" id="profile_picture" src="<%= profile.getProfilePicture() != null && !profile.getProfilePicture().isEmpty() ? profile.getProfilePicture() : "default-avatar.jpg"%>" alt="Profile Picture" />
-                <label for="imageUpload">📷</label>
-                <input type="file" id="imageUpload" name="image" accept="image/*" onchange="previewImage(event)" />
-            </div>
 
-            <form action="profile" method="post" onsubmit="return validateForm();">
+
+                <form action="profile" method="post" enctype="multipart/form-data" onsubmit="return validateForm();">
+                    <div class="profile-picture">
+                        <img name="profile_picture" id="profile_picture" src="<%= profile.getProfilePicture() != null && !profile.getProfilePicture().isEmpty() ? profile.getProfilePicture() : "default-avatar.jpg"%>" alt="Profile Picture" />
+                    <label for="imageUpload">📷</label>
+                    <input type="file" id="imageUpload" name="profile_picture" accept="image/*" onchange="previewImage(event)" />
+                </div>
+
                 <div class="form-wrapper">
                     <input type="hidden" name="customerId" value="<%= profile.getCustomerId()%>" />
 
@@ -282,7 +285,7 @@
                 </div>
             </form>
 
-            <a href="<%= request.getContextPath() %>/changePassword" class="change-password-link">Change Password</a>
+            <a href="<%= request.getContextPath()%>/changePassword" class="change-password-link">Change Password</a>
         </div>
 
         <!-- Popup Notification -->
@@ -291,6 +294,11 @@
             <h3>Success!</h3>
             <p>Your profile has been updated successfully.</p>
             <button onclick="closePopup()">OK</button>
+        </div>
+        <div class="popup" id="errorPopup" style="border: 2px solid red;">
+            <h3>Error!</h3>
+            <p><%= errorMessage != null ? errorMessage : "Something went wrong."%></p>
+            <button onclick="closeErrorPopup()">OK</button>
         </div>
 
         <script>
@@ -335,10 +343,13 @@
                 window.location.href = 'event';
             }
 
-            // Check for success message and show popup
+            // Check for success message or error message and show popup
             <% if (successMessage != null && !successMessage.isEmpty()) { %>
-                showPopup();
+            showPopup();
             <% } %>
+            <% if (errorMessage != null && !errorMessage.isEmpty()) { %>
+            showErrorPopup();
+            <% }%>
         </script>
     </body>
 </html>

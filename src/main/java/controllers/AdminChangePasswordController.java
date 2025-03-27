@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controllers;
 
 import dals.AdminDAO;
@@ -31,15 +30,34 @@ public class AdminChangePasswordController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Integer adminId = (Integer) session.getAttribute("adminId");
-        
-        if (adminId == null) {
+        Object adminIdObj = session.getAttribute("adminId");
+        int adminId = 0;
+        if (adminIdObj instanceof Integer) {
+            adminId = (Integer) adminIdObj;
+            System.out.println("admin ID: " + adminId);
+        } else if (adminIdObj instanceof String) {
+            try {
+                adminId = Integer.parseInt((String) adminIdObj);
+                System.out.println("admin ID: " + adminId);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("admin ID không hợp lệ hoặc chưa được set trong session.");
+            response.sendRedirect("adminLogin");
+        }
+
+        AdminDAO dao = new AdminDAO();
+        Admin admin = dao.selectAdminById(adminId);
+        request.setAttribute("profile", admin);
+
+        if (admin == null) {
             response.sendRedirect("adminLogin");
             return;
         }
-        
+
         // Forward to change password page
-        request.getRequestDispatcher("pages/adminPage/changePassword.jsp").forward(request, response);
+        request.getRequestDispatcher("pages/adminPage/settings.jsp").forward(request, response);
     }
 
     @Override
@@ -47,7 +65,7 @@ public class AdminChangePasswordController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         Integer adminId = (Integer) session.getAttribute("adminId");
-        
+
         // Check if admin is logged in
         if (adminId == null) {
             response.sendRedirect("adminLogin");
@@ -65,28 +83,28 @@ public class AdminChangePasswordController extends HttpServlet {
 
             if (admin == null) {
                 request.setAttribute("error", "Admin account not found");
-                request.getRequestDispatcher("pages/adminPage/changePassword.jsp").forward(request, response);
+                request.getRequestDispatcher("pages/adminPage/settings.jsp").forward(request, response);
                 return;
             }
 
             // Validate current password
             if (!BCrypt.checkpw(currentPassword, admin.getPassword())) {
                 request.setAttribute("error", "Current password is incorrect");
-                request.getRequestDispatcher("pages/adminPage/changePassword.jsp").forward(request, response);
+                request.getRequestDispatcher("pages/adminPage/settings.jsp").forward(request, response);
                 return;
             }
 
             // Validate new password match
             if (!newPassword.equals(confirmPassword)) {
                 request.setAttribute("error", "New passwords do not match");
-                request.getRequestDispatcher("pages/adminPage/changePassword.jsp").forward(request, response);
+                request.getRequestDispatcher("pages/adminPage/settings.jsp").forward(request, response);
                 return;
             }
 
             // Optional: Add password strength validation
             if (newPassword.length() < 8) {
                 request.setAttribute("error", "New password must be at least 8 characters long");
-                request.getRequestDispatcher("pages/adminPage/changePassword.jsp").forward(request, response);
+                request.getRequestDispatcher("pages/adminPage/settings.jsp").forward(request, response);
                 return;
             }
 
@@ -103,11 +121,11 @@ public class AdminChangePasswordController extends HttpServlet {
                 request.setAttribute("error", "Failed to change password");
             }
 
-            request.getRequestDispatcher("pages/adminPage/changePassword.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/adminPage/settings.jsp").forward(request, response);
 
         } catch (Exception e) {
             request.setAttribute("error", "An error occurred: " + e.getMessage());
-            request.getRequestDispatcher("pages/adminPage/changePassword.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/adminPage/settings.jsp").forward(request, response);
         }
     }
 

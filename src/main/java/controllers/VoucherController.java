@@ -65,8 +65,6 @@ public class VoucherController extends HttpServlet {
         Voucher voucher = dao.getVoucherById(voucherId);
         request.setAttribute("voucher", voucher);
         request.getRequestDispatcher("pages/voucherPage/editVoucher.jsp").forward(request, response);
-        // SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        // System.out.println(displayFormat.format(voucher.getEndDate()));
     }
 
     /**
