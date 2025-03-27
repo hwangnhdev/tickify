@@ -6,6 +6,7 @@ package controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import dals.SeatDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -14,6 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +52,33 @@ public class ViewPaymentController extends HttpServlet {
         }
     }
 
+    private boolean holdSeats(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        SeatDAO seatDao = new SeatDAO();
+        String selectedDataJson = request.getParameter("selectedData");
+
+        Gson gson = new Gson();
+        Type listType = new TypeToken<List<Map<String, Object>>>() {
+        }.getType();
+        List<Map<String, Object>> seatDataList = gson.fromJson(selectedDataJson, listType);
+
+        List<Integer> seatIds = new ArrayList<>();
+        for (Map<String, Object> ticketType : seatDataList) {
+            List<Map<String, Object>> seats = (List<Map<String, Object>>) ticketType.get("seats");
+            for (Map<String, Object> seat : seats) {
+                int seatId = Integer.parseInt(seat.get("id").toString());
+                seatIds.add(seatId);
+            }
+        }
+
+        boolean success = seatDao.holdSeatsForPayment(seatIds);
+        if (!success) {
+            request.setAttribute("errorMessage", "Seats could not be held. Please try again.");
+            request.getRequestDispatcher("viewSeat").forward(request, response);
+            return false; // Dừng tại đây nếu thất bại
+        }
+        return true; // Thành công
+    }
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -75,18 +105,40 @@ public class ViewPaymentController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String selectedSeats = request.getParameter("selectedSeats");
-        String selectedDataJson = request.getParameter("selectedData");
-        String subtotal = request.getParameter("subtotal"); // Nhận tổng tiền
+        
+        SeatDAO seatDao = new SeatDAO();
+        Gson gson = new Gson();
 
+        String selectedDataJson = request.getParameter("selectedData");
+        String selectedSeats = request.getParameter("selectedSeats");
+        String subtotal = request.getParameter("subtotal"); // Nhận tổng tiền
+        
+        Type listType = new TypeToken<List<Map<String, Object>>>() {}.getType();
+        List<Map<String, Object>> seatDataList = gson.fromJson(selectedDataJson, listType);
+
+        List<Integer> seatIds = new ArrayList<>();
+        for (Map<String, Object> ticketType : seatDataList) {
+            List<Map<String, Object>> seats = (List<Map<String, Object>>) ticketType.get("seats");
+            for (Map<String, Object> seat : seats) {
+                int seatId = Integer.parseInt(seat.get("id").toString());
+                seatIds.add(seatId);
+            }
+        }
+
+        boolean success = seatDao.holdSeatsForPayment(seatIds);
+        if (!success) {
+            request.setAttribute("errorMessage", "Seats could not be held. Please try again.");
+            request.getRequestDispatcher("viewSeat").forward(request, response);
+            return;
+        }
+
+        for (Integer seatId : seatIds) {
+            System.out.println(seatId);
+        }
+        
         System.out.println("Selected Seats: " + selectedSeats);
         System.out.println("Selected Data: " + selectedDataJson);
         System.out.println("Subtotal: " + subtotal);
-
-        Gson gson = new Gson();
-        Type listType = new TypeToken<List<Map<String, Object>>>() {
-        }.getType();
-        List<Map<String, Object>> seatDataList = gson.fromJson(selectedDataJson, listType);
 
         HttpSession session = request.getSession();
         session.setAttribute("selectedSeats", selectedSeats);

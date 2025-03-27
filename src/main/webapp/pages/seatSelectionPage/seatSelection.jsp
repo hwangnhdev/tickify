@@ -112,6 +112,10 @@
                             <div class="w-4 h-4 bg-gray-500 border border-black rounded-lg mr-2" style="border-radius: 4px; height: 26px; width: 38px;"></div>
                             <span class="text-white">Not Available</span>
                         </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 border border-black rounded-lg mr-2" style="border-radius: 4px; height: 26px; width: 38px; background-color: #FFA500;"></div>
+                            <span class="text-white">Pending</span>
+                        </div>
                     </div>
                     <form action="<%= request.getContextPath()%>/viewPayment" method="post" id="seatForm">
                         <div class="seat-container" id="seatContainer">
@@ -125,6 +129,13 @@
                                     <c:set var="seatColor" value="#808080" />  <%-- Màu xám --%>
                                     <c:set var="seatCursor" value="not-allowed" />
                                 </c:if>
+
+                                <c:if test="${seat.status eq 'pending'}">
+                                    <c:set var="seatClass" value="seat pending" />
+                                    <c:set var="seatColor" value="#FFA500" />  <%-- Màu cam --%>
+                                    <c:set var="seatCursor" value="not-allowed" />
+                                </c:if>
+
                                 <div class="${seatClass}" 
                                      data-ticket_type_id="${seat.ticketTypeId}" 
                                      data-seat_id="${seat.seatId}" 

@@ -6,8 +6,11 @@ package utils;
 
 import configs.EmailConfig;
 import com.google.zxing.WriterException;
+import configs.CloudinaryConfig;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
+import jakarta.activation.URLDataSource;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.util.Properties;
@@ -15,6 +18,8 @@ import java.util.Properties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.util.ByteArrayDataSource;
 import java.io.IOException;
+import java.net.URL;
+import static utils.QRCodeGenerator.generateQRCode;
 import static utils.QRCodeGenerator.generateQRCodeAsBytes;
 
 /**
@@ -75,24 +80,48 @@ public class EmailUtility {
         MimeBodyPart textPart = new MimeBodyPart();
         textPart.setText(content);
 
-        // Generate QR code as byte array
-        byte[] qrCodeBytes = generateQRCodeAsBytes(qrData);
+//        // Generate QR code as byte array
+//        byte[] qrCodeBytes = generateQRCodeAsBytes(qrData);
+//
+//        // Attach QR code image
+//        MimeBodyPart imagePart = new MimeBodyPart();
+//        DataSource dataSource = new ByteArrayDataSource(qrCodeBytes, "image/png");
+//        imagePart.setDataHandler(new DataHandler(dataSource));
+//        imagePart.setFileName("qrcode.png");
 
-        // Attach QR code image
+//        // Tạo QR code dưới dạng byte[]
+//        byte[] qrCodeBytes = generateQRCodeAsBytes(qrData);
+//
+//        // Upload lên Cloudinary và lấy URL
+//        String cloudinaryUrl = CloudinaryConfig.uploadQRCode(qrCodeBytes, qrData);
+
+//        // Lưu URL vào database
+//        saveQRCodeUrlToDatabase(qrData, cloudinaryUrl);
+
+        // Đính kèm QR code từ Cloudinary vào email
         MimeBodyPart imagePart = new MimeBodyPart();
-        DataSource dataSource = new ByteArrayDataSource(qrCodeBytes, "image/png");
+        DataSource dataSource = new URLDataSource(new URL(qrData));
         imagePart.setDataHandler(new DataHandler(dataSource));
         imagePart.setFileName("qrcode.png");
 
-        // Combine the email parts
+        // Gửi email
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(textPart);
         multipart.addBodyPart(imagePart);
-
         message.setContent(multipart);
 
-        // Send the email
         Transport.send(message);
+    }
+    
+    private static void saveQRCodeUrlToDatabase(String ticketId, String qrCodePath) {
+//        String sql = "INSERT INTO ticket_qr (ticket_id, qr_code_path) VALUES (?, ?) ON DUPLICATE KEY UPDATE qr_code_path = VALUES(qr_code_path)";
+//
+//        try (Connection conn = DatabaseUtils.getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(sql)) {
+//            stmt.setString(1, ticketId);
+//            stmt.setString(2, qrCodePath);
+//            stmt.executeUpdate();
+//        }
     }
 
     public static void main(String[] args) throws MessagingException {
