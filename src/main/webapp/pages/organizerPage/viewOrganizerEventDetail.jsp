@@ -12,118 +12,83 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config = {
-                theme: {extend: {}},
-                plugins: [require('@tailwindcss/aspect-ratio')],
+                theme: { extend: {} },
+                plugins: [ require('@tailwindcss/aspect-ratio') ],
             }
         </script>
         <!-- Font Awesome & Google Fonts -->
-        <link
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-            rel="stylesheet"
-            />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap"
-            rel="stylesheet"
-            />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
         <style>
             /* Animation & Typography */
             @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
             }
-            .animate-fadeIn {
-                animation: fadeIn 0.8s ease-out forwards;
-            }
-            .fancy-text {
-                font-family: 'Playfair Display', serif;
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-            }
-            .font-inter {
-                font-family: 'Inter', sans-serif;
-            }
-            .card-title {
-                margin-bottom: 1.5rem;
-            }
-            .card-content {
-                margin-bottom: 1rem;
-            }
-            .glow-border {
-                border: 2px dashed rgba(74,85,104,0.5);
-                box-shadow: 0 0 10px rgba(74,85,104,0.5);
-            }
-            /* CSS Grid container cho header */
-            .equal-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
-                grid-auto-rows: 1fr;
-            }
+            .animate-fadeIn { animation: fadeIn 0.8s ease-out forwards; }
+            .fancy-text { font-family: 'Playfair Display', serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+            .font-inter { font-family: 'Inter', sans-serif; }
+            .card-title { margin-bottom: 1.5rem; }
+            .card-content { margin-bottom: 1rem; }
+            .glow-border { border: 2px dashed rgba(74,85,104,0.5); box-shadow: 0 0 10px rgba(74,85,104,0.5); }
+            /* Grid container cho header */
+            .equal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; grid-auto-rows: 1fr; }
             /* Modal Lightbox */
             .modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.75);
-                z-index: 50;
-                align-items: center;
+                display: none; 
+                position: fixed; 
+                top: 0; left: 0; 
+                width: 100%; height: 100%; 
+                background-color: rgba(0,0,0,0.75); 
+                z-index: 50; 
+                align-items: center; 
                 justify-content: center;
             }
-            .modal.active {
-                display: flex;
-            }
+            .modal.active { display: flex; }
+            /* Căn chỉnh text */
+            .text-justify { text-align: justify; }
+            .text-left { text-align: left; }
         </style>
     </head>
     <body class="bg-gradient-to-br from-gray-100 to-gray-300">
         <!-- Include Header -->
         <jsp:include page="../../components/header.jsp" />
 
-        <!-- Set các attribute từ Controller -->
+        <!-- Set các attribute từ Controller (không thay đổi logic) -->
         <c:set var="event" value="${organizerEventDetail}" />
         <c:set var="listEventImages" value="${listEventImages}" />
         <c:set var="listShowtimes" value="${listShowtimes}" />
         <c:set var="ticketTypes" value="${listTicketTypes}" />
 
         <main class="max-w-6xl mx-auto p-6 mt-20 animate-fadeIn">
-            <!-- Header: Event Information & Banner (View-only) -->
+            <!-- Header: Card thông tin sự kiện & Banner -->
             <div class="equal-grid min-h-[350px]">
-                <!-- Event Information Card -->
-                <section class="bg-gray-800 text-white p-8 rounded-2xl shadow-2xl glow-border flex flex-col justify-between h-full">
+                <!-- Card thông tin với icon -->
+                <section class="bg-gray-800 text-white p-8 rounded-2xl shadow-2xl glow-border flex flex-col justify-between h-full text-left">
                     <c:if test="${not empty event}">
                         <div>
                             <h2 class="fancy-text text-3xl font-bold card-title" title="${event.eventName}">
                                 ${event.eventName}
                             </h2>
-                            <p class="text-sm card-content flex items-center font-inter text-white">
+                            <p class="text-sm card-content flex items-center font-inter">
                                 <i class="fas fa-calendar-alt mr-2 text-gray-300"></i>
-                                <span class="text-white">
-                                    <fmt:formatDate value="${event.startDate}" pattern="dd MMM, yyyy" />
-                                    -
+                                <span>
+                                    <fmt:formatDate value="${event.startDate}" pattern="dd MMM, yyyy" /> -
                                     <fmt:formatDate value="${event.endDate}" pattern="dd MMM, yyyy" />
                                 </span>
                             </p>
-                            <p class="text-sm card-content flex items-center font-inter text-white">
+                            <p class="text-sm card-content flex items-center font-inter">
                                 <i class="fas fa-map-marker-alt mr-2 text-gray-300"></i>
-                                <span class="text-white" title="${event.location}">${event.location}</span>
+                                <span title="${event.location}">${event.location}</span>
                             </p>
-                            <!-- Lấy thông tin Category và Event Type từ database -->
-                            <p class="text-sm card-content font-inter text-white">
+                            <p class="text-sm card-content font-inter">
                                 <i class="fas fa-tag mr-1 text-gray-300"></i>
                                 <strong>Category:</strong> ${event.categoryName}
                             </p>
-                            <p class="text-sm card-content font-inter text-white">
+                            <p class="text-sm card-content font-inter">
                                 <i class="fas fa-layer-group mr-1 text-gray-300"></i>
                                 <strong>Event Type:</strong> ${event.eventType}
                             </p>
-
                         </div>
                         <div class="mt-6 border-t border-gray-600 pt-4">
                             <c:choose>
@@ -131,18 +96,6 @@
                                     <div class="w-full inline-flex items-center justify-center bg-gray-700 border border-gray-600 px-4 py-2 rounded-full">
                                         <i class="fas fa-hourglass-half mr-2"></i>
                                         <span class="text-sm">Status: ${event.eventStatus}</span>
-                                    </div>
-                                    <div class="mt-4 flex flex-col sm:flex-row gap-4">
-                                        <button type="button" onclick="updateEvent(${event.eventId}, 'Approved')"
-                                                class="w-full sm:w-1/2 bg-green-600 text-white py-2 px-6 rounded-full flex items-center justify-center hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-green-500">
-                                            <i class="fas fa-check-circle text-xl mr-2"></i>
-                                            <span>Approve</span>
-                                        </button>
-                                        <button type="button" onclick="updateEvent(${event.eventId}, 'Rejected')"
-                                                class="w-full sm:w-1/2 bg-red-600 text-white py-2 px-6 rounded-full flex items-center justify-center hover:scale-105 transition transform focus:outline-none focus:ring-2 focus:ring-red-500">
-                                            <i class="fas fa-times-circle text-xl mr-2"></i>
-                                            <span>Reject</span>
-                                        </button>
                                     </div>
                                 </c:when>
                                 <c:when test="${fn:toLowerCase(event.eventStatus) == 'approved'}">
@@ -174,13 +127,16 @@
                 </section>
             </div>
 
-            <!-- About Section -->
-            <section class="bg-white p-6 rounded-xl shadow-lg mt-6">
+            <!-- About Section: Mô tả với style copy từ mẫu -->
+            <section class="bg-white p-6 rounded-xl shadow-lg mt-6 text-left">
                 <c:choose>
                     <c:when test="${not empty event.description}">
                         <h3 class="text-2xl font-bold text-gray-800 card-title">About</h3>
                         <hr class="border-gray-300 mb-4" />
-                        <p class="text-gray-700 font-inter overflow-auto">${event.description}</p>
+                        <!-- Sử dụng textarea để hiển thị mô tả (readonly) -->
+                        <textarea class="w-full p-4 border rounded-lg font-inter text-gray-700 text-justify resize-y" rows="6" readonly>
+${event.description}
+                        </textarea>
                     </c:when>
                     <c:otherwise>
                         <p class="text-gray-700 font-inter">No event description found.</p>
@@ -189,7 +145,7 @@
             </section>
 
             <!-- Organizer Information Section -->
-            <section class="bg-white p-6 rounded-xl shadow-lg mt-6">
+            <section class="bg-white p-6 rounded-xl shadow-lg mt-6 text-left">
                 <c:choose>
                     <c:when test="${not empty event.organizationName}">
                         <h3 class="text-2xl font-bold text-gray-800 card-title">Organizer Information</h3>
@@ -198,7 +154,18 @@
                             <i class="fas fa-user mr-2 text-blue-500"></i>
                             <span>Organizer: ${event.organizationName}</span>
                         </p>
-
+                        <p class="text-gray-700 flex items-center font-inter">
+                            <i class="fas fa-id-badge mr-2 text-blue-500"></i>
+                            <span>Account Holder: ${event.accountHolder}</span>
+                        </p>
+                        <p class="text-gray-700 flex items-center font-inter">
+                            <i class="fas fa-credit-card mr-2 text-blue-500"></i>
+                            <span>Account Number: ${event.accountNumber}</span>
+                        </p>
+                        <p class="text-gray-700 flex items-center font-inter">
+                            <i class="fas fa-landmark mr-2 text-blue-500"></i>
+                            <span>Bank: ${event.bankName}</span>
+                        </p>
                     </c:when>
                     <c:otherwise>
                         <p class="text-gray-700 font-inter">No organizer detail found.</p>
@@ -207,7 +174,7 @@
             </section>
 
             <!-- Showtimes Section -->
-            <section class="bg-white p-6 rounded-xl shadow-lg mt-6">
+            <section class="bg-white p-6 rounded-xl shadow-lg mt-6 text-left">
                 <h3 class="text-2xl font-bold text-gray-800 mb-4">Showtimes</h3>
                 <hr class="border-gray-300 mb-4" />
                 <c:if test="${not empty listShowtimes}">
@@ -240,14 +207,13 @@
             </section>
 
             <!-- Ticket Types Section -->
-            <section class="bg-white p-6 rounded-xl shadow-lg mt-6">
+            <section class="bg-white p-6 rounded-xl shadow-lg mt-6 text-left">
                 <h3 class="text-2xl font-bold text-gray-800 mb-4">Ticket Types</h3>
                 <hr class="border-gray-300 mb-4" />
                 <c:if test="${not empty ticketTypes}">
                     <div class="space-y-4">
                         <c:forEach var="tt" items="${ticketTypes}">
                             <div class="p-4 border rounded-lg font-inter">
-                                <!-- Không hiển thị ID để bảo mật -->
                                 <p class="flex items-center text-gray-700">
                                     <i class="fas fa-ticket-alt mr-2 text-blue-500"></i>
                                     <span><strong>Name:</strong> ${tt.name}</span>
@@ -277,9 +243,9 @@
                 </c:if>
             </section>
 
-            <!-- Admin Images Section -->
-            <section class="bg-white p-6 rounded-xl shadow-lg mt-6">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Event Images</h3>
+            <!-- Card Ảnh & Modal: Hiển thị ảnh dạng grid với chức năng mở ảnh to -->
+            <section class="bg-white p-6 rounded-xl shadow-lg mt-6 text-center">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Event Images</h3>
                 <hr class="border-gray-300 mb-4" />
                 <c:choose>
                     <c:when test="${not empty listEventImages}">
@@ -297,12 +263,12 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <p class="text-gray-700 text-center">No additional images available.</p>
+                        <p class="text-gray-700">No additional images available.</p>
                     </c:otherwise>
                 </c:choose>
             </section>
 
-            <!-- Modal Lightbox -->
+            <!-- Modal Lightbox để mở ảnh to -->
             <div id="imageModal" class="modal">
                 <div class="relative">
                     <img id="modalImage" class="max-w-full max-h-full rounded-lg" src="" alt="Enlarged Image" />
@@ -314,24 +280,20 @@
         <!-- Modal & SweetAlert Script -->
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
-                        function openModal(imageUrl, imageTitle) {
-                            const modal = document.getElementById('imageModal');
-                            const modalImage = document.getElementById('modalImage');
-                            modalImage.src = imageUrl;
-                            modalImage.alt = imageTitle;
-                            modal.classList.add('active');
-                        }
-
-                        function closeModal() {
-                            const modal = document.getElementById('imageModal');
-                            modal.classList.remove('active');
-                        }
-
-                        document.getElementById('imageModal').addEventListener('click', function (e) {
-                            if (e.target === this) {
-                                closeModal();
-                            }
-                        });
+            function openModal(imageUrl, imageTitle) {
+                const modal = document.getElementById('imageModal');
+                const modalImage = document.getElementById('modalImage');
+                modalImage.src = imageUrl;
+                modalImage.alt = imageTitle;
+                modal.classList.add('active');
+            }
+            function closeModal() {
+                const modal = document.getElementById('imageModal');
+                modal.classList.remove('active');
+            }
+            document.getElementById('imageModal').addEventListener('click', function (e) {
+                if (e.target === this) { closeModal(); }
+            });
         </script>
     </body>
 </html>

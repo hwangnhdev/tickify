@@ -136,7 +136,9 @@ public class AuthController extends HttpServlet {
         if (customer != null && BCrypt.checkpw(password, customerAuth.getPassword())) {
             HttpSession session = request.getSession();
             session.setAttribute("customerImage", customer.getProfilePicture());
+            System.out.println(customer.getCustomerId());
             session.setAttribute("customerId", customer.getCustomerId());
+            session.setAttribute("accountRole", "customer");
             response.sendRedirect(request.getContextPath());
         } else {
             request.setAttribute("errorMessage", "Invalid email or password");
