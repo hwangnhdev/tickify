@@ -140,6 +140,4 @@ public class TicketDAO extends DBContext {
         return tickets;
     }
 
-  
-
 }

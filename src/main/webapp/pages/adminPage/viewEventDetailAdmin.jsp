@@ -8,11 +8,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Event Details - Admin</title>
+        <!-- Tailwind CSS CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
+            // Nếu muốn sử dụng plugin aspect-ratio, bạn cần thêm cấu hình đúng hoặc load script plugin riêng.
             tailwind.config = {
-                theme: {extend: {}},
-                plugins: [require('@tailwindcss/aspect-ratio')],
+                theme: { extend: {} },
+                // plugins: [] // Nếu không dùng plugin thì để rỗng
             }
         </script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
@@ -51,13 +53,13 @@
         <main class="max-w-6xl mx-auto p-6 mt-20 animate-fadeIn">
             <div class="flex flex-col lg:flex-row gap-6 items-stretch min-h-[350px]">
                 <!-- Event Information Card -->
-                <section class="lg:w-1/3 bg-gray-800 text-white p-8 rounded-2xl shadow-2xl glow-border flex flex-col justify-between h-full">
+                <section class="lg:w-1/3 bg-gray-800 text-white p-8 rounded-2xl shadow-2xl glow-border flex flex-col justify-between h-full min-h-[350px]">
                     <c:if test="${not empty event}">
                         <div>
                             <h2 class="fancy-text text-3xl font-bold card-title" title="${event.eventName}">
                                 ${event.eventName}
                             </h2>
-                            <p class="text-sm card-content flex items-center font-inter text-white">
+                            <p class="text-sm card-content flex items-center font-inter">
                                 <i class="fas fa-calendar-alt mr-2 text-gray-300"></i>
                                 <span class="text-white">
                                     <fmt:formatDate value="${event.startDate}" pattern="dd MMM, yyyy" />
@@ -65,20 +67,20 @@
                                     <fmt:formatDate value="${event.endDate}" pattern="dd MMM, yyyy" />
                                 </span>
                             </p>
-                            <p class="text-sm card-content flex items-center font-inter text-white">
+                            <p class="text-sm card-content flex items-center font-inter">
                                 <i class="fas fa-map-marker-alt mr-2 text-gray-300"></i>
                                 <span class="text-white" title="${event.location}">${event.location}</span>
                             </p>
-                            <p class="text-sm card-content font-inter text-white">
+                            <p class="text-sm card-content font-inter">
                                 <i class="fas fa-tag mr-1 text-gray-300"></i>
                                 <strong>Category:</strong> ${event.categoryName}
                             </p>
-                            <p class="text-sm card-content font-inter text-white">
+                            <p class="text-sm card-content font-inter">
                                 <i class="fas fa-layer-group mr-1 text-gray-300"></i>
                                 <strong>Event Type:</strong> ${event.eventType}
                             </p>
-                           
                         </div>
+                        <!-- Xử lý trạng thái event -->
                         <div class="mt-6 border-t border-gray-600 pt-4">
                             <c:choose>
                                 <c:when test="${fn:toLowerCase(event.eventStatus) == 'processing'}">
@@ -104,12 +106,14 @@
                                         <i class="fas fa-check-circle mr-2"></i>
                                         <span class="text-green-400 text-sm">Status: ${event.eventStatus}</span>
                                     </div>
+                                    <div class="mt-4 h-0"></div>
                                 </c:when>
                                 <c:otherwise>
                                     <div class="w-full inline-flex items-center justify-center bg-gray-700 border border-red-900 px-4 py-2 rounded-full">
                                         <i class="fas fa-times-circle mr-2"></i>
                                         <span class="text-sm">Status: ${event.eventStatus}</span>
                                     </div>
+                                    <div class="mt-4 h-0"></div>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -118,7 +122,6 @@
                         <p class="text-sm text-center">No event information available.</p>
                     </c:if>
                 </section>
-                
 
                 <!-- Banner Image Section -->
                 <section class="lg:w-2/3 overflow-hidden flex-1 h-full min-h-[350px]">
@@ -130,20 +133,22 @@
                 </section>
             </div>
 
-
             <!-- Event Description Card -->
             <section class="bg-white p-6 rounded-xl shadow-lg mt-6">
                 <c:choose>
                     <c:when test="${not empty event.description}">
                         <h3 class="text-2xl font-bold text-gray-800 card-title">Description</h3>
                         <hr class="border-gray-300 card-content">
-                        <p class="text-gray-700">${event.description}</p>
+                        <textarea readonly 
+                                  class="w-full p-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
+                                  rows="5">${event.description}</textarea>
                     </c:when>
                     <c:otherwise>
                         <p class="text-gray-700">No description available.</p>
                     </c:otherwise>
                 </c:choose>
             </section>
+
             <!-- Organizer Information Card -->
             <section class="bg-white p-6 rounded-xl shadow-lg mt-6">
                 <c:choose>
@@ -214,7 +219,6 @@
                     <div class="space-y-4">
                         <c:forEach var="tt" items="${ticketTypes}">
                             <div class="p-4 border rounded-lg font-inter">
-                                <!-- Loại bỏ hiển thị ID để bảo mật -->
                                 <p class="flex items-center text-gray-700">
                                     <i class="fas fa-ticket-alt mr-2 text-blue-500"></i>
                                     <span><strong>Name:</strong> ${tt.name}</span>
@@ -286,49 +290,49 @@
         <!-- SweetAlert & Update Event Script -->
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
-                  function updateEvent(eventId, newStatus) {
-                      var popupTitle, popupMessage, popupIcon;
-                      if (newStatus === 'Approved') {
-                          popupTitle = "Approve Event";
-                          popupMessage = "Are you sure you want to approve event #" + eventId + "?";
-                          popupIcon = "info";
-                      } else if (newStatus === 'Rejected') {
-                          popupTitle = "Reject Event";
-                          popupMessage = "Are you sure you want to reject event #" + eventId + "?";
-                          popupIcon = "error";
-                      } else {
-                          popupTitle = "Confirm";
-                          popupMessage = "Do you want to update event #" + eventId + "?";
-                          popupIcon = "warning";
-                      }
-                      swal({
-                          title: popupTitle,
-                          text: popupMessage,
-                          icon: popupIcon,
-                          buttons: true,
-                          dangerMode: true,
-                      }).then((willUpdate) => {
-                          if (willUpdate) {
-                              fetch('${pageContext.request.contextPath}/admin/approveEvent', {
-                                  method: 'POST',
-                                  headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                                  body: 'eventId=' + eventId + '&newStatus=' + newStatus
-                              })
-                                      .then(response => response.text())
-                                      .then(result => {
-                                          if (result.trim() === 'success') {
-                                              swal("Success", "Event updated successfully!", "success")
-                                                      .then(() => window.location.reload());
-                                          } else {
-                                              swal("Failed", "Failed to update event.", "error");
-                                          }
-                                      })
-                                      .catch(error => {
-                                          swal("Error", "Error: " + error, "error");
-                                      });
-                          }
-                      });
-                  }
+            function updateEvent(eventId, newStatus) {
+                var popupTitle, popupMessage, popupIcon;
+                if (newStatus === 'Approved') {
+                    popupTitle = "Approve Event";
+                    popupMessage = "Are you sure you want to approve event #" + eventId + "?";
+                    popupIcon = "info";
+                } else if (newStatus === 'Rejected') {
+                    popupTitle = "Reject Event";
+                    popupMessage = "Are you sure you want to reject event #" + eventId + "?";
+                    popupIcon = "error";
+                } else {
+                    popupTitle = "Confirm";
+                    popupMessage = "Do you want to update event #" + eventId + "?";
+                    popupIcon = "warning";
+                }
+                swal({
+                    title: popupTitle,
+                    text: popupMessage,
+                    icon: popupIcon,
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willUpdate) => {
+                    if (willUpdate) {
+                        fetch('${pageContext.request.contextPath}/admin/approveEvent', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                            body: 'eventId=' + eventId + '&newStatus=' + newStatus
+                        })
+                        .then(response => response.text())
+                        .then(result => {
+                            if (result.trim() === 'success') {
+                                swal("Success", "Event updated successfully!", "success")
+                                    .then(() => window.location.reload());
+                            } else {
+                                swal("Failed", "Failed to update event.", "error");
+                            }
+                        })
+                        .catch(error => {
+                            swal("Error", "Error: " + error, "error");
+                        });
+                    }
+                });
+            }
         </script>
     </body>
 </html>

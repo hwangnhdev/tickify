@@ -92,7 +92,8 @@
                             </thead>
                             <tbody class="bg-gray-800 divide-y divide-gray-700">
                                 <c:forEach var="order" items="${orders}">
-                                    <tr class="hover:bg-gray-700 transition duration-150 cursor-pointer" onclick="window.open('${pageContext.request.contextPath}/orderDetail?orderId=${order.orderSummary.orderId}', '_blank')">
+                                    <tr class="hover:bg-gray-700 transition duration-150 cursor-pointer" onclick="location.href='${pageContext.request.contextPath}/orderDetail?orderId=${order.orderSummary.orderId}'">
+
                                         <td class="px-6 py-4 text-sm">${order.orderSummary.orderId}</td>
                                         <td class="px-6 py-4 text-sm">
                                             <fmt:formatDate value="${order.orderSummary.orderDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
