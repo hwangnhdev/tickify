@@ -80,6 +80,9 @@ public class ViewAllVouchersController extends HttpServlet {
         } else {
             System.out.println("Event ID không hợp lệ hoặc chưa được set trong session.");
         }
+        System.out.println("Session"+ session);
+        System.out.println("eventIdObj"+eventIdObj);
+        System.out.println("eventId"+eventId);
         request.setAttribute("eventId", eventId);
 
         int page = 1;

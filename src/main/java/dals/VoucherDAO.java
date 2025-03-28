@@ -110,6 +110,23 @@ public class VoucherDAO extends DBContext {
         }
         return total;
     }
+    
+public Voucher getVoucherByCode(String code) {
+    String sql = "SELECT * FROM Vouchers WHERE code = ? AND is_deleted = 0";
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setString(1, code);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                Voucher voucher = mapResultSetToVoucher(rs);
+                System.out.println("Voucher Retrieved: " + voucher.getCode() + ", Discount Value: " + voucher.getDiscountValue());
+                return voucher;
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("Error fetching voucher by code: " + e.getMessage());
+    }
+    return null;
+}
 
     public List<Voucher> searchVoucher(int eventId, String keyword, int page, int pageSize) {
         List<Voucher> vouchers = new ArrayList<>();
