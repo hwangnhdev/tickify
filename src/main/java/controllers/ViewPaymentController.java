@@ -145,7 +145,9 @@ public class ViewPaymentController extends HttpServlet {
         session.setAttribute("seatDataList", seatDataList);
         session.setAttribute("subtotal", subtotal); // Lưu subtotal vào session
 
-        response.sendRedirect("pages/paymentPage/payment.jsp");
+//        response.sendRedirect("");
+        request.getRequestDispatcher("pages/paymentPage/payment.jsp").forward(request, response);
+//        response.sendRedirect("pages/paymentPage/payment.jsp");
     }
 
     /**
