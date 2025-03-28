@@ -11,6 +11,7 @@ import dals.OrderDetailDAO;
 import dals.SeatDAO;
 import dals.TicketDAO;
 import dals.TicketTypeDAO;
+import dals.VoucherDAO;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -93,6 +94,7 @@ public class VnPayReturnController extends HttpServlet {
         TicketDAO ticketDao = new TicketDAO();
         OrderDAO orderDao = new OrderDAO();
         OrderDetailDAO orderDetailDao = new OrderDetailDAO();
+        VoucherDAO voucherDao = new VoucherDAO();
 
         HttpSession session = request.getSession();
         Customer customer = (Customer) session.getAttribute("customer");
@@ -159,6 +161,16 @@ public class VnPayReturnController extends HttpServlet {
             // Insert order
             Order newOrder = new Order(0, customer.getCustomerId(), voucherId != null ? voucherId : 0, total, null, transactionStatus, transactionId, null, null);
             orderDao.insertOrder(newOrder);
+
+            // Decrement voucher quantity if a voucher was used
+            if (voucherId != null) {
+                boolean voucherUpdated = voucherDao.decrementVoucherQuantity(voucherId);
+                if (voucherUpdated) {
+                    System.out.println("Voucher ID " + voucherId + " quantity decremented successfully.");
+                } else {
+                    System.out.println("Failed to decrement quantity for Voucher ID " + voucherId + " (possibly already at 0).");
+                }
+            }
 
             // Insert orderDetail
             for (Map<String, Object> seatData : seatDataList) {
