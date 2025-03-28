@@ -56,7 +56,7 @@ public class VnPayReturnController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
+        try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -210,7 +210,7 @@ public class VnPayReturnController extends HttpServlet {
                             continue;
                             // Có thể rollback hoặc log để xử lý sau
                         }
-                        
+
                         // Send QR to Email 
                         String recipient = customer.getEmail();
                         String subject = "Tickify - Your Ticket Confirmation";
@@ -218,8 +218,8 @@ public class VnPayReturnController extends HttpServlet {
                                 + "Thank you for your purchase! Your ticket details are as follows:\n\n"
                                 + "🎟 Ticket Code: " + ticketCode + "\n"
                                 + "📍 Event: " + event.getEventName() + "\n"
-//                                + "📅 Date & Time: " + eventDateTime + "\n"
-//                                + "💺 Seat: " + seatName + "\n"
+                                //                                + "📅 Date & Time: " + eventDateTime + "\n"
+                                //                                + "💺 Seat: " + seatName + "\n"
                                 + "💰 Price: $" + price + "\n\n"
                                 + "Please present the attached QR code at the venue for entry.\n"
                                 + "If you have any questions, feel free to contact our support team.\n\n"
