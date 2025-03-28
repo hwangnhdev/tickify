@@ -2,12 +2,12 @@ package viewModels;
 
 import java.sql.Timestamp;
 
-public class ShowtimeDTO {
-    private int showtimeId;
-    private Timestamp startDate;
-    private Timestamp endDate;
-    private String showtimeStatus;
-    private int totalSeats; // Tổng số ghế tính từ số lượng ghế của các loại vé
+    public class ShowtimeDTO {
+        private int showtimeId;
+        private Timestamp startDate;
+        private Timestamp endDate;
+        private String showtimeStatus;
+        private int totalSeats; // Tổng số ghế tính từ số lượng ghế của các loại vé
 
     // Getters and Setters
     public int getShowtimeId() {

@@ -53,7 +53,7 @@ public class QRCodeGenerator {
     public static void main(String[] args) {
         try {
             String qrData = "ticketId=123456;eventId=E001;userName=Nguyen Van C";
-            String filePath = "D:/qrcode.png";
+            String filePath = "F:/qrcode.png";
 //            generateQRCode(qrData, filePath);
 //            System.out.println(generateQRCodeAsBytes(qrData));
         } catch (Exception e) {

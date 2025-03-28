@@ -305,58 +305,65 @@ public class OrganizerDAO extends DBContext {
     }
 
     public EventDetailDTO getEventDetail(int eventId) {
-        EventDetailDTO detail = null;
-        String sql = "WITH BannerImages AS ( "
-                + "    SELECT event_id, image_url, "
-                + "           ROW_NUMBER() OVER (PARTITION BY event_id "
-                + "                              ORDER BY CASE WHEN LOWER(image_title) LIKE '%banner%' THEN 0 ELSE 1 END, image_id) AS rn "
-                + "    FROM EventImages "
-                + ") "
-                + "SELECT "
-                + "    e.event_id AS eventId, "
-                + "    e.event_name AS eventName, "
-                + "    MIN(s.start_date) AS startDate, "
-                + "    MAX(s.end_date) AS endDate, "
-                + "    e.location AS location, "
-                + "    e.status AS eventStatus, "
-                + "    e.description AS description, "
-                + "    ISNULL(bi.image_url, 'https://your-cloud-storage.com/path/to/default-banner.jpg') AS imageURL, "
-                + "    org.organization_name AS organizationName, "
-                + "    c.category_name AS categoryName, "
-                + "    e.event_type AS eventType "
-                + "FROM Events e "
-                + "JOIN Organizers org ON e.organizer_id = org.organizer_id "
-                + "JOIN Categories c ON e.category_id = c.category_id "
-                + "JOIN Showtimes s ON e.event_id = s.event_id "
-                + "LEFT JOIN BannerImages bi ON e.event_id = bi.event_id AND bi.rn = 1 "
-                + "WHERE e.event_id = ? "
-                + "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, "
-                + "         org.organization_name, bi.image_url, c.category_name, e.event_type";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, eventId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    detail = new EventDetailDTO();
-                    detail.setEventId(rs.getInt("eventId"));
-                    detail.setEventName(rs.getString("eventName") != null ? rs.getString("eventName") : "");
-                    detail.setStartDate(rs.getTimestamp("startDate"));
-                    detail.setEndDate(rs.getTimestamp("endDate"));
-                    detail.setLocation(rs.getString("location") != null ? rs.getString("location") : "");
-                    detail.setEventStatus(rs.getString("eventStatus") != null ? rs.getString("eventStatus") : "");
-                    detail.setDescription(rs.getString("description") != null ? rs.getString("description") : "");
-                    detail.setImageUrl(rs.getString("imageURL") != null ? rs.getString("imageURL")
-                            : "https://your-cloud-storage.com/path/to/default-banner.jpg");
-                    detail.setOrganizationName(
-                            rs.getString("organizationName") != null ? rs.getString("organizationName") : "");
-                    detail.setCategoryName(rs.getString("categoryName") != null ? rs.getString("categoryName") : "");
-                    detail.setEventType(rs.getString("eventType") != null ? rs.getString("eventType") : "");
-                }
+    EventDetailDTO detail = null;
+    String sql = "WITH BannerImages AS ( " +
+                 "    SELECT event_id, image_url, " +
+                 "           ROW_NUMBER() OVER (PARTITION BY event_id " +
+                 "                              ORDER BY CASE WHEN LOWER(image_title) LIKE '%banner%' THEN 0 ELSE 1 END, image_id) AS rn " +
+                 "    FROM EventImages " +
+                 ") " +
+                 "SELECT " +
+                 "    e.event_id AS eventId, " +
+                 "    e.event_name AS eventName, " +
+                 "    MIN(s.start_date) AS startDate, " +
+                 "    MAX(s.end_date) AS endDate, " +
+                 "    e.location AS location, " +
+                 "    e.status AS eventStatus, " +
+                 "    e.description AS description, " +
+                 "    ISNULL(bi.image_url, 'https://your-cloud-storage.com/path/to/default-banner.jpg') AS imageURL, " +
+                 "    org.organization_name AS organizationName, " +
+                 "    org.account_holder AS accountHolder, " +
+                 "    org.account_number AS accountNumber, " +
+                 "    org.bank_name AS bankName, " +
+                 "    c.category_name AS categoryName, " +
+                 "    e.event_type AS eventType " +
+                 "FROM Events e " +
+                 "JOIN Organizers org ON e.organizer_id = org.organizer_id " +
+                 "JOIN Categories c ON e.category_id = c.category_id " +
+                 "JOIN Showtimes s ON e.event_id = s.event_id " +
+                 "LEFT JOIN BannerImages bi ON e.event_id = bi.event_id AND bi.rn = 1 " +
+                 "WHERE e.event_id = ? " +
+                 "GROUP BY e.event_id, e.event_name, e.location, e.status, e.description, " +
+                 "         org.organization_name, org.account_holder, org.account_number, org.bank_name, " +
+                 "         bi.image_url, c.category_name, e.event_type";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, eventId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                detail = new EventDetailDTO();
+                detail.setEventId(rs.getInt("eventId"));
+                detail.setEventName(rs.getString("eventName") != null ? rs.getString("eventName") : "");
+                detail.setStartDate(rs.getTimestamp("startDate"));
+                detail.setEndDate(rs.getTimestamp("endDate"));
+                detail.setLocation(rs.getString("location") != null ? rs.getString("location") : "");
+                detail.setEventStatus(rs.getString("eventStatus") != null ? rs.getString("eventStatus") : "");
+                detail.setDescription(rs.getString("description") != null ? rs.getString("description") : "");
+                detail.setImageUrl(rs.getString("imageURL") != null ? rs.getString("imageURL")
+                        : "https://your-cloud-storage.com/path/to/default-banner.jpg");
+                detail.setOrganizationName(rs.getString("organizationName") != null ? rs.getString("organizationName") : "");
+                detail.setAccountHolder(rs.getString("accountHolder") != null ? rs.getString("accountHolder") : "");
+                detail.setAccountNumber(rs.getString("accountNumber") != null ? rs.getString("accountNumber") : "");
+                detail.setBankName(rs.getString("bankName") != null ? rs.getString("bankName") : "");
+                detail.setCategoryName(rs.getString("categoryName") != null ? rs.getString("categoryName") : "");
+                detail.setEventType(rs.getString("eventType") != null ? rs.getString("eventType") : "");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return detail;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return detail;
+}
+
 
     public List<ShowtimeDTO> getShowtimesByEventId(int eventId) {
         List<ShowtimeDTO> showtimes = new ArrayList<>();

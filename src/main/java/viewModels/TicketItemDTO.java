@@ -3,6 +3,7 @@ package viewModels;
 import java.math.BigDecimal;
 
 public class TicketItemDTO {
+
     private int ticketTypeId;
     private String ticketType;
     private BigDecimal unitPrice;
@@ -10,7 +11,8 @@ public class TicketItemDTO {
     private int quantity;
     private BigDecimal subtotalPerType;
 
-    public TicketItemDTO() {}
+    public TicketItemDTO() {
+    }
 
     public TicketItemDTO(int ticketTypeId, String ticketType, BigDecimal unitPrice, String seats, int quantity, BigDecimal subtotalPerType) {
         this.ticketTypeId = ticketTypeId;

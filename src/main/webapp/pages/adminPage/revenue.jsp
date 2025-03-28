@@ -31,6 +31,7 @@
                                 <option <c:if test="${selectedStatus == 'Pending'}">selected</c:if> value="Pending">Pending</option>
                                 </select>
                             </div>
+                                
                             <div class="relative w-64">
                                 <input type="text" name="search" placeholder="Search events by name" class="bg-gray-200 rounded-full py-2 px-4 pl-10 focus:outline-none w-full" value="${param.search}">
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>

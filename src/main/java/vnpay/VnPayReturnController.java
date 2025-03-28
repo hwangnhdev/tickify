@@ -5,6 +5,7 @@
 package vnpay;
 
 import com.google.zxing.WriterException;
+import configs.CloudinaryConfig;
 import dals.OrderDAO;
 import dals.OrderDetailDAO;
 import dals.SeatDAO;
@@ -28,11 +29,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Customer;
+import models.Event;
 import models.Order;
 import models.OrderDetail;
 import models.Ticket;
 import models.TicketType;
 import utils.EmailUtility;
+import static utils.QRCodeGenerator.generateQRCodeAsBytes;
 import utils.VnPayUtils;
 
 /**
@@ -100,6 +103,7 @@ public class VnPayReturnController extends HttpServlet {
         System.out.println(subtotal);
         double total = subtotal;
         List<Map<String, Object>> seatDataList = (List<Map<String, Object>>) session.getAttribute("seatDataList");
+        Event event = (Event) session.getAttribute("event");
 
         String transactionId = request.getParameter("vnp_TransactionNo");
         String transactionStatus = request.getParameter("vnp_TransactionStatus").equals("00") ? "paid" : "unsuccessful";
@@ -179,7 +183,15 @@ public class VnPayReturnController extends HttpServlet {
                     OrderDetail latestOrderDetail = orderDetailDao.getLatestOrderDetail(latestOrder.getOrderId(), ticketTypeId);
 
                     for (int seatId : updatedSeatIds) {
-                        String ticketCode = "TICKET-" + latestOrder.getOrderId() + "-" + seatId;
+                        String ticketCode = customer.getCustomerId() + "-" + latestOrder.getOrderId() + "-" + seatId;
+
+                        String qrData = "ticketCode=" + ticketCode;
+
+                        // Tạo QR code dưới dạng byte[]
+                        byte[] qrCodeBytes = generateQRCodeAsBytes(qrData);
+
+                        // Upload lên Cloudinary và lấy URL
+                        String cloudinaryUrl = CloudinaryConfig.uploadQRCode(qrCodeBytes, ticketCode);
 
                         boolean ticketInserted = ticketDao.insertTicket(new Ticket(
                                 0,
@@ -189,30 +201,35 @@ public class VnPayReturnController extends HttpServlet {
                                 price, // Giá vé
                                 "active", // Trạng thái ban đầu
                                 null,
-                                null
+                                null,
+                                cloudinaryUrl
                         ));
 
                         if (!ticketInserted) {
                             System.out.println("Failed to create ticket for seat: " + seatId);
+                            continue;
                             // Có thể rollback hoặc log để xử lý sau
                         }
+                        
+                        // Send QR to Email 
+                        String recipient = customer.getEmail();
+                        String subject = "Tickify - Your Ticket Confirmation";
+                        String content = "Dear " + customer.getFullName() + ",\n\n"
+                                + "Thank you for your purchase! Your ticket details are as follows:\n\n"
+                                + "🎟 Ticket Code: " + ticketCode + "\n"
+                                + "📍 Event: " + event.getEventName() + "\n"
+//                                + "📅 Date & Time: " + eventDateTime + "\n"
+//                                + "💺 Seat: " + seatName + "\n"
+                                + "💰 Price: $" + price + "\n\n"
+                                + "Please present the attached QR code at the venue for entry.\n"
+                                + "If you have any questions, feel free to contact our support team.\n\n"
+                                + "Best regards,\n"
+                                + "🎫 Tickify Team";
 
-                        ticketCodes.add(ticketCode);
+                        EmailUtility.sendEmailWithQRCode(recipient, subject, content, cloudinaryUrl);
                     }
                 }
             }
-
-            // Send QR to Email 
-            String ticketCodesString = String.join(";", ticketCodes);
-
-            String qrData = "ticketCode=" + ticketCodesString;
-            String recipient = customer.getEmail();
-//            String recipient = "hwang.huyhoang@gmail.com";
-            String subject = "Your Ticket!";
-            String content = "Here is the QR code for your ticket. Please bring it with you to the event.";
-
-            EmailUtility.sendEmailWithQRCode(recipient, subject, content, qrData);
-
             session.setAttribute("paymentProcessed", true);
         }
 

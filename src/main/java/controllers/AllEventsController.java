@@ -138,10 +138,8 @@ public class AllEventsController extends HttpServlet {
             response.setContentType("application/json");
             PrintWriter out = response.getWriter();
             if (totalEvents == 0) {
-                System.out.println("No filtered events found, returning fallback, totalEventsAll: " + totalEventsAll + ", page: " + page);
                 out.print(toJsonWithFlag(paginatedEventsAll, totalPagesAll, page, true));
             } else {
-                System.out.println("Returning filtered events, totalEvents: " + totalEvents + ", page: " + page);
                 out.print(toJsonWithFlag(paginatedFilteredEvents, totalPages, page, false));
             }
             out.flush();

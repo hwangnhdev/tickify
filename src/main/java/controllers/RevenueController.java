@@ -50,11 +50,11 @@ public class RevenueController extends HttpServlet {
     protected void revenue(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
 //        int page = 1;
-//        String status = request.getParameter("status");
-//        if (status == null) {
-//            status = "";
-//        }
-//        String searchKeyword = request.getParameter("search");
+        String status = request.getParameter("status");
+        if (status == null) {
+            status = "";
+        }
+        String searchKeyword = request.getParameter("search");
 //        try {
 //            String pageParam = request.getParameter("page");
 //            if (pageParam != null && !pageParam.trim().isEmpty()) {
