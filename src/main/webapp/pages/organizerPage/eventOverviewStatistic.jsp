@@ -137,7 +137,6 @@
                                             <th class="px-4 py-2 border-r border-gray-700">Price of Ticket</th>
                                             <th class="px-4 py-2 border-r border-gray-700">Sold</th>
                                             <th class="px-4 py-2 border-r border-gray-700">Remaining</th>
-                                            <th class="px-4 py-2 border-r border-gray-700">Total Revenue</th>
                                             <th class="px-4 py-2">Fill Rate</th>
                                         </tr>
                                     </thead>
@@ -151,9 +150,6 @@
                                                 </td>
                                                 <td class="border-t border-gray-700 px-4 py-2 border-r border-gray-700">${ticket.sold}</td>
                                                 <td class="border-t border-gray-700 px-4 py-2 border-r border-gray-700">${ticket.remaining}</td>
-                                                <td class="border-t border-gray-700 px-4 py-2 border-r border-gray-700">
-                                                    <fmt:formatNumber value="${ticket.totalRevenue}" pattern="#,##0"/>đ
-                                                </td>
                                                 <td class="border-t border-gray-700 px-4 py-2">
                                                     <div class="relative w-full h-4 bg-gray-700">
                                                         <div class="absolute top-0 left-0 h-4 bg-yellow-500" style="width: ${ticket.fillRate}%;"></div>
@@ -185,9 +181,6 @@
                                             <td class="border-t border-gray-700 px-4 py-2 border-r border-gray-700">-</td>
                                             <td class="border-t border-gray-700 px-4 py-2 border-r border-gray-700">${totalSold}</td>
                                             <td class="border-t border-gray-700 px-4 py-2 border-r border-gray-700">${totalRemaining}</td>
-                                            <td class="border-t border-gray-700 px-4 py-2 border-r border-gray-700">
-                                                <fmt:formatNumber value="${totalRevenueSum}" pattern="#,##0"/>đ
-                                            </td>
                                             <td class="border-t border-gray-700 px-4 py-2">
                                                 <div class="relative w-full h-4 bg-gray-700">
                                                     <div class="absolute top-0 left-0 h-4 bg-yellow-500" style="width: ${averageFillRate}%;"></div>

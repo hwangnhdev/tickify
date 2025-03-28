@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1289,15 +1288,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByMonth AS (\n"
                 + "    SELECT \n"
                 + "        MONTH(o.order_date) AS Month,\n"
-                + "        (SELECT SUM(o.total_price)\n"
-                + "     FROM Orders o\n"
-                + "     WHERE o.order_id IN (\n"
-                + "         SELECT od2.order_id \n"
-                + "         FROM OrderDetails od2\n"
-                + "         JOIN TicketTypes tt2 ON od2.ticket_type_id = tt2.ticket_type_id\n"
-                + "         JOIN Showtimes s2 ON tt2.showtime_id = s2.showtime_id\n"
-                + "         WHERE s2.event_id = ?\n"
-                + "     ))  AS Revenue,\n"
+                + "        o.total_price AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1306,8 +1297,8 @@ public class EventDAO extends DBContext {
                 + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
                 + "    WHERE \n"
                 + "        e.event_id = ?\n"
-                + "        AND YEAR(o.order_date) = ?\n"
-                + "    GROUP BY MONTH(o.order_date), o.order_id\n"
+                + "        AND YEAR(o.order_date) = ? \n"
+                + "    GROUP BY MONTH(o.order_date), o.order_id, o.total_price\n"
                 + "),\n"
                 + "MonthlyRevenue AS (\n"
                 + "    SELECT \n"
@@ -1328,12 +1319,10 @@ public class EventDAO extends DBContext {
                 + ") m\n"
                 + "LEFT JOIN MonthlyRevenue rm ON m.Month = rm.Month\n"
                 + "ORDER BY m.Month;";
-
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, eventId);
-            st.setInt(2, eventId);
-            st.setInt(3, year);
+            st.setInt(2, year);
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
@@ -1459,7 +1448,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByDay AS (\n"
                 + "    SELECT \n"
                 + "        DATEDIFF(DAY, o.order_date, GETDATE()) AS DaysAgo,\n"
-                + "        SUM(od.quantity * od.price) AS Revenue,\n"
+                + "        o.total_price AS Revenue, -- Lấy total_price trực tiếp\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1469,7 +1458,15 @@ public class EventDAO extends DBContext {
                 + "    WHERE \n"
                 + "        e.event_id = ?\n"
                 + "        AND o.order_date >= DATEADD(DAY, -29, GETDATE())\n"
-                + "    GROUP BY DATEDIFF(DAY, o.order_date, GETDATE())\n"
+                + "    GROUP BY DATEDIFF(DAY, o.order_date, GETDATE()), o.order_id, o.total_price\n"
+                + "),\n"
+                + "DailyRevenue AS (\n"
+                + "    SELECT \n"
+                + "        DaysAgo,\n"
+                + "        SUM(Revenue) AS Revenue,\n"
+                + "        SUM(TicketQuantity) AS TicketQuantity\n"
+                + "    FROM RevenueByDay\n"
+                + "    GROUP BY DaysAgo\n"
                 + ")\n"
                 + "SELECT \n"
                 + "    d.DaysAgo,\n"
@@ -1479,7 +1476,7 @@ public class EventDAO extends DBContext {
                 + "    SELECT TOP 30 n = ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n"
                 + "    FROM sys.all_objects\n"
                 + ") d(DaysAgo)\n"
-                + "LEFT JOIN RevenueByDay rd ON d.DaysAgo = rd.DaysAgo\n"
+                + "LEFT JOIN DailyRevenue rd ON d.DaysAgo = rd.DaysAgo\n"
                 + "ORDER BY d.DaysAgo;";
 
         try {
@@ -1505,15 +1502,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByHour AS (\n"
                 + "    SELECT \n"
                 + "        DATEDIFF(HOUR, o.order_date, GETDATE()) AS HoursAgo,\n"
-                + "        (SELECT SUM(o.total_price)\n"
-                + "     FROM Orders o\n"
-                + "     WHERE o.order_id IN (\n"
-                + "         SELECT od2.order_id \n"
-                + "         FROM OrderDetails od2\n"
-                + "         JOIN TicketTypes tt2 ON od2.ticket_type_id = tt2.ticket_type_id\n"
-                + "         JOIN Showtimes s2 ON tt2.showtime_id = s2.showtime_id\n"
-                + "         WHERE s2.event_id = ?\n"
-                + "     ))  AS Revenue,\n"
+                + "        o.total_price AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1523,7 +1512,15 @@ public class EventDAO extends DBContext {
                 + "    WHERE \n"
                 + "        e.event_id = ?\n"
                 + "        AND o.order_date >= DATEADD(HOUR, -23, GETDATE())\n"
-                + "    GROUP BY DATEDIFF(HOUR, o.order_date, GETDATE())\n"
+                + "    GROUP BY DATEDIFF(HOUR, o.order_date, GETDATE()), o.order_id, o.total_price\n"
+                + "),\n"
+                + "HourlyRevenue AS (\n"
+                + "    SELECT \n"
+                + "        HoursAgo,\n"
+                + "        SUM(Revenue) AS Revenue,\n"
+                + "        SUM(TicketQuantity) AS TicketQuantity\n"
+                + "    FROM RevenueByHour\n"
+                + "    GROUP BY HoursAgo\n"
                 + ")\n"
                 + "SELECT \n"
                 + "    h.HoursAgo,\n"
@@ -1533,13 +1530,12 @@ public class EventDAO extends DBContext {
                 + "    SELECT TOP 24 n = ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n"
                 + "    FROM sys.all_objects\n"
                 + ") h(HoursAgo)\n"
-                + "LEFT JOIN RevenueByHour rh ON h.HoursAgo = rh.HoursAgo\n"
+                + "LEFT JOIN HourlyRevenue rh ON h.HoursAgo = rh.HoursAgo\n"
                 + "ORDER BY h.HoursAgo;";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, eventId);
-            st.setInt(2, eventId);
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
