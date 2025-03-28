@@ -99,9 +99,7 @@ public class VoucherDAO extends DBContext {
         int total = 0;
         String sql = "SELECT COUNT(*) FROM vouchers WHERE event_id = ?";
         try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
-            try ( ResultSet rs = stmt.executeQuery()) {
             try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     total = rs.getInt(1);
