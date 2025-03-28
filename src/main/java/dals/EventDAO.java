@@ -1289,15 +1289,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByMonth AS (\n"
                 + "    SELECT \n"
                 + "        MONTH(o.order_date) AS Month,\n"
-                + "        (SELECT SUM(o.total_price)\n"
-                + "     FROM Orders o\n"
-                + "     WHERE o.order_id IN (\n"
-                + "         SELECT od2.order_id \n"
-                + "         FROM OrderDetails od2\n"
-                + "         JOIN TicketTypes tt2 ON od2.ticket_type_id = tt2.ticket_type_id\n"
-                + "         JOIN Showtimes s2 ON tt2.showtime_id = s2.showtime_id\n"
-                + "         WHERE s2.event_id = ?\n"
-                + "     ))  AS Revenue,\n"
+                + "        o.total_price AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1306,8 +1298,8 @@ public class EventDAO extends DBContext {
                 + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
                 + "    WHERE \n"
                 + "        e.event_id = ?\n"
-                + "        AND YEAR(o.order_date) = ?\n"
-                + "    GROUP BY MONTH(o.order_date), o.order_id\n"
+                + "        AND YEAR(o.order_date) = ? \n"
+                + "    GROUP BY MONTH(o.order_date), o.order_id, o.total_price\n"
                 + "),\n"
                 + "MonthlyRevenue AS (\n"
                 + "    SELECT \n"
@@ -1328,12 +1320,10 @@ public class EventDAO extends DBContext {
                 + ") m\n"
                 + "LEFT JOIN MonthlyRevenue rm ON m.Month = rm.Month\n"
                 + "ORDER BY m.Month;";
-
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, eventId);
-            st.setInt(2, eventId);
-            st.setInt(3, year);
+            st.setInt(2, year);
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {

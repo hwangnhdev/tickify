@@ -13,7 +13,7 @@
         <script>
             // Nếu muốn sử dụng plugin aspect-ratio, bạn cần thêm cấu hình đúng hoặc load script plugin riêng.
             tailwind.config = {
-                theme: { extend: {} },
+                theme: {extend: {}},
                 // plugins: [] // Nếu không dùng plugin thì để rỗng
             }
         </script>
@@ -124,11 +124,11 @@
                 </section>
 
                 <!-- Banner Image Section -->
-                <section class="lg:w-2/3 overflow-hidden flex-1 h-full min-h-[350px]">
+                <section class="flex-1 relative">
                     <c:if test="${not empty logoBannerImage}">
                         <img alt="${event.eventName} Banner" 
-                             class="w-full h-full object-cover transition duration-500 ease-in-out hover:scale-105 shadow-2xl" 
-                             src="${logoBannerImage}" />
+                             class="w-full h-full object-contain rounded-2xl shadow-2xl transition duration-500 ease-in-out hover:scale-105" 
+                             src="${logoBannerImage}"style="object-fit: fill" />
                     </c:if>
                 </section>
             </div>
@@ -290,49 +290,49 @@
         <!-- SweetAlert & Update Event Script -->
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
-            function updateEvent(eventId, newStatus) {
-                var popupTitle, popupMessage, popupIcon;
-                if (newStatus === 'Approved') {
-                    popupTitle = "Approve Event";
-                    popupMessage = "Are you sure you want to approve event #" + eventId + "?";
-                    popupIcon = "info";
-                } else if (newStatus === 'Rejected') {
-                    popupTitle = "Reject Event";
-                    popupMessage = "Are you sure you want to reject event #" + eventId + "?";
-                    popupIcon = "error";
-                } else {
-                    popupTitle = "Confirm";
-                    popupMessage = "Do you want to update event #" + eventId + "?";
-                    popupIcon = "warning";
-                }
-                swal({
-                    title: popupTitle,
-                    text: popupMessage,
-                    icon: popupIcon,
-                    buttons: true,
-                    dangerMode: true,
-                }).then((willUpdate) => {
-                    if (willUpdate) {
-                        fetch('${pageContext.request.contextPath}/admin/approveEvent', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                            body: 'eventId=' + eventId + '&newStatus=' + newStatus
-                        })
-                        .then(response => response.text())
-                        .then(result => {
-                            if (result.trim() === 'success') {
-                                swal("Success", "Event updated successfully!", "success")
-                                    .then(() => window.location.reload());
-                            } else {
-                                swal("Failed", "Failed to update event.", "error");
-                            }
-                        })
-                        .catch(error => {
-                            swal("Error", "Error: " + error, "error");
-                        });
-                    }
-                });
-            }
+                                            function updateEvent(eventId, newStatus) {
+                                                var popupTitle, popupMessage, popupIcon;
+                                                if (newStatus === 'Approved') {
+                                                    popupTitle = "Approve Event";
+                                                    popupMessage = "Are you sure you want to approve event #" + eventId + "?";
+                                                    popupIcon = "info";
+                                                } else if (newStatus === 'Rejected') {
+                                                    popupTitle = "Reject Event";
+                                                    popupMessage = "Are you sure you want to reject event #" + eventId + "?";
+                                                    popupIcon = "error";
+                                                } else {
+                                                    popupTitle = "Confirm";
+                                                    popupMessage = "Do you want to update event #" + eventId + "?";
+                                                    popupIcon = "warning";
+                                                }
+                                                swal({
+                                                    title: popupTitle,
+                                                    text: popupMessage,
+                                                    icon: popupIcon,
+                                                    buttons: true,
+                                                    dangerMode: true,
+                                                }).then((willUpdate) => {
+                                                    if (willUpdate) {
+                                                        fetch('${pageContext.request.contextPath}/admin/approveEvent', {
+                                                            method: 'POST',
+                                                            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                                                            body: 'eventId=' + eventId + '&newStatus=' + newStatus
+                                                        })
+                                                                .then(response => response.text())
+                                                                .then(result => {
+                                                                    if (result.trim() === 'success') {
+                                                                        swal("Success", "Event updated successfully!", "success")
+                                                                                .then(() => window.location.reload());
+                                                                    } else {
+                                                                        swal("Failed", "Failed to update event.", "error");
+                                                                    }
+                                                                })
+                                                                .catch(error => {
+                                                                    swal("Error", "Error: " + error, "error");
+                                                                });
+                                                    }
+                                                });
+                                            }
         </script>
     </body>
 </html>
