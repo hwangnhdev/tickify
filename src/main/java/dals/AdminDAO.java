@@ -6,11 +6,15 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import models.Admin;
 import models.Event;
 import viewModels.EventDetailDTO;
 import models.EventImage;
+import models.Showtime;
+import models.Ticket;
 import models.TicketType;
 import utils.DBContext;
 import viewModels.ShowtimeDTO;
@@ -24,17 +28,19 @@ public class AdminDAO extends DBContext {
     private static final String UPDATE_ADMIN = "UPDATE Admins SET name = ?, email = ?, password = ?, profile_picture = ? WHERE admin_id = ?";
     private static final String SELECT_ALL_REVENUES
             = "SELECT \n"
-            + "    e.event_id,\n"
+            + "	e.event_id,\n"
             + "    e.event_name,\n"
-            + "    SUM(od.quantity) AS total_tickets_sold,\n"
-            + "    SUM(od.price) AS total_revenue,\n"
-            + "    MIN(s.start_date) AS start_date,\n"
-            + "    MAX(s.end_date) AS end_date\n"
-            + "FROM Events e\n"
-            + "JOIN Showtimes s ON e.event_id = s.event_id\n"
-            + "JOIN TicketTypes tt ON s.showtime_id = tt.showtime_id\n"
-            + "JOIN OrderDetails od ON tt.ticket_type_id = od.ticket_type_id\n"
-            + "JOIN Orders o ON od.order_id = o.order_id\n"
+            + "    COUNT(e.event_id) AS total_tickets_sold,\n"
+            + "    SUM(tt.price) AS total_revenue,\n"
+            + "    MIN(st.start_date) AS start_date,\n"
+            + "    MAX(st.end_date) AS end_date\n"
+            + "FROM Orders o\n"
+            + "JOIN OrderDetails od ON o.order_id = od.order_id\n"
+            + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id\n"
+            + "JOIN Showtimes st ON st.showtime_id = tt.showtime_id\n"
+            + "JOIN Events e ON e.event_id =st.event_id\n"
+            + "JOIN Ticket t ON od.order_detail_id = t.order_detail_id\n"
+            + "JOIN Seats s ON t.seat_id = s.seat_id\n"
             + "GROUP BY e.event_id, e.event_name\n"
             + "ORDER BY e.event_id ASC;";
 
@@ -68,7 +74,7 @@ public class AdminDAO extends DBContext {
 
     public List<Admin> selectAllAdmins() {
         List<Admin> admins = new ArrayList<>();
-        try (PreparedStatement st = connection.prepareStatement(SELECT_ALL_ADMINS); ResultSet rs = st.executeQuery()) {
+        try ( PreparedStatement st = connection.prepareStatement(SELECT_ALL_ADMINS);  ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
                 admins.add(mapResultSetToAdmin(rs));
             }
@@ -80,9 +86,9 @@ public class AdminDAO extends DBContext {
 
     public Admin selectAdminById(int id) {
         Admin admin = null;
-        try (PreparedStatement st = connection.prepareStatement(SELECT_ADMIN_BY_ID)) {
+        try ( PreparedStatement st = connection.prepareStatement(SELECT_ADMIN_BY_ID)) {
             st.setInt(1, id);
-            try (ResultSet rs = st.executeQuery()) {
+            try ( ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     admin = mapResultSetToAdmin(rs);
                 }
@@ -95,9 +101,9 @@ public class AdminDAO extends DBContext {
 
     public Admin selectAdminByEmail(String email) {
         Admin admin = null;
-        try (PreparedStatement st = connection.prepareStatement(SELECT_ADMIN_BY_EMAIL)) {
+        try ( PreparedStatement st = connection.prepareStatement(SELECT_ADMIN_BY_EMAIL)) {
             st.setString(1, email);
-            try (ResultSet rs = st.executeQuery()) {
+            try ( ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     admin = mapResultSetToAdmin(rs);
                 }
@@ -109,7 +115,7 @@ public class AdminDAO extends DBContext {
     }
 
     public boolean updateAdmin(Admin admin) {
-        try (PreparedStatement st = connection.prepareStatement(UPDATE_ADMIN)) {
+        try ( PreparedStatement st = connection.prepareStatement(UPDATE_ADMIN)) {
             st.setString(1, admin.getName());
             st.setString(2, admin.getEmail());
             st.setString(3, admin.getPassword());
@@ -124,7 +130,7 @@ public class AdminDAO extends DBContext {
 
     public List<Event> selectAllRevenues() {
         List<Event> revenues = new ArrayList<>();
-        try (PreparedStatement st = connection.prepareStatement(SELECT_ALL_REVENUES); ResultSet rs = st.executeQuery()) {
+        try ( PreparedStatement st = connection.prepareStatement(SELECT_ALL_REVENUES);  ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
                 Event revenue = new Event();
                 revenue.setEventId(rs.getInt("event_id"));
@@ -143,9 +149,9 @@ public class AdminDAO extends DBContext {
 
     public List<TicketType> getRevenueDetailByEventId(int eventId) {
         List<TicketType> revenueDetails = new ArrayList<>();
-        try (PreparedStatement st = connection.prepareStatement(SELECT_REVENUE_DETAIL_BY_EVENT_ID)) {
+        try ( PreparedStatement st = connection.prepareStatement(SELECT_REVENUE_DETAIL_BY_EVENT_ID)) {
             st.setInt(1, eventId);
-            try (ResultSet rs = st.executeQuery()) {
+            try ( ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     TicketType revenueDetail = new TicketType();
                     revenueDetail.setEventId(rs.getInt("event_id"));
@@ -188,7 +194,7 @@ public class AdminDAO extends DBContext {
                 + "  AND e.event_id = ? "
                 + "GROUP BY e.event_id, e.event_name, e.description, e.approved_at, "
                 + "         e.location, e.event_type, e.status, c.category_name, o.organization_name, o.account_holder, o.account_number, o.bank_name";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -227,7 +233,7 @@ public class AdminDAO extends DBContext {
                 + ") sc ON s.showtime_id = sc.showtime_id "
                 + "WHERE s.event_id = ? "
                 + "ORDER BY s.start_date";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -258,7 +264,7 @@ public class AdminDAO extends DBContext {
                 + ") "
                 + "GROUP BY tt.ticket_type_id, tt.showtime_id, tt.name, tt.description, "
                 + "tt.price, tt.color, tt.total_quantity, tt.created_at, tt.updated_at";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -284,9 +290,9 @@ public class AdminDAO extends DBContext {
     public List<EventImage> getImageEventsByEventId(int eventId) {
         List<EventImage> list = new ArrayList<>();
         String sql = "SELECT image_url, image_title FROM EventImages WHERE event_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     EventImage image = new EventImage();
                     image.setImageUrl(rs.getString("image_url"));
@@ -312,7 +318,7 @@ public class AdminDAO extends DBContext {
     public EventDetailDTO updateEventStatus(int eventId, String newStatus) {
         // Sử dụng approved_at thay vì updated_at để cập nhật thời gian duyệt
         String sql = "UPDATE Events SET status = ?, approved_at = GETDATE() WHERE event_id = ? AND status = 'Processing'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, newStatus);
             ps.setInt(2, eventId);
             int rowsAffected = ps.executeUpdate();
@@ -350,7 +356,7 @@ public class AdminDAO extends DBContext {
                 + "WHERE E.event_id = ? AND E.status = 'approved' "
                 + "GROUP BY E.event_id, E.event_name, C.category_name, O.organization_name, "
                 + "E.location, E.event_type, E.status, E.description, E.created_at, E.updated_at, E.approved_at";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -403,7 +409,7 @@ public class AdminDAO extends DBContext {
                 + "FROM Events e "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -442,7 +448,7 @@ public class AdminDAO extends DBContext {
                 + "WHERE LOWER(e.status) = LOWER(?) "
                 + orderByClause
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -479,7 +485,7 @@ public class AdminDAO extends DBContext {
                 + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.approved_at "
                 + "ORDER BY e.approved_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -515,7 +521,7 @@ public class AdminDAO extends DBContext {
                 + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.approved_at "
                 + "ORDER BY e.approved_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -624,7 +630,7 @@ public class AdminDAO extends DBContext {
         if (connection == null) {
             return 0;
         }
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
@@ -646,7 +652,7 @@ public class AdminDAO extends DBContext {
         if (connection == null) {
             return 0;
         }
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, param);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -722,7 +728,7 @@ public class AdminDAO extends DBContext {
                 + "WHERE e.event_name LIKE ? "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -744,7 +750,7 @@ public class AdminDAO extends DBContext {
      */
     public int getTotalSearchEventsByName(String keyword) {
         String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -780,7 +786,7 @@ public class AdminDAO extends DBContext {
                 + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.approved_at "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -802,7 +808,7 @@ public class AdminDAO extends DBContext {
      */
     public int getTotalSearchApprovedEventsByName(String keyword) {
         String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND status = 'approved'";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -838,7 +844,7 @@ public class AdminDAO extends DBContext {
                 + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.approved_at "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setInt(2, (page - 1) * pageSize);
             ps.setInt(3, pageSize);
@@ -862,7 +868,7 @@ public class AdminDAO extends DBContext {
         // Lưu ý: truy vấn này đang so sánh với trạng thái rỗng (''),
         // bạn có thể điều chỉnh lại điều kiện nếu cần thiết (ví dụ: 'completed')
         String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND status = ''";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -889,7 +895,7 @@ public class AdminDAO extends DBContext {
                 + "GROUP BY e.event_id, e.event_name, e.location, e.event_type, e.status, e.approved_at "
                 + "ORDER BY e.approved_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, (page - 1) * pageSize);
             ps.setInt(2, pageSize);
             ResultSet rs = ps.executeQuery();
@@ -904,7 +910,7 @@ public class AdminDAO extends DBContext {
 
     public int getTotalHistoryEventsByStatus(String status) {
         String sql = "SELECT COUNT(*) FROM Events WHERE status = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -947,7 +953,7 @@ public class AdminDAO extends DBContext {
                     + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         }
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             if ("all".equalsIgnoreCase(status)) {
                 ps.setInt(2, (page - 1) * pageSize);
@@ -976,7 +982,7 @@ public class AdminDAO extends DBContext {
             sql = "SELECT COUNT(DISTINCT event_id) FROM Events WHERE event_name LIKE ? AND status = ?";
         }
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             if (!"all".equalsIgnoreCase(status)) {
                 ps.setString(2, status);
@@ -1005,7 +1011,7 @@ public class AdminDAO extends DBContext {
                 + "WHERE e.event_name LIKE ? AND LOWER(e.status) = LOWER(?) "
                 + "ORDER BY e.event_name "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setString(2, status);
             ps.setInt(3, (page - 1) * pageSize);
@@ -1029,7 +1035,7 @@ public class AdminDAO extends DBContext {
      */
     public int getTotalSearchEventsByNameAndStatus(String keyword, String status) {
         String sql = "SELECT COUNT(*) FROM Events WHERE event_name LIKE ? AND LOWER(status) = LOWER(?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             ps.setString(2, status);
             ResultSet rs = ps.executeQuery();
@@ -1065,7 +1071,7 @@ public class AdminDAO extends DBContext {
                 + "ORDER BY e.approved_at DESC "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             int paramIndex = 1;
             // Nếu status khác "all", set giá trị cho placeholder
             if (!"all".equalsIgnoreCase(status)) {
@@ -1081,5 +1087,72 @@ public class AdminDAO extends DBContext {
             System.out.println("Lỗi khi lọc lịch sử sự kiện theo trạng thái: " + e.getMessage());
         }
         return events;
+    }
+
+    public List<Showtime> getShowtimeRevenueByEventId(int eventId) {
+        List<Showtime> showtimeList = new ArrayList<>();
+
+        String sql = "SELECT e.event_id, st.showtime_id, "
+                + "tt.name AS ticket_type_name, tt.price AS ticket_type_price, "
+                + "t.ticket_id, t.ticket_code, t.price AS ticket_price, "
+                + "s.seat_row, s.seat_col, s.status AS seat_status "
+                + "FROM Orders o "
+                + "JOIN OrderDetails od ON o.order_id = od.order_id "
+                + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+                + "JOIN Showtimes st ON st.showtime_id = tt.showtime_id "
+                + "JOIN Events e ON e.event_id = st.event_id "
+                + "JOIN Ticket t ON od.order_detail_id = t.order_detail_id "
+                + "JOIN Seats s ON t.seat_id = s.seat_id "
+                + "WHERE e.event_id = ?";
+
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+
+            Map<Integer, Showtime> showtimeMap = new HashMap<>();
+            Map<String, TicketType> ticketTypeMap;
+
+            while (rs.next()) {
+                int showtimeId = rs.getInt("showtime_id");
+                String ticketTypeName = rs.getString("ticket_type_name");
+                double ticketTypePrice = rs.getDouble("ticket_type_price");
+
+                int ticketId = rs.getInt("ticket_id");
+                String ticketCode = rs.getString("ticket_code");
+                double ticketPrice = rs.getDouble("ticket_price");
+                String seatRow = rs.getString("seat_row");
+                int seatCol = rs.getInt("seat_col");
+                String seatStatus = rs.getString("seat_status");
+
+                Ticket ticket = new Ticket(ticketId, ticketCode, ticketPrice, seatStatus);
+
+                // Nếu showtime chưa có, thêm vào danh sách
+                if (!showtimeMap.containsKey(showtimeId)) {
+                    showtimeMap.put(showtimeId, new Showtime(showtimeId));
+                }
+
+                Showtime showtimeDTO = showtimeMap.get(showtimeId);
+                ticketTypeMap = new HashMap<>();
+
+                // Kiểm tra nếu TicketType đã có trong Showtime
+                for (TicketType tt : showtimeDTO.getTicketTypes()) {
+                    ticketTypeMap.put(tt.getName(), tt);
+                }
+
+                if (!ticketTypeMap.containsKey(ticketTypeName)) {
+                    ticketTypeMap.put(ticketTypeName, new TicketType(ticketTypeName, ticketTypePrice));
+                    showtimeDTO.addTicketType(ticketTypeMap.get(ticketTypeName));
+                }
+
+                ticketTypeMap.get(ticketTypeName).addTicket(ticket);
+            }
+
+            showtimeList.addAll(showtimeMap.values());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return showtimeList;
     }
 }

@@ -11,6 +11,7 @@ import dals.OrderDetailDAO;
 import dals.SeatDAO;
 import dals.TicketDAO;
 import dals.TicketTypeDAO;
+import dals.VoucherDAO;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -56,7 +57,7 @@ public class VnPayReturnController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -93,6 +94,7 @@ public class VnPayReturnController extends HttpServlet {
         TicketDAO ticketDao = new TicketDAO();
         OrderDAO orderDao = new OrderDAO();
         OrderDetailDAO orderDetailDao = new OrderDetailDAO();
+        VoucherDAO voucherDao = new VoucherDAO();
 
         HttpSession session = request.getSession();
         Customer customer = (Customer) session.getAttribute("customer");
@@ -101,7 +103,16 @@ public class VnPayReturnController extends HttpServlet {
         System.out.println(subtotalStr);
         double subtotal = (subtotalStr != null && !subtotalStr.isEmpty()) ? Double.parseDouble(subtotalStr) : 0.0;
         System.out.println(subtotal);
-        double total = subtotal;
+
+        Object totalObj = session.getAttribute("total");
+        double total = (totalObj != null) ? Double.parseDouble(totalObj.toString()) : subtotal; // Fallback to subtotal if total is not set
+        System.out.println("Total from session: " + total);
+
+        // Retrieve voucherId from session
+        Object voucherIdObj = session.getAttribute("voucherId");
+        Integer voucherId = (voucherIdObj != null) ? Integer.parseInt(voucherIdObj.toString()) : null;
+        System.out.println("Voucher ID from session: " + (voucherId != null ? voucherId : "None"));
+
         List<Map<String, Object>> seatDataList = (List<Map<String, Object>>) session.getAttribute("seatDataList");
         Event event = (Event) session.getAttribute("event");
 
@@ -148,8 +159,18 @@ public class VnPayReturnController extends HttpServlet {
             List<String> ticketCodes = new ArrayList<>();
 
             // Insert order
-            Order newOrder = new Order(0, customer.getCustomerId(), 0, total, null, transactionStatus, transactionId, null, null);
+            Order newOrder = new Order(0, customer.getCustomerId(), voucherId != null ? voucherId : 0, total, null, transactionStatus, transactionId, null, null);
             orderDao.insertOrder(newOrder);
+
+            // Decrement voucher quantity if a voucher was used
+            if (voucherId != null) {
+                boolean voucherUpdated = voucherDao.decrementVoucherQuantity(voucherId);
+                if (voucherUpdated) {
+                    System.out.println("Voucher ID " + voucherId + " quantity decremented successfully.");
+                } else {
+                    System.out.println("Failed to decrement quantity for Voucher ID " + voucherId + " (possibly already at 0).");
+                }
+            }
 
             // Insert orderDetail
             for (Map<String, Object> seatData : seatDataList) {

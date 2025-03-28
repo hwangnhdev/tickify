@@ -5,6 +5,7 @@
 package models;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,6 +56,15 @@ public class Showtime extends Event {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.ticketTypes = ticketTypes;
+    }
+    
+    public Showtime(int showtimeId) {
+        this.showtimeId = showtimeId;
+        this.ticketTypes = new ArrayList<>();
+    }
+
+    public void addTicketType(TicketType ticketType) {
+        this.ticketTypes.add(ticketType);
     }
 
     public int getShowtimeId() {
@@ -113,4 +123,8 @@ public class Showtime extends Event {
         this.updatedAt = updatedAt;
     }
 
+    @Override
+    public String toString() {
+        return "Showtime{id=" + showtimeId + ", ticketTypes=" + ticketTypes + "}";
+    }
 }

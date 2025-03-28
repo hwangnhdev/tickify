@@ -92,7 +92,7 @@
                 </div>
 
                 <div class="text-center">
-                    <a class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600" href=<%request.getContextPath();%>>
+                    <a class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600" href="${pageContext.request.contextPath}/event">
                         Back to Home
                     </a>
                 </div>

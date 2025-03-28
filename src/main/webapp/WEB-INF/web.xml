@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <filter>
+        <filter-name>AuthenticationFilter</filter-name>
+        <filter-class>filters.AuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <servlet>
         <servlet-name>AuthController</servlet-name>
         <servlet-class>controllers.AuthController</servlet-class>
@@ -225,8 +233,20 @@
         <servlet-class>controllers.EventAjaxController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>SignUpController</servlet-name>
+        <servlet-class>controllers.SignUpController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginController</servlet-name>
+        <servlet-class>controllers.LoginController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ApplyVoucherController</servlet-name>
         <servlet-class>controllers.ApplyVoucherController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminOrdersController</servlet-name>
+        <servlet-class>controllers.AdminOrdersController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
@@ -442,8 +462,20 @@
         <url-pattern>/eventAjax</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>SignUpController</servlet-name>
+        <url-pattern>/signUp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginController</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>ApplyVoucherController</servlet-name>
         <url-pattern>/applyVoucher</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminOrdersController</servlet-name>
+        <url-pattern>/adminOrders</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>10080</session-timeout>

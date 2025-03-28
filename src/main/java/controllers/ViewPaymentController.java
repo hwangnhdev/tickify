@@ -105,15 +105,17 @@ public class ViewPaymentController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         SeatDAO seatDao = new SeatDAO();
         Gson gson = new Gson();
 
         String selectedDataJson = request.getParameter("selectedData");
         String selectedSeats = request.getParameter("selectedSeats");
-        String subtotal = request.getParameter("subtotal"); // Nhận tổng tiền
-        
-        Type listType = new TypeToken<List<Map<String, Object>>>() {}.getType();
+        String subtotal = request.getParameter("subtotal");// Nhận tổng tiền
+        String total = request.getParameter("total");
+
+        Type listType = new TypeToken<List<Map<String, Object>>>() {
+        }.getType();
         List<Map<String, Object>> seatDataList = gson.fromJson(selectedDataJson, listType);
 
         List<Integer> seatIds = new ArrayList<>();
@@ -135,15 +137,17 @@ public class ViewPaymentController extends HttpServlet {
         for (Integer seatId : seatIds) {
             System.out.println(seatId);
         }
-        
+
         System.out.println("Selected Seats: " + selectedSeats);
         System.out.println("Selected Data: " + selectedDataJson);
         System.out.println("Subtotal: " + subtotal);
+        System.out.println("Total: " + total);
 
         HttpSession session = request.getSession();
         session.setAttribute("selectedSeats", selectedSeats);
         session.setAttribute("seatDataList", seatDataList);
-        session.setAttribute("subtotal", subtotal); // Lưu subtotal vào session
+        session.setAttribute("subtotal", subtotal); // Lưu subtotal vào session 
+        session.setAttribute("total", total);
 
         request.getRequestDispatcher("pages/paymentPage/payment.jsp").forward(request, response);
     }

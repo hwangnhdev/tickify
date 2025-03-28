@@ -111,6 +111,35 @@ public class VoucherDAO extends DBContext {
         return total;
     }
 
+    public Voucher getVoucherByCode(String code) {
+        String sql = "SELECT * FROM Vouchers WHERE code = ? AND is_deleted = 0";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, code);
+            try ( ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Voucher voucher = mapResultSetToVoucher(rs);
+                    System.out.println("Voucher Retrieved: " + voucher.getCode() + ", Discount Value: " + voucher.getDiscountValue());
+                    return voucher;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching voucher by code: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public boolean decrementVoucherQuantity(int voucherId) {
+        String sql = "UPDATE vouchers SET usage_limit = usage_limit - 1 WHERE voucher_id = ? AND usage_limit > 0";
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, voucherId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0; // Returns true if update was successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public List<Voucher> searchVoucher(int eventId, String keyword, int page, int pageSize) {
         List<Voucher> vouchers = new ArrayList<>();
         try ( PreparedStatement stmt = connection.prepareStatement(SEARCH_VOUCHER)) {
@@ -174,39 +203,13 @@ public class VoucherDAO extends DBContext {
         return vouchers;
     }
 
-    public static void main(String[] args) {
-        VoucherDAO dao = new VoucherDAO();
-        int page = 1;
-        int PAGE_SIZE = 1;
-        List<Voucher> vouchers = dao.getVouchersByEventAndStatus(1, page, PAGE_SIZE, true, false);
-        System.out.println(vouchers);
-
-        Voucher vo = dao.getVoucherByEventID(17);
-        System.out.println(vo.getCode());
-
-        List<Voucher> listVoucher = dao.getListVoucherByEventID(1);
-        for (Voucher voucher : listVoucher) {
-            System.out.println(voucher.getCode());
-        }
-    }
-
-    public Voucher getVoucherByCode(String code) {
-        String sql = "SELECT * FROM Vouchers WHERE code = ? AND is_deleted = 0";
-        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, code);
-            try ( ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Voucher voucher = mapResultSetToVoucher(rs);
-                    System.out.println("Voucher Retrieved: " + voucher.getCode() + ", Discount Value: " + voucher.getDiscountValue());
-                    return voucher;
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("Error fetching voucher by code: " + e.getMessage());
-        }
-        return null;
-    }
-
+//    public static void main(String[] args) {
+//        VoucherDAO dao = new VoucherDAO();
+//        int page = 1;
+//        int PAGE_SIZE = 1;
+//        List<Voucher> vouchers = dao.getVouchersByEventAndStatus(1, page, PAGE_SIZE, true, false);
+//        System.out.println(vouchers);
+//    }
     // Get total number of vouchers by event ID
     public int getTotalVouchersByEventAndStatus(int eventId, boolean status) {
         String sql = "SELECT COUNT(*) FROM vouchers WHERE event_id = ? AND status = ?";
