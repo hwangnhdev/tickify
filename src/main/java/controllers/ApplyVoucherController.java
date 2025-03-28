@@ -51,10 +51,10 @@ public class ApplyVoucherController extends HttpServlet {
             if (currentDate.after(voucher.getStartDate()) && currentDate.before(voucher.getEndDate())) {
                 double discount = 0;
 
-                if ("Percentage".equals(voucher.getDiscountType())) {
+                if ("percentage".equalsIgnoreCase(voucher.getDiscountType())) {
                     discount = subtotal * (voucher.getDiscountValue() / 100.0);
                     System.out.println("Calculated Percentage Discount: " + discount);
-                } else if ("Fixed".equals(voucher.getDiscountType())) {
+                } else if ("fixed".equalsIgnoreCase(voucher.getDiscountType())) {
                     discount = voucher.getDiscountValue();
                     System.out.println("Fixed Discount: " + discount);
                 } else {
