@@ -6,15 +6,17 @@ public class OrderDetailDTO {
     private OrderSummaryDTO orderSummary;
     private CalculationDTO calculation;
     private EventSummaryDTO eventSummary;
-    private List<TicketItemDTO> orderItems;
+    private List<TicketItemDTO> orderItems;           // dùng cho carousel (mỗi vé riêng biệt)
+    private List<TicketItemDTO> groupedOrderItems;      // dùng cho bảng Order Detail (dữ liệu nhóm theo ticket type)
 
     public OrderDetailDTO() {}
 
-    public OrderDetailDTO(OrderSummaryDTO orderSummary, CalculationDTO calculation, EventSummaryDTO eventSummary, List<TicketItemDTO> orderItems) {
+    public OrderDetailDTO(OrderSummaryDTO orderSummary, CalculationDTO calculation, EventSummaryDTO eventSummary, List<TicketItemDTO> orderItems, List<TicketItemDTO> groupedOrderItems) {
         this.orderSummary = orderSummary;
         this.calculation = calculation;
         this.eventSummary = eventSummary;
         this.orderItems = orderItems;
+        this.groupedOrderItems = groupedOrderItems;
     }
 
     public OrderSummaryDTO getOrderSummary() {
@@ -47,5 +49,13 @@ public class OrderDetailDTO {
 
     public void setOrderItems(List<TicketItemDTO> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public List<TicketItemDTO> getGroupedOrderItems() {
+        return groupedOrderItems;
+    }
+
+    public void setGroupedOrderItems(List<TicketItemDTO> groupedOrderItems) {
+        this.groupedOrderItems = groupedOrderItems;
     }
 }

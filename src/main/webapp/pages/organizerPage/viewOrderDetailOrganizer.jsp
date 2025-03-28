@@ -31,10 +31,13 @@
             </style>
         </head>
         <body class="bg-gray-100 text-gray-900">
+           
             <div class="max-w-4xl mx-auto p-6">
+                
                 <!-- Ánh xạ orderDetail sang ticketDetail để dùng chung cho EL -->
             <c:set var="ticketDetail" value="${orderDetail}" />
             <div class="bg-white shadow rounded-lg p-6 space-y-8">
+                
                 <!-- Header: Event Name -->
                 <c:if test="${not empty ticketDetail.eventSummary.eventName}">
                     <div class="space-y-2">
@@ -71,7 +74,7 @@
                             <i class="fas fa-info-circle mr-2"></i>Ticket overview
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <c:if test="${not empty ticketDetail.eventSummary.location}">
+                            <c:if test="${not empty ticketDetail.orderSummary.orderDate}">
                                 <div class="border p-3 rounded">
                                     <h3 class="text-sm font-semibold">Order Date</h3>
                                     <p class="text-base">
@@ -126,7 +129,25 @@
                         </div>
                     </div>
                 </c:if>
-                
+                        <!-- Buyer Information -->
+                <c:if test="${not empty ticketDetail.orderSummary.customerName or not empty ticketDetail.orderSummary.customerEmail}">
+                    <div class="border-t border-gray-200 pt-4">
+                        <h2 class="text-2xl font-bold mb-4">
+                            <i class="fas fa-user mr-2"></i>Buyer information
+                        </h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <c:if test="${not empty ticketDetail.orderSummary.customerName}">
+                                <div class="border border-gray-200 p-4 rounded hover:bg-gray-50">
+                                    <h4 class="text-sm font-semibold">Name</h4>
+                                    <p class="text-base truncate-text" title="${ticketDetail.orderSummary.customerName}">
+                                        ${ticketDetail.orderSummary.customerName}
+                                    </p>
+                                </div>
+                            </c:if>
+                            
+                        </div>
+                    </div>
+                </c:if>
                 <!-- Order Detail: Danh sách các loại vé và ghế -->
                 <c:if test="${not empty ticketDetail.orderItems}">
                     <div class="bg-white shadow rounded-lg p-4 border border-gray-200">
@@ -202,16 +223,6 @@
                 </div>
             </c:if>
         </div>
-        <script>
-            // Cấu hình Tippy.js cho các phần tử có thuộc tính title
-            tippy('[title]', {
-                animation: 'shift-away',
-                arrow: true,
-                theme: 'light-border',
-                duration: [200, 150],
-                maxWidth: 300,
-                delay: [100, 50]
-            });
-        </script>
+       
     </body>
 </html>
