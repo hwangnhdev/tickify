@@ -21,8 +21,12 @@ import models.Customer;
 import dals.CustomerDAO;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.sql.Date;
 
-@MultipartConfig
+@MultipartConfig(
+    maxFileSize = 1024 * 1024 * 5,    // 5MB
+    maxRequestSize = 1024 * 1024 * 10 // 10MB
+)
 public class ProfileController extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(ProfileController.class.getName());
@@ -58,7 +62,7 @@ public class ProfileController extends HttpServlet {
 
             // Fetch and validate customer
             CustomerDAO dao = new CustomerDAO();
-            Customer customer = dao.getCustomerById(customerId);
+            Customer customer = dao.selectCustomerById(customerId);
 
             if (customer == null) {
                 System.out.println("No customer found for ID: " + customerId);
@@ -102,7 +106,7 @@ public class ProfileController extends HttpServlet {
 
             // Fetch existing customer
             CustomerDAO customerDAO = new CustomerDAO();
-            Customer existingCustomer = customerDAO.getCustomerById(customerId);
+            Customer existingCustomer = customerDAO.selectCustomerById(customerId);
 
             if (existingCustomer == null) {
                 LOGGER.warning("No customer found for ID: " + customerId);
@@ -114,6 +118,8 @@ public class ProfileController extends HttpServlet {
             String fullname = request.getParameter("fullname");
             String address = request.getParameter("address");
             String phone = request.getParameter("phone");
+            Date dob = Date.valueOf(request.getParameter("dob"));
+            String gender = request.getParameter("gender");
 
             String picture = existingCustomer.getProfilePicture();
             Part filePart = request.getPart("profile_picture");
@@ -159,6 +165,8 @@ public class ProfileController extends HttpServlet {
             customer.setAddress(address);
             customer.setPhone(phone);
             customer.setProfilePicture(picture);
+            customer.setDob(dob);
+            customer.setGender(gender);
 
             // Perform update
             boolean isUpdated = customerDAO.updateCustomer(customer);

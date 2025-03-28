@@ -55,11 +55,11 @@
             }
 
             .profile-picture img {
-                width: 90px;
-                height: 90px;
+                width: 120px;
+                height: 120px;
                 border-radius: 50%;
                 object-fit: cover;
-                border: 3px solid #2dc275;
+                border: 0px;
                 background-color: #fff;
             }
 
@@ -102,7 +102,8 @@
             }
 
             .profile-container input[type="text"],
-            .profile-container input[type="email"] {
+            .profile-container input[type="email"],
+            .profile-container input[type="date"]{
                 font-family: 'Inter', sans-serif;
                 width: 100%;
                 padding: 10px;
@@ -117,7 +118,8 @@
             }
 
             .profile-container input[type="text"]:focus,
-            .profile-container input[type="email"]:focus {
+            .profile-container input[type="email"]:focus,
+            .profile-container input[type="date"]:focus {
                 outline: none;
                 border-color: #2dc275;
             }
@@ -126,6 +128,14 @@
                 background-color: #e5e7eb;
                 color: #6b7280;
                 cursor: not-allowed;
+            }
+            
+            .profile-container gender-group {
+                text-align: left;
+                margin: 10px 0;
+            }
+            .profile-container gender-group label {
+                margin-right: 10px;
             }
 
             .submit-btn {
@@ -257,8 +267,6 @@
                     </svg>
                 </div>
 
-
-
                 <form action="profile" method="post" enctype="multipart/form-data" onsubmit="return validateForm();">
                     <div class="profile-picture">
                         <img name="profile_picture" id="profile_picture" src="<%= profile.getProfilePicture() != null && !profile.getProfilePicture().isEmpty() ? profile.getProfilePicture() : "default-avatar.jpg"%>" alt="Profile Picture" />
@@ -281,6 +289,16 @@
                     <label for="phone">Phone Number</label>
                     <input type="text" id="phone" name="phone" pattern="[0-9]{10}" maxlength="10" value="<%= profile.getPhone() != null ? profile.getPhone() : ""%>" placeholder="10 digits only" required />
 
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" value="<%= profile.getDob() != null ? profile.getDob() : ""%>" />
+
+                    <div class="gender-group">
+                        <label>Gender</label>
+                        <span><input type="radio" name="gender" value="male" <%= "male".equals(profile.getGender()) ? "checked" : ""%> /> Male</span> &nbsp;
+                        <span><input type="radio" name="gender" value="female" <%= "female".equals(profile.getGender()) ? "checked" : ""%> /> Female</span> &nbsp;
+                        <span><input type="radio" name="gender" value="others" <%= "others".equals(profile.getGender()) ? "checked" : ""%> /> Others</span>
+                    </div>
+                    </br>
                     <button type="submit" class="submit-btn">Complete</button>
                 </div>
             </form>
@@ -318,6 +336,7 @@
             function validateForm() {
                 const phone = document.getElementById('phone').value;
                 const fullName = document.getElementById('fullname').value;
+                const dob = document.getElementById('dob').value;
                 const phonePattern = /^[0-9]{10}$/;
 
                 if (!phonePattern.test(phone)) {
@@ -327,6 +346,16 @@
                 if (fullName.trim() === '') {
                     alert('Full Name cannot be empty.');
                     return false;
+                }
+                if (dob) { 
+                    const dobDate = new Date(dob);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (dobDate >= today) {
+                        alert('Date of Birth must be earlier than today.');
+                        return false;
+                    }
                 }
                 return true;
             }
@@ -342,7 +371,7 @@
                 document.getElementById('popupBackdrop').style.display = 'none';
                 window.location.href = 'event';
             }
-
+            
             // Check for success message or error message and show popup
             <% if (successMessage != null && !successMessage.isEmpty()) { %>
             showPopup();

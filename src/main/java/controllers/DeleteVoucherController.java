@@ -90,7 +90,7 @@ public class DeleteVoucherController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/listVoucher" + "?eventId=" + eventId);
         } catch (NumberFormatException e) {
             int eventId = Integer.parseInt(request.getParameter("eventId"));
-            // Handle invalid parameters
+            // Handle invalid parameters    
             request.getSession().setAttribute("deleteMessage", "Invalid voucher ID.");
             request.getSession().setAttribute("deleteSuccess", false);
             response.sendRedirect(request.getContextPath() + "/listVoucher" + "?eventId=" + eventId);

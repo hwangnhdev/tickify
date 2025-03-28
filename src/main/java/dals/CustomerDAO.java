@@ -46,10 +46,9 @@ public class CustomerDAO extends DBContext {
     private static final String SELECT_CUSTOMER_BY_ID = "SELECT * FROM Customers WHERE customer_id = ?";
     private static final String SELECT_CUSTOMER_BY_EMAIL = "SELECT * FROM Customers WHERE email = ?";
     private static final String INSERT_CUSTOMER = "INSERT INTO Customers (full_name, email, address, phone, profile_picture, status) VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String UPDATE_CUSTOMER = "UPDATE Customers SET full_name = ?, email = ?, address = ?, phone = ?, profile_picture = ?, status = ? WHERE customer_id = ?";
+    private static final String UPDATE_CUSTOMER = "UPDATE Customers SET full_name = ?, email=?, address = ?, phone = ?, profile_picture = ?, dob = ?, gender = ? WHERE customer_id = ?";
 
     // Các phương thức select, insert, update khác không thay đổi
-
     private Customer mapResultSetToCustomer(ResultSet rs) throws SQLException {
         Customer customer = new Customer();
         customer.setCustomerId(rs.getInt("customer_id"));
@@ -64,7 +63,6 @@ public class CustomerDAO extends DBContext {
         customer.setGender(rs.getString("gender"));
         return customer;
     }
-
 
     public List<Customer> selectAllCustomers() {
         List<Customer> customers = new ArrayList<>();
@@ -83,7 +81,7 @@ public class CustomerDAO extends DBContext {
     public Customer selectCustomerById(int id) {
         Customer customer = null;
         try {
-            PreparedStatement st = connection.prepareStatement("SELECT * FROM Customers WHERE customer_id = ?");
+            PreparedStatement st = connection.prepareStatement(SELECT_CUSTOMER_BY_ID);
             st.setInt(1, id);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
@@ -129,13 +127,16 @@ public class CustomerDAO extends DBContext {
     }
 
     public boolean updateCustomer(Customer customer) {
-        String query = "UPDATE Customers SET full_name = ?, address = ?, phone = ?, profile_picture = ? WHERE customer_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        String query = UPDATE_CUSTOMER;
+        try ( PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, customer.getFullName());
-            ps.setString(2, customer.getAddress());
-            ps.setString(3, customer.getPhone());
-            ps.setString(4, customer.getProfilePicture());
-            ps.setInt(5, customer.getCustomerId());
+            ps.setString(2, customer.getEmail());
+            ps.setString(3, customer.getAddress());
+            ps.setString(4, customer.getPhone());
+            ps.setString(5, customer.getProfilePicture());
+            ps.setDate(6, customer.getDob());
+            ps.setString(7, customer.getGender());
+            ps.setInt(8, customer.getCustomerId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error updating profile: " + e.getMessage());
@@ -145,7 +146,7 @@ public class CustomerDAO extends DBContext {
 
     public boolean updateCustomerImageProfile(Customer customer) {
         String query = "UPDATE Customers SET profile_picture = ? WHERE customer_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try ( PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, customer.getProfilePicture());
             ps.setInt(2, customer.getCustomerId());
             return ps.executeUpdate() > 0;
@@ -165,9 +166,9 @@ public class CustomerDAO extends DBContext {
         String query = "select customer_id, full_name, address, phone, email, profile_picture, status\n"
                 + "	from Customers\n"
                 + "where customer_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try ( PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, customerId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Customer customer = new Customer();
                     customer.setCustomerId(rs.getInt("customer_id"));
@@ -195,7 +196,7 @@ public class CustomerDAO extends DBContext {
      */
     public boolean updatePassword(int customerId, String newPassword) {
         String sql = "UPDATE Customer_auths SET password=? WHERE customer_id=?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt()); // Hash newPasword
             ps.setString(1, hashedPassword);
             ps.setInt(2, customerId);
@@ -210,9 +211,9 @@ public class CustomerDAO extends DBContext {
         CustomerAuth pass = null;
         String sql = "SELECT password FROM Customer_auths WHERE customer_id=?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, customerId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     pass = new CustomerAuth();
                     pass.setPassword(rs.getString("password"));
@@ -235,7 +236,7 @@ public class CustomerDAO extends DBContext {
                 + "AND (? IS NULL OR status = ?) "
                 + "ORDER BY " + sortColumn + " " + sortOrder + " "
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             // Thiết lập tham số cho searchTerm
             if (searchTerm == null) {
                 stmt.setNull(1, Types.NVARCHAR);
@@ -258,7 +259,7 @@ public class CustomerDAO extends DBContext {
             stmt.setInt(5, offset);
             stmt.setInt(6, pageSize);
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Customer customer = new Customer();
                     customer.setCustomerId(rs.getInt("customer_id"));
@@ -281,7 +282,7 @@ public class CustomerDAO extends DBContext {
                 + "FROM Customers "
                 + "WHERE (? IS NULL OR full_name LIKE ?) "
                 + "AND (? IS NULL OR status = ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             if (searchTerm == null) {
                 stmt.setNull(1, Types.NVARCHAR);
                 stmt.setNull(2, Types.NVARCHAR);
@@ -297,7 +298,7 @@ public class CustomerDAO extends DBContext {
                 stmt.setInt(3, status);
                 stmt.setInt(4, status);
             }
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt("total");
                 }
@@ -310,12 +311,12 @@ public class CustomerDAO extends DBContext {
 
     public Customer getCustomerProfile(int customerId) {
         Customer customer = null;
-        String sql = "SELECT customer_id AS UserID, full_name AS UserName, email, address, phone, " +
-                     "profile_picture AS ProfilePicture, status AS AccountStatus, dob, gender " +
-                     "FROM Customers WHERE customer_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String sql = "SELECT customer_id AS UserID, full_name AS UserName, email, address, phone, "
+                + "profile_picture AS ProfilePicture, status AS AccountStatus, dob, gender "
+                + "FROM Customers WHERE customer_id = ?";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, customerId);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     customer = new Customer();
                     customer.setCustomerId(rs.getInt("UserID"));
@@ -341,7 +342,7 @@ public class CustomerDAO extends DBContext {
      */
     public boolean updateAccountStatus(int customerId, boolean active) {
         String sql = "UPDATE Customers SET status = ? WHERE customer_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             // Dùng setInt để cập nhật giá trị 1 (active) hoặc 0 (inactive)
             ps.setInt(1, active ? 1 : 0);
             ps.setInt(2, customerId);
@@ -355,10 +356,10 @@ public class CustomerDAO extends DBContext {
         return false;
     }
 
-   // Phương thức cập nhật thông tin cá nhân (bao gồm dob và gender)
+    // Phương thức cập nhật thông tin cá nhân (bao gồm dob và gender)
     public void updateCustomerInfo(Customer customer) {
         String sql = "UPDATE Customers SET full_name = ?, email = ?, address = ?, phone = ?, dob = ?, gender = ? WHERE customer_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, customer.getFullName());
             ps.setString(2, customer.getEmail());
             ps.setString(3, customer.getAddress());
@@ -371,6 +372,5 @@ public class CustomerDAO extends DBContext {
             e.printStackTrace();
         }
     }
-
 
 }
