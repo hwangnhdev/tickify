@@ -64,9 +64,9 @@ public class VoucherDAO extends DBContext {
     }
 
     public Voucher getVoucherById(int id) {
-        try (PreparedStatement stmt = connection.prepareStatement(SELECT_VOUCHER_BY_ID)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(SELECT_VOUCHER_BY_ID)) {
             stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSetToVoucher(rs);
                 }
@@ -80,11 +80,11 @@ public class VoucherDAO extends DBContext {
     public List<Voucher> getVouchersByEvent(int eventId, int page, int pageSize) {
         List<Voucher> vouchers = new ArrayList<>();
         String sql = SELECT_VOUCHER_BY_EVENT;
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setInt(2, (page - 1) * pageSize);
             stmt.setInt(3, pageSize);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     vouchers.add(mapResultSetToVoucher(rs));
                 }
@@ -98,9 +98,9 @@ public class VoucherDAO extends DBContext {
     public int getTotalVouchersByEvent(int eventId) {
         int total = 0;
         String sql = "SELECT COUNT(*) FROM vouchers WHERE event_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     total = rs.getInt(1);
                 }
@@ -110,32 +110,44 @@ public class VoucherDAO extends DBContext {
         }
         return total;
     }
-    
-public Voucher getVoucherByCode(String code) {
-    String sql = "SELECT * FROM Vouchers WHERE code = ? AND is_deleted = 0";
-    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-        stmt.setString(1, code);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                Voucher voucher = mapResultSetToVoucher(rs);
-                System.out.println("Voucher Retrieved: " + voucher.getCode() + ", Discount Value: " + voucher.getDiscountValue());
-                return voucher;
+
+    public Voucher getVoucherByCode(String code) {
+        String sql = "SELECT * FROM Vouchers WHERE code = ? AND is_deleted = 0";
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, code);
+            try ( ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Voucher voucher = mapResultSetToVoucher(rs);
+                    System.out.println("Voucher Retrieved: " + voucher.getCode() + ", Discount Value: " + voucher.getDiscountValue());
+                    return voucher;
+                }
             }
+        } catch (SQLException e) {
+            System.out.println("Error fetching voucher by code: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        System.out.println("Error fetching voucher by code: " + e.getMessage());
+        return null;
     }
-    return null;
-}
+
+    public boolean decrementVoucherQuantity(int voucherId) {
+        String sql = "UPDATE vouchers SET usage_limit = usage_limit - 1 WHERE voucher_id = ? AND usage_limit > 0";
+        try ( PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, voucherId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0; // Returns true if update was successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public List<Voucher> searchVoucher(int eventId, String keyword, int page, int pageSize) {
         List<Voucher> vouchers = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(SEARCH_VOUCHER)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(SEARCH_VOUCHER)) {
             stmt.setInt(1, eventId);
             stmt.setString(2, "%" + keyword.toLowerCase() + "%"); // Case-insensitive search
             stmt.setInt(3, (page - 1) * pageSize);
             stmt.setInt(4, pageSize);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     vouchers.add(mapResultSetToVoucher(rs));
                 }
@@ -152,10 +164,10 @@ public Voucher getVoucherByCode(String code) {
                 + "FROM Vouchers "
                 + "WHERE event_id = ? "
                 + "  AND LOWER(code) LIKE ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setString(2, "%" + keyword.toLowerCase() + "%");
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     total = rs.getInt(1);
                 }
@@ -173,14 +185,14 @@ public Voucher getVoucherByCode(String code) {
         String sql = "SELECT * FROM vouchers WHERE event_id = ? AND status = ? AND is_deleted = ? ORDER BY event_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         int offset = (page - 1) * pageSize;
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setBoolean(2, status);
             stmt.setBoolean(3, isDeleted);
             stmt.setInt(4, offset);
             stmt.setInt(5, pageSize);
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     vouchers.add(mapResultSetToVoucher(rs));
                 }
@@ -198,14 +210,13 @@ public Voucher getVoucherByCode(String code) {
 //        List<Voucher> vouchers = dao.getVouchersByEventAndStatus(1, page, PAGE_SIZE, true, false);
 //        System.out.println(vouchers);
 //    }
-
     // Get total number of vouchers by event ID
     public int getTotalVouchersByEventAndStatus(int eventId, boolean status) {
         String sql = "SELECT COUNT(*) FROM vouchers WHERE event_id = ? AND status = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setBoolean(2, status);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
@@ -217,7 +228,7 @@ public Voucher getVoucherByCode(String code) {
     }
 
     public boolean insertVoucher(Voucher voucher) {
-        try (PreparedStatement stmt = connection.prepareStatement(INSERT_VOUCHER)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(INSERT_VOUCHER)) {
             stmt.setInt(1, voucher.getEventId());
             stmt.setString(2, voucher.getCode());
             stmt.setString(3, voucher.getDescription());
@@ -238,7 +249,7 @@ public Voucher getVoucherByCode(String code) {
     }
 
     public boolean updateVoucher(Voucher voucher) {
-        try (PreparedStatement stmt = connection.prepareStatement(UPDATE_VOUCHER)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(UPDATE_VOUCHER)) {
             stmt.setString(1, voucher.getCode());
             stmt.setString(2, voucher.getDescription());
             stmt.setString(3, voucher.getDiscountType());
@@ -257,7 +268,7 @@ public Voucher getVoucherByCode(String code) {
     }
 
     public boolean deleteVoucher(int voucherId) {
-        try (PreparedStatement stmt = connection.prepareStatement(DELETE_VOUCHER)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(DELETE_VOUCHER)) {
             stmt.setBoolean(1, true);
             stmt.setInt(2, voucherId);
             return stmt.executeUpdate() > 0;
