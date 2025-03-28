@@ -1,25 +1,24 @@
 package viewModels;
 
 import java.sql.Timestamp;
-import models.Event;
 
 public class EventSummaryDTO {
-
     private int eventId;
     private String eventName;
     private String location;
     private Timestamp startDate;
     private Timestamp endDate;
     private String imageUrl;
-    // Không cần trường paymentStatus nữa, dùng eventStatus cho trạng thái của sự
-    // kiện
-    private String eventStatus; // Ví dụ: "processing", "approved", "rejected", "upcoming", "past"
+    private String eventStatus; // ví dụ: "upcoming", "past", v.v.
+    
+    // Thêm các trường để hiển thị thông tin Ticket Detail (nếu cần)
+    private String ticketCode;
+    private String ticketInfo;
 
-    public EventSummaryDTO() {
-    }
+    public EventSummaryDTO() {}
 
     public EventSummaryDTO(int eventId, String eventName, String location, Timestamp startDate, Timestamp endDate,
-            String imageUrl, String eventStatus) {
+                           String imageUrl, String eventStatus, String ticketCode, String ticketInfo) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.location = location;
@@ -27,9 +26,10 @@ public class EventSummaryDTO {
         this.endDate = endDate;
         this.imageUrl = imageUrl;
         this.eventStatus = eventStatus;
+        this.ticketCode = ticketCode;
+        this.ticketInfo = ticketInfo;
     }
 
-    // Getters and Setters
     public int getEventId() {
         return eventId;
     }
@@ -84,5 +84,21 @@ public class EventSummaryDTO {
 
     public void setEventStatus(String eventStatus) {
         this.eventStatus = eventStatus;
+    }
+
+    public String getTicketCode() {
+        return ticketCode;
+    }
+
+    public void setTicketCode(String ticketCode) {
+        this.ticketCode = ticketCode;
+    }
+
+    public String getTicketInfo() {
+        return ticketInfo;
+    }
+
+    public void setTicketInfo(String ticketInfo) {
+        this.ticketInfo = ticketInfo;
     }
 }

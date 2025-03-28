@@ -11,58 +11,47 @@ import java.io.IOException;
 import java.util.List;
 import viewModels.EventSummaryDTO;
 
-
 public class OrganizerEventController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Object customerIdObj = session.getAttribute("customerId");
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("customerId") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
         int customerId = 0;
-        if (customerIdObj instanceof Integer) {
-            customerId = (Integer) customerIdObj;
-            System.out.println("Customer ID: " + customerId);
-        } else if (customerIdObj instanceof String) {
-            try {
-                customerId = Integer.parseInt((String) customerIdObj);
-                System.out.println("Customer ID: " + customerId);
-            } catch (NumberFormatException e) {
-                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
+        try {
+            customerId = Integer.parseInt(session.getAttribute("customerId").toString());
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
         }
 
         String filter = request.getParameter("filter");
         if (filter == null || filter.trim().isEmpty()) {
             filter = "all";
         }
-
         String eventName = request.getParameter("eventName");
-        if (eventName == null || eventName.trim().isEmpty()) {
+        if (eventName != null && eventName.trim().isEmpty()) {
             eventName = null;
         }
 
         OrganizerDAO organizerDAO = new OrganizerDAO();
-//        List<EventSummaryDTO> events = organizerDAO.getEventsByCustomer(customerId, filter);
         List<EventSummaryDTO> events = organizerDAO.getEventsByCustomer(customerId, filter, eventName);
-
-        // Đặt danh sách sự kiện và bộ lọc hiện tại vào request để JSP hiển thị
         request.setAttribute("events", events);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/organizerEvents.jsp");
-        dispatcher.forward(request, response);
-    }
+        request.setAttribute("filter", filter); // Để fragment có thể biết bộ lọc hiện tại
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
-    }
-    
-    @Override
-    public String getServletInfo() {
-        return "OrganizerEventController retrieves events with banner images";
+        // Nếu là AJAX request, forward đến JSP fragment để chỉ render phần danh sách sự kiện
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/_eventsFragment.jsp");
+            dispatcher.forward(request, response);
+        } else {
+            // Nếu không phải AJAX thì forward toàn bộ trang
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/organizerEvents.jsp");
+            dispatcher.forward(request, response);
+        }
     }
 }
-

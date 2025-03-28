@@ -6,21 +6,16 @@ public class TicketItemDTO {
 
     private int ticketTypeId;
     private String ticketType;
-    private BigDecimal unitPrice;
-    private String seats; // Danh sách ghế dạng chuỗi (ví dụ: "A-15, A-16, A-14, A-13")
+    private String ticketCode;
     private int quantity;
+    private BigDecimal unitPrice;
     private BigDecimal subtotalPerType;
+    private String seats;
+    private String paymentStatus;
+    private String ticketStatus;
+    private String ticketQRCode;
 
     public TicketItemDTO() {
-    }
-
-    public TicketItemDTO(int ticketTypeId, String ticketType, BigDecimal unitPrice, String seats, int quantity, BigDecimal subtotalPerType) {
-        this.ticketTypeId = ticketTypeId;
-        this.ticketType = ticketType;
-        this.unitPrice = unitPrice;
-        this.seats = seats;
-        this.quantity = quantity;
-        this.subtotalPerType = subtotalPerType;
     }
 
     public int getTicketTypeId() {
@@ -31,6 +26,14 @@ public class TicketItemDTO {
         this.ticketTypeId = ticketTypeId;
     }
 
+    public String getTicketQRCode() {
+        return ticketQRCode;
+    }
+
+    public void setTicketQRCode(String ticketQRCode) {
+        this.ticketQRCode = ticketQRCode;
+    }
+
     public String getTicketType() {
         return ticketType;
     }
@@ -39,20 +42,12 @@ public class TicketItemDTO {
         this.ticketType = ticketType;
     }
 
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
+    public String getTicketCode() {
+        return ticketCode;
     }
 
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public String getSeats() {
-        return seats;
-    }
-
-    public void setSeats(String seats) {
-        this.seats = seats;
+    public void setTicketCode(String ticketCode) {
+        this.ticketCode = ticketCode;
     }
 
     public int getQuantity() {
@@ -63,11 +58,43 @@ public class TicketItemDTO {
         this.quantity = quantity;
     }
 
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
     public BigDecimal getSubtotalPerType() {
         return subtotalPerType;
     }
 
     public void setSubtotalPerType(BigDecimal subtotalPerType) {
         this.subtotalPerType = subtotalPerType;
+    }
+
+    public String getSeats() {
+        return seats;
+    }
+
+    public void setSeats(String seats) {
+        this.seats = seats;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getTicketStatus() {
+        return ticketStatus;
+    }
+
+    public void setTicketStatus(String ticketStatus) {
+        this.ticketStatus = ticketStatus;
     }
 }
