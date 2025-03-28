@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class OrderSummaryDTO {
+
+    private int customerId;
     private int orderId;
     private Date orderDate;
     private String paymentStatus;
@@ -14,6 +16,14 @@ public class OrderSummaryDTO {
 
     public String getEventName() {
         return eventName;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
     public void setEventName(String eventName) {
@@ -32,7 +42,7 @@ public class OrderSummaryDTO {
     private String voucherCode;
     private String discountType;
     private BigDecimal discountValue;
-    
+
     // Các thuộc tính bổ sung
     private BigDecimal grandTotal;
     private String orderNotes;

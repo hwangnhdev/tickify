@@ -32,32 +32,46 @@ public class TicketDetailController extends HttpServlet {
             return;
         }
         
-        // Lấy customerId từ session (có thể kiểm tra quyền truy cập)
+        // Lấy customerId từ session (để kiểm tra quyền truy cập)
         HttpSession session = request.getSession();
         Object customerIdObj = session.getAttribute("customerId");
         int customerId = 0;
+        if (customerIdObj == null) {
+            request.setAttribute("errorMessage", "Bạn chưa đăng nhập!");
+            RequestDispatcher rd = request.getRequestDispatcher("/pages/ticketPage/ticketDetail.jsp");
+            rd.forward(request, response);
+            return;
+        }
         if (customerIdObj instanceof Integer) {
             customerId = (Integer) customerIdObj;
         } else if (customerIdObj instanceof String) {
             try {
                 customerId = Integer.parseInt((String) customerIdObj);
             } catch (NumberFormatException e) {
-                System.out.println("Lỗi chuyển đổi Customer ID: " + e.getMessage());
+                request.setAttribute("errorMessage", "Customer ID không hợp lệ!");
+                RequestDispatcher rd = request.getRequestDispatcher("/pages/ticketPage/ticketDetail.jsp");
+                rd.forward(request, response);
+                return;
             }
         } else {
-            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
+            request.setAttribute("errorMessage", "Customer ID không hợp lệ hoặc chưa được set trong session.");
+            RequestDispatcher rd = request.getRequestDispatcher("/pages/ticketPage/ticketDetail.jsp");
+            rd.forward(request, response);
+            return;
         }
         
         TicketDAO ticketDAO = new TicketDAO();
         OrderDetailDTO orderDetail = null;
         try {
-            orderDetail = ticketDAO.getTicketDetailByOrderId(orderId);
+            // Gọi phương thức với cả orderId và customerId
+            orderDetail = ticketDAO.getTicketDetailByOrderId(orderId, customerId);
         } catch (SQLException ex) {
             ex.printStackTrace();
+            request.setAttribute("errorMessage", "Có lỗi xảy ra trong quá trình truy xuất dữ liệu!");
         }
         
-        if (orderDetail == null) {
-            request.setAttribute("errorMessage", "Không tìm thấy chi tiết vé!");
+        if (orderDetail == null || orderDetail.getOrderSummary() == null) {
+            request.setAttribute("errorMessage", "Không tìm thấy chi tiết vé hoặc bạn không có quyền truy cập đơn hàng này!");
         } else {
             // Set đối tượng orderDetail vào request để JSP sử dụng
             request.setAttribute("orderDetail", orderDetail);

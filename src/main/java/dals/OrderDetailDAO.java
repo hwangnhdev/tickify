@@ -15,7 +15,7 @@ import viewModels.TicketItemDTO;
 public class OrderDetailDAO extends DBContext {
 
     // Query Header: Lấy thông tin đơn hàng, khách hàng, voucher, tổng tính toán và event liên quan
-    // Query Header: Lấy thông tin đơn hàng, khách hàng, voucher, tổng tính toán và event liên quan
+    // Đã bổ sung điều kiện lọc theo customer: AND c.customer_id = ?
     private static final String SQL_GET_ORDER_HEADER
             = "SELECT "
             + "    o.order_id, "
@@ -67,7 +67,8 @@ public class OrderDetailDAO extends DBContext {
             + "    WHERE ei.event_id = e.event_id "
             + "    ORDER BY ei.image_id "
             + ") ei "
-            + "WHERE o.order_id = ?";
+            + "WHERE o.order_id = ? "
+            + "  AND c.customer_id = ?";
 
     // Query Order Items: Lấy thông tin chi tiết các order items theo từng loại vé
     private static final String SQL_GET_ORDER_ITEMS
@@ -85,7 +86,8 @@ public class OrderDetailDAO extends DBContext {
             + "WHERE od.order_id = ? "
             + "GROUP BY od.ticket_type_id, tt.name, tt.price, od.quantity";
 
-    public OrderDetailDTO getOrderDetailByOrderId(int orderId) {
+    // Phương thức cập nhật: thêm tham số customerId để kiểm tra quyền truy xuất đơn hàng
+    public OrderDetailDTO getOrderDetailByOrderId(int orderId, int customerId) {
         OrderDetailDTO detail = new OrderDetailDTO();
         PreparedStatement psHeader = null;
         PreparedStatement psItems = null;
@@ -96,6 +98,7 @@ public class OrderDetailDAO extends DBContext {
             // --- Query Header ---
             psHeader = connection.prepareStatement(SQL_GET_ORDER_HEADER);
             psHeader.setInt(1, orderId);
+            psHeader.setInt(2, customerId);
             rsHeader = psHeader.executeQuery();
             if (rsHeader.next()) {
                 OrderSummaryDTO summary = new OrderSummaryDTO();
@@ -125,7 +128,7 @@ public class OrderDetailDAO extends DBContext {
                 detail.setCalculation(calc);
                 detail.setEventSummary(eventInfo);
             } else {
-                System.err.println("No header data found for order_id = " + orderId);
+                System.err.println("No header data found for order_id = " + orderId + " and customer_id = " + customerId);
                 return null;
             }
 
@@ -159,8 +162,10 @@ public class OrderDetailDAO extends DBContext {
     }
 
     // Các phương thức insertOrderDetail, getLatestOrderDetail, getOrderDetailsByOrderId, getOrderDetailById giữ nguyên...
+
     public boolean insertOrderDetail(models.OrderDetail orderDetail) {
-        try (PreparedStatement st = connection.prepareStatement("INSERT INTO OrderDetails (order_id, ticket_type_id, quantity, price) VALUES (?, ?, ?, ?)")) {
+        try (PreparedStatement st = connection.prepareStatement(
+                "INSERT INTO OrderDetails (order_id, ticket_type_id, quantity, price) VALUES (?, ?, ?, ?)")) {
             st.setInt(1, orderDetail.getOrderId());
             st.setInt(2, orderDetail.getTicketTypeId());
             st.setInt(3, orderDetail.getQuantity());

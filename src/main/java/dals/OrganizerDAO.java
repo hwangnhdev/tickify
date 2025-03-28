@@ -17,7 +17,7 @@ import utils.DBContext;
 
 public class OrganizerDAO extends DBContext {
 
-    // Lấy thông tin chi tiết của event mà customer đã mua vé (nếu cần)
+    // 1. Lấy thông tin chi tiết của event mà customer đã mua vé (có lọc theo customer)
     public EventDetailDTO getCustomerEventDetail(int customerId, int eventId) {
         EventDetailDTO detail = null;
         String sql = "SELECT "
@@ -73,14 +73,13 @@ public class OrganizerDAO extends DBContext {
         return detail;
     }
 
-    // Lấy danh sách event theo customer (theo organizer được liên kết với customer)
+    // 2. Lấy danh sách event theo customer (theo organizer được liên kết với customer)
     public List<EventSummaryDTO> getEventsByCustomer(int customerId, String filter, String eventName) {
         List<EventSummaryDTO> events = new ArrayList<>();
-        // Lưu ý: Stored procedure được tạo với tên dbo.GetCustomerEvents
+        // Stored procedure dbo.GetCustomerEvents đã được tạo với các tham số: customerId, filter, eventName
         String sql = "{call dbo.GetCustomerEvents(?, ?, ?)}";
 
         try (CallableStatement cs = connection.prepareCall(sql)) {
-            // Thiết lập tham số cho stored procedure
             cs.setInt(1, customerId);
             cs.setString(2, filter);
             if (eventName != null && !eventName.trim().isEmpty()) {
@@ -88,8 +87,6 @@ public class OrganizerDAO extends DBContext {
             } else {
                 cs.setNull(3, java.sql.Types.NVARCHAR);
             }
-
-            // Thực thi stored procedure và lấy kết quả
             try (ResultSet rs = cs.executeQuery()) {
                 while (rs.next()) {
                     EventSummaryDTO event = new EventSummaryDTO();
@@ -109,12 +106,9 @@ public class OrganizerDAO extends DBContext {
         return events;
     }
 
-    /**
-     * Lấy danh sách OrderDetail theo eventId, paymentStatus và tìm kiếm tên
-     * khách hàng. Phương thức này sử dụng phân trang theo offset và pageSize.
-     */
+    // 3. Lấy danh sách OrderDetail theo eventId, paymentStatus, tên khách hàng và customerId
     public List<OrderDetailDTO> getOrderDetailsByEventAndPaymentStatus(
-            int eventId, String paymentStatus, String searchOrder, int offset, int pageSize) {
+            int eventId, int customerId, String paymentStatus, String searchOrder, int offset, int pageSize) {
         List<OrderDetailDTO> orders = new ArrayList<>();
         String sql = "SELECT \n"
                 + "    o.order_id, \n"
@@ -131,6 +125,7 @@ public class OrganizerDAO extends DBContext {
                 + "JOIN Showtimes s ON tt.showtime_id = s.showtime_id \n"
                 + "JOIN Events e ON s.event_id = e.event_id \n"
                 + "WHERE e.event_id = ? \n"
+                + "  AND o.customer_id = ? \n"  // Lọc theo customer
                 + "  AND (LOWER(?) = 'all' OR LOWER(o.payment_status) = LOWER(?)) \n"
                 + "  AND ( ? IS NULL OR c.full_name LIKE ? ) \n"
                 + "GROUP BY \n"
@@ -144,6 +139,7 @@ public class OrganizerDAO extends DBContext {
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             int index = 1;
             st.setInt(index++, eventId);
+            st.setInt(index++, customerId);
             st.setString(index++, paymentStatus);
             st.setString(index++, paymentStatus);
             if (searchOrder == null || searchOrder.trim().isEmpty()) {
@@ -160,15 +156,12 @@ public class OrganizerDAO extends DBContext {
                     OrderSummaryDTO summary = new OrderSummaryDTO();
                     summary.setOrderId(rs.getInt("order_id"));
                     summary.setOrderDate(rs.getTimestamp("order_date"));
-                    // total_price được sử dụng làm grandTotal
-                    summary.setGrandTotal(rs.getBigDecimal("total_price"));
+                    summary.setGrandTotal(rs.getBigDecimal("total_price")); // total_price dùng làm grandTotal
                     summary.setPaymentStatus(rs.getString("payment_status"));
                     summary.setCustomerName(rs.getString("customerName"));
-                    // Mapping thông tin event từ kết quả truy vấn
                     summary.setEventName(rs.getString("eventName"));
                     summary.setLocation(rs.getString("location"));
 
-                    // Tạo OrderDetailDTO và set OrderSummaryDTO
                     OrderDetailDTO orderDetail = new OrderDetailDTO();
                     orderDetail.setOrderSummary(summary);
                     orders.add(orderDetail);
@@ -180,8 +173,9 @@ public class OrganizerDAO extends DBContext {
         return orders;
     }
 
+    // 4. Đếm số đơn hàng theo event, paymentStatus, tìm kiếm tên khách hàng và customerId
     public int countOrdersByEventAndPaymentStatus(
-            int eventId, String paymentStatus, String searchOrder) {
+            int eventId, int customerId, String paymentStatus, String searchOrder) {
         int count = 0;
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT COUNT(*) ");
@@ -192,6 +186,7 @@ public class OrganizerDAO extends DBContext {
         sql.append("JOIN Showtimes s ON tt.showtime_id = s.showtime_id ");
         sql.append("JOIN Events e ON s.event_id = e.event_id ");
         sql.append("WHERE e.event_id = ? ");
+        sql.append("  AND o.customer_id = ? ");  // Lọc theo customer
         if (!"all".equalsIgnoreCase(paymentStatus)) {
             sql.append("AND LOWER(o.payment_status) = ? ");
         }
@@ -201,6 +196,7 @@ public class OrganizerDAO extends DBContext {
         try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
             int index = 1;
             st.setInt(index++, eventId);
+            st.setInt(index++, customerId);
             if (!"all".equalsIgnoreCase(paymentStatus)) {
                 st.setString(index++, paymentStatus.toLowerCase());
             }
@@ -218,6 +214,7 @@ public class OrganizerDAO extends DBContext {
         return count;
     }
 
+    // 5. Phiên bản đếm đơn hàng theo event và paymentStatus (dành cho organizer, không cần lọc theo customer)
     public int countOrdersByEventAndPaymentStatus(int eventId, String paymentStatus) {
         int count = 0;
         String sql = "SELECT COUNT(*) AS total "
@@ -243,6 +240,7 @@ public class OrganizerDAO extends DBContext {
         return count;
     }
 
+    // 6. Đếm đơn hàng theo organizer và paymentStatus (cho giao diện của organizer)
     public int countOrdersByOrganizerAndPaymentStatus(int organizerId, String paymentStatus) {
         int count = 0;
         String sql = "SELECT COUNT(*) AS total "
@@ -269,6 +267,7 @@ public class OrganizerDAO extends DBContext {
         return count;
     }
 
+    // 7. Lấy chi tiết event (công khai, không cần lọc theo customer)
     public EventDetailDTO getEventDetail(int eventId) {
         EventDetailDTO detail = null;
         String sql = "WITH BannerImages AS ( "
@@ -329,6 +328,7 @@ public class OrganizerDAO extends DBContext {
         return detail;
     }
 
+    // 8. Lấy danh sách showtimes theo event (không cần lọc theo customer)
     public List<ShowtimeDTO> getShowtimesByEventId(int eventId) {
         List<ShowtimeDTO> showtimes = new ArrayList<>();
         String sql = "SELECT s.showtime_id, s.start_date, s.end_date, s.status AS showtime_status, "
@@ -344,15 +344,16 @@ public class OrganizerDAO extends DBContext {
                 + "ORDER BY s.start_date";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                ShowtimeDTO dto = new ShowtimeDTO();
-                dto.setShowtimeId(rs.getInt("showtime_id"));
-                dto.setStartDate(rs.getTimestamp("start_date"));
-                dto.setEndDate(rs.getTimestamp("end_date"));
-                dto.setShowtimeStatus(rs.getString("showtime_status"));
-                dto.setTotalSeats(rs.getInt("total_seats"));
-                showtimes.add(dto);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ShowtimeDTO dto = new ShowtimeDTO();
+                    dto.setShowtimeId(rs.getInt("showtime_id"));
+                    dto.setStartDate(rs.getTimestamp("start_date"));
+                    dto.setEndDate(rs.getTimestamp("end_date"));
+                    dto.setShowtimeStatus(rs.getString("showtime_status"));
+                    dto.setTotalSeats(rs.getInt("total_seats"));
+                    showtimes.add(dto);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -360,6 +361,7 @@ public class OrganizerDAO extends DBContext {
         return showtimes;
     }
 
+    // 9. Lấy danh sách ticket types theo event (không cần lọc theo customer)
     public List<TicketTypeDTO> getTicketTypesByEventId(int eventId) {
         List<TicketTypeDTO> ticketTypes = new ArrayList<>();
         String sql = "SELECT tt.ticket_type_id, tt.name, tt.description, tt.price, tt.color, tt.total_quantity, "
@@ -372,19 +374,20 @@ public class OrganizerDAO extends DBContext {
                 + "GROUP BY tt.ticket_type_id, tt.name, tt.description, tt.price, tt.color, tt.total_quantity, tt.created_at, tt.updated_at";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, eventId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                TicketTypeDTO dto = new TicketTypeDTO();
-                dto.setTicketTypeId(rs.getInt("ticket_type_id"));
-                dto.setName(rs.getString("name"));
-                dto.setDescription(rs.getString("description"));
-                dto.setPrice(rs.getDouble("price"));
-                dto.setColor(rs.getString("color"));
-                dto.setTotalQuantity(rs.getInt("total_quantity"));
-                dto.setSoldQuantity(rs.getInt("sold_quantity"));
-                dto.setCreatedAt(rs.getTimestamp("created_at"));
-                dto.setUpdatedAt(rs.getTimestamp("updated_at"));
-                ticketTypes.add(dto);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TicketTypeDTO dto = new TicketTypeDTO();
+                    dto.setTicketTypeId(rs.getInt("ticket_type_id"));
+                    dto.setName(rs.getString("name"));
+                    dto.setDescription(rs.getString("description"));
+                    dto.setPrice(rs.getDouble("price"));
+                    dto.setColor(rs.getString("color"));
+                    dto.setTotalQuantity(rs.getInt("total_quantity"));
+                    dto.setSoldQuantity(rs.getInt("sold_quantity"));
+                    dto.setCreatedAt(rs.getTimestamp("created_at"));
+                    dto.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    ticketTypes.add(dto);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

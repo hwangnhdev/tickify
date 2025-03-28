@@ -17,9 +17,7 @@
     </head>
     <body class="bg-gray-100 font-sans antialiased">
         <!-- Header -->
-        <jsp:include page="header.jsp">
-            <jsp:param name="pageTitle" value="Admin" />
-        </jsp:include>
+
 
         <div class="flex min-h-screen">
             <!-- Sidebar -->

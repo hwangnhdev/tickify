@@ -3,6 +3,7 @@ package viewModels;
 import java.util.List;
 
 public class OrderDetailDTO {
+  
     private OrderSummaryDTO orderSummary;
     private CalculationDTO calculation;
     private EventSummaryDTO eventSummary;

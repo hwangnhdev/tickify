@@ -17,10 +17,10 @@
        href="${viewProcessingEventsUrl}">
        Approve Event
     </a>
-    <a class="py-2 px-4 font-medium hover:text-blue-500 ${fn:toLowerCase(pageContext.request.requestURI).contains('viewapprovedevents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" 
+<!--    <a class="py-2 px-4 font-medium hover:text-blue-500 ${fn:toLowerCase(pageContext.request.requestURI).contains('viewapprovedevents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" 
        href="${viewApprovedEventsUrl}">
        View Approved
-    </a>
+    </a>-->
     <a class="py-2 px-4 font-medium hover:text-blue-500 ${fn:toLowerCase(pageContext.request.requestURI).contains('viewhistoryapprovedevents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" 
        href="${viewHistoryApprovedEventsUrl}">
        View History Approved

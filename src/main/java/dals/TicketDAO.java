@@ -35,7 +35,7 @@ public class TicketDAO extends DBContext {
             = "UPDATE Ticket SET status = 'used', updated_at = GETDATE() WHERE seat_id = ?";
 
     public boolean insertTicket(Ticket ticket) {
-        try ( PreparedStatement st = connection.prepareStatement(INSERT_TICKET)) {
+        try (PreparedStatement st = connection.prepareStatement(INSERT_TICKET)) {
             st.setInt(1, ticket.getOrderDetailId());
             st.setInt(2, ticket.getSeatId());
             st.setString(3, ticket.getTicketCode());
@@ -52,9 +52,9 @@ public class TicketDAO extends DBContext {
     }
 
     public boolean isTicketExist(String ticketCode) {
-        try ( PreparedStatement st = connection.prepareStatement(CHECK_TICKET_EXIST)) {
+        try (PreparedStatement st = connection.prepareStatement(CHECK_TICKET_EXIST)) {
             st.setString(1, ticketCode);
-            try ( ResultSet rs = st.executeQuery()) {
+            try (ResultSet rs = st.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
@@ -64,10 +64,10 @@ public class TicketDAO extends DBContext {
     }
 
     public String getTicketStatus(int orderId, int seatId) {
-        try ( PreparedStatement st = connection.prepareStatement(CHECK_TICKET_STATUS)) {
+        try (PreparedStatement st = connection.prepareStatement(CHECK_TICKET_STATUS)) {
             st.setInt(1, orderId);
             st.setInt(2, seatId);
-            try ( ResultSet rs = st.executeQuery()) {
+            try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     String status = rs.getString("ticket_status");
                     return status != null ? status : "";
@@ -80,7 +80,7 @@ public class TicketDAO extends DBContext {
     }
 
     public boolean updateTicketStatus(int seatId) {
-        try ( PreparedStatement st = connection.prepareStatement(UPDATE_TICKET_STATUS)) {
+        try (PreparedStatement st = connection.prepareStatement(UPDATE_TICKET_STATUS)) {
             st.setInt(1, seatId);
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -129,12 +129,12 @@ public class TicketDAO extends DBContext {
         sql.append("GROUP BY O.order_id, O.payment_status, S.start_date, S.end_date, E.location, E.event_name ");
         sql.append("ORDER BY S.start_date");
 
-        try ( PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
             stmt.setInt(1, customerId);
             if (filter != null && (filter.equalsIgnoreCase("paid") || filter.equalsIgnoreCase("pending"))) {
                 stmt.setString(2, filter.toLowerCase());
             }
-            try ( ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     CustomerTicketDTO ticket = new CustomerTicketDTO();
                     ticket.setOrderCode(rs.getString("orderCode"));
@@ -157,10 +157,10 @@ public class TicketDAO extends DBContext {
      * Lấy chi tiết vé theo orderId (chỉ trả về record khi các thông tin bắt
      * buộc đều có giá trị).
      */
-    public OrderDetailDTO getTicketDetailByOrderId(int orderId) throws SQLException {
+    public OrderDetailDTO getTicketDetailByOrderId(int orderId, int customerId) throws SQLException {
         OrderDetailDTO detail = new OrderDetailDTO();
 
-        // 1. Order Summary – chỉ lấy khi các trường bắt buộc không null
+        // 1. Order Summary – chỉ lấy khi các trường bắt buộc không null và kiểm tra customer
         String sqlOrderSummary = "SELECT o.order_date, o.payment_status, o.payment_status AS order_status, "
                 + "       c.full_name AS buyer_name, c.email AS buyer_email, c.phone AS buyer_phone, c.address AS buyer_address, "
                 + "       v.code AS voucherCode, v.discount_type, v.discount_value "
@@ -168,15 +168,17 @@ public class TicketDAO extends DBContext {
                 + "JOIN Customers c ON o.customer_id = c.customer_id "
                 + "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id "
                 + "WHERE o.order_id = ? "
+                + "  AND c.customer_id = ? " // Kiểm tra customer
                 + "  AND o.payment_status IS NOT NULL "
                 + "  AND c.full_name IS NOT NULL "
                 + "  AND c.email IS NOT NULL "
                 + "  AND c.phone IS NOT NULL "
                 + "  AND c.address IS NOT NULL";
         OrderSummaryDTO orderSummary = new OrderSummaryDTO();
-        try ( PreparedStatement ps = connection.prepareStatement(sqlOrderSummary)) {
+        try (PreparedStatement ps = connection.prepareStatement(sqlOrderSummary)) {
             ps.setInt(1, orderId);
-            try ( ResultSet rs = ps.executeQuery()) {
+            ps.setInt(2, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     orderSummary.setOrderDate(rs.getTimestamp("order_date"));
                     orderSummary.setPaymentStatus(rs.getString("payment_status"));
@@ -193,27 +195,28 @@ public class TicketDAO extends DBContext {
         }
         detail.setOrderSummary(orderSummary);
 
-        // 2. Order Items – chỉ lấy khi các trường bắt buộc của vé không null
-        // Trong phần lấy Order Items – bổ sung trường ticket_qr_code
+        // 2. Order Items – bổ sung kiểm tra customer thông qua Orders
         String sqlOrderItems = "SELECT tt.ticket_type_id, tt.name AS ticket_type, t.ticket_code, "
                 + "       od.quantity, tt.price AS unit_price, (od.quantity * tt.price) AS subtotalPerType, "
                 + "       s.seat_row + '-' + s.seat_col AS seats, "
                 + "       o.payment_status, "
                 + "       t.status AS ticket_status, "
-                + "       t.ticket_qr_code " // <-- thêm trường mới
+                + "       t.ticket_qr_code "
                 + "FROM OrderDetails od "
                 + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
                 + "JOIN Ticket t ON od.order_detail_id = t.order_detail_id "
-                + "JOIN Seats s ON t.seat_id = s.seat_id " // ép buộc có thông tin ghế
+                + "JOIN Seats s ON t.seat_id = s.seat_id "
                 + "JOIN Orders o ON od.order_id = o.order_id "
                 + "WHERE od.order_id = ? "
+                + "  AND o.customer_id = ? " // Kiểm tra customer
                 + "  AND tt.name IS NOT NULL "
                 + "  AND t.ticket_code IS NOT NULL "
                 + "  AND t.status IS NOT NULL";
         List<TicketItemDTO> items = new ArrayList<>();
-        try ( PreparedStatement ps = connection.prepareStatement(sqlOrderItems)) {
+        try (PreparedStatement ps = connection.prepareStatement(sqlOrderItems)) {
             ps.setInt(1, orderId);
-            try ( ResultSet rs = ps.executeQuery()) {
+            ps.setInt(2, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     TicketItemDTO item = new TicketItemDTO();
                     item.setTicketTypeId(rs.getInt("ticket_type_id"));
@@ -225,7 +228,6 @@ public class TicketDAO extends DBContext {
                     item.setSeats(rs.getString("seats"));
                     item.setPaymentStatus(rs.getString("payment_status"));
                     item.setTicketStatus(rs.getString("ticket_status"));
-                    // Ánh xạ ticket_qr_code
                     item.setTicketQRCode(rs.getString("ticket_qr_code"));
                     items.add(item);
                 }
@@ -233,19 +235,22 @@ public class TicketDAO extends DBContext {
         }
         detail.setOrderItems(items);
 
-        // 2b. Grouped Order Items – cũng chỉ lấy khi tên vé không null
+        // 2b. Grouped Order Items – thêm join Orders để kiểm tra customer
         String sqlGroupedOrderItems = "SELECT tt.ticket_type_id, tt.name AS ticket_type, tt.price AS unit_price, "
                 + "       SUM(od.quantity) AS quantity, "
                 + "       SUM(od.quantity * tt.price) AS subtotalPerType "
                 + "FROM OrderDetails od "
                 + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
+                + "JOIN Orders o ON od.order_id = o.order_id "
                 + "WHERE od.order_id = ? "
+                + "  AND o.customer_id = ? " // Kiểm tra customer
                 + "  AND tt.name IS NOT NULL "
                 + "GROUP BY tt.ticket_type_id, tt.name, tt.price";
         List<TicketItemDTO> groupedItems = new ArrayList<>();
-        try ( PreparedStatement ps = connection.prepareStatement(sqlGroupedOrderItems)) {
+        try (PreparedStatement ps = connection.prepareStatement(sqlGroupedOrderItems)) {
             ps.setInt(1, orderId);
-            try ( ResultSet rs = ps.executeQuery()) {
+            ps.setInt(2, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     TicketItemDTO item = new TicketItemDTO();
                     item.setTicketTypeId(rs.getInt("ticket_type_id"));
@@ -259,7 +264,7 @@ public class TicketDAO extends DBContext {
         }
         detail.setGroupedOrderItems(groupedItems);
 
-        // 3. Calculation – tính toán (nếu các thông tin bắt buộc có)
+        // 3. Calculation – tính toán (với điều kiện kiểm tra customer)
         String sqlCalculation = "SELECT v.code AS voucherCode, v.discount_type, v.discount_value, "
                 + "       CASE WHEN v.discount_type = 'percentage' THEN "
                 + "            CONVERT(DECIMAL(10,2), o.total_price / (1 - (v.discount_value / 100.0))) "
@@ -274,11 +279,13 @@ public class TicketDAO extends DBContext {
                 + "       o.total_price AS final_total "
                 + "FROM Orders o "
                 + "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id "
-                + "WHERE o.order_id = ?";
+                + "WHERE o.order_id = ? "
+                + "  AND o.customer_id = ?";  // Kiểm tra customer
         CalculationDTO calc = new CalculationDTO();
-        try ( PreparedStatement ps = connection.prepareStatement(sqlCalculation)) {
+        try (PreparedStatement ps = connection.prepareStatement(sqlCalculation)) {
             ps.setInt(1, orderId);
-            try ( ResultSet rs = ps.executeQuery()) {
+            ps.setInt(2, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     calc.setTotalSubtotal(rs.getBigDecimal("total_subtotal") != null ? rs.getBigDecimal("total_subtotal") : BigDecimal.ZERO);
                     calc.setDiscountAmount(rs.getBigDecimal("discount_amount") != null ? rs.getBigDecimal("discount_amount") : BigDecimal.ZERO);
@@ -288,7 +295,7 @@ public class TicketDAO extends DBContext {
         }
         detail.setCalculation(calc);
 
-        // 4. Event Summary – chỉ lấy khi thông tin sự kiện bắt buộc có
+        // 4. Event Summary – lấy thông tin sự kiện, đảm bảo order thuộc về customer
         String sqlEventSummary = "SELECT DISTINCT e.event_id, e.event_name, e.location, st.start_date AS startTime, st.end_date AS endTime, "
                 + "       ei.event_image, t.ticket_code, "
                 + "       CONCAT(tt.name, ' - ', COALESCE(s.seat_row + '-' + s.seat_col, 'No seat')) AS ticketInfo "
@@ -298,7 +305,7 @@ public class TicketDAO extends DBContext {
                 + "JOIN TicketTypes tt ON od.ticket_type_id = tt.ticket_type_id "
                 + "JOIN Showtimes st ON tt.showtime_id = st.showtime_id "
                 + "JOIN Events e ON st.event_id = e.event_id "
-                + "JOIN Seats s ON t.seat_id = s.seat_id " // bắt buộc có thông tin ghế
+                + "JOIN Seats s ON t.seat_id = s.seat_id "
                 + "CROSS APPLY ( "
                 + "    SELECT TOP 1 image_url AS event_image "
                 + "    FROM EventImages "
@@ -306,12 +313,14 @@ public class TicketDAO extends DBContext {
                 + "    ORDER BY image_id "
                 + ") ei "
                 + "WHERE o.order_id = ? "
+                + "  AND o.customer_id = ? " // Kiểm tra customer
                 + "  AND e.event_name IS NOT NULL "
                 + "  AND e.location IS NOT NULL";
         EventSummaryDTO eventSummary = new EventSummaryDTO();
-        try ( PreparedStatement ps = connection.prepareStatement(sqlEventSummary)) {
+        try (PreparedStatement ps = connection.prepareStatement(sqlEventSummary)) {
             ps.setInt(1, orderId);
-            try ( ResultSet rs = ps.executeQuery()) {
+            ps.setInt(2, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     eventSummary.setEventId(rs.getInt("event_id"));
                     eventSummary.setEventName(rs.getString("event_name"));
@@ -331,9 +340,9 @@ public class TicketDAO extends DBContext {
 
     public String getTicketQRCode(String ticketCode) {
         String sql = "SELECT ticket_qr_code FROM Ticket WHERE ticket_code = ?";
-        try ( PreparedStatement st = connection.prepareStatement(sql)) {
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, ticketCode);
-            try ( ResultSet rs = st.executeQuery()) {
+            try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString("ticket_qr_code");
                 }
