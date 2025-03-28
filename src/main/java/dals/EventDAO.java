@@ -1393,15 +1393,7 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByDay AS (\n"
                 + "    SELECT \n"
                 + "        DATEDIFF(DAY, o.order_date, GETDATE()) AS DaysAgo,\n"
-                + "        (SELECT SUM(o.total_price)\n"
-                + "     FROM Orders o\n"
-                + "     WHERE o.order_id IN (\n"
-                + "         SELECT od2.order_id \n"
-                + "         FROM OrderDetails od2\n"
-                + "         JOIN TicketTypes tt2 ON od2.ticket_type_id = tt2.ticket_type_id\n"
-                + "         JOIN Showtimes s2 ON tt2.showtime_id = s2.showtime_id\n"
-                + "         WHERE s2.event_id = ?\n"
-                + "     ))  AS Revenue,\n"
+                + "        o.total_price AS Revenue, -- Lấy total_price trực tiếp\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1411,7 +1403,15 @@ public class EventDAO extends DBContext {
                 + "    WHERE \n"
                 + "        e.event_id = ?\n"
                 + "        AND o.order_date >= DATEADD(DAY, -29, GETDATE())\n"
-                + "    GROUP BY DATEDIFF(DAY, o.order_date, GETDATE())\n"
+                + "    GROUP BY DATEDIFF(DAY, o.order_date, GETDATE()), o.order_id, o.total_price\n"
+                + "),\n"
+                + "DailyRevenue AS (\n"
+                + "    SELECT \n"
+                + "        DaysAgo,\n"
+                + "        SUM(Revenue) AS Revenue,\n"
+                + "        SUM(TicketQuantity) AS TicketQuantity\n"
+                + "    FROM RevenueByDay\n"
+                + "    GROUP BY DaysAgo\n"
                 + ")\n"
                 + "SELECT \n"
                 + "    d.DaysAgo,\n"
@@ -1421,13 +1421,12 @@ public class EventDAO extends DBContext {
                 + "    SELECT TOP 30 n = ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1\n"
                 + "    FROM sys.all_objects\n"
                 + ") d(DaysAgo)\n"
-                + "LEFT JOIN RevenueByDay rd ON d.DaysAgo = rd.DaysAgo\n"
+                + "LEFT JOIN DailyRevenue rd ON d.DaysAgo = rd.DaysAgo\n"
                 + "ORDER BY d.DaysAgo;";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, eventId);
-            st.setInt(2, eventId);
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {

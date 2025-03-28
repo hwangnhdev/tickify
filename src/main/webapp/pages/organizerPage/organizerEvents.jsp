@@ -19,45 +19,24 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
-            /* Container ảnh sử dụng aspect ratio để duy trì tỉ lệ cố định */
+            /* Container ảnh sử dụng aspect ratio */
             .card-image-container {
                 width: 100%;
-                /* Dùng aspect-ratio để container tự động tính chiều cao theo tỉ lệ mong muốn */
-                aspect-ratio: 16 / 9;  /* Hoặc điều chỉnh theo tỉ lệ ảnh gốc: ví dụ 4/3, 1/1, ... */
+                aspect-ratio: 16 / 9;
                 overflow: hidden;
-                background-color: #000; /* Màu nền để tạo điểm nhấn nếu ảnh không lấp đầy container */
+                background-color: #000;
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
-
-            /* Ảnh sẽ hiển thị đầy đủ, không bị cắt xén */
             .card-image-container img {
                 width: 100%;
                 height: 100%;
-                object-fit: contain; /* Hiển thị toàn bộ ảnh */
-                display: block;
+                object-fit: cover;
+                transition: transform 0.3s ease-in-out;
             }
-
-            /* CSS cho suggestions của search */
-            #suggestions {
-                position: absolute;
-                top: 45px;
-                background-color: white;
-                border: 1px solid #ddd;
-                border-radius: 15px;
-                max-height: 200px;
-                overflow-y: auto;
-                width: 256px;
-                z-index: 10;
-                color: black;
-            }
-            #suggestions div {
-                padding: 8px;
-                cursor: pointer;
-            }
-            #suggestions div:hover, #suggestions .selected {
-                background-color: #f0f0f0;
+            .card-image-container img:hover {
+                transform: scale(1.05);
             }
         </style>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -67,9 +46,12 @@
             <!-- Sidebar -->
             <aside class="w-1/6 bg-gradient-to-b from-green-900 to-black p-4 text-white">
                 <div class="flex items-center mb-8">
-                    <img src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" 
-                         alt="Tickify logo" class="mr-2" height="40" width="40">
-                    <span class="text-lg font-bold text-green-500">Organizer Center</span>
+                    <a href="${pageContext.request.contextPath}/OrganizerEventController" class="block">
+                        <img style="border-radius: 8px;" alt="Tickify logo" class="mr-2 cursor-pointer" height="40" src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" width="40"/>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/OrganizerEventController" class="block">
+                        <span class="text-lg font-bold text-green-500">Organizer Center</span>
+                    </a>
                 </div>
                 <nav class="space-y-4">
                     <a href="${pageContext.request.contextPath}/OrganizerEventController" 
@@ -81,10 +63,10 @@
             <!-- Main Content -->
             <main class="flex-1 flex flex-col">
                 <!-- Header -->
-                <header class="flex justify-between items-center bg-gray-800 p-4">
+                <header class="flex justify-between items-center bg-gray-800 p-4 shadow-md">
                     <h1 class="text-xl font-bold">My Events</h1>
                     <div class="flex items-center space-x-4">
-                        <button type="button" onclick="window.open('${pageContext.request.contextPath}/createNewEvent?customerId=${sessionScope.customerId}', '_blank')" 
+                        <button type="button" onclick="window.open('${pageContext.request.contextPath}/createNewEvent', '_blank')" 
                                 class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600 transition duration-200">
                             + Create Event
                         </button>
@@ -104,119 +86,94 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                                     <i class="fas fa-search text-gray-500"></i>
                                 </span>
-                                <input type="text" name="eventName" placeholder="Search event" class="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 text-black">
-                                <button type="submit" class="ml-3 bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-200">
+                                <input id="searchInput" type="text" name="eventName" placeholder="Search event" class="w-64 pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 text-black">
+                                <button id="searchButton" type="submit" class="ml-3 bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-200">
                                     Search
                                 </button>
                             </form>
+                            <div id="suggestions" class="hidden"></div>
                         </div>
                         <!-- Filter Buttons -->
                         <div class="flex flex-1 ml-4 space-x-2">
                             <!-- All -->
-                            <button
-                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=all'"
-                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-                                <c:choose>
-                                    <c:when test='${currentFilter eq "all"}'>
-                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
-                                    </c:when>
-                                    <c:otherwise>
-                                        bg-gray-600 text-gray-200
-                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-                                    </c:otherwise>
-                                </c:choose>"
-                                >
+                            <button onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=all'"
+                                    class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                    <c:choose>
+                                        <c:when test='${currentFilter eq "all"}'>
+                                            bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                        </c:when>
+                                        <c:otherwise>
+                                            bg-gray-600 text-gray-200 hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                        </c:otherwise>
+                                    </c:choose>">
                                 All
                             </button>
-
                             <!-- Processing -->
-                            <button
-                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=processing'"
-                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-                                <c:choose>
-                                    <c:when test='${currentFilter eq "processing"}'>
-                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
-                                    </c:when>
-                                    <c:otherwise>
-                                        bg-gray-600 text-gray-200
-                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-                                    </c:otherwise>
-                                </c:choose>"
-                                >
+                            <button onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=processing'"
+                                    class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                    <c:choose>
+                                        <c:when test='${currentFilter eq "processing"}'>
+                                            bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                        </c:when>
+                                        <c:otherwise>
+                                            bg-gray-600 text-gray-200 hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                        </c:otherwise>
+                                    </c:choose>">
                                 Processing
                             </button>
-
                             <!-- Approved -->
-                            <button
-                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=approved'"
-                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-                                <c:choose>
-                                    <c:when test='${currentFilter eq "approved"}'>
-                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
-                                    </c:when>
-                                    <c:otherwise>
-                                        bg-gray-600 text-gray-200
-                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-                                    </c:otherwise>
-                                </c:choose>"
-                                >
+                            <button onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=approved'"
+                                    class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                    <c:choose>
+                                        <c:when test='${currentFilter eq "approved"}'>
+                                            bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                        </c:when>
+                                        <c:otherwise>
+                                            bg-gray-600 text-gray-200 hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                        </c:otherwise>
+                                    </c:choose>">
                                 Approved
                             </button>
-
                             <!-- Rejected -->
-                            <button
-                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=rejected'"
-                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-                                <c:choose>
-                                    <c:when test='${currentFilter eq "rejected"}'>
-                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
-                                    </c:when>
-                                    <c:otherwise>
-                                        bg-gray-600 text-gray-200
-                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-                                    </c:otherwise>
-                                </c:choose>"
-                                >
+                            <button onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=rejected'"
+                                    class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                    <c:choose>
+                                        <c:when test='${currentFilter eq "rejected"}'>
+                                            bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                        </c:when>
+                                        <c:otherwise>
+                                            bg-gray-600 text-gray-200 hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                        </c:otherwise>
+                                    </c:choose>">
                                 Rejected
                             </button>
-
                             <!-- Upcoming -->
-                            <button
-                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=upcoming'"
-                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-                                <c:choose>
-                                    <c:when test='${currentFilter eq "upcoming"}'>
-                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
-                                    </c:when>
-                                    <c:otherwise>
-                                        bg-gray-600 text-gray-200
-                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-                                    </c:otherwise>
-                                </c:choose>"
-                                >
+                            <button onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=upcoming'"
+                                    class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                    <c:choose>
+                                        <c:when test='${currentFilter eq "upcoming"}'>
+                                            bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                        </c:when>
+                                        <c:otherwise>
+                                            bg-gray-600 text-gray-200 hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                        </c:otherwise>
+                                    </c:choose>">
                                 Upcoming
                             </button>
-
                             <!-- Past -->
-                            <button
-                                onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=past'"
-                                class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
-                                <c:choose>
-                                    <c:when test='${currentFilter eq "past"}'>
-                                        bg-green-500 text-white shadow-lg ring-2 ring-green-300
-                                    </c:when>
-                                    <c:otherwise>
-                                        bg-gray-600 text-gray-200
-                                        hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
-                                    </c:otherwise>
-                                </c:choose>"
-                                >
+                            <button onclick="location.href = '${pageContext.request.contextPath}/OrganizerEventController?filter=past'"
+                                    class="flex-1 px-4 py-2 rounded-full transition duration-200 focus:outline-none
+                                    <c:choose>
+                                        <c:when test='${currentFilter eq "past"}'>
+                                            bg-green-500 text-white shadow-lg ring-2 ring-green-300
+                                        </c:when>
+                                        <c:otherwise>
+                                            bg-gray-600 text-gray-200 hover:bg-green-500 hover:text-white hover:shadow-lg hover:ring-2 hover:ring-green-300
+                                        </c:otherwise>
+                                    </c:choose>">
                                 Past
                             </button>
                         </div>
-
-
-
                     </div>
                 </section>
                 <!-- Events List -->
@@ -227,18 +184,15 @@
                         </c:if>
                         <c:forEach var="event" items="${events}">
                             <!-- Card sự kiện -->
-                            <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-4">
-                                <!-- Phần trên: 2 cột (ảnh và thông tin) -->
+                            <div class="bg-gray-800 rounded-lg shadow-xl overflow-hidden mb-6 transform hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
                                 <div class="flex">
                                     <c:if test="${not empty event.imageUrl}">
-                                        <div class="w-1/3 flex items-center justify-center bg-gray-800 card-image-container">
-                                            <!-- Sử dụng class "cover" để ảnh luôn bao phủ container.
-                                                 Nếu muốn hiển thị toàn bộ ảnh mà không cắt, thay đổi "cover" thành "contain" -->
-                                            <img src="${event.imageUrl}" alt="Event image" class="cover" />
+                                        <div class="w-1/3 flex items-center justify-center card-image-container">
+                                            <img src="${event.imageUrl}" alt="Event image" class="object-cover" />
                                         </div>
                                     </c:if>
-                                    <div class="w-2/3 p-4 bg-gray-800 flex flex-col justify-center">
-                                        <h2 class="fancy-text text-3xl font-bold card-title text-white cursor-pointer hover:text-gray-400 mb-4" 
+                                    <div class="w-2/3 p-6 flex flex-col justify-center">
+                                        <h2 class="text-3xl font-bold text-white cursor-pointer hover:text-gray-400 mb-4"
                                             onclick="window.open('${pageContext.request.contextPath}/OrganizerEventDetailController?eventId=${event.eventId}', '_blank')">
                                             ${event.eventName}
                                         </h2>
@@ -247,7 +201,7 @@
                                                 <div class="flex items-center text-green-400">
                                                     <i class="far fa-calendar-alt mr-2 text-white"></i>
                                                     <span>
-                                                        <fmt:formatDate value="${event.startDate}" pattern="HH:mm, EEEE, MMM dd yyyy" />
+                                                        <fmt:formatDate value="${event.startDate}" pattern="dd MMMM, yyyy" />
                                                     </span>
                                                 </div>
                                             </c:if>
@@ -267,40 +221,31 @@
                                                 <div class="flex items-center text-green-400">
                                                     <i class="fas fa-hourglass-half mr-2 text-white"></i>
                                                     <span>Duration: 
-                                                        <fmt:formatDate value="${event.startDate}" pattern="MMM dd, yyyy" /> - 
-                                                        <fmt:formatDate value="${event.endDate}" pattern="MMM dd, yyyy" />
+                                                        <fmt:formatDate value="${event.startDate}" pattern="dd MMMM, yyyy" /> - 
+                                                        <fmt:formatDate value="${event.endDate}" pattern="dd MMMM, yyyy" />
                                                     </span>
                                                 </div>
                                             </c:if>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Phần dưới: Các nút hành động, căn giữa -->
-                                <div class="p-4 border-t border-gray-700 flex justify-center">
-                                    <button type="button" 
-                                            onclick="window.open('${pageContext.request.contextPath}/eventOverview?eventId=${event.eventId}', '_blank')" 
-                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                        <i class="fas fa-chart-pie text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Overview</span>
+                                <!-- Action Buttons -->
+                                <div class="p-4 border-t border-gray-700 flex justify-center space-x-4">
+                                    <button type="button" onclick="window.open('${pageContext.request.contextPath}/eventOverview?eventId=${event.eventId}', '_blank')"
+                                            class="flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700">
+                                        <i class="fas fa-chart-pie text-2xl text-green-400 mr-2"></i>
+                                        <span class="text-gray-400">Overview</span>
                                     </button>
-                                    <button type="button" 
-                                            onclick="window.open('${pageContext.request.contextPath}/organizerOrders?eventId=${event.eventId}', '_blank')"
-                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                        <i class="fas fa-list text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Orders</span>
-                                    </button>
-                                    <button type="button" 
-                                            onclick="window.open('${pageContext.request.contextPath}/viewdetail.jsp', '_blank')" 
-                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                        <i class="fas fa-chair text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Seating Chart</span>
+                                    <button type="button" onclick="window.open('${pageContext.request.contextPath}/organizerOrders?eventId=${event.eventId}', '_blank')"
+                                            class="flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700">
+                                        <i class="fas fa-list text-2xl text-green-400 mr-2"></i>
+                                        <span class="text-gray-400">Orders</span>
                                     </button>
                                     <c:if test="${event.eventStatus eq 'Processing'}">
-                                        <button type="button" 
-                                                onclick="window.open('${pageContext.request.contextPath}/updateEvent?eventId=${event.eventId}', '_blank')" 
-                                                class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                            <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                            <span class="text-gray-400 group-hover:text-white">Edit</span>
+                                        <button type="button" onclick="window.open('${pageContext.request.contextPath}/updateEvent?eventId=${event.eventId}', '_blank')"
+                                                class="flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700">
+                                            <i class="fas fa-edit text-2xl text-green-400 mr-2"></i>
+                                            <span class="text-gray-400">Edit</span>
                                         </button>
                                     </c:if>
                                 </div>
@@ -314,17 +259,14 @@
         <!-- JavaScript xử lý AJAX cho tìm kiếm & gợi ý -->
         <script>
             $(document).ready(function () {
-                let selectedIndex = -1; // Chỉ số của gợi ý được chọn
+                let selectedIndex = -1;
 
                 // Hàm lấy gợi ý tìm kiếm
                 function fetchSuggestions(eventName) {
                     $.ajax({
                         url: '${pageContext.request.contextPath}/OrganizerEventController',
                         type: 'POST',
-                        data: {
-                            eventName: eventName,
-                            organizerId: 98 // Giả định organizerId = 98
-                        },
+                        data: {eventName: eventName, organizerId: 98},
                         dataType: 'json',
                         success: function (data) {
                             displaySuggestions(data);
@@ -340,10 +282,7 @@
                     $.ajax({
                         url: '${pageContext.request.contextPath}/OrganizerEventController',
                         type: 'POST',
-                        data: {
-                            eventName: eventName,
-                            organizerId: 98
-                        },
+                        data: {eventName: eventName, organizerId: 98},
                         dataType: 'json',
                         success: function (data) {
                             updateEventsList(data);
@@ -355,10 +294,9 @@
                     });
                 }
 
-                // Sự kiện khi gõ vào ô input
                 $('#searchInput').on('input', function () {
                     var eventName = $(this).val().trim();
-                    selectedIndex = -1; // Đặt lại chỉ số khi gõ
+                    selectedIndex = -1;
                     if (eventName === "") {
                         $('#suggestions').addClass('hidden').empty();
                     } else {
@@ -366,12 +304,10 @@
                     }
                 });
 
-                // Xử lý phím mũi tên và Enter
                 $('#searchInput').on('keydown', function (e) {
                     var suggestions = $('#suggestions div');
                     if (suggestions.length === 0)
                         return;
-
                     if (e.key === 'ArrowDown') {
                         e.preventDefault();
                         if (selectedIndex < suggestions.length - 1) {
@@ -397,13 +333,11 @@
                     }
                 });
 
-                // Sự kiện click vào gợi ý
                 $('#suggestions').on('click', 'div', function () {
                     $('#searchInput').val($(this).text());
                     $('#suggestions').addClass('hidden');
                 });
 
-                // Sự kiện khi nhấn nút Search
                 $('#searchButton').click(function () {
                     var eventName = $('#searchInput').val().trim();
                     if (eventName === "") {
@@ -414,17 +348,15 @@
                     $('#suggestions').addClass('hidden');
                 });
 
-                // Hiển thị gợi ý
+                // Hàm hiển thị gợi ý
                 function displaySuggestions(events) {
                     var suggestions = $('#suggestions');
                     suggestions.empty().removeClass('hidden');
-                    selectedIndex = -1; // Đặt lại chỉ số khi hiển thị gợi ý mới
-
+                    selectedIndex = -1;
                     if (events.length === 0) {
                         suggestions.append('<div>No suggestions found</div>');
                         return;
                     }
-
                     $.each(events, function (index, event) {
                         suggestions.append('<div>' + event.eventName + '</div>');
                     });
@@ -443,37 +375,35 @@
                 function updateEventsList(events) {
                     var container = $('#eventsContainer');
                     container.empty();
-
                     if (events.length === 0) {
                         container.append('<p class="text-center text-gray-300">No events found.</p>');
                         return;
                     }
-
+                    // Hàm formatDate với định dạng "dd MMMM, yyyy"
                     function formatDate(dateString) {
                         const date = new Date(dateString);
-                        return date.toLocaleString('en-US', {
-                            month: 'short',
-                            day: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                        }).replace(',', '');
-                    }
-
-                    $.each(events, function (index, event) {
-                        var eventHtml = `
-                            <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-4">
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = date.toLocaleString('en-US', {month: 'long'});
+                        const year = date.getFullYear();
+                        return `${day} ${month}, ${year}`;
+                                    }
+                                    $.each(events, function (index, event) {
+                                        var eventHtml = `
+                            <div class="bg-gray-800 rounded-lg shadow-xl overflow-hidden mb-6 transform hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
                                 <div class="flex">
                                     <div class="w-1/3 flex items-center justify-center bg-gray-800 card-image-container">
-                                        <img src="${event.imageUrl}" alt="Event image" class="cover" />
+                                        <img src="${event.imageUrl}" alt="Event image" class="object-cover" />
                                     </div>
-                                    <div class="w-2/3 p-4 bg-gray-800 flex flex-col justify-center">
-                                        <h2 class="text-xl font-bold text-white cursor-pointer hover:text-gray-400 mb-4" 
-                                            onclick="location.href = '${pageContext.request.contextPath}/organizerEventDetail?eventId=` + event.eventId + `'">
+                                    <div class="w-2/3 p-6 flex flex-col justify-center">
+                                        <h2 class="text-3xl font-bold text-white cursor-pointer hover:text-gray-400 mb-4" 
+                                            onclick="window.open('${pageContext.request.contextPath}/OrganizerEventDetailController?eventId=` + event.eventId + `', '_blank')">
                                             ` + event.eventName + `
                                         </h2>
                                         <div class="flex flex-col gap-2">
+                                            <div class="flex items-center text-green-400">
+                                                <i class="far fa-calendar-alt mr-2 text-white"></i>
+                                                <span>` + formatDate(event.startDate) + `</span>
+                                            </div>
                                             <div class="flex items-center text-green-400">
                                                 <i class="fas fa-map-marker-alt mr-2 text-white"></i>
                                                 <span>` + event.location + `</span>
@@ -484,38 +414,38 @@
                                             </div>
                                             <div class="flex items-center text-green-400">
                                                 <i class="fas fa-hourglass-half mr-2 text-white"></i>
-                                                <span>Duration: ` + formatDate(event.createdAt) + ` - ` + formatDate(event.updatedAt) + `</span>
+                                                <span>Duration: ` + formatDate(event.startDate) + ` - ` + formatDate(event.endDate) + `</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="p-4 border-t border-gray-700 flex justify-center">
-                                    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/eventOverview?eventId=` + event.eventId + `'" 
-                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                        <i class="fas fa-chart-pie text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Overview</span>
+                                <div class="p-4 border-t border-gray-700 flex justify-center space-x-4">
+                                    <button type="button" onclick="window.open('${pageContext.request.contextPath}/eventOverview?eventId=` + event.eventId + `', '_blank')"
+                                            class="flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700">
+                                        <i class="fas fa-chart-pie text-2xl text-green-400 mr-2"></i>
+                                        <span class="text-gray-400">Overview</span>
                                     </button>
-                                    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/organizerOrders?eventId=` + event.eventId + `'" 
-                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                        <i class="fas fa-list text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Orders</span>
+                                    <button type="button" onclick="window.open('${pageContext.request.contextPath}/organizerOrders?eventId=` + event.eventId + `', '_blank')"
+                                            class="flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700">
+                                        <i class="fas fa-list text-2xl text-green-400 mr-2"></i>
+                                        <span class="text-gray-400">Orders</span>
                                     </button>
-                                    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/viewdetail.jsp'" 
-                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                        <i class="fas fa-chair text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Seating Chart</span>
+                                    <button type="button" onclick="window.open('${pageContext.request.contextPath}/viewdetail.jsp', '_blank')"
+                                            class="flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700">
+                                        <i class="fas fa-chair text-2xl text-green-400 mr-2"></i>
+                                        <span class="text-gray-400">Seating Chart</span>
                                     </button>
-                                    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/updateEvent?eventId=` + event.eventId + `'" 
-                                            class="group flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700 mx-2">
-                                        <i class="fas fa-edit text-2xl text-green-400 mr-2 group-hover:text-white"></i>
-                                        <span class="text-gray-400 group-hover:text-white">Edit</span>
+                                    <button type="button" onclick="window.open('${pageContext.request.contextPath}/updateEvent?eventId=` + event.eventId + `', '_blank')"
+                                            class="flex items-center justify-center bg-gray-800 px-4 py-2 rounded-lg transition duration-200 hover:bg-gray-700">
+                                        <i class="fas fa-edit text-2xl text-green-400 mr-2"></i>
+                                        <span class="text-gray-400">Edit</span>
                                     </button>
                                 </div>
                             </div>`;
-                        container.append(eventHtml);
-                    });
-                }
-            });
+                                        container.append(eventHtml);
+                                    });
+                                }
+                            });
         </script>
     </body>
 </html>

@@ -1,142 +1,197 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.Map;
+
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+
+import configs.CloudinaryConfig;
 import models.Customer;
 import dals.CustomerDAO;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.sql.Date;
 
-/**
- *
- * @author Dinh Minh Tien CE190701
- */
+@MultipartConfig(
+    maxFileSize = 1024 * 1024 * 5,    // 5MB
+    maxRequestSize = 1024 * 1024 * 10 // 10MB
+)
 public class ProfileController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ProfileController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ProfileController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+    private static final Logger LOGGER = Logger.getLogger(ProfileController.class.getName());
+    private Cloudinary cloudinary;
+
+    @Override
+    public void init() throws ServletException {
+        cloudinary = CloudinaryConfig.getInstance();
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Object customerIdObj = session.getAttribute("customerId");
-        int customerId = 0;
-        if (customerIdObj instanceof Integer) {
-            customerId = (Integer) customerIdObj;
-            System.out.println("Customer ID: " + customerId);
-        } else if (customerIdObj instanceof String) {
-            try {
-                customerId = Integer.parseInt((String) customerIdObj);
-                System.out.println("Customer ID: " + customerId);
-            } catch (NumberFormatException e) {
-                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
-        }
-        CustomerDAO dao = new CustomerDAO();
-        Customer customer = dao.getCustomerById(customerId);
-        request.setAttribute("profile", customer);
-        request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
+        HttpSession session = request.getSession(false);
+        int customerId = -1;
 
-        if (customer == null) {
-            System.out.println("Customer not found!");
+        // Robust customer ID extraction
+        try {
+            Object customerIdObj = (session != null) ? session.getAttribute("customerId") : null;
+
+            if (customerIdObj instanceof Integer) {
+                customerId = (Integer) customerIdObj;
+            } else if (customerIdObj instanceof String) {
+                customerId = Integer.parseInt((String) customerIdObj);
+            }
+
+            // Validate customer ID
+            if (customerId <= 0) {
+                System.out.println("Invalid customer ID: " + customerId);
+                response.sendRedirect(request.getContextPath() + "/event");
+                return;
+            }
+
+            // Fetch and validate customer
+            CustomerDAO dao = new CustomerDAO();
+            Customer customer = dao.selectCustomerById(customerId);
+
+            if (customer == null) {
+                System.out.println("No customer found for ID: " + customerId);
+                response.sendRedirect(request.getContextPath() + "/event");
+                return;
+            }
+
+            // Set customer profile and forward
+            request.setAttribute("profile", customer);
+            request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.SEVERE, "Invalid customer ID format", e);
+            response.sendRedirect(request.getContextPath() + "/event");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error in doGet", e);
+            response.sendRedirect(request.getContextPath() + "/event");
         }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int customerId = Integer.parseInt(request.getParameter("customerId"));
-        String fullname = request.getParameter("fullname");
-        String address = request.getParameter("address");
-        String phone = request.getParameter("phone");
-        String picture = request.getParameter("profile_picture");
-//        Date dob = Date.valueOf(request.getParameter("dob")); // Convert string to SQL Date
-//        String gender = request.getParameter("gender");
+        try {
+            // Extract and validate customer ID
+            int customerId = -1;
+            HttpSession session = request.getSession(false);
+            Object customerIdObj = (session != null) ? session.getAttribute("customerId") : null;
 
-        // Fetch customer email from the database (since it's not editable)
-        CustomerDAO customerDAO = new CustomerDAO();
-        Customer existingCustomer = customerDAO.getCustomerById(customerId);
-        String email = existingCustomer.getEmail(); // Retain the original email
+            if (customerIdObj instanceof Integer) {
+                customerId = (Integer) customerIdObj;
+            } else if (customerIdObj instanceof String) {
+                customerId = Integer.parseInt((String) customerIdObj);
+            }
 
-        Customer customer = new Customer();
-        customer.setCustomerId(customerId);
-        customer.setFullName(fullname);
-        customer.setEmail(email);
-        customer.setAddress(address);
-        customer.setPhone(phone);
+            if (customerId <= 0) {
+                LOGGER.warning("Invalid customer ID in update request: " + customerId);
+                response.sendRedirect(request.getContextPath() + "/event");
+                return;
+            }
 
-        customer.setProfilePicture(picture);
+            // Fetch existing customer
+            CustomerDAO customerDAO = new CustomerDAO();
+            Customer existingCustomer = customerDAO.selectCustomerById(customerId);
 
-        boolean isUpdated = customerDAO.updateCustomer(customer);
+            if (existingCustomer == null) {
+                LOGGER.warning("No customer found for ID: " + customerId);
+                response.sendRedirect(request.getContextPath() + "/event");
+                return;
+            }
 
-        if (isUpdated == true) {
-            request.setAttribute("successMessage", "Profile updated successfully.");
-        } else {
-            request.setAttribute("errorMessage", "Update profile failed.");
+            // Sanitize and validate inputs
+            String fullname = request.getParameter("fullname");
+            String address = request.getParameter("address");
+            String phone = request.getParameter("phone");
+            Date dob = Date.valueOf(request.getParameter("dob"));
+            String gender = request.getParameter("gender");
+
+            String picture = existingCustomer.getProfilePicture();
+            Part filePart = request.getPart("profile_picture");
+            if (filePart != null && filePart.getSize() > 0) {
+                LOGGER.log(Level.INFO, "Uploading file: {0}, Size: {1}", new Object[]{filePart.getSubmittedFileName(), filePart.getSize()});
+                try ( InputStream inputStream = filePart.getInputStream()) {
+                    // Convert InputStream to byte array as a fallback for Cloudinary 2.0.0
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        baos.write(buffer, 0, bytesRead);
+                    }
+                    byte[] fileBytes = baos.toByteArray();
+
+                    if (fileBytes.length > 0) {
+                        Map uploadResult = cloudinary.uploader().upload(
+                                fileBytes,
+                                ObjectUtils.asMap(
+                                        "folder", "profile_pictures",
+                                        "overwrite", true,
+                                        "resource_type", "image" // Explicitly specify resource type
+                                )
+                        );
+                        picture = (String) uploadResult.get("url");
+                        LOGGER.log(Level.INFO, "Upload successful, URL: {0}", picture);
+                    } else {
+                        LOGGER.warning("Empty file content for profile picture upload");
+                    }
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "Profile picture upload failed for customer ID: " + customerId, e);
+                    // Keep existing picture on upload failure
+                }
+            } else {
+                LOGGER.log(Level.INFO, "No profile picture uploaded for customer ID: {0}", customerId);
+            }
+
+            // Create updated customer
+            Customer customer = new Customer();
+            customer.setCustomerId(customerId);
+            customer.setFullName(fullname);
+            customer.setEmail(existingCustomer.getEmail());
+            customer.setAddress(address);
+            customer.setPhone(phone);
+            customer.setProfilePicture(picture);
+            customer.setDob(dob);
+            customer.setGender(gender);
+
+            // Perform update
+            boolean isUpdated = customerDAO.updateCustomer(customer);
+
+            // Set response attributes
+            if (isUpdated) {
+                request.setAttribute("successMessage", "Profile updated successfully");
+                request.setAttribute("profile", customer);
+            } else {
+                request.setAttribute("errorMessage", "Failed to update profile");
+                request.setAttribute("profile", existingCustomer);
+            }
+
+            // Forward to profile page
+            request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
+
+        } catch (ServletException | IOException | NumberFormatException e) {
+            LOGGER.log(Level.SEVERE, "Error in profile update", e);
+            request.setAttribute("errorMessage", "An unexpected error occurred");
+            request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
         }
-        request.setAttribute("profile", customer);
-        request.getRequestDispatcher("pages/profile/profile.jsp").forward(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Profile Management Servlet";
+    }
 }

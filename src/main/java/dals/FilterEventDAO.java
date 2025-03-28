@@ -101,7 +101,7 @@ public class FilterEventDAO extends DBContext {
         sql.append(" GROUP BY e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, e.status, \n"
                 + "e.location, e.event_type, e.created_at, e.updated_at, ei.image_url, ei.image_title");
 
-        try ( PreparedStatement st = connection.prepareStatement(sql.toString())) {
+        try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
             // Set query parameters dynamically
             for (int i = 0; i < parameters.size(); i++) {
                 st.setObject(i + 1, parameters.get(i));

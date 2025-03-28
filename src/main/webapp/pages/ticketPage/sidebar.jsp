@@ -2,11 +2,6 @@
 <div class="w-1/4 p-6">
     
     <ul>
-        <!-- Account Settings -->
-        <li class="mb-4 flex items-center p-2 rounded cursor-pointer 
-                   ${pageContext.request.requestURI.contains('accountSettings') ? 'bg-green-700' : 'hover:bg-green-700'}">
-            
-        </li>
         <!-- My Profile -->
         <li class="mb-4 flex items-center p-2 rounded cursor-pointer 
                    ${pageContext.request.requestURI.contains('myProfile') ? 'bg-green-700' : 'hover:bg-green-700'}">

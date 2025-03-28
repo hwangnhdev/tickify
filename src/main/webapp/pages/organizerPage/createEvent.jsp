@@ -19,7 +19,7 @@
         <style>
 
             /*// pop up*/
-            #successPopup { 
+            #successPopup {
                 display: none; /* Ẩn mặc định */
                 position: fixed;
                 top: 0;
@@ -84,8 +84,12 @@
             <!-- Sidebar -->
             <aside class="w-64 min-w-[16rem] bg-gradient-to-b from-green-900 to-black p-4 text-white">
                 <div class="flex items-center mb-8">
-                    <img alt="Tickify logo" class="mr-2" height="40" src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" width="40"/>
-                    <span class="text-lg font-bold text-green-500">Organizer Center</span>
+                    <a href="${pageContext.request.contextPath}/OrganizerEventController" class="block">
+                        <img style="border-radius: 8px;" alt="Tickify logo" class="mr-2 cursor-pointer" height="40" src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" width="40"/>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/OrganizerEventController" class="block">
+                        <span class="text-lg font-bold text-green-500">Organizer Center</span>
+                    </a>
                 </div>
                 <nav class="space-y-4">
                     <a href="${pageContext.request.contextPath}/OrganizerEventController" 

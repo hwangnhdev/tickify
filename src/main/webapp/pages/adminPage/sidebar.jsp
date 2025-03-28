@@ -11,18 +11,6 @@
     <ul class="space-y-2">
       <li>
         <a class="sidebar-item flex items-center px-4 py-2 rounded hover:bg-blue-800 transition-colors duration-200" 
-           href="${pageContext.request.contextPath}/admin/home">
-          <i class="sidebar-icon fas fa-home mr-3"></i> Home
-        </a>
-      </li>
-      <li>
-        <a class="sidebar-item flex items-center px-4 py-2 rounded hover:bg-blue-800 transition-colors duration-200" 
-           href="${pageContext.request.contextPath}/admin/dashboard">
-          <i class="sidebar-icon fas fa-tachometer-alt mr-3"></i> Dashboard
-        </a>
-      </li>
-      <li>
-        <a class="sidebar-item flex items-center px-4 py-2 rounded hover:bg-blue-800 transition-colors duration-200" 
            href="${pageContext.request.contextPath}/ViewAllCustomersController">
           <i class="sidebar-icon fas fa-users mr-3"></i> Manage Users
         </a>

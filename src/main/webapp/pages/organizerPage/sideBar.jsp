@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -14,25 +15,20 @@
                 <i class="fas fa-bars"></i>
             </button>
             <div class="flex items-center mb-8">
-                <img alt="Tickify logo" class="mr-2" height="40" src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" width="40"/>
-                <span class="text-lg font-bold text-green-500">Organizer Center</span>
+                <a href="${pageContext.request.contextPath}/OrganizerEventController" class="block">
+                    <img style="border-radius: 8px;" alt="Tickify logo" class="mr-2 cursor-pointer" height="40" src="https://storage.googleapis.com/a1aa/image/8k6Ikw_t95IdEBRzaSbfv_qa-9InZk34-JUibXbK7B4.jpg" width="40"/>
+                </a>
+                <a href="${pageContext.request.contextPath}/OrganizerEventController" class="block">
+                    <span class="text-lg font-bold text-green-500">Organizer Center</span>
+                </a>
             </div>
             <nav class="space-y-4">
                 <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
                    href="${pageContext.request.contextPath}/eventOverview?eventId=${eventId}">
                     <i class="fas fa-chart-pie mr-2"></i>Overview
                 </a>
-                
                 <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
-                   href="${pageContext.request.contextPath}/updateEvent?eventId=${eventId}">
-                    <i class="fas fa-edit mr-2"></i>Edit Event
-                </a>
-                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
-                   href="${pageContext.request.contextPath}/seatingChart?eventId=${eventId}">
-                    <i class="fas fa-chair mr-2"></i>Seat Map
-                </a>
-                <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
-                   href="${pageContext.request.contextPath}/vouchers?eventId=${eventId}">
+                   href="${pageContext.request.contextPath}/listVoucher?eventId=${eventId}">
                     <i class="fas fa-tags mr-2"></i>Voucher
                 </a>
                 <a class="flex items-center text-white hover:bg-green-700 p-2 rounded" 
