@@ -790,11 +790,14 @@
                                                                         <div><label>Price (VND):</label> <span>${ticket.price}</span></div>
                                                                         <div><label>Quantity:</label> <span>${ticket.totalQuantity}</span></div>
                                                                         <div><label>Color:</label> <span style="color: ${ticket.color}">${ticket.color}</span></div>
-                                                                        <c:forEach var="seat" items="${seats}">
-                                                                            <c:if test="${seat.ticketTypeId == ticket.ticketTypeId}">
-                                                                                <div class="seat-info"><label>Seats:</label> <span>${seat.seatRow} ${seat.seatCol}</span></div>
-                                                                            </c:if>
-                                                                        </c:forEach>
+                                                                        <div class="seat-info">
+                                                                            <label>Seats:</label> 
+                                                                            <c:forEach var="seat" items="${seats}" varStatus="loop">
+                                                                                <c:if test="${seat.ticketTypeId == ticket.ticketTypeId}">
+                                                                                    <span>${seat.seatRow} ${seat.seatCol}</span><c:if test="${!loop.last}">, </c:if>
+                                                                                </c:if>
+                                                                            </c:forEach>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>

@@ -19,6 +19,8 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+        <!-- Swiper CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
         <style>
             /* Existing styles remain unchanged */
             body {
@@ -456,6 +458,9 @@
                         <p><strong>Type Of Event:</strong> ${event.eventType}</p>
                         <p><strong>Organizer:</strong> ${organizer.organizationName}</p>
                         <p><strong>Venue:</strong> ${event.location}</p>
+                        <p><strong>Voucher:</strong> 
+                            ${voucher.status ? "<span style='color: red; font-weight: bold;'>GIFT VOUCHER AT THE MOMENT - Hot Deal - Apply Now!</span>" : "<span style='color: white;'>Not voucher available at the moment!</span>"}
+                        </p>
                         <p><strong>Status:</strong> <c:if test="${event.status == 'Approved'}">Available</c:if></p>
                         </div>
                         <div class="w-full mt-2 inline-flex items-center justify-center bg-gray-800 border border-red-900 px-4 py-2 rounded-full cursor-pointer" 
@@ -553,6 +558,41 @@
                 </div>
             </div>
         </div>
+
+        <c:if test="${not empty listVouchers}">
+            <div class="event-info-event_detail grid grid-cols-1 gap-4 " style="max-height: 300px; overflow-y: auto;">
+                <h2 class="text-base font-semibold text-blue-600 truncate">List Vouchers For You</h2>
+                <c:forEach var="voucher" items="${listVouchers}">
+                    <div class="border rounded-xl shadow-md p-3 hover:shadow-xl transition duration-300 bg-white space-y-2">
+                        <!-- Thông tin nằm hàng ngang -->
+                        <div class="flex flex-wrap gap-4 text-sm text-gray-700">
+                            <p class="font-semibold text-blue-600 truncate"><strong>Code:</strong> ${voucher.code}</p>
+                            <p><strong>Discount:</strong> 
+                                <c:choose>
+                                    <c:when test="${voucher.discountType eq 'Percentage'}">
+                                        ${voucher.discountValue}%
+                                    </c:when>
+                                    <c:otherwise>
+                                        <fmt:formatNumber value="${voucher.discountValue}" currencyCode="VND" minFractionDigits="0" /> VND
+                                    </c:otherwise>
+                                </c:choose>
+                            </p>
+                            <p><strong>Start:</strong> <fmt:formatDate value="${voucher.startDate}" pattern="hh:mm a, dd MMM yyyy"/></p>
+                            <p><strong>End:</strong> <fmt:formatDate value="${voucher.endDate}" pattern="hh:mm a, dd MMM yyyy"/></p>
+                            <p><strong>Usage:</strong> ${voucher.usageLimit}</p>
+                            <p class="text-xs font-medium ${voucher.status ? 'text-green-600' : 'text-red-500'}">
+                                ${voucher.status ? 'Available' : 'Unavailable'}
+                            </p>
+                            <p class="text-gray-600 text-sm"><strong>Description:</strong> <span class="line-clamp-2">${voucher.description}</span></p>
+                        </div>
+
+                        <!-- Description riêng xuống dưới -->
+                    </div>
+
+                </c:forEach>
+            </div>
+        </c:if>
+
 
         <div class="event-info-event_detail">
             <h2>Event Information Details</h2>

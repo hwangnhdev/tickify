@@ -82,8 +82,22 @@ public class CreateNewEventController extends HttpServlet {
         session.setAttribute("listCategories", listCategories);
 
         // Get customerID
-        String customerIdParam = request.getParameter("customerId");
-        session.setAttribute("customerId", customerIdParam);
+        Object customerIdObj = session.getAttribute("customerId");
+        int customerIdParam = 0;
+        if (customerIdObj instanceof Integer) {
+            customerIdParam = (Integer) customerIdObj;
+            System.out.println("Customer ID: " + customerIdParam);
+        } else if (customerIdObj instanceof String) {
+            try {
+                customerIdParam = Integer.parseInt((String) customerIdObj);
+                System.out.println("Customer ID: " + customerIdParam);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Customer ID không hợp lệ hoặc chưa được set trong session.");
+        }
+        session.setAttribute("customerIdParam", customerIdParam);
 
         // Forward to JSP
         request.getRequestDispatcher("pages/organizerPage/createEvent.jsp").forward(request, response);

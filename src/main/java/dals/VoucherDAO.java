@@ -4,6 +4,7 @@
  */
 package dals;
 
+import com.sun.tools.javac.resources.compiler;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,9 +65,9 @@ public class VoucherDAO extends DBContext {
     }
 
     public Voucher getVoucherById(int id) {
-        try (PreparedStatement stmt = connection.prepareStatement(SELECT_VOUCHER_BY_ID)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(SELECT_VOUCHER_BY_ID)) {
             stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSetToVoucher(rs);
                 }
@@ -80,11 +81,11 @@ public class VoucherDAO extends DBContext {
     public List<Voucher> getVouchersByEvent(int eventId, int page, int pageSize) {
         List<Voucher> vouchers = new ArrayList<>();
         String sql = SELECT_VOUCHER_BY_EVENT;
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setInt(2, (page - 1) * pageSize);
             stmt.setInt(3, pageSize);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     vouchers.add(mapResultSetToVoucher(rs));
                 }
@@ -98,9 +99,9 @@ public class VoucherDAO extends DBContext {
     public int getTotalVouchersByEvent(int eventId) {
         int total = 0;
         String sql = "SELECT COUNT(*) FROM vouchers WHERE event_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     total = rs.getInt(1);
                 }
@@ -113,12 +114,12 @@ public class VoucherDAO extends DBContext {
 
     public List<Voucher> searchVoucher(int eventId, String keyword, int page, int pageSize) {
         List<Voucher> vouchers = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(SEARCH_VOUCHER)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(SEARCH_VOUCHER)) {
             stmt.setInt(1, eventId);
             stmt.setString(2, "%" + keyword.toLowerCase() + "%"); // Case-insensitive search
             stmt.setInt(3, (page - 1) * pageSize);
             stmt.setInt(4, pageSize);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     vouchers.add(mapResultSetToVoucher(rs));
                 }
@@ -135,10 +136,10 @@ public class VoucherDAO extends DBContext {
                 + "FROM Vouchers "
                 + "WHERE event_id = ? "
                 + "  AND LOWER(code) LIKE ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setString(2, "%" + keyword.toLowerCase() + "%");
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     total = rs.getInt(1);
                 }
@@ -156,14 +157,14 @@ public class VoucherDAO extends DBContext {
         String sql = "SELECT * FROM vouchers WHERE event_id = ? AND status = ? AND is_deleted = ? ORDER BY event_id ASC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         int offset = (page - 1) * pageSize;
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setBoolean(2, status);
             stmt.setBoolean(3, isDeleted);
             stmt.setInt(4, offset);
             stmt.setInt(5, pageSize);
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     vouchers.add(mapResultSetToVoucher(rs));
                 }
@@ -180,15 +181,23 @@ public class VoucherDAO extends DBContext {
         int PAGE_SIZE = 1;
         List<Voucher> vouchers = dao.getVouchersByEventAndStatus(1, page, PAGE_SIZE, true, false);
         System.out.println(vouchers);
+
+        Voucher vo = dao.getVoucherByEventID(17);
+        System.out.println(vo.getCode());
+
+        List<Voucher> listVoucher = dao.getListVoucherByEventID(1);
+        for (Voucher voucher : listVoucher) {
+            System.out.println(voucher.getCode());
+        }
     }
 
     // Get total number of vouchers by event ID
     public int getTotalVouchersByEventAndStatus(int eventId, boolean status) {
         String sql = "SELECT COUNT(*) FROM vouchers WHERE event_id = ? AND status = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             stmt.setBoolean(2, status);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
@@ -200,7 +209,7 @@ public class VoucherDAO extends DBContext {
     }
 
     public boolean insertVoucher(Voucher voucher) {
-        try (PreparedStatement stmt = connection.prepareStatement(INSERT_VOUCHER)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(INSERT_VOUCHER)) {
             stmt.setInt(1, voucher.getEventId());
             stmt.setString(2, voucher.getCode());
             stmt.setString(3, voucher.getDescription());
@@ -221,7 +230,7 @@ public class VoucherDAO extends DBContext {
     }
 
     public boolean updateVoucher(Voucher voucher) {
-        try (PreparedStatement stmt = connection.prepareStatement(UPDATE_VOUCHER)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(UPDATE_VOUCHER)) {
             stmt.setString(1, voucher.getCode());
             stmt.setString(2, voucher.getDescription());
             stmt.setString(3, voucher.getDiscountType());
@@ -240,7 +249,7 @@ public class VoucherDAO extends DBContext {
     }
 
     public boolean deleteVoucher(int voucherId) {
-        try (PreparedStatement stmt = connection.prepareStatement(DELETE_VOUCHER)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(DELETE_VOUCHER)) {
             stmt.setBoolean(1, true);
             stmt.setInt(2, voucherId);
             return stmt.executeUpdate() > 0;
@@ -248,6 +257,40 @@ public class VoucherDAO extends DBContext {
             System.out.println(e.getMessage());
             return false;
         }
+    }
+
+    // Get a single voucher by event ID
+    public Voucher getVoucherByEventID(int eventId) {
+        String sql = "SELECT TOP(1) * FROM Vouchers WHERE event_id = ? AND status = 1";
+        try ( PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, eventId);
+            try ( ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToVoucher(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting voucher by event ID: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // Get list of vouchers by event ID
+    public List<Voucher> getListVoucherByEventID(int eventId) {
+        List<Voucher> vouchers = new ArrayList<>();
+        String sql = "SELECT * FROM Vouchers WHERE event_id = ?";
+        try ( PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, eventId);
+            try ( ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Voucher voucher = mapResultSetToVoucher(rs);
+                    vouchers.add(voucher);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting list of vouchers by event ID: " + e.getMessage());
+        }
+        return vouchers;
     }
 
 }
