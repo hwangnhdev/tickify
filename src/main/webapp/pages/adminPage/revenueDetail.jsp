@@ -7,6 +7,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -29,54 +30,81 @@
             <div class="flex-1 p-6">
                 <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
                     <h2 class="text-3xl font-bold mb-6">Revenue Detail</h2>
-                    
-<!--                     Tab Navigation 
-                    <div class="mb-6 border-b pb-2 flex space-x-4">
-                        <c:url var="viewAllEventsUrl" value="/admin/viewAllEvents" />
-                        <c:url var="viewApprovedEventsUrl" value="/admin/viewApprovedEvents" />
-                        <c:url var="viewHistoryApprovedEventsUrl" value="/admin/viewHistoryApprovedEvents" />
-                        <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewAllEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewAllEventsUrl}">View All</a>
-                        <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewApprovedEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewApprovedEventsUrl}">View Approved</a>
-                        <a class="py-2 px-4 font-medium hover:text-blue-500 ${pageContext.request.requestURI.contains('viewHistoryApprovedEvents') ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}" href="${viewHistoryApprovedEventsUrl}">View History Approved</a>
-                    </div> comment -->
-                    
+
                     <div class="bg-gray-100 p-4 rounded-lg mb-6">
                         <p><strong>Event ID:</strong> ${eventId}</p>
                         <p><strong>Event Name:</strong> ${eventName}</p>
                         <p><strong>Total Revenue:</strong>
-                           <fmt:formatNumber value="${totalRevenue}" currencyCode="VND" minFractionDigits="0" /> VND
+                            <fmt:formatNumber value="${totalRevenue}" currencyCode="VND" minFractionDigits="0" /> VND
                         </p>
                     </div>
-                    <div class="overflow-x-auto max-h-96">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-200">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Ticket Type</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Total Quantity</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Price</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Quantity Sold</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Total Revenue</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-100">
-                                <c:forEach items="${revenueDetails}" var="revenueDetail">
-                                    <tr class="hover:bg-gray-50 transition duration-150">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${revenueDetail.name}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${revenueDetail.totalQuantity}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            <fmt:formatNumber value="${revenueDetail.price}" currencyCode="VND" minFractionDigits="0" /> VND
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${revenueDetail.soldQuantity}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            <fmt:formatNumber value="${revenueDetail.totalRevenuePerTicketType}" currencyCode="VND" minFractionDigits="0" /> VND
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Showtimes</h3>
+
+                        <div class="space-y-4">
+                            <c:forEach var="showtime" items="${showtimeList}">
+                                <div class="bg-blue-100 p-4 rounded-lg" onclick="toggleDropdown('dropdown${showtime.getShowtimeId()}')">
+                                    <div class="flex justify-between items-center">
+                                        <p class="font-medium">Showtime ${showtime.getShowtimeId()}</p>
+                                        <button class="text-blue-500">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                    <div id="dropdown${showtime.getShowtimeId()}" class="hidden mt-4 bg-white p-4 rounded-lg">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-100">
+                                                <tr>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Ticket Type</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Price</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Quantity Sold</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Total Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-100">
+                                                <c:forEach var="ticketType" items="${showtime.ticketTypes}">
+                                                    <tr class="hover:bg-gray-50 transition duration-150">
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${ticketType.name}</td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                            <fmt:formatNumber value="${ticketType.price}" currencyCode="VND" minFractionDigits="0" /> VND
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                            <c:choose>
+                                                                <c:when test="${not empty ticketType.tickets}">
+                                                                    ${fn:length(ticketType.tickets)}
+                                                                </c:when>
+                                                                <c:otherwise>0</c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                            <c:choose>
+                                                                <c:when test="${not empty ticketType.tickets}">
+                                                                    <fmt:formatNumber value="${ticketType.price*fn:length(ticketType.tickets)}" currencyCode="VND" minFractionDigits="0" /> VND
+                                                                </c:when>
+                                                                <c:otherwise>0</c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+                        
+        <script>
+            function toggleDropdown(id) {
+                const dropdown = document.getElementById(id);
+                if (dropdown.classList.contains('hidden')) {
+                    dropdown.classList.remove('hidden');
+                } else {
+                    dropdown.classList.add('hidden');
+                }
+            }
+        </script>
     </body>
 </html>

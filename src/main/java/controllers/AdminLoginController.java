@@ -68,6 +68,7 @@ public class AdminLoginController extends HttpServlet {
         // Kiểm tra mật khẩu có hợp lệ không
         if (password != null && BCrypt.checkpw(password, admin.getPassword())) {
             HttpSession session = request.getSession();
+            session.setAttribute("accountRole", "admin");
             session.setAttribute("admin", admin);
             response.sendRedirect("ViewAllCustomersController");
         } else {

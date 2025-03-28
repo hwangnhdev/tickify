@@ -225,6 +225,14 @@
         <servlet-class>controllers.EventAjaxController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>SignUpController</servlet-name>
+        <servlet-class>controllers.SignUpController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginController</servlet-name>
+        <servlet-class>controllers.LoginController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ApplyVoucherController</servlet-name>
         <servlet-class>controllers.ApplyVoucherController</servlet-class>
     </servlet>
@@ -440,6 +448,14 @@
     <servlet-mapping>
         <servlet-name>EventAjaxController</servlet-name>
         <url-pattern>/eventAjax</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SignUpController</servlet-name>
+        <url-pattern>/signUp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginController</servlet-name>
+        <url-pattern>/login</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ApplyVoucherController</servlet-name>

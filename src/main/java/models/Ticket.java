@@ -36,6 +36,13 @@ public class Ticket {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+    
+    public Ticket(int ticketId, String ticketCode, double price, String status) {
+        this.ticketId = ticketId;
+        this.ticketCode = ticketCode;
+        this.price = price;
+        this.status = status;
+    }
 
     public Ticket(int ticketId, int orderDetailId, int seatId, String ticketCode, double price, String status, Timestamp createdAt, Timestamp updatedAt, String ticketQRCode) {
         this.ticketId = ticketId;
@@ -48,7 +55,7 @@ public class Ticket {
         this.updatedAt = updatedAt;
         this.ticketQRCode = ticketQRCode;
     }
-
+    
     public int getTicketId() {
         return ticketId;
     }
@@ -120,4 +127,10 @@ public class Ticket {
     public void setTicketQRCode(String ticketQRCode) {
         this.ticketQRCode = ticketQRCode;
     }
+    
+    @Override
+    public String toString() {
+        return "Ticket{id=" + ticketId + ", code='" + ticketCode + "', price=" + price + ", status='" + status + "'}";
+    }
+
 }
