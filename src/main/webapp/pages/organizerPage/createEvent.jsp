@@ -221,7 +221,7 @@ Notes and VAT Terms</textarea>
                                 <div class="input-container">
                                     <label class="block text-gray-300 mb-2">Organizer Name</label>
                                     <input type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Organizer Name" required>
-                                    <input value="${sessionScope.customerId}" hidden name="customerId">
+                                    <input value="${sessionScope.customerIdParam}" hidden name="customerId">
                                     <span class="error-message" id="organizerName_error"></span>
                                 </div>
 

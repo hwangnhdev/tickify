@@ -6,6 +6,7 @@ package controllers;
 
 import dals.EventDAO;
 import dals.FilterEventDAO;
+import dals.VoucherDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ import viewModels.FilterEvent;
 import models.Organizer;
 import models.Showtime;
 import models.TicketType;
+import models.Voucher;
 import viewModels.EventDTO;
 
 /**
@@ -35,15 +37,15 @@ public class EventDetailController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -62,16 +64,17 @@ public class EventDetailController extends HttpServlet {
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         EventDAO eventDAO = new EventDAO();
         FilterEventDAO filterEventDAO = new FilterEventDAO();
+        VoucherDAO voucherDAO = new VoucherDAO();
 
         /* Get ID of Event */
         String id = request.getParameter("id");
@@ -95,6 +98,8 @@ public class EventDetailController extends HttpServlet {
         List<EventImage> listEventImages = eventDAO.getImageEventsByEventId(eventId);
         Organizer organizer = eventDAO.getOrganizerByEventId(eventId);
         List<Showtime> listShowtimes = eventDAO.getShowTimesByEventId(eventId);
+        Voucher voucher = voucherDAO.getVoucherByEventID(eventId);
+        List<Voucher> listVouchers = voucherDAO.getListVoucherByEventID(eventId);
 
         for (Showtime showtime : listShowtimes) {
             List<TicketType> ticketTypes = eventDAO.getTicketTypesByShowtimeId(showtime.getShowtimeId());
@@ -121,6 +126,8 @@ public class EventDetailController extends HttpServlet {
         request.setAttribute("eventCategories", eventCategories);
         request.setAttribute("organizer", organizer);
         request.setAttribute("listShowtimes", listShowtimes);
+        request.setAttribute("voucher", voucher);
+        request.setAttribute("listVouchers", listVouchers);
 
         // Pagination parameters for Relevant Events
         int page = 1;
@@ -242,10 +249,10 @@ public class EventDetailController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
