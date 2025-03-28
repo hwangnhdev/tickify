@@ -147,7 +147,6 @@ public class ViewPaymentController extends HttpServlet {
 
 //        response.sendRedirect("");
         request.getRequestDispatcher("pages/paymentPage/payment.jsp").forward(request, response);
-//        response.sendRedirect("pages/paymentPage/payment.jsp");
     }
 
     /**

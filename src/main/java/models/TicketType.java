@@ -5,7 +5,10 @@
  */
 package models;
 
+import com.google.gson.annotations.Expose;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -14,6 +17,7 @@ import java.sql.Timestamp;
 public class TicketType extends Showtime {
 
     private int ticketTypeId;
+    @Expose
     private int showtimeId;
     private String name;
     private String description;
@@ -24,6 +28,7 @@ public class TicketType extends Showtime {
     private double totalRevenuePerTicketType;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private List<Ticket> tickets;
 
     public TicketType() {
     }
@@ -51,6 +56,16 @@ public class TicketType extends Showtime {
         this.color = color;
         this.totalQuantity = totalQuantity;
         this.soldQuantity = soldQuantity;
+    }
+    
+    public TicketType(String name, double price) {
+        this.name = name;
+        this.price = price;
+        this.tickets = new ArrayList<>();
+    }
+
+    public void addTicket(Ticket ticket) {
+        this.tickets.add(ticket);
     }
 
     public int getTicketTypeId() {
@@ -139,6 +154,19 @@ public class TicketType extends Showtime {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+    
+    @Override
+    public String toString() {
+        return "TicketType{name='" + name + "', price=" + price + ", tickets=" + tickets + "}";
     }
 
 }
