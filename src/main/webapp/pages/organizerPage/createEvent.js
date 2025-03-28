@@ -791,7 +791,9 @@ function openModal(button) {
         const usedRows = new Set();
 
         ticketList.querySelectorAll('.saved-ticket').forEach(ticket => {
-            const rowsText = ticket.querySelector('.ticket-details div:nth-child(5) span')?.textContent || '';
+            const rowsText = (ticket.querySelector('.ticket-details div:nth-child(5) span') 
+                ? ticket.querySelector('.ticket-details div:nth-child(5) span').textContent 
+                : '') || '';
             rowsText.split(', ').forEach(row => {
                 const rowName = row.split(' ')[0];
                 usedRows.add(rowName);
@@ -877,7 +879,9 @@ function validateSeatSelection() {
             // Bỏ qua vé đang chỉnh sửa để không báo lỗi ghế của chính nó
             return;
         }
-        const rowsText = ticket.querySelector('.ticket-details div:nth-child(5) span')?.textContent || '';
+        const rowsText = (ticket.querySelector('.ticket-details div:nth-child(5) span') 
+            ? ticket.querySelector('.ticket-details div:nth-child(5) span').textContent 
+            : '') || '';
         rowsText.split(', ').forEach(row => {
             const rowName = row.split(' ')[0]; // Lấy row (e.g., "A" từ "A 16")
             usedRows.add(rowName);
@@ -1089,32 +1093,33 @@ function editTicket(button, showTimeId) {
         const allDivs = ticketDetails.querySelectorAll('div');
 
         // Description
-        const descriptionDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Description:');
+        const descriptionDiv = Array.from(allDivs).find(div => div.querySelector('label') && div.querySelector('label').textContent === 'Description:');
         if (descriptionDiv) {
             document.getElementById('modalTicketDescription').value = descriptionDiv.querySelector('span').textContent;
         }
 
         // Price (VND)
-        const priceDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Price (VND):');
+        const priceDiv = Array.from(allDivs).find(div => div.querySelector('label') && div.querySelector('label').textContent === 'Price (VND):');
         if (priceDiv) {
             console.log('Price:', priceDiv.querySelector('span').textContent);
             document.getElementById('modalTicketPrice').value = priceDiv.querySelector('span').textContent;
         }
 
         // Quantity
-        const quantityDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Quantity:');
+        const quantityDiv = Array.from(allDivs).find(div => div.querySelector('label') && div.querySelector('label').textContent === 'Quantity:');
         if (quantityDiv) {
             console.log('Quantity:', quantityDiv.querySelector('span').textContent);
             document.getElementById('modalTicketQuantity').value = quantityDiv.querySelector('span').textContent;
         }
 
         // Color
-        const colorDiv = Array.from(allDivs).find(div => div.querySelector('label')?.textContent === 'Color:');
+        const colorDiv = Array.from(allDivs).find(div => div.querySelector('label') && div.querySelector('label').textContent === 'Color:');
         if (colorDiv) {
             const colorValue = colorDiv.querySelector('span').textContent;
             document.getElementById('modalTicketColor').value = colorValue;
             document.getElementById('colorValue').textContent = colorValue;
         }
+
     } catch (e) {
         console.error('Lỗi khi điền dữ liệu vào modal:', e);
     }
@@ -1127,7 +1132,9 @@ function editTicket(button, showTimeId) {
         try {
             const seatsByRow = calculateSeatSummary();
             // Tìm div chứa label "Seats:"
-            const seatsDiv = Array.from(ticketDetails.querySelectorAll('div')).find(div => div.querySelector('label')?.textContent === 'Seats:');
+            const seatsDiv = Array.from(ticketDetails.querySelectorAll('div')).find(div => 
+                div.querySelector('label') && div.querySelector('label').textContent === 'Seats:'
+            );
             const selectedRowsText = seatsDiv ? seatsDiv.querySelector('span').textContent : '';
             const selectedRows = selectedRowsText.split(', ').map(row => row.split(' ')[0]);
             let seatOptions = '<label class="block text-gray-300 mb-2">Select Seat Rows (VIP: A, B; Normal: C):</label>';
@@ -1138,7 +1145,9 @@ function editTicket(button, showTimeId) {
             ticketList.querySelectorAll('.saved-ticket').forEach(otherTicket => {
                 const otherTicketName = otherTicket.querySelector('.ticket-label').getAttribute('data-ticket-name');
                 if (otherTicketName !== ticket.querySelector('.ticket-label').getAttribute('data-ticket-name')) {
-                    const otherSeatsDiv = Array.from(otherTicket.querySelector('.ticket-details').querySelectorAll('div')).find(div => div.querySelector('label')?.textContent === 'Seats:');
+                    const otherSeatsDiv = Array.from(otherTicket.querySelector('.ticket-details').querySelectorAll('div')).find(div => 
+                        div.querySelector('label') && div.querySelector('label').textContent === 'Seats:'
+                    );
                     const rowsText = otherSeatsDiv ? otherSeatsDiv.querySelector('span').textContent : '';
                     rowsText.split(', ').forEach(row => usedRows.add(row.split(' ')[0]));
                 }
@@ -1614,29 +1623,29 @@ async function submitEventForm() {
     }
 
     // ... (giữ nguyên phần thu thập dữ liệu và gửi request)
-    const eventName = document.querySelector('#event-info input[placeholder="Event Name"]')?.value.trim() || '';
-    const customerId = document.querySelector('#event-info .organizer-row input[name="customerId"]')?.value || '';
-    const eventCategory = document.querySelector('#event-info select')?.value || '';
-    const province = document.getElementById('province')?.value || '';
-    const district = document.getElementById('district')?.value || '';
-    const ward = document.getElementById('ward')?.value || '';
-    const fullAddress = document.getElementById('fullAddress')?.value.trim() || '';
-    const eventInfo = document.querySelector('#event-info textarea')?.value.trim() || '';
-    const eventLogo = document.getElementById('logoEventInput')?.dataset.url || '';
-    const backgroundImage = document.getElementById('backgroundInput')?.dataset.url || '';
-    const organizerLogo = document.getElementById('organizerLogoInput')?.dataset.url || '';
-    const organizerName = document.querySelector('#event-info .organizer-row input[placeholder="Organizer Name"]')?.value.trim() || '';
-    const eventType = document.getElementById('eventType')?.value || '';
-    const bankName = document.getElementById('bank')?.value || '';
-    const bankAccount = document.querySelector('input[name="bankAccount"]')?.value.trim() || '';
-    const accountHolder = document.querySelector('input[name="accountHolder"]')?.value.trim() || '';
+    const eventName = ((document.querySelector('#event-info input[placeholder="Event Name"]') || {}).value || '').trim();
+    const customerId = (document.querySelector('#event-info .organizer-row input[name="customerId"]') || {}).value || '';
+    const eventCategory = (document.querySelector('#event-info select') || {}).value || '';
+    const province = (document.getElementById('province') || {}).value || '';
+    const district = (document.getElementById('district') || {}).value || '';
+    const ward = (document.getElementById('ward') || {}).value || '';
+    const fullAddress = ((document.getElementById('fullAddress') || {}).value || '').trim();
+    const eventInfo = ((document.querySelector('#event-info textarea') || {}).value || '').trim();
+    const eventLogo = ((document.getElementById('logoEventInput') || {}).dataset || {}).url || '';
+    const backgroundImage = ((document.getElementById('backgroundInput') || {}).dataset || {}).url || '';
+    const organizerLogo = ((document.getElementById('organizerLogoInput') || {}).dataset || {}).url || '';
+    const organizerName = ((document.querySelector('#event-info .organizer-row input[placeholder="Organizer Name"]') || {}).value || '').trim();
+    const eventType = (document.getElementById('eventType') || {}).value || '';
+    const bankName = (document.getElementById('bank') || {}).value || '';
+    const bankAccount = ((document.querySelector('input[name="bankAccount"]') || {}).value || '').trim();
+    const accountHolder = ((document.querySelector('input[name="accountHolder"]') || {}).value || '').trim();
 
     // Collect showTimes
     const showTimes = [];
     const showTimeElements = document.querySelectorAll('.show-time');
     showTimeElements.forEach((showTime) => {
-        const startDate = showTime.querySelector('input[name="showStartDate"]')?.value || '';
-        const endDate = showTime.querySelector('input[name="showEndDate"]')?.value || '';
+        const startDate = (showTime.querySelector('input[name="showStartDate"]') || {}).value || '';
+        const endDate = (showTime.querySelector('input[name="showEndDate"]') || {}).value || '';
         if (startDate && endDate) {
             showTimes.push({
                 startDate: formatDateTime(startDate),
@@ -1650,18 +1659,18 @@ async function submitEventForm() {
     const ticketTypes = [];
     const seatAssignments = {}; // Để theo dõi ghế đã được gán cho ticket nào
     showTimeElements.forEach((showTime) => {
-        const showTimeId = showTime.querySelector('input[name="showStartDate"]')?.value || '';
-        const showEndTime = showTime.querySelector('input[name="showEndDate"]')?.value || '';
+        const showTimeId = (showTime.querySelector('input[name="showStartDate"]') || {}).value || '';
+        const showEndTime = (showTime.querySelector('input[name="showEndDate"]') || {}).value || '';
         if (showTimeId && showEndTime) {
             const ticketElements = showTime.querySelectorAll('.saved-ticket');
             ticketElements.forEach((ticket) => {
-                const ticketName = ticket.querySelector('.ticket-label')?.getAttribute('data-ticket-name') || '';
-                const ticketDescription = ticket.querySelector('.ticket-details div:nth-child(1) span')?.textContent || '';
-                const ticketPrice = parseFloat(ticket.querySelector('.ticket-details div:nth-child(2) span')?.textContent) || 0;
-                const ticketQuantity = parseInt(ticket.querySelector('.ticket-details div:nth-child(3) span')?.textContent) || 0;
+                const ticketName = (ticket.querySelector('.ticket-label') || {}).getAttribute && ticket.querySelector('.ticket-label').getAttribute('data-ticket-name') || '';
+                const ticketDescription = (ticket.querySelector('.ticket-details div:nth-child(1) span') || {}).textContent || '';
+                const ticketPrice = parseFloat((ticket.querySelector('.ticket-details div:nth-child(2) span') || {}).textContent) || 0;
+                const ticketQuantity = parseInt((ticket.querySelector('.ticket-details div:nth-child(3) span') || {}).textContent) || 0;
                 const ticketColorSpan = ticket.querySelector('.ticket-details div:nth-child(4) span');
-                const ticketColor = ticketColorSpan?.textContent.split(' ')[0] || '#000000';
-                const seatsText = ticket.querySelector('.ticket-details div:nth-child(5) span')?.textContent || '';
+                const ticketColor = (ticketColorSpan && ticketColorSpan.textContent) ? ticketColorSpan.textContent.split(' ')[0] : '#000000';
+                const seatsText = (ticket.querySelector('.ticket-details div:nth-child(5) span') || {}).textContent || '';
                 const selectedSeats = seatsText.split(', ').map(seat => {
                     const [row, col] = seat.split(' ');
                     return { seatRow: row, seatCol: col };
@@ -1701,7 +1710,7 @@ async function submitEventForm() {
             const ticketElements = showTime.querySelectorAll('.saved-ticket');
             ticketElements.forEach((ticket) => {
                 const ticketName = ticket.querySelector('.ticket-label').getAttribute('data-ticket-name') || '';
-                const seatsText = ticket.querySelector('.ticket-details div:nth-child(5) span')?.textContent || '';
+                const seatsText = (ticket.querySelector('.ticket-details div:nth-child(5) span') && ticket.querySelector('.ticket-details div:nth-child(5) span').textContent) || '';
                 const selectedSeats = seatsText.split(', ').map(seat => {
                     const [row, col] = seat.split(' '); // Ví dụ: "A 10" -> row = "A", col = "10"
                     return { seatRow: row, seatCol: col }; // Lấy cả row và col từ giao diện
