@@ -154,7 +154,7 @@
                         </div>
                         <div class="flex justify-between items-center mt-2">
                             <p>Total</p>
-                            <p id="totalAmount" class="font-bold text-green-500"><fmt:formatNumber value="${subtotal}" currencyCode="VND" minFractionDigits="0"/> VND</p>
+                            <p id="totalAmount" class="font-bold text-green-500"><fmt:formatNumber value="${total}" currencyCode="VND" minFractionDigits="0"/> VND</p>
                         </div>
                         <div class="mt-2">
                             <p class="text-sm">By proceeding the order, you agree to the <a class="text-blue-500 underline" href="#">General Trading Conditions</a></p>
@@ -186,10 +186,10 @@
                     data: {voucherCode: voucherCode, eventId: ${event.eventId}},
                     dataType: "json",
                     success: function (response) {
-                        console.log("AJAX Response: ", response); // Log the response
+                        console.log("AJAX Response: ", response);
                         if (response.success) {
-                            discount = parseFloat(response.discount); // Ensure discount is a number
-                            total = subtotal - discount;
+                            discount = parseFloat(response.discount);
+                            total = response.total ? parseFloat(response.total) : subtotal - discount; // Use total from response if provided
                             $("#discountRow").removeClass("hidden");
                             $("#discountAmount").text(formatCurrency(discount) + " VND");
                             $("#totalAmount").text(formatCurrency(total) + " VND");

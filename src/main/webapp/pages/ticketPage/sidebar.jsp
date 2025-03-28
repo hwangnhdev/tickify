@@ -10,7 +10,7 @@
         <!-- My Profile -->
         <li class="mb-4 flex items-center p-2 rounded cursor-pointer 
                    ${pageContext.request.requestURI.contains('myProfile') ? 'bg-green-700' : 'hover:bg-green-700'}">
-            <a href="${pageContext.request.contextPath}//profile" 
+            <a href="${pageContext.request.contextPath}/profile" 
                class="flex items-center w-full text-white">
                 <i class="fas fa-id-badge mr-3"></i>
                 <span>My profile</span>

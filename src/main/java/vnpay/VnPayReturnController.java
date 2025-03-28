@@ -56,7 +56,7 @@ public class VnPayReturnController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -101,7 +101,16 @@ public class VnPayReturnController extends HttpServlet {
         System.out.println(subtotalStr);
         double subtotal = (subtotalStr != null && !subtotalStr.isEmpty()) ? Double.parseDouble(subtotalStr) : 0.0;
         System.out.println(subtotal);
-        double total = subtotal;
+
+        Object totalObj = session.getAttribute("total");
+        double total = (totalObj != null) ? Double.parseDouble(totalObj.toString()) : subtotal; // Fallback to subtotal if total is not set
+        System.out.println("Total from session: " + total);
+
+        // Retrieve voucherId from session
+        Object voucherIdObj = session.getAttribute("voucherId");
+        Integer voucherId = (voucherIdObj != null) ? Integer.parseInt(voucherIdObj.toString()) : null;
+        System.out.println("Voucher ID from session: " + (voucherId != null ? voucherId : "None"));
+
         List<Map<String, Object>> seatDataList = (List<Map<String, Object>>) session.getAttribute("seatDataList");
         Event event = (Event) session.getAttribute("event");
 
@@ -148,7 +157,7 @@ public class VnPayReturnController extends HttpServlet {
             List<String> ticketCodes = new ArrayList<>();
 
             // Insert order
-            Order newOrder = new Order(0, customer.getCustomerId(), 0, total, null, transactionStatus, transactionId, null, null);
+            Order newOrder = new Order(0, customer.getCustomerId(), voucherId != null ? voucherId : 0, total, null, transactionStatus, transactionId, null, null);
             orderDao.insertOrder(newOrder);
 
             // Insert orderDetail

@@ -228,6 +228,10 @@
         <servlet-name>ApplyVoucherController</servlet-name>
         <servlet-class>controllers.ApplyVoucherController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminOrdersController</servlet-name>
+        <servlet-class>controllers.AdminOrdersController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
         <url-pattern>/auth</url-pattern>
@@ -444,6 +448,10 @@
     <servlet-mapping>
         <servlet-name>ApplyVoucherController</servlet-name>
         <url-pattern>/applyVoucher</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminOrdersController</servlet-name>
+        <url-pattern>/adminOrders</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>10080</session-timeout>
