@@ -5,6 +5,7 @@
 package controllers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dals.CategoryDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,6 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.util.List;
 import models.Category;
 
@@ -64,7 +66,7 @@ public class CategoryController extends HttpServlet {
 
         if ("search".equals(action)) {
             String query = request.getParameter("query");
-            List<Category> searchResults = categoryDAO.getAllCategories(query); // Sử dụng phương thức GET_ALL_CATEGORY_SEARCH
+            List<Category> searchResults = categoryDAO.getAllCategories(query);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             PrintWriter out = response.getWriter();
@@ -90,48 +92,73 @@ public class CategoryController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         CategoryDAO categoryDAO = new CategoryDAO();
-        String action = request.getParameter("action");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
 
         try {
+            // Đọc dữ liệu JSON từ request body
+            StringBuilder sb = new StringBuilder();
+            String line;
+            BufferedReader reader = request.getReader();
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            String jsonData = sb.toString();
+            JsonObject jsonObject = gson.fromJson(jsonData, JsonObject.class);
+
+            String action = jsonObject.get("action").getAsString();
+
             if ("create".equals(action)) {
-                String categoryName = request.getParameter("categoryName");
-                String categoryDescription = request.getParameter("description");
+                String categoryName = jsonObject.get("categoryName").getAsString();
+                String categoryDescription = jsonObject.get("description").getAsString();
                 Category existingCategory = categoryDAO.getCategoryByName(categoryName);
 
                 if (existingCategory != null) {
-                    out.print("{\"success\": false, \"error\": \"Category already exists. Please use a different name.\"}");
+                    out.print(gson.toJson(new ResponseMessage(false, "Category already exists. Please use a different name.")));
                 } else {
                     categoryDAO.createCategory(new Category(categoryName, categoryDescription));
-                    response.sendRedirect("category?success=create");
+                    out.print(gson.toJson(new ResponseMessage(true, "Category created successfully")));
                 }
             } else if ("update".equals(action)) {
-                int categoryId = Integer.parseInt(request.getParameter("categoryID"));
-                String categoryName = request.getParameter("categoryName");
-                String description = request.getParameter("description");
+                int categoryId = jsonObject.get("categoryID").getAsInt();
+                String categoryName = jsonObject.get("categoryName").getAsString();
+                String description = jsonObject.get("description").getAsString();
 
                 Category existingCategory = categoryDAO.getCategoryByName(categoryName);
 
                 if (existingCategory != null && existingCategory.getCategoryId() != categoryId) {
-                    out.print("{\"success\": false, \"error\": \"Category name already exists. Please choose a different name.\"}");
+                    out.print(gson.toJson(new ResponseMessage(false, "Category name already exists. Please choose a different name.")));
                 } else {
                     categoryDAO.updateCategory(new Category(categoryId, categoryName, description));
-                    response.sendRedirect("category?success=update");
+                    out.print(gson.toJson(new ResponseMessage(true, "Category updated successfully")));
                 }
             } else if ("delete".equals(action)) {
-                int categoryId = Integer.parseInt(request.getParameter("categoryID"));
-
+                int categoryId = jsonObject.get("categoryID").getAsInt();
                 categoryDAO.deleteCategory(categoryId);
-                response.sendRedirect("category?success=delete");
+                out.print(gson.toJson(new ResponseMessage(true, "Category deleted successfully")));
             } else {
-                out.print("{\"success\": false, \"error\": \"Invalid action\"}");
+                out.print(gson.toJson(new ResponseMessage(false, "Invalid action")));
             }
         } catch (Exception e) {
-            out.print("{\"success\": false, \"error\": \"Server error: " + e.getMessage() + "\"}");
+            e.printStackTrace(); // Log lỗi để kiểm tra
+            out.print(gson.toJson(new ResponseMessage(false, "Server error: " + e.getMessage())));
+        } finally {
+            out.flush();
         }
-        out.flush();
+    }
+
+// Class phụ để định dạng response JSON
+    class ResponseMessage {
+
+        boolean success;
+        String message;
+
+        public ResponseMessage(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
     }
 
     /**
