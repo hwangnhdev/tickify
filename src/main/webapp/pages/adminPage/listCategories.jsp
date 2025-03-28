@@ -58,6 +58,9 @@
             .suggestion-item:hover {
                 background-color: #f3f4f6;
             }
+            .hidden {
+                display: none;
+            }
         </style>
     </head>
     <body class="bg-gray-100 font-sans antialiased">
@@ -77,7 +80,7 @@
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
                             <div id="suggestions" class="suggestions"></div>
                         </div>
-                        <input type="submit" value="Search" onclick="searchCategories()" class="bg-blue-600 text-white py-2 px-4 rounded">
+                        <input type="submit" value="Search" onclick="searchCategories(); return false;" class="bg-blue-600 text-white py-2 px-4 rounded">
                         <button type="button" onclick="openCreatePopup()" class="bg-blue-600 text-white py-2 px-4 rounded">Create New</button>
                     </form>
 
@@ -100,9 +103,9 @@
                                         <td class="px-6 py-4 text-sm text-gray-600 truncate" title="${category.description}">${category.description}</td>
                                         <td class="px-6 py-4 text-sm">
                                             <button onclick="openEditPopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
-                                                    class="text-yellow-600 hover:text-yellow-800 mr-2">Edit</button>
+                                                    class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300 mr-2">Edit</button>
                                             <button onclick="openDeletePopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
-                                                    class="text-red-600 hover:text-red-800">Delete</button>
+                                                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Delete</button>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -124,21 +127,17 @@
                                 <h2 class="text-xl font-semibold text-gray-800">Create Category</h2>
                                 <button onclick="closePopup('createPopup')" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
                             </div>
-
-                            <c:if test="${not empty errorMessage}">
-                                <p class="text-red-500 mb-4">${errorMessage}</p>
-                            </c:if>
-
-                            <form id="createForm" method="post">
+                            <form id="createForm" onsubmit="createCategory(event)">
                                 <input type="hidden" name="action" value="create">
                                 <div class="mb-4">
                                     <label for="createCategoryName" class="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
-                                    <input type="text" id="createCategoryName" name="categoryName" value="${category.categoryName}" 
+                                    <input type="text" id="createCategoryName" name="categoryName" 
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    <div id="createErrorMessage" class="text-red-500 mt-2 hidden"></div>
                                 </div>
                                 <div class="mb-4">
                                     <label for="createDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                    <input type="text" id="createDescription" name="description" value="${category.description}" 
+                                    <input type="text" id="createDescription" name="description" 
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                                 </div>
                                 <div class="flex justify-end space-x-2">
@@ -157,8 +156,7 @@
                                 <h2 class="text-xl font-semibold text-gray-800">Edit Category</h2>
                                 <button onclick="closePopup('editPopup')" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
                             </div>
-                            <p id="editErrorMessage" class="text-red-500 mb-4 hidden"></p>
-                            <form id="editForm" action="category" method="post">
+                            <form id="editForm" onsubmit="updateCategory(event)">
                                 <input type="hidden" name="action" value="update">
                                 <div class="mb-4">
                                     <label for="categoryId" class="block text-sm font-medium text-gray-700 mb-1">Category ID</label>
@@ -168,12 +166,13 @@
                                 <div class="mb-4">
                                     <label for="categoryName" class="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
                                     <input type="text" id="categoryName" name="categoryName" 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    <div id="editErrorMessage" class="text-red-500 mt-2 hidden"></div>
                                 </div>
                                 <div class="mb-4">
                                     <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                                     <input type="text" id="description" name="description" 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                                 </div>
                                 <div class="flex justify-end space-x-2">
                                     <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300">Save</button>
@@ -187,12 +186,12 @@
                     <!-- Delete Popup -->
                     <div id="deletePopup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden transition-opacity duration-300">
                         <div class="bg-white rounded-lg p-6 w-full max-w-md transform transition-all duration-300 scale-95">
-                            <form id="deleteForm" action="category" method="post">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h2 class="text-xl font-semibold text-gray-800">Confirm Delete</h2>
-                                    <button type="button" onclick="closePopup('deletePopup')" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
-                                </div>
-                                <p id="deleteConfirmationMessage" class="mb-4 text-gray-600"></p>
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-semibold text-gray-800">Confirm Delete</h2>
+                                <button type="button" onclick="closePopup('deletePopup')" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                            </div>
+                            <form id="deleteForm" onsubmit="deleteCategory(event)">
+                                <input type="hidden" name="action" value="delete">
                                 <div class="mb-4">
                                     <label for="deleteCategoryId" class="block text-sm font-medium text-gray-700 mb-1">Category ID</label>
                                     <input type="text" id="deleteCategoryId" name="categoryID" readonly 
@@ -208,7 +207,6 @@
                                     <input type="text" id="deleteDescription" name="description" readonly 
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100">
                                 </div>
-                                <input type="hidden" name="action" value="delete">
                                 <div class="flex justify-end space-x-2">
                                     <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Delete</button>
                                     <button type="button" onclick="closePopup('deletePopup')" 
@@ -249,28 +247,136 @@
 
             function closePopup(popupId) {
                 document.getElementById(popupId).classList.add('hidden');
+                document.getElementById('createErrorMessage')?.classList.add('hidden');
+                document.getElementById('editErrorMessage')?.classList.add('hidden');
             }
-
-            window.onload = function () {
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('success')) {
-                    const action = urlParams.get('success');
-                    if (action === 'create') {
-                        document.getElementById('successMessage').innerText = 'Category created successfully!';
-                    } else if (action === 'update') {
-                        document.getElementById('successMessage').innerText = 'Category updated successfully!';
-                    } else if (action === 'delete') {
-                        document.getElementById('successMessage').innerText = 'Category deleted successfully!';
-                    }
-                    document.getElementById('successPopup').style.display = 'block';
-                    document.getElementById('overlay').style.display = 'block';
-                }
-            };
 
             function closeSuccessPopup() {
                 document.getElementById('successPopup').style.display = 'none';
                 document.getElementById('overlay').style.display = 'none';
-                window.location.href = '${pageContext.request.contextPath}/category';
+            }
+
+            function createCategory(event) {
+                event.preventDefault();
+                const form = document.getElementById('createForm');
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+
+                fetch('${pageContext.request.contextPath}/category', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const errorDiv = document.getElementById('createErrorMessage');
+                    if (data.success) {
+                        errorDiv.classList.add('hidden');
+                        closePopup('createPopup');
+                        showSuccess('Category created successfully!');
+                        refreshCategoryList();
+                    } else {
+                        errorDiv.innerText = data.error;
+                        errorDiv.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('createErrorMessage').innerText = 'An error occurred. Please try again.';
+                    document.getElementById('createErrorMessage').classList.remove('hidden');
+                });
+            }
+
+            function updateCategory(event) {
+                event.preventDefault();
+                const form = document.getElementById('editForm');
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+
+                fetch('${pageContext.request.contextPath}/category', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const errorDiv = document.getElementById('editErrorMessage');
+                    if (data.success) {
+                        errorDiv.classList.add('hidden');
+                        closePopup('editPopup');
+                        showSuccess('Category updated successfully!');
+                        refreshCategoryList();
+                    } else {
+                        errorDiv.innerText = data.error;
+                        errorDiv.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('editErrorMessage').innerText = 'An error occurred. Please try again.';
+                    document.getElementById('editErrorMessage').classList.remove('hidden');
+                });
+            }
+
+            function deleteCategory(event) {
+                event.preventDefault();
+                const form = document.getElementById('deleteForm');
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+
+                fetch('${pageContext.request.contextPath}/category', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        closePopup('deletePopup');
+                        showSuccess('Category deleted successfully!');
+                        refreshCategoryList();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            function showSuccess(message) {
+                document.getElementById('successMessage').innerText = message;
+                document.getElementById('successPopup').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block';
+            }
+
+            function refreshCategoryList() {
+                fetch('${pageContext.request.contextPath}/category?action=search&query=')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('categoryTableBody');
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td class="px-6 py-4 text-center text-gray-500" colspan="4">No categories found.</td>
+                            </tr>
+                        `;
+                    } else {
+                        data.forEach(category => {
+                            tbody.innerHTML += `
+                                <tr class="hover:bg-gray-50 transition duration-150">
+                                    <td class="px-6 py-4 text-sm text-gray-600">${category.categoryId}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">${category.categoryName}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600 truncate" title="${category.description}">${category.description}</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <button onclick="openEditPopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
+                                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300 mr-2">Edit</button>
+                                        <button onclick="openDeletePopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
+                                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => console.error('Error refreshing list:', error));
             }
 
             function fetchSuggestions(query) {
@@ -278,65 +384,59 @@
                     document.getElementById('suggestions').style.display = 'none';
                     return;
                 }
-
                 fetch(`${pageContext.request.contextPath}/category?action=search&query=` + encodeURIComponent(query))
-                        .then(response => response.json())
-                        .then(data => {
-                            const suggestionsDiv = document.getElementById('suggestions');
-                            suggestionsDiv.innerHTML = '';
-                            if (data.length > 0) {
-                                data.forEach(category => {
-                                    const div = document.createElement('div');
-                                    div.className = 'suggestion-item';
-                                    div.innerText = category.categoryName;
-                                    div.onclick = () => {
-                                        document.getElementById('searchInput').value = category.categoryName;
-                                        suggestionsDiv.style.display = 'none';
-                                        searchCategories(category.categoryName);
-                                    };
-                                    suggestionsDiv.appendChild(div);
-                                });
-                                suggestionsDiv.style.display = 'block';
-                            } else {
-                                suggestionsDiv.style.display = 'none';
-                            }
-                        })
-                        .catch(error => console.error('Error fetching suggestions:', error));
+                .then(response => response.json())
+                .then(data => {
+                    const suggestionsDiv = document.getElementById('suggestions');
+                    suggestionsDiv.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(category => {
+                            suggestionsDiv.innerHTML += `
+                                <div class="suggestion-item" onclick="document.getElementById('searchInput').value = '${category.categoryName}'; searchCategories('${category.categoryName}'); document.getElementById('suggestions').style.display = 'none';">
+                                    ${category.categoryName}
+                                </div>
+                            `;
+                        });
+                        suggestionsDiv.style.display = 'block';
+                    } else {
+                        suggestionsDiv.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error fetching suggestions:', error));
             }
 
             function searchCategories(query = document.getElementById('searchInput').value) {
                 fetch(`${pageContext.request.contextPath}/category?action=search&query=` + encodeURIComponent(query))
-                        .then(response => response.json())
-                        .then(data => {
-                            const tbody = document.getElementById('categoryTableBody');
-                            tbody.innerHTML = '';
-                            if (data.length === 0) {
-                                tbody.innerHTML = `
-                                <tr>
-                                    <td class="px-6 py-4 text-center text-gray-500" colspan="4">No categories found.</td>
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('categoryTableBody');
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td class="px-6 py-4 text-center text-gray-500" colspan="4">No categories found.</td>
+                            </tr>
+                        `;
+                    } else {
+                        data.forEach(category => {
+                            tbody.innerHTML += `
+                                <tr class="hover:bg-gray-50 transition duration-150">
+                                    <td class="px-6 py-4 text-sm text-gray-600">${category.categoryId}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">${category.categoryName}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600 truncate" title="${category.description}">${category.description}</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <button onclick="openEditPopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
+                                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300 mr-2">Edit</button>
+                                        <button onclick="openDeletePopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
+                                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Delete</button>
+                                    </td>
                                 </tr>
                             `;
-                            } else {
-                                data.forEach(category => {
-                                    const row = document.createElement('tr');
-                                    row.className = 'hover:bg-gray-50 transition duration-150';
-                                    row.innerHTML = `
-                                    <td class="px-6 py-4 text-sm text-gray-600">` + category.categoryId + `</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">` + category.categoryName + `</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600 truncate" title="` + category.description + `">` + category.description + `</td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <button onclick="openEditPopup('` + category.categoryId + `', '` + category.categoryName + `', '` + category.description + `')" 
-                                                class="text-yellow-600 hover:text-yellow-800 mr-2">Edit</button>
-                                        <button onclick="openDeletePopup('` + category.categoryId + `', '` + category.categoryName + `', '` + category.description + `')" 
-                                                class="text-red-600 hover:text-red-800">Delete</button>
-                                    </td>
-                                `;
-                                    tbody.appendChild(row);
-                                });
-                            }
-                            document.getElementById('suggestions').style.display = 'none';
-                        })
-                        .catch(error => console.error('Error searching categories:', error));
+                        });
+                    }
+                    document.getElementById('suggestions').style.display = 'none';
+                })
+                .catch(error => console.error('Error searching categories:', error));
             }
         </script>
     </body>
