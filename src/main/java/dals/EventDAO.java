@@ -70,7 +70,7 @@ public class EventDAO extends DBContext {
 
         String sql = "{CALL [dbo].[UpdateEventByID](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
-        try (CallableStatement stmt = connection.prepareCall(sql)) {
+        try ( CallableStatement stmt = connection.prepareCall(sql)) {
             // Thiết lập các tham số đầu vào khớp với stored procedure
             stmt.setInt(1, eventId);
             stmt.setInt(2, customerId);
@@ -138,16 +138,16 @@ public class EventDAO extends DBContext {
         String showTimesJson = prepareShowTimesJson(showTimes, gson);
         String ticketTypesJson = prepareTicketTypesJson(ticketTypes, showTimes, gson);
         String seatsJson = (seats != null && !seats.isEmpty()) ? prepareSeatsJson(seats, gson) : null; // Removed
-                                                                                                       // ticketTypes
-                                                                                                       // parameter
-                                                                                                       // since
-                                                                                                       // ticketTypeName
-                                                                                                       // is now in Seat
+        // ticketTypes
+        // parameter
+        // since
+        // ticketTypeName
+        // is now in Seat
 
         String sql = "{CALL [dbo].[CreateEvent](?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
         EventCreationResult result = new EventCreationResult();
 
-        try (CallableStatement stmt = connection.prepareCall(sql)) {
+        try ( CallableStatement stmt = connection.prepareCall(sql)) {
             // Set input parameters (match stored procedure parameters)
             stmt.setInt(1, customerId);
             stmt.setString(2, organizationName);
@@ -349,7 +349,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
                 + "FROM Events "
                 + "WHERE event_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -383,7 +383,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT image_id, event_id, image_url, image_title "
                 + "FROM EventImages "
                 + "WHERE event_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -412,7 +412,7 @@ public class EventDAO extends DBContext {
                 + "FROM Events e "
                 + "INNER JOIN Organizers o ON e.organizer_id = o.organizer_id "
                 + "WHERE e.event_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -444,7 +444,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT showtime_id, event_id, start_date, end_date, status, created_at, updated_at "
                 + "FROM Showtimes "
                 + "WHERE event_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -477,7 +477,7 @@ public class EventDAO extends DBContext {
                 + "FROM Showtimes st "
                 + "INNER JOIN TicketTypes tt ON st.showtime_id = tt.showtime_id "
                 + "WHERE st.event_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, eventId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -512,7 +512,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT ticket_type_id, showtime_id, name, description, price, color, total_quantity, sold_quantity, created_at, updated_at "
                 + "FROM TicketTypes "
                 + "WHERE showtime_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, showtimeId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -661,7 +661,7 @@ public class EventDAO extends DBContext {
      * Retrieves the list of events by name using a partial match for a specific
      * organizer.
      *
-     * @param eventName   The name or partial name of the event to search for.
+     * @param eventName The name or partial name of the event to search for.
      * @param organizerId The ID of the organizer to filter events.
      * @return A list of Event objects matching the search criteria.
      */
@@ -670,7 +670,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT event_id, category_id, organizer_id, event_name, location, event_type, status, description, created_at, updated_at "
                 + "FROM Events "
                 + "WHERE event_name LIKE ? AND organizer_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             // Thêm ký tự % để tìm kiếm gần đúng
             stmt.setString(1, "%" + eventName + "%");
             stmt.setInt(2, organizerId);
@@ -700,7 +700,7 @@ public class EventDAO extends DBContext {
      * Retrieves the list of events by name using a partial match for a specific
      * organizer.
      *
-     * @param eventName   The name or partial name of the event to search for.
+     * @param eventName The name or partial name of the event to search for.
      * @param organizerId The ID of the organizer to filter events.
      * @return A list of Event objects matching the search criteria.
      */
@@ -712,7 +712,7 @@ public class EventDAO extends DBContext {
                 + "                FROM EventImages\n"
                 + "                WHERE image_title = 'logo_banner') ei ON e.event_id = ei.event_id\n"
                 + "                WHERE e.event_name LIKE ? AND e.organizer_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + eventName + "%");
             stmt.setInt(2, organizerId);
             ResultSet rs = stmt.executeQuery();
@@ -783,7 +783,7 @@ public class EventDAO extends DBContext {
         String sql = "SELECT ticket_type_id, showtime_id, name, description, price, color, total_quantity, sold_quantity, created_at, updated_at\n"
                 + "FROM     TicketTypes\n"
                 + "WHERE showtime_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, showtimeId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -812,7 +812,7 @@ public class EventDAO extends DBContext {
      * Event========================================================================
      * ======================
      */
-    /* getEventsByPage */
+ /* getEventsByPage */
     public List<EventDTO> getEventsByPage(int page, int pageSize) {
         List<EventDTO> listEvents = new ArrayList<>();
         String sql = "WITH EventPagination AS (\n"
@@ -909,7 +909,7 @@ public class EventDAO extends DBContext {
     }
 
     /* getTop10LatestEvents */
-    /* Get All Events */
+ /* Get All Events */
     public List<EventImage> getAllEvents() {
         List<EventImage> listEvents = new ArrayList<>();
         String sql = "SELECT e.event_id, e.event_name, e.category_id, e.organizer_id, e.description, "
@@ -920,7 +920,7 @@ public class EventDAO extends DBContext {
                 + "WHERE e.status = 'Approved' "
                 + "ORDER BY e.created_at DESC";
 
-        try (PreparedStatement st = connection.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
+        try ( PreparedStatement st = connection.prepareStatement(sql);  ResultSet rs = st.executeQuery()) {
 
             while (rs.next()) {
                 EventImage eventImage = new EventImage(
@@ -1243,10 +1243,17 @@ public class EventDAO extends DBContext {
     /* getTotalRevenueOfEventById */
     public List<Double> getTotalRevenueOfEventById(int eventId) {
         List<Double> listTotals = new ArrayList<>();
-
         String sql = "SELECT \n"
                 + "    s.event_id,\n"
-                + "    COALESCE(SUM(od.quantity * tt.price), 0) AS total_revenue,\n"
+                + "    (SELECT SUM(o.total_price)\n"
+                + "     FROM Orders o\n"
+                + "     WHERE o.order_id IN (\n"
+                + "         SELECT od2.order_id \n"
+                + "         FROM OrderDetails od2\n"
+                + "         JOIN TicketTypes tt2 ON od2.ticket_type_id = tt2.ticket_type_id\n"
+                + "         JOIN Showtimes s2 ON tt2.showtime_id = s2.showtime_id\n"
+                + "         WHERE s2.event_id = s.event_id\n"
+                + "     )) AS total_revenue,\n"
                 + "    COALESCE(SUM(od.quantity), 0) AS tickets_sold,\n"
                 + "    SUM(tt.total_quantity) AS total_tickets,\n"
                 + "    SUM(tt.total_quantity) - COALESCE(SUM(od.quantity), 0) AS tickets_remaining,\n"
@@ -1254,10 +1261,8 @@ public class EventDAO extends DBContext {
                 + "FROM Showtimes s\n"
                 + "JOIN TicketTypes tt ON tt.showtime_id = s.showtime_id \n"
                 + "LEFT JOIN OrderDetails od ON od.ticket_type_id = tt.ticket_type_id \n"
-                + "LEFT JOIN Orders o ON o.order_id = od.order_id\n"
                 + "WHERE s.event_id = ?\n"
                 + "GROUP BY s.event_id;";
-
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, eventId);
@@ -1284,7 +1289,15 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByMonth AS (\n"
                 + "    SELECT \n"
                 + "        MONTH(o.order_date) AS Month,\n"
-                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
+                + "        (SELECT SUM(o.total_price)\n"
+                + "     FROM Orders o\n"
+                + "     WHERE o.order_id IN (\n"
+                + "         SELECT od2.order_id \n"
+                + "         FROM OrderDetails od2\n"
+                + "         JOIN TicketTypes tt2 ON od2.ticket_type_id = tt2.ticket_type_id\n"
+                + "         JOIN Showtimes s2 ON tt2.showtime_id = s2.showtime_id\n"
+                + "         WHERE s2.event_id = ?\n"
+                + "     ))  AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1292,11 +1305,18 @@ public class EventDAO extends DBContext {
                 + "    INNER JOIN [dbo].[Showtimes] st ON tt.showtime_id = st.showtime_id\n"
                 + "    INNER JOIN [dbo].[Events] e ON st.event_id = e.event_id\n"
                 + "    WHERE \n"
-                + "        e.event_id = ? -- Thay bằng ID của sự kiện cần tìm\n"
-                + "        AND YEAR(o.order_date) = ? -- Thay bằng năm cần tìm\n"
-                + "    GROUP BY MONTH(o.order_date)\n"
+                + "        e.event_id = ?\n"
+                + "        AND YEAR(o.order_date) = ?\n"
+                + "    GROUP BY MONTH(o.order_date), o.order_id\n"
+                + "),\n"
+                + "MonthlyRevenue AS (\n"
+                + "    SELECT \n"
+                + "        Month,\n"
+                + "        SUM(Revenue) AS Revenue,\n"
+                + "        SUM(TicketQuantity) AS TicketQuantity\n"
+                + "    FROM RevenueByMonth\n"
+                + "    GROUP BY Month\n"
                 + ")\n"
-                + "\n"
                 + "SELECT \n"
                 + "    m.Month,\n"
                 + "    ISNULL(rm.Revenue, 0) AS Revenue,\n"
@@ -1306,13 +1326,14 @@ public class EventDAO extends DBContext {
                 + "    SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION \n"
                 + "    SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12\n"
                 + ") m\n"
-                + "LEFT JOIN RevenueByMonth rm ON m.Month = rm.Month\n"
+                + "LEFT JOIN MonthlyRevenue rm ON m.Month = rm.Month\n"
                 + "ORDER BY m.Month;";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, eventId);
-            st.setInt(2, year);
+            st.setInt(2, eventId);
+            st.setInt(3, year);
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
@@ -1383,7 +1404,15 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByDay AS (\n"
                 + "    SELECT \n"
                 + "        DATEDIFF(DAY, o.order_date, GETDATE()) AS DaysAgo,\n"
-                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
+                + "        (SELECT SUM(o.total_price)\n"
+                + "     FROM Orders o\n"
+                + "     WHERE o.order_id IN (\n"
+                + "         SELECT od2.order_id \n"
+                + "         FROM OrderDetails od2\n"
+                + "         JOIN TicketTypes tt2 ON od2.ticket_type_id = tt2.ticket_type_id\n"
+                + "         JOIN Showtimes s2 ON tt2.showtime_id = s2.showtime_id\n"
+                + "         WHERE s2.event_id = ?\n"
+                + "     ))  AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1409,6 +1438,7 @@ public class EventDAO extends DBContext {
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, eventId);
+            st.setInt(2, eventId);
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
@@ -1475,7 +1505,15 @@ public class EventDAO extends DBContext {
         String sql = "WITH RevenueByHour AS (\n"
                 + "    SELECT \n"
                 + "        DATEDIFF(HOUR, o.order_date, GETDATE()) AS HoursAgo,\n"
-                + "        SUM(od.quantity * tt.price) AS Revenue,\n"
+                + "        (SELECT SUM(o.total_price)\n"
+                + "     FROM Orders o\n"
+                + "     WHERE o.order_id IN (\n"
+                + "         SELECT od2.order_id \n"
+                + "         FROM OrderDetails od2\n"
+                + "         JOIN TicketTypes tt2 ON od2.ticket_type_id = tt2.ticket_type_id\n"
+                + "         JOIN Showtimes s2 ON tt2.showtime_id = s2.showtime_id\n"
+                + "         WHERE s2.event_id = ?\n"
+                + "     ))  AS Revenue,\n"
                 + "        SUM(od.quantity) AS TicketQuantity\n"
                 + "    FROM [dbo].[Orders] o\n"
                 + "    INNER JOIN [dbo].[OrderDetails] od ON o.order_id = od.order_id\n"
@@ -1501,6 +1539,7 @@ public class EventDAO extends DBContext {
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, eventId);
+            st.setInt(2, eventId);
             ResultSet rs = st.executeQuery();
 
             while (rs.next()) {
@@ -1610,7 +1649,7 @@ public class EventDAO extends DBContext {
 
     public int getSoldQuantityFromOrders(int ticketTypeId) {
         String sql = "SELECT COALESCE(SUM(quantity), 0) FROM OrderDetails WHERE ticket_type_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, ticketTypeId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -1624,7 +1663,7 @@ public class EventDAO extends DBContext {
 
     public double getActualPriceFromOrders(int ticketTypeId) {
         String sql = "SELECT COALESCE(AVG(price), 0) FROM OrderDetails WHERE ticket_type_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, ticketTypeId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

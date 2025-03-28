@@ -18,10 +18,10 @@
         <!-- CSS tùy chỉnh -->
         <style>
             #ticketContainer {
-                transition: opacity 0.1s ease-in-out;
+                transition: opacity 0.2s ease-in-out;
             }
             .fade-in {
-                animation: fadeIn 0.1s ease-in-out;
+                animation: fadeIn 0.2s ease-in-out;
             }
             @keyframes fadeIn {
                 from {
@@ -34,9 +34,11 @@
         </style>
     </head>
     <body class="bg-gray-900 text-white">
-        <div class="flex">
+        <jsp:include page="../../components/header.jsp" />
+
+        <div class="pt-16 flex">
             <jsp:include page="sidebar.jsp" />
-            <jsp:include page="../../components/header.jsp"></jsp:include>
+
             <main class="w-3/4 p-8">
                 <h1 class="text-3xl font-bold mb-6">My Tickets</h1>
                 <!-- Nút Filter -->
@@ -74,13 +76,15 @@
                     <c:if test="${not empty tickets}">
                         <div class="grid grid-cols-1 gap-6 fade-in">
                             <c:forEach var="ticket" items="${tickets}">
-                                <a href="${pageContext.request.contextPath}/viewTicketDetail?ticketCode=${ticket.orderCode}"
+                                <a href="${pageContext.request.contextPath}/viewTicketDetail?orderI=${ticket.orderCode}"
                                    class="block bg-gray-700 text-white rounded-lg flex overflow-hidden w-full hover:bg-gray-600 transition-colors duration-200 mb-4">
                                     <div class="bg-gray-600 p-6 flex flex-col items-center justify-center w-1/4">
                                         <div class="text-6xl font-bold">
                                             <fmt:formatDate value="${ticket.startDate}" pattern="dd" />
                                         </div>
-                                        <div class="text-lg">Month</div>
+                                        <div class="text-lg">
+                                            <fmt:formatDate value="${ticket.startDate}" pattern="MMM" />
+                                        </div>
                                         <div class="text-4xl font-bold">
                                             <fmt:formatDate value="${ticket.startDate}" pattern="MM" />
                                         </div>
@@ -89,7 +93,7 @@
                                         </div>
                                     </div>
                                     <div class="p-6 w-3/4">
-                                        <h1 class="text-xl font-bold mb-4 text-green-400">${ticket.eventName}</h1>
+                                        <h1 class="text-xl font-bold mb-4 text-white-400">${ticket.eventName}</h1>
                                         <!-- Hiển thị Payment Status và Past/Upcoming nằm ngang -->
                                         <div class="flex items-center mb-2 space-x-2">
                                             <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">
@@ -134,7 +138,7 @@
                     </c:if>
                 </div>
 
-                <!-- Phân Trang (giữ nguyên) -->
+                <!-- Phân Trang (nếu cần) -->
                 <c:if test="${totalPages gt 1}">
                     <div class="flex justify-center items-center mt-6 space-x-1">
                         <c:set var="displayPages" value="5" />
@@ -180,7 +184,7 @@
             </main>
         </div>
 
-        <!-- JavaScript: AJAX, Active State & Transition Effect -->
+        <!-- JavaScript: AJAX và xử lý active state của filter -->
         <script>
             var contextPath = "${pageContext.request.contextPath}";
             var currentFilter = ""; // Theo dõi filter hiện tại
@@ -189,7 +193,7 @@
                 return str.charAt(0).toUpperCase() + str.slice(1);
             }
 
-            // Cập nhật active state cho nút filter
+            // Cập nhật trạng thái active cho các nút filter
             function setActive(status) {
                 currentFilter = status;
                 var buttons = document.querySelectorAll('.filter-btn');
@@ -202,7 +206,7 @@
                 }
             }
 
-            // Hàm fetchTickets: Nếu nút đang active thì không fetch lại
+            // Hàm fetchTickets: chỉ fetch khi filter thay đổi
             function fetchTickets(status) {
                 if (currentFilter === status)
                     return;
@@ -210,21 +214,22 @@
                 var notification = document.getElementById("notification");
                 var ticketContainer = document.getElementById("ticketContainer");
                 notification.innerHTML = '<div class="flex items-center"><div class="w-6 h-6 border-4 border-t-transparent border-green-500 rounded-full animate-spin"></div><span class="ml-2">Đang tải dữ liệu...</span></div>';
-                fetch("viewAllTickets?ajax=true&status=" + status)
-                    .then(function (response) {
-                        if (!response.ok) {
-                            throw new Error("Network response was not ok");
-                        }
-                        return response.json();
-                    })
-                    .then(function (data) {
-                        notification.innerText = "";
-                        updateTicketContainer(data);
-                    })
-                    .catch(function (error) {
-                        console.error("Error fetching tickets:", error);
-                        notification.innerText = "Có lỗi xảy ra. Vui lòng thử lại sau.";
-                    });
+
+                fetch(contextPath + "/viewAllTickets?ajax=true&status=" + status)
+                        .then(function (response) {
+                            if (!response.ok) {
+                                throw new Error("Network response was not ok");
+                            }
+                            return response.json();
+                        })
+                        .then(function (data) {
+                            notification.innerText = "";
+                            updateTicketContainer(data);
+                        })
+                        .catch(function (error) {
+                            console.error("Error fetching tickets:", error);
+                            notification.innerText = "Có lỗi xảy ra. Vui lòng thử lại sau.";
+                        });
             }
 
             // Cập nhật nội dung danh sách vé với hiệu ứng chuyển mờ
@@ -232,7 +237,7 @@
                 var ticketContainer = document.getElementById("ticketContainer");
                 ticketContainer.style.opacity = 0;
                 if (!data.tickets || data.tickets.length === 0) {
-                    ticketContainer.innerHTML = "<p class='text-center text-gray-300'>You don't have any ticket yet.</p>";
+                    ticketContainer.innerHTML = "<p class='text-center text-gray-300'>You have not purchased any tickets yet.</p>";
                     setTimeout(function () {
                         ticketContainer.style.opacity = 1;
                     }, 200);
@@ -240,32 +245,22 @@
                 }
                 var html = "<div class='grid grid-cols-1 gap-6'>";
                 data.tickets.forEach(function (ticket) {
-                    html += '<a href="' + contextPath + '/viewTicketDetail?ticketCode=' + ticket.orderCode + '" class="block bg-gray-700 text-white rounded-lg flex overflow-hidden w-full hover:bg-gray-600 transition-colors duration-200 mb-4">';
+                    html += '<a href="' + contextPath + '/viewTicketDetail?orderId=' + ticket.orderCode + '" class="block bg-gray-700 text-white rounded-lg flex overflow-hidden w-full hover:bg-gray-600 transition-colors duration-200 mb-4">';
                     html += '    <div class="bg-gray-600 p-6 flex flex-col items-center justify-center w-1/4">';
                     html += '        <div class="text-6xl font-bold">' + new Date(ticket.startDate).getDate() + '</div>';
-                    html += '        <div class="text-lg">Month</div>';
+                    html += '        <div class="text-lg">' + new Date(ticket.startDate).toLocaleString("en-US", {month: "short"}) + '</div>';
                     html += '        <div class="text-4xl font-bold">' + ("0" + (new Date(ticket.startDate).getMonth() + 1)).slice(-2) + '</div>';
                     html += '        <div class="text-lg">' + new Date(ticket.startDate).getFullYear() + '</div>';
                     html += '    </div>';
                     html += '    <div class="p-6 w-3/4">';
                     html += '        <h1 class="text-xl font-bold mb-4 text-green-400">' + ticket.eventName + '</h1>';
-                    // Hiển thị Payment Status và Past/Upcoming nằm ngang trong JS
                     html += '        <div class="flex items-center mb-2 space-x-2">';
                     html += '            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">' + (ticket.paymentStatus || 'Successful') + '</span>';
                     html += '            <span class="' + (new Date(ticket.startDate) < new Date() ? 'bg-red-500' : 'bg-green-500') + ' text-white px-3 py-1 rounded-full text-sm">' + (new Date(ticket.startDate) < new Date() ? 'Past' : 'Upcoming') + '</span>';
                     html += '        </div>';
-                    html += '        <div class="mb-2">';
-                    html += '            <i class="fas fa-ticket-alt mr-2"></i>';
-                    html += '            <span>Order code: ' + ticket.orderCode + '</span>';
-                    html += '        </div>';
-                    html += '        <div class="mb-2">';
-                    html += '            <i class="far fa-clock mr-2"></i>';
-                    html += '            <span>' + new Date(ticket.startDate).toLocaleString() + ' - ' + new Date(ticket.endDate).toLocaleString() + '</span>';
-                    html += '        </div>';
-                    html += '        <div>';
-                    html += '            <i class="fas fa-map-marker-alt mr-2"></i>';
-                    html += '            <span>' + ticket.location + '</span>';
-                    html += '        </div>';
+                    html += '        <div class="mb-2"><i class="fas fa-ticket-alt mr-2"></i><span>Order code: ' + ticket.orderCode + '</span></div>';
+                    html += '        <div class="mb-2"><i class="far fa-clock mr-2"></i><span>' + new Date(ticket.startDate).toLocaleString() + ' - ' + new Date(ticket.endDate).toLocaleString() + '</span></div>';
+                    html += '        <div><i class="fas fa-map-marker-alt mr-2"></i><span>' + ticket.location + '</span></div>';
                     html += '    </div>';
                     html += '</a>';
                 });
