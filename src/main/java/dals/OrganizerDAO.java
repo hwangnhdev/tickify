@@ -80,7 +80,8 @@ public class OrganizerDAO extends DBContext {
         sql.append("WITH BannerImages AS ( ");
         sql.append("    SELECT event_id, image_url, ");
         sql.append("           ROW_NUMBER() OVER (PARTITION BY event_id ");
-        sql.append("                              ORDER BY CASE WHEN LOWER(image_title) LIKE '%banner%' THEN 0 ELSE 1 END, image_id) AS rn ");
+        sql.append(
+                "                              ORDER BY CASE WHEN LOWER(image_title) LIKE '%banner%' THEN 0 ELSE 1 END, image_id) AS rn ");
         sql.append("    FROM EventImages ");
         sql.append(") ");
         sql.append("SELECT ");

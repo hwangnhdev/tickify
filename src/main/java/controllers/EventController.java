@@ -123,7 +123,7 @@ public class EventController extends HttpServlet {
             throws ServletException, IOException {
         // Create an instance of EventDAO to interact with the database
         EventDAO eventDAO = new EventDAO();
-        // Get the requested page number, default to 1 if not provided <!--All Event--> 
+        // Get the requested page number, default to 1 if not provided <!--All Event-->
         int page = 1;
         int pageSize = 20;
         if (request.getParameter("page") != null) {
@@ -143,7 +143,7 @@ public class EventController extends HttpServlet {
         request.setAttribute("paginatedEvents", paginatedEvents);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-        
+
         // Forward the request and response to the home.jsp page to display the events
         request.getRequestDispatcher("pages/homePage/home.jsp").forward(request, response);
     }

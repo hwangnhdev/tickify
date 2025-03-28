@@ -168,7 +168,9 @@ public class EventDetailController extends HttpServlet {
 
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalRelevantEvents);
-        List<EventDTO> paginatedRelevantEvents = (List<EventDTO>) ((totalRelevantEvents > 0) ? relevantEvents.subList(startIndex, endIndex) : new ArrayList<>());
+        List<EventDTO> paginatedRelevantEvents = (List<EventDTO>) ((totalRelevantEvents > 0)
+                ? relevantEvents.subList(startIndex, endIndex)
+                : new ArrayList<>());
 
         // Pagination parameters for All Events
         int pageAll = 1;

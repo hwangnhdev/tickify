@@ -14,6 +14,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  *
@@ -27,15 +28,15 @@ public class ViewAllVouchersController extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -54,16 +55,36 @@ public class ViewAllVouchersController extends HttpServlet {
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Get event ID from request parameter
-        int eventId = 1;
+        HttpSession session = request.getSession();
+        Object eventIdObj = session.getAttribute("eventId");
+        int eventId = 0;
+        if (eventIdObj instanceof Integer) {
+            eventId = (Integer) eventIdObj;
+            System.out.println("Event ID: " + eventId);
+        } else if (eventIdObj instanceof String) {
+            try {
+                eventId = Integer.parseInt((String) eventIdObj);
+                System.out.println("Event ID: " + eventId);
+            } catch (NumberFormatException e) {
+                System.out.println("Lỗi chuyển đổi String sang Integer: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Event ID không hợp lệ hoặc chưa được set trong session.");
+        }
+        System.out.println("Session"+ session);
+        System.out.println("eventIdObj"+eventIdObj);
+        System.out.println("eventId"+eventId);
+        request.setAttribute("eventId", eventId);
+
         int page = 1;
         String voucherStatus = request.getParameter("voucherStatus");
 
@@ -72,13 +93,12 @@ public class ViewAllVouchersController extends HttpServlet {
             voucherStatus = "all";
         }
         try {
-            // eventId = Integer.parseInt(request.getParameter("eventId"));
             String pageParam = request.getParameter("page");
             if (pageParam != null && !pageParam.trim().isEmpty()) {
                 page = Integer.parseInt(pageParam);
             }
         } catch (NumberFormatException e) {
-            response.sendRedirect("error.jsp");
+            response.sendRedirect("event");
             return;
         }
         // Validate event ID
@@ -97,17 +117,17 @@ public class ViewAllVouchersController extends HttpServlet {
             // Filter vouchers based on status
             switch (voucherStatus.toLowerCase()) {
                 case "active":
-                    vouchers = voucherDAO.getVouchersByEventAndStatus(1, page, PAGE_SIZE, true, false);
-                    totalVouchers = voucherDAO.getTotalVouchersByEventAndStatus(1, true);
+                    vouchers = voucherDAO.getVouchersByEventAndStatus(eventId, page, PAGE_SIZE, true, false);
+                    totalVouchers = voucherDAO.getTotalVouchersByEventAndStatus(eventId, true);
                     break;
                 case "inactive":
-                    vouchers = voucherDAO.getVouchersByEventAndStatus(1, page, PAGE_SIZE, false, false);
-                    totalVouchers = voucherDAO.getTotalVouchersByEventAndStatus(1, false);
+                    vouchers = voucherDAO.getVouchersByEventAndStatus(eventId, page, PAGE_SIZE, false, false);
+                    totalVouchers = voucherDAO.getTotalVouchersByEventAndStatus(eventId, false);
                     break;
                 case "all":
                 default:
-                    vouchers = voucherDAO.getVouchersByEvent(1, page, PAGE_SIZE);
-                    totalVouchers = voucherDAO.getTotalVouchersByEvent(1);
+                    vouchers = voucherDAO.getVouchersByEvent(eventId, page, PAGE_SIZE);
+                    totalVouchers = voucherDAO.getTotalVouchersByEvent(eventId);
                     break;
             }
             int totalPages = (int) Math.ceil((double) totalVouchers / PAGE_SIZE);
@@ -150,14 +170,17 @@ public class ViewAllVouchersController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        int eventId = Integer.parseInt(request.getParameter("eventId"));
+        response.sendRedirect(request.getContextPath() + "/listVoucher" + "?eventId=" + eventId);
         doGet(request, response);
     }
 

@@ -4,7 +4,6 @@
  */
 package dals;
 
-import com.sun.tools.javac.resources.compiler;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
