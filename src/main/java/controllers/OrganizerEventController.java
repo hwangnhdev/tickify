@@ -26,7 +26,7 @@ public class OrganizerEventController extends HttpServlet {
         try {
             customerId = Integer.parseInt(session.getAttribute("customerId").toString());
         } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "signUpPage/signUp.jsp");
             return;
         }
 
@@ -46,7 +46,7 @@ public class OrganizerEventController extends HttpServlet {
 
         // Nếu là AJAX request, forward đến JSP fragment để chỉ render phần danh sách sự kiện
         if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/_eventsFragment.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/pages/organizerPage/organizerEvents.jsp");
             dispatcher.forward(request, response);
         } else {
             // Nếu không phải AJAX thì forward toàn bộ trang
