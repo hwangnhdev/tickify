@@ -35,7 +35,7 @@ public class TicketDAO extends DBContext {
             = "UPDATE Ticket SET status = 'used', updated_at = GETDATE() WHERE seat_id = ?";
 
     public boolean insertTicket(Ticket ticket) {
-        try (PreparedStatement st = connection.prepareStatement(INSERT_TICKET)) {
+        try ( PreparedStatement st = connection.prepareStatement(INSERT_TICKET)) {
             st.setInt(1, ticket.getOrderDetailId());
             st.setInt(2, ticket.getSeatId());
             st.setString(3, ticket.getTicketCode());
@@ -52,9 +52,9 @@ public class TicketDAO extends DBContext {
     }
 
     public boolean isTicketExist(String ticketCode) {
-        try (PreparedStatement st = connection.prepareStatement(CHECK_TICKET_EXIST)) {
+        try ( PreparedStatement st = connection.prepareStatement(CHECK_TICKET_EXIST)) {
             st.setString(1, ticketCode);
-            try (ResultSet rs = st.executeQuery()) {
+            try ( ResultSet rs = st.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
@@ -64,10 +64,10 @@ public class TicketDAO extends DBContext {
     }
 
     public String getTicketStatus(int orderId, int seatId) {
-        try (PreparedStatement st = connection.prepareStatement(CHECK_TICKET_STATUS)) {
+        try ( PreparedStatement st = connection.prepareStatement(CHECK_TICKET_STATUS)) {
             st.setInt(1, orderId);
             st.setInt(2, seatId);
-            try (ResultSet rs = st.executeQuery()) {
+            try ( ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     String status = rs.getString("ticket_status");
                     return status != null ? status : "";
@@ -80,7 +80,7 @@ public class TicketDAO extends DBContext {
     }
 
     public boolean updateTicketStatus(int seatId) {
-        try (PreparedStatement st = connection.prepareStatement(UPDATE_TICKET_STATUS)) {
+        try ( PreparedStatement st = connection.prepareStatement(UPDATE_TICKET_STATUS)) {
             st.setInt(1, seatId);
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -129,12 +129,12 @@ public class TicketDAO extends DBContext {
         sql.append("GROUP BY O.order_id, O.payment_status, S.start_date, S.end_date, E.location, E.event_name ");
         sql.append("ORDER BY S.start_date");
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+        try ( PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
             stmt.setInt(1, customerId);
             if (filter != null && (filter.equalsIgnoreCase("paid") || filter.equalsIgnoreCase("pending"))) {
                 stmt.setString(2, filter.toLowerCase());
             }
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     CustomerTicketDTO ticket = new CustomerTicketDTO();
                     ticket.setOrderCode(rs.getString("orderCode"));
@@ -174,9 +174,9 @@ public class TicketDAO extends DBContext {
                 + "  AND c.phone IS NOT NULL "
                 + "  AND c.address IS NOT NULL";
         OrderSummaryDTO orderSummary = new OrderSummaryDTO();
-        try (PreparedStatement ps = connection.prepareStatement(sqlOrderSummary)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sqlOrderSummary)) {
             ps.setInt(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     orderSummary.setOrderDate(rs.getTimestamp("order_date"));
                     orderSummary.setPaymentStatus(rs.getString("payment_status"));
@@ -211,9 +211,9 @@ public class TicketDAO extends DBContext {
                 + "  AND t.ticket_code IS NOT NULL "
                 + "  AND t.status IS NOT NULL";
         List<TicketItemDTO> items = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sqlOrderItems)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sqlOrderItems)) {
             ps.setInt(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     TicketItemDTO item = new TicketItemDTO();
                     item.setTicketTypeId(rs.getInt("ticket_type_id"));
@@ -243,9 +243,9 @@ public class TicketDAO extends DBContext {
                 + "  AND tt.name IS NOT NULL "
                 + "GROUP BY tt.ticket_type_id, tt.name, tt.price";
         List<TicketItemDTO> groupedItems = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sqlGroupedOrderItems)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sqlGroupedOrderItems)) {
             ps.setInt(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     TicketItemDTO item = new TicketItemDTO();
                     item.setTicketTypeId(rs.getInt("ticket_type_id"));
@@ -276,9 +276,9 @@ public class TicketDAO extends DBContext {
                 + "LEFT JOIN Vouchers v ON o.voucher_id = v.voucher_id "
                 + "WHERE o.order_id = ?";
         CalculationDTO calc = new CalculationDTO();
-        try (PreparedStatement ps = connection.prepareStatement(sqlCalculation)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sqlCalculation)) {
             ps.setInt(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     calc.setTotalSubtotal(rs.getBigDecimal("total_subtotal") != null ? rs.getBigDecimal("total_subtotal") : BigDecimal.ZERO);
                     calc.setDiscountAmount(rs.getBigDecimal("discount_amount") != null ? rs.getBigDecimal("discount_amount") : BigDecimal.ZERO);
@@ -309,9 +309,9 @@ public class TicketDAO extends DBContext {
                 + "  AND e.event_name IS NOT NULL "
                 + "  AND e.location IS NOT NULL";
         EventSummaryDTO eventSummary = new EventSummaryDTO();
-        try (PreparedStatement ps = connection.prepareStatement(sqlEventSummary)) {
+        try ( PreparedStatement ps = connection.prepareStatement(sqlEventSummary)) {
             ps.setInt(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     eventSummary.setEventId(rs.getInt("event_id"));
                     eventSummary.setEventName(rs.getString("event_name"));
@@ -331,9 +331,9 @@ public class TicketDAO extends DBContext {
 
     public String getTicketQRCode(String ticketCode) {
         String sql = "SELECT ticket_qr_code FROM Ticket WHERE ticket_code = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
+        try ( PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, ticketCode);
-            try (ResultSet rs = st.executeQuery()) {
+            try ( ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString("ticket_qr_code");
                 }
