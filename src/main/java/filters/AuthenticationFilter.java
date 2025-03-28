@@ -107,20 +107,19 @@ public class AuthenticationFilter implements Filter {
         String uri = req.getRequestURI();
 
         // Các URL không yêu cầu đăng nhập
-        List<String> publicUrls = Arrays.asList("/Tickify/", "/Tickify/allEvents", "/Tickify/eventAjax", "/Tickify/eventDetail", "/Tickify/loginGoogleHandler", "/Tickify/loginFacebookHandler", "/Tickify/pages/signUpPage/signUp.jsp", "/Tickify/pages/adminPage/login.jsp");
+        List<String> publicUrls = Arrays.asList("/Tickify/", "/Tickify/allEvents", "/Tickify/eventAjax", "/Tickify/eventDetail", "/Tickify/loginGoogleHandler", "/Tickify/loginFacebookHandler", "/Tickify/pages/signUpPage/signUp.jsp", "/Tickify/pages/adminPage/login.jsp", "/Tickify/event");
         List<String> privateAdminUrls = Arrays.asList("/Tickify/admin", "/Tickify/ViewAllCustomersController", "/Tickify/admin/viewAllEvents", "/Tickify/category", "/Tickify/admin/revenue");
 
         System.out.println("Requested URI: " + uri);
         System.out.println("Role: " + accountRole);
 
-        
         if (!publicUrls.contains(uri) && !"customer".equals(accountRole)) {
 //            res.sendRedirect("signUp");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
             chain.doFilter(request, response);
             return;
         }
-        
+
         if (privateAdminUrls.contains(uri) && !"admin".equals(accountRole)) {
 //            res.sendRedirect("login");
             request.getRequestDispatcher("/pages/adminPage/login.jsp").forward(request, response);

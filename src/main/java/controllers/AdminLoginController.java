@@ -70,7 +70,7 @@ public class AdminLoginController extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("accountRole", "admin");
             session.setAttribute("admin", admin);
-            response.sendRedirect("ViewAllCustomersController");
+            response.sendRedirect("admin");
         } else {
             System.out.println("Sai mật khẩu!");
             request.setAttribute("errorMessage", "Invalid email or password");
@@ -91,8 +91,7 @@ public class AdminLoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-//        processRequest(request, response);
-        request.getRequestDispatcher("pages/adminPage/login.jsp").forward(request, response);
+        processRequest(request, response);
     }
 
     /**
