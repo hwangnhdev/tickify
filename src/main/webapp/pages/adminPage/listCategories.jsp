@@ -247,8 +247,8 @@
 
             function closePopup(popupId) {
                 document.getElementById(popupId).classList.add('hidden');
-                document.getElementById('createErrorMessage')?.classList.add('hidden');
-                document.getElementById('editErrorMessage')?.classList.add('hidden');
+                        document.getElementById('createErrorMessage')?.classList.add('hidden');
+                        document.getElementById('editErrorMessage')?.classList.add('hidden');
             }
 
             function closeSuccessPopup() {
@@ -261,30 +261,38 @@
                 const form = document.getElementById('createForm');
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData);
+                console.log('Data gửi đi:', data); // Log dữ liệu gửi đi
 
                 fetch('${pageContext.request.contextPath}/category', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(data)
                 })
-                .then(response => response.json())
-                .then(data => {
-                    const errorDiv = document.getElementById('createErrorMessage');
-                    if (data.success) {
-                        errorDiv.classList.add('hidden');
-                        closePopup('createPopup');
-                        showSuccess('Category created successfully!');
-                        refreshCategoryList();
-                    } else {
-                        errorDiv.innerText = data.error;
-                        errorDiv.classList.remove('hidden');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('createErrorMessage').innerText = 'An error occurred. Please try again.';
-                    document.getElementById('createErrorMessage').classList.remove('hidden');
-                });
+                        .then(response => {
+                            console.log('Response status:', response.status); // Log trạng thái phản hồi
+                            if (!response.ok)
+                                throw new Error('Network response was not ok');
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Response data:', data); // Log dữ liệu nhận về
+                            const errorDiv = document.getElementById('createErrorMessage');
+                            if (data.success) {
+                                errorDiv.classList.add('hidden');
+                                closePopup('createPopup');
+                                showSuccess('Category created successfully!');
+                                refreshCategoryList();
+                            } else {
+                                errorDiv.innerText = data.message || 'Unknown error';
+                                errorDiv.classList.remove('hidden');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            const errorDiv = document.getElementById('createErrorMessage');
+                            errorDiv.innerText = 'An error occurred: ' + error.message;
+                            errorDiv.classList.remove('hidden');
+                        });
             }
 
             function updateCategory(event) {
@@ -295,27 +303,27 @@
 
                 fetch('${pageContext.request.contextPath}/category', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(data)
                 })
-                .then(response => response.json())
-                .then(data => {
-                    const errorDiv = document.getElementById('editErrorMessage');
-                    if (data.success) {
-                        errorDiv.classList.add('hidden');
-                        closePopup('editPopup');
-                        showSuccess('Category updated successfully!');
-                        refreshCategoryList();
-                    } else {
-                        errorDiv.innerText = data.error;
-                        errorDiv.classList.remove('hidden');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('editErrorMessage').innerText = 'An error occurred. Please try again.';
-                    document.getElementById('editErrorMessage').classList.remove('hidden');
-                });
+                        .then(response => response.json())
+                        .then(data => {
+                            const errorDiv = document.getElementById('editErrorMessage');
+                            if (data.success) {
+                                errorDiv.classList.add('hidden');
+                                closePopup('editPopup');
+                                showSuccess('Category updated successfully!');
+                                refreshCategoryList();
+                            } else {
+                                errorDiv.innerText = data.message;
+                                errorDiv.classList.remove('hidden');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            document.getElementById('editErrorMessage').innerText = 'An error occurred. Please try again.';
+                            document.getElementById('editErrorMessage').classList.remove('hidden');
+                        });
             }
 
             function deleteCategory(event) {
@@ -326,18 +334,18 @@
 
                 fetch('${pageContext.request.contextPath}/category', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(data)
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        closePopup('deletePopup');
-                        showSuccess('Category deleted successfully!');
-                        refreshCategoryList();
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                closePopup('deletePopup');
+                                showSuccess('Category deleted successfully!');
+                                refreshCategoryList();
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
             }
 
             function showSuccess(message) {
@@ -348,35 +356,34 @@
 
             function refreshCategoryList() {
                 fetch('${pageContext.request.contextPath}/category?action=search&query=')
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('categoryTableBody');
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = `
+                        .then(response => response.json())
+                        .then(data => {
+                            const tbody = document.getElementById('categoryTableBody');
+                            tbody.innerHTML = '';
+                            if (data.length === 0) {
+                                tbody.innerHTML = `
                             <tr>
                                 <td class="px-6 py-4 text-center text-gray-500" colspan="4">No categories found.</td>
                             </tr>
                         `;
-                    } else {
-                        data.forEach(category => {
-                            tbody.innerHTML += `
-                                <tr class="hover:bg-gray-50 transition duration-150">
-                                    <td class="px-6 py-4 text-sm text-gray-600">${category.categoryId}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">${category.categoryName}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600 truncate" title="${category.description}">${category.description}</td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <button onclick="openEditPopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
-                                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300 mr-2">Edit</button>
-                                        <button onclick="openDeletePopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
-                                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Delete</button>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    }
-                })
-                .catch(error => console.error('Error refreshing list:', error));
+                            } else {
+                                data.forEach(category => {
+                                    tbody.innerHTML +=
+                                            '<tr class="hover:bg-gray-50 transition duration-150">' +
+                                            '<td class="px-6 py-4 text-sm text-gray-600">' + category.categoryId + '</td>' +
+                                            '<td class="px-6 py-4 text-sm text-gray-600">' + category.categoryName + '</td>' +
+                                            '<td class="px-6 py-4 text-sm text-gray-600 truncate" title="' + category.description + '">' + category.description + '</td>' +
+                                            '<td class="px-6 py-4 text-sm">' +
+                                            '<button onclick="openEditPopup(\'' + category.categoryId + '\', \'' + category.categoryName + '\', \'' + category.description + '\')" ' +
+                                            'class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300 mr-2">Edit</button>' +
+                                            '<button onclick="openDeletePopup(\'' + category.categoryId + '\', \'' + category.categoryName + '\', \'' + category.description + '\')" ' +
+                                            'class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Delete</button>' +
+                                            '</td>' +
+                                            '</tr>';
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error refreshing list:', error));
             }
 
             function fetchSuggestions(query) {
@@ -385,58 +392,57 @@
                     return;
                 }
                 fetch(`${pageContext.request.contextPath}/category?action=search&query=` + encodeURIComponent(query))
-                .then(response => response.json())
-                .then(data => {
-                    const suggestionsDiv = document.getElementById('suggestions');
-                    suggestionsDiv.innerHTML = '';
-                    if (data.length > 0) {
-                        data.forEach(category => {
-                            suggestionsDiv.innerHTML += `
-                                <div class="suggestion-item" onclick="document.getElementById('searchInput').value = '${category.categoryName}'; searchCategories('${category.categoryName}'); document.getElementById('suggestions').style.display = 'none';">
-                                    ${category.categoryName}
+                        .then(response => response.json())
+                        .then(data => {
+                            const suggestionsDiv = document.getElementById('suggestions');
+                            suggestionsDiv.innerHTML = '';
+                            if (data.length > 0) {
+                                data.forEach(category => {
+                                    suggestionsDiv.innerHTML += `
+                                <div class="suggestion-item" onclick="document.getElementById('searchInput').value = '` + category.categoryName + `'; searchCategories('` + category.categoryName + `'); document.getElementById('suggestions').style.display = 'none';">
+                                    ` + category.categoryName + `
                                 </div>
                             `;
-                        });
-                        suggestionsDiv.style.display = 'block';
-                    } else {
-                        suggestionsDiv.style.display = 'none';
-                    }
-                })
-                .catch(error => console.error('Error fetching suggestions:', error));
+                                });
+                                suggestionsDiv.style.display = 'block';
+                            } else {
+                                suggestionsDiv.style.display = 'none';
+                            }
+                        })
+                        .catch(error => console.error('Error fetching suggestions:', error));
             }
 
             function searchCategories(query = document.getElementById('searchInput').value) {
                 fetch(`${pageContext.request.contextPath}/category?action=search&query=` + encodeURIComponent(query))
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('categoryTableBody');
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = `
+                        .then(response => response.json())
+                        .then(data => {
+                            const tbody = document.getElementById('categoryTableBody');
+                            tbody.innerHTML = '';
+                            if (data.length === 0) {
+                                tbody.innerHTML = `
                             <tr>
                                 <td class="px-6 py-4 text-center text-gray-500" colspan="4">No categories found.</td>
                             </tr>
                         `;
-                    } else {
-                        data.forEach(category => {
-                            tbody.innerHTML += `
-                                <tr class="hover:bg-gray-50 transition duration-150">
-                                    <td class="px-6 py-4 text-sm text-gray-600">${category.categoryId}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">${category.categoryName}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600 truncate" title="${category.description}">${category.description}</td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <button onclick="openEditPopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
-                                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300 mr-2">Edit</button>
-                                        <button onclick="openDeletePopup('${category.categoryId}', '${category.categoryName}', '${category.description}')" 
-                                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Delete</button>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    }
-                    document.getElementById('suggestions').style.display = 'none';
-                })
-                .catch(error => console.error('Error searching categories:', error));
+                            } else {
+                                data.forEach(category => {
+                                    tbody.innerHTML +=
+                                            '<tr class="hover:bg-gray-50 transition duration-150">' +
+                                            '<td class="px-6 py-4 text-sm text-gray-600">' + category.categoryId + '</td>' +
+                                            '<td class="px-6 py-4 text-sm text-gray-600">' + category.categoryName + '</td>' +
+                                            '<td class="px-6 py-4 text-sm text-gray-600 truncate" title="' + category.description + '">' + category.description + '</td>' +
+                                            '<td class="px-6 py-4 text-sm">' +
+                                            '<button onclick="openEditPopup(\'' + category.categoryId + '\', \'' + category.categoryName + '\', \'' + category.description + '\')" ' +
+                                            'class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300 mr-2">Edit</button>' +
+                                            '<button onclick="openDeletePopup(\'' + category.categoryId + '\', \'' + category.categoryName + '\', \'' + category.description + '\')" ' +
+                                            'class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Delete</button>' +
+                                            '</td>' +
+                                            '</tr>';
+                                });
+                            }
+                            document.getElementById('suggestions').style.display = 'none';
+                        })
+                        .catch(error => console.error('Error searching categories:', error));
             }
         </script>
     </body>
