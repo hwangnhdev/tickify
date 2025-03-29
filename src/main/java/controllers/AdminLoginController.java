@@ -52,6 +52,9 @@ public class AdminLoginController extends HttpServlet {
     private void handleLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        
+        System.out.println(email);
+        System.out.println(password);
 
         AdminDAO adminDao = new AdminDAO();
         Admin admin = adminDao.selectAdminByEmail(email);
@@ -70,7 +73,7 @@ public class AdminLoginController extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("accountRole", "admin");
             session.setAttribute("admin", admin);
-            response.sendRedirect("admin");
+            response.sendRedirect("ViewAllCustomersController");
         } else {
             System.out.println("Sai mật khẩu!");
             request.setAttribute("errorMessage", "Invalid email or password");

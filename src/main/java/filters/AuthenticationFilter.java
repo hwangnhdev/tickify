@@ -109,7 +109,8 @@ public class AuthenticationFilter implements Filter {
         List<String> publicUrls = Arrays.asList(
                 "/Tickify/", "/Tickify/allEvents", "/Tickify/eventAjax", "/Tickify/eventDetail",
                 "/Tickify/loginGoogleHandler", "/Tickify/loginFacebookHandler",
-                "/Tickify/pages/signUpPage/signUp.jsp", "/Tickify/pages/adminPage/login.jsp", "/Tickify/event"
+                "/Tickify/pages/signUpPage/signUp.jsp", "/Tickify/pages/adminPage/login.jsp", "/Tickify/event",
+                "/Tickify/adminLogin"
                 
         );
 
