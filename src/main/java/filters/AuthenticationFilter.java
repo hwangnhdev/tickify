@@ -99,31 +99,41 @@ public class AuthenticationFilter implements Filter {
      * @exception ServletException if a servlet error occurs
      */
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-//        System.out.println("Filter is working!"); // Kiểm tra xem có vào filter không
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
-        String accountRole = (String) ((session != null) ? session.getAttribute("accountRole") : null);
+        String accountRole = (session != null) ? (String) session.getAttribute("accountRole") : null;
         String uri = req.getRequestURI();
 
         // Các URL không yêu cầu đăng nhập
-        List<String> publicUrls = Arrays.asList("/Tickify/", "/Tickify/allEvents", "/Tickify/eventAjax", "/Tickify/eventDetail", "/Tickify/loginGoogleHandler", "/Tickify/loginFacebookHandler", "/Tickify/pages/signUpPage/signUp.jsp", "/Tickify/pages/adminPage/login.jsp", "/Tickify/event");
-        List<String> privateAdminUrls = Arrays.asList("/Tickify/admin", "/Tickify/ViewAllCustomersController", "/Tickify/admin/viewAllEvents", "/Tickify/category", "/Tickify/admin/revenue");
+        List<String> publicUrls = Arrays.asList(
+                "/Tickify/", "/Tickify/allEvents", "/Tickify/eventAjax", "/Tickify/eventDetail",
+                "/Tickify/loginGoogleHandler", "/Tickify/loginFacebookHandler",
+                "/Tickify/pages/signUpPage/signUp.jsp", "/Tickify/pages/adminPage/login.jsp", "/Tickify/event",
+                "/Tickify/adminLogin"
+                
+        );
+
+        // Các URL chỉ dành cho admin
+        List<String> privateAdminUrls = Arrays.asList(
+                "/Tickify/admin", "/Tickify/ViewAllCustomersController",
+                "/Tickify/admin/viewAllEvents", "/Tickify/category", "/Tickify/admin/revenue"
+                
+        );
 
         System.out.println("Requested URI: " + uri);
         System.out.println("Role: " + accountRole);
 
-        if (!publicUrls.contains(uri) && !"customer".equals(accountRole)) {
-//            res.sendRedirect("signUp");
-            request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
-            chain.doFilter(request, response);
-            return;
+        // Kiểm tra nếu request yêu cầu quyền admin nhưng tài khoản không phải admin
+        if (privateAdminUrls.contains(uri) && !"admin".equals(accountRole)) {
+            request.getRequestDispatcher("/pages/adminPage/login.jsp").forward(request, response);
+            return; // STOP processing, không gọi `chain.doFilter`
         }
 
-        if (privateAdminUrls.contains(uri) && !"admin".equals(accountRole)) {
-//            res.sendRedirect("login");
-            request.getRequestDispatcher("/pages/adminPage/login.jsp").forward(request, response);
-            return; // STOP processing further
+        // Kiểm tra nếu request cần đăng nhập mà người dùng chưa đăng nhập
+        if (!publicUrls.contains(uri) && accountRole == null && !"admin".equals(accountRole)) {
+            request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
+            return; // STOP processing
         }
 
         chain.doFilter(request, response);

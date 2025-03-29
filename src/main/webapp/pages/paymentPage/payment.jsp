@@ -123,9 +123,9 @@
                                 <div style="width: 50%;">
                                     <p>${seatData.name}</p>
                                     <p><c:forEach var="seat" items="${seatData.seats}">${seat.name} </c:forEach></p>
-                                    </div>
-                                    <div class="flex flex-col items-end">
-                                        <p><fmt:formatNumber value="${seatData.price}" currencyCode="VND" minFractionDigits="0"/> VND</p>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <p><fmt:formatNumber value="${seatData.price}" currencyCode="VND" minFractionDigits="0"/> VND</p>
                                     <p>x<fmt:formatNumber value="${seatData.count}" currencyCode="VND" minFractionDigits="0"/></p>
                                 </div>
                             </div>
@@ -156,6 +156,7 @@
                             <p>Total</p>
                             <p id="totalAmount" class="font-bold text-green-500"><fmt:formatNumber value="${total}" currencyCode="VND" minFractionDigits="0"/> VND</p>
                         </div>
+                        <p class="text-xs mt-1 text-gray-600">Note: VNPay only accepts a minimum of 5,000 VND</p>
                         <div class="mt-2">
                             <p class="text-sm">By proceeding the order, you agree to the <a class="text-blue-500 underline" href="#">General Trading Conditions</a></p>
                         </div>
@@ -189,7 +190,7 @@
                         console.log("AJAX Response: ", response);
                         if (response.success) {
                             discount = parseFloat(response.discount);
-                            total = response.total ? parseFloat(response.total) : subtotal - discount; // Use total from response if provided
+                            total = parseFloat(response.total); // Use total from server (min 5000 VND)
                             $("#discountRow").removeClass("hidden");
                             $("#discountAmount").text(formatCurrency(discount) + " VND");
                             $("#totalAmount").text(formatCurrency(total) + " VND");
@@ -238,6 +239,9 @@
                         } else {
                             alert(x.Message);
                         }
+                    },
+                    error: function () {
+                        alert("Error submitting payment");
                     }
                 });
                 return false;

@@ -112,7 +112,7 @@
                                     <div class="flex items-center mt-1">
                                         <input type="number" name="discountValue" id="discountValue" 
                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 pr-8" 
-                                               required step="1" min="0">
+                                               required step="1" min="1">
                                         <span id="unit" class="absolute right-2 text-white pointer-events-none"></span>
                                     </div>
                                 </div>
@@ -121,7 +121,7 @@
                                     <label class="block text-sm font-medium text-white">Total number of tickets applied:</label>
                                     <input type="number" name="usageLimit" 
                                            class="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" 
-                                           min="0" required>
+                                           min="1" required>
                                     <span class="text-xs text-gray-500">Number of tickets that can be redeemed (must be ≥ 0)</span>
                                 </div>
 

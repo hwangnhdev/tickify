@@ -49,12 +49,12 @@
   </nav>
   <!-- Footer -->
   <div class="mt-auto">
-    <div class="flex items-center space-x-3 mb-4">
+<!--    <div class="flex items-center space-x-3 mb-4">
       <img alt="User avatar" class="rounded-full w-10 h-10 border-2 border-white" src="https://storage.googleapis.com/a1aa/image/KRiR2AdeEXCXp1qpTAr9oFboyrbiCwlRwJ2zz0YBkZQ.jpg"/>
       <span class="font-semibold">Admin</span>
-    </div>
+    </div>-->
     <a class="flex items-center px-4 py-2 rounded hover:bg-blue-800 transition-colors duration-200" 
-       href="${pageContext.request.contextPath}/admin/logout">
+       href="${pageContext.request.contextPath}/logout">
       <i class="fas fa-sign-out-alt mr-3"></i> Logout
     </a>
   </div>

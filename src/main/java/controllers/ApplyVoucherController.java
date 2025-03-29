@@ -41,6 +41,7 @@ public class ApplyVoucherController extends HttpServlet {
             System.out.println("Deleted: " + voucher.isDeleted());
             System.out.println("Start Date: " + voucher.getStartDate());
             System.out.println("End Date: " + voucher.getEndDate());
+            System.out.println("Remaining Usage Limit: " + voucher.getUsageLimit());
         } else {
             System.out.println("Voucher not found for code: " + voucherCode);
         }
@@ -49,34 +50,45 @@ public class ApplyVoucherController extends HttpServlet {
             java.util.Date currentDate = new java.util.Date();
             System.out.println("Current Date: " + currentDate);
             if (currentDate.after(voucher.getStartDate()) && currentDate.before(voucher.getEndDate())) {
-                double discount = 0;
+                if (voucher.getUsageLimit() > 0) { // Check if usageLimit > 0
+                    double discount = 0;
+                    double newTotal = subtotal;
 
-                if ("percentage".equalsIgnoreCase(voucher.getDiscountType())) {
-                    discount = subtotal * (voucher.getDiscountValue() / 100.0);
-                    System.out.println("Calculated Percentage Discount: " + discount);
-                } else if ("fixed".equalsIgnoreCase(voucher.getDiscountType())) {
-                    discount = voucher.getDiscountValue();
-                    System.out.println("Fixed Discount: " + discount);
+                    if ("Percentage".equalsIgnoreCase(voucher.getDiscountType())) {
+                        discount = subtotal * (voucher.getDiscountValue() / 100.0);
+                        System.out.println("Calculated Percentage Discount: " + discount);
+                        newTotal = subtotal - discount; // Percentage discount inherently capped at subtotal
+                    } else if ("Fixed".equalsIgnoreCase(voucher.getDiscountType())) {
+                        discount = voucher.getDiscountValue();
+                        System.out.println("Fixed Discount: " + discount);
+                        // If fixed discount exceeds subtotal, set total to 5000 VND (minimum payment)
+                        newTotal = (discount >= subtotal) ? 5000 : subtotal - discount;
+                    } else {
+                        System.out.println("Unknown discount type: " + voucher.getDiscountType());
+                    }
+
+                    // Ensure newTotal is at least 5000 VND (minimum payment requirement)
+                    newTotal = Math.max(newTotal, 5000);
+                    System.out.println("New Total after discount (min 5000 VND): " + newTotal);
+
+                    // Update session with new total and voucherId
+                    session.setAttribute("total", newTotal);
+                    session.setAttribute("voucherId", voucher.getVoucherId());
+                    System.out.println("Voucher ID stored in session: " + voucher.getVoucherId());
+
+                    jsonResponse.put("success", true);
+                    jsonResponse.put("discount", discount);
+                    jsonResponse.put("total", newTotal);
                 } else {
-                    System.out.println("Unknown discount type: " + voucher.getDiscountType());
+                    jsonResponse.put("success", false);
+                    jsonResponse.put("message", "Voucher has reached its usage limit (0 remaining)");
+                    session.removeAttribute("voucherId");
+                    System.out.println("Voucher usage limit reached: Usage Limit = " + voucher.getUsageLimit());
                 }
-
-                // Ensure discount doesn't exceed subtotal
-                discount = Math.min(discount, subtotal);
-                double newTotal = subtotal - discount;
-
-                // Update session with new total
-                session.setAttribute("total", newTotal);
-                session.setAttribute("voucherId", voucher.getVoucherId()); // Store voucherId in session
-                System.out.println("New Total after discount: " + newTotal);
-                System.out.println("Voucher ID stored in session: " + voucher.getVoucherId());
-
-                jsonResponse.put("success", true);
-                jsonResponse.put("discount", discount);
-                jsonResponse.put("total", newTotal); // Optionally send total back to client
             } else {
                 jsonResponse.put("success", false);
                 jsonResponse.put("message", "Voucher has expired");
+                session.removeAttribute("voucherId");
                 System.out.println("Voucher expired: Start=" + voucher.getStartDate() + ", End=" + voucher.getEndDate());
             }
         } else {
