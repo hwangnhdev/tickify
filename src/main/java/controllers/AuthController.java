@@ -121,6 +121,7 @@ public class AuthController extends HttpServlet {
         CustomerAuthDAO customerAuthDao = new CustomerAuthDAO();
         
         Customer customer = customerDao.selectCustomerByEmail(email);
+        System.out.println(customer);
         
         if (customer == null) {
             System.out.println("1");
@@ -136,7 +137,7 @@ public class AuthController extends HttpServlet {
             return;
         }
         
-        CustomerAuth customerAuth = customerAuthDao.selectCustomerAuthById(customer.getCustomerId());
+        CustomerAuth customerAuth = customerAuthDao.selectCustomerAuthByIdProvider(customer.getCustomerId(), "email");
         System.out.println(customerAuth);
         System.out.println(customerAuth.getPassword());
         

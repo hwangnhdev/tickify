@@ -113,7 +113,7 @@ public class AuthenticationFilter implements Filter {
                 "/Tickify/adminLogin", "/Tickify/pages/forgetPasswordPage/forgetPassword.jsp",
                 "/Tickify/verifyEmail", "/Tickify/verifyOtp", "/Tickify/pages/submitOTPPage/submitOTP.jsp",
                 "/Tickify/pages/changePasswordPage/changePassword.jsp", "/Tickify/pages/changePasswordPage/changePassword.jsp",
-                "/Tickify/auth"
+                "/Tickify/auth", "/Tickify/logout"
                 
         );
 
