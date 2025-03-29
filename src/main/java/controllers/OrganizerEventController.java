@@ -18,7 +18,7 @@ public class OrganizerEventController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("customerId") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "signUpPage/signUp.jsp");
             return;
         }
 

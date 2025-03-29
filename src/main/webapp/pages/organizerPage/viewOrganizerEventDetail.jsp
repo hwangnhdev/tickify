@@ -168,20 +168,18 @@
             </div>
 
             <!-- About Section -->
-            <section class="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-xl shadow-lg mt-6 text-left">
-                <c:choose>
-                    <c:when test="${not empty event.description}">
-                        <h3 class="text-2xl font-bold text-white card-title">About</h3>
-                        <hr class="border-gray-500 mb-4" />
-                        <textarea class="w-full p-4 border border-gray-600 rounded-lg font-inter text-gray-200 text-justify resize-y bg-gray-800" rows="6" readonly>
-                            <c:out value="${fn:trim(event.description)}"/>
-                        </textarea>
-                    </c:when>
-                    <c:otherwise>
-                        <p class="text-gray-200 font-inter">No event description found.</p>
-                    </c:otherwise>
-                </c:choose>
-            </section>
+   <section class="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-xl shadow-lg mt-6 text-left">
+    <c:choose>
+        <c:when test="${not empty event.description}">
+            <h3 class="text-2xl font-bold text-white card-title">About</h3>
+            <hr class="border-gray-500 mb-4" />
+            <textarea class="w-full p-4 border border-gray-600 rounded-lg font-inter text-gray-200 text-justify resize-y bg-gray-800" rows="6" readonly><c:out value="${fn:trim(event.description)}"/></textarea>
+        </c:when>
+        <c:otherwise>
+            <p class="text-gray-200 font-inter">No event description found.</p>
+        </c:otherwise>
+    </c:choose>
+</section>
 
             <!-- Organizer Information Section -->
             <section class="bg-gray-800 p-6 rounded-xl shadow-lg mt-6 text-left">

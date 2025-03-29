@@ -110,7 +110,10 @@ public class AuthenticationFilter implements Filter {
                 "/Tickify/", "/Tickify/allEvents", "/Tickify/eventAjax", "/Tickify/eventDetail",
                 "/Tickify/loginGoogleHandler", "/Tickify/loginFacebookHandler",
                 "/Tickify/pages/signUpPage/signUp.jsp", "/Tickify/pages/adminPage/login.jsp", "/Tickify/event",
-                "/Tickify/adminLogin"
+                "/Tickify/adminLogin", "/Tickify/pages/forgetPasswordPage/forgetPassword.jsp",
+                "/Tickify/verifyEmail", "/Tickify/verifyOtp", "/Tickify/pages/submitOTPPage/submitOTP.jsp",
+                "/Tickify/pages/changePasswordPage/changePassword.jsp", "/Tickify/pages/changePasswordPage/changePassword.jsp",
+                "/Tickify/auth"
                 
         );
 

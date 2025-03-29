@@ -33,18 +33,6 @@
           <i class="sidebar-icon fas fa-chart-line mr-3"></i> Manage Revenue
         </a>
       </li>
-      <li>
-        <a class="sidebar-item flex items-center px-4 py-2 rounded hover:bg-blue-800 transition-colors duration-200" 
-           href="${pageContext.request.contextPath}/pages/adminPage/validateTicket.jsp">
-          <i class="sidebar-icon fas fa-camera-retro mr-3"></i> Scan QR code
-        </a>
-      </li>
-      <li>
-        <a class="sidebar-item flex items-center px-4 py-2 rounded hover:bg-blue-800 transition-colors duration-200" 
-           href="${pageContext.request.contextPath}/admin/settings">
-          <i class="sidebar-icon fas fa-cog mr-3"></i> Settings
-        </a>
-      </li>
     </ul>
   </nav>
   <!-- Footer -->

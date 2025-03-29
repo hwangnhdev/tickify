@@ -87,7 +87,8 @@
                     <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
                         Log In
                     </button>
-                    <a class="inline-block align-baseline font-bold text-sm text-green-500 hover:text-green-700" href="#">
+                    <a class="inline-block align-baseline font-bold text-sm text-green-500 hover:text-green-700" 
+                       href="<%= request.getContextPath()%>/pages/forgetPasswordPage/forgetPassword.jsp" class="forgetLink">
                         Forgot Password?
                     </a>
                 </div>
