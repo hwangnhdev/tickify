@@ -59,7 +59,7 @@ public class UpdateAccountController extends HttpServlet {
         if (!phone.isEmpty() && !phone.matches("^\\d{7,15}$")) {
             errors.add("Phone number must contain 7 to 15 digits.");
         }
-        if (phone.length() > 15) {
+        if (phone.length() > 12) {
             errors.add("Phone number must not exceed 15 digits.");
         }
 
@@ -75,10 +75,6 @@ public class UpdateAccountController extends HttpServlet {
             }
         }
 
-        // Validate Gender: must be one of: Male, Female, or Other.
-        if (gender.isEmpty() || !(gender.equals("Male") || gender.equals("Female") || gender.equals("Other"))) {
-            errors.add("Gender must be one of: Male, Female, or Other.");
-        }
         return errors;
     }
 
