@@ -29,5 +29,13 @@
                 <span>My events</span>
             </a>
         </li>
+        
+        <li class="mb-4 flex items-center p-2 rounded cursor-pointer 
+                   ${pageContext.request.requestURI.contains('OrganizerEventController') ? 'bg-green-700' : 'hover:bg-green-700'}">
+            <a href="${pageContext.request.contextPath}/pages/adminPage/validateTicket.jsp" 
+               target="_blank" class="flex items-center w-full text-white">
+                <i class="sidebar-icon fas fa-camera-retro mr-3"></i> Scan QR code
+            </a>
+        </li>
     </ul>
 </div>

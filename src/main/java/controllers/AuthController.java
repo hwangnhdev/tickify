@@ -58,6 +58,8 @@ public class AuthController extends HttpServlet {
         String email = (String) session.getAttribute("email");
         String fullName = (String) session.getAttribute("name");
         String password = (String) session.getAttribute("pass");
+        
+        System.out.println(email);
 
         CustomerDAO customerDao = new CustomerDAO();
         CustomerAuthDAO customerAuthDao = new CustomerAuthDAO();
@@ -112,6 +114,8 @@ public class AuthController extends HttpServlet {
     private void handleLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        System.out.println(email);
+        System.out.println(password);
         
         CustomerDAO customerDao = new CustomerDAO();
         CustomerAuthDAO customerAuthDao = new CustomerAuthDAO();
@@ -119,6 +123,7 @@ public class AuthController extends HttpServlet {
         Customer customer = customerDao.selectCustomerByEmail(email);
         
         if (customer == null) {
+            System.out.println("1");
             request.setAttribute("errorMessage", "Invalid email");
             request.getRequestDispatcher("pages/signUpPage/signUp.jsp").forward(request, response);
             return;
@@ -132,18 +137,27 @@ public class AuthController extends HttpServlet {
         }
         
         CustomerAuth customerAuth = customerAuthDao.selectCustomerAuthById(customer.getCustomerId());
+        System.out.println(customerAuth);
+        System.out.println(customerAuth.getPassword());
         
-        if (customer != null && BCrypt.checkpw(password, customerAuth.getPassword())) {
-            HttpSession session = request.getSession();
-            session.setAttribute("customerImage", customer.getProfilePicture());
-            System.out.println(customer.getCustomerId());
-            session.setAttribute("customerId", customer.getCustomerId());
-            session.setAttribute("accountRole", "customer");
-            response.sendRedirect(request.getContextPath());
-        } else {
+        try {
+            if (customer != null && BCrypt.checkpw(password, customerAuth.getPassword())) {
+                HttpSession session = request.getSession();
+                session.setAttribute("customerImage", customer.getProfilePicture());
+                System.out.println(customer.getCustomerId());
+                session.setAttribute("customerId", customer.getCustomerId());
+                session.setAttribute("accountRole", "customer");
+                response.sendRedirect(request.getContextPath());
+            } else {
+                request.setAttribute("errorMessage", "Invalid email or password");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("pages/signUpPage/signUp.jsp");
+                dispatcher.forward(request, response);
+            }
+            
+        } catch (Exception e) {
             request.setAttribute("errorMessage", "Invalid email or password");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("pages/signUpPage/signUp.jsp");
-            dispatcher.forward(request, response);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("pages/signUpPage/signUp.jsp");
+                dispatcher.forward(request, response);
         }
     }
 
