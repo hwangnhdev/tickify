@@ -18,11 +18,12 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
     </head>
-    <body class="bg-gray-100 font-roboto">
-        <div class="flex h-screen">
-            <jsp:include page="sidebar.jsp" />
+    <body class=" font-roboto bg-gray-900 text-white">
+        <jsp:include page="../../components/header.jsp" />
+        <div class="flex h-screen" style="margin-top: 30px;">
+            <jsp:include page="../ticketPage/sidebar.jsp" />
             <div class="flex-1 p-6">
-                <div class="flex flex-col items-center justify-center" style="min-height: 95vh">
+                <div class="flex flex-col items-center justify-center">
                     <h1 class="text-3xl font-bold mb-6">
                         QR Code Scanner
                     </h1>
