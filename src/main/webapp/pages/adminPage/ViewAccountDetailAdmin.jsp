@@ -53,7 +53,7 @@
                 <!-- Card chính -->
                 <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg p-8">
                     <!-- Tiêu đề -->
-                    <h2 class="left text-5xl font-bold text-gray-800 mb-8">
+                    <h2 class="left text-3xl font-bold text-gray-800 mb-8">
                         Account Details
                     </h2>
 
